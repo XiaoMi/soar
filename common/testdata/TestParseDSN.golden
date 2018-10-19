@@ -1,0 +1,15 @@
+&common.dsn{Addr:"", Schema:"", User:"", Password:"", Charset:"", Disable:true, Version:0}
+&common.dsn{Addr:"hostname:3307", Schema:"database", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3307", Schema:"information_schema", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3306", Schema:"database", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"127.0.0.1:3307", Schema:"database", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"127.0.0.1:3306", Schema:"information_schema", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3307", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3307", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3306", Schema:"information_schema", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3306", Schema:"information_schema", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"127.0.0.1:3306", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"hostname:3307", Schema:"information_schema", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"127.0.0.1:3307", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"127.0.0.1:3307", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}
+&common.dsn{Addr:"127.0.0.1:3306", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Version:999}

@@ -1,0 +1,666 @@
+/* Title: Torpedo */
+/* Author: Jocelyn Richard http://jocelynrichard.com/ */
+/* Description: A muted color palette for long-form writing or reading, suited for technical documentation. Works best with Cinta: http://www.myfonts.com/fonts/tipo-pepel/cinta/ */
+
+/* ================================================ */
+/* 1. Reset */
+/* 2. Skeleton */
+/* 3. Media Queries */
+/* 4. Print Styles */
+/* 5. Torpedo Overrides */
+/* ================================================ */
+
+
+
+/* ================================================ */
+/* 1. Reset */
+/* ================================================ */
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {margin: 0; padding: 0; border: 0;} /* Edited from http://www.cssreset.com/scripts/eric-meyer-reset-css/ */
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section, summary {display: block;} /* Semantic tags definition for IE 6/7/8/9 and Firefox 3 */
+
+html {-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;} /* Prevents iOS text size adjust after orientation change, without disabling user zoom */
+
+
+
+/* ================================================ */
+/* 2. Skeleton */
+/* ================================================ */
+
+/* ------------------------------------------------- */
+/* General */
+/* ------------------------------------------------- */
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 1.71rem 1.71rem  3rem 1.71rem ; /* Get margins even if the Markdown rendering app doesn't include any */
+  background-color: white;
+  color: #222;
+}
+
+#wrapper { /* #wrapper: ID added by Marked */
+  max-width: 42rem;
+  margin: 0 auto;
+  margin-left: auto !important;  /* Countering toc.css added by Marked */
+  padding: 1.71rem 0 !important; /* Countering toc.css added by Marked */
+}
+
+/* ------------------------------------------------- */
+/* Typography */
+/* ------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 1.6rem;
+}
+
+h1,
+h2 {
+    margin-top: 3.2rem;
+}
+
+h1 {
+    font-size:   2.82rem; /* 42.3px @15px */
+    line-height: 3.2rem;  /* 48px @15px */
+}
+
+h2 {
+    font-size:   1.99rem; /* 29.9px @15px */
+    line-height: 2.4rem;  /* 36px @15px */
+}
+
+h3 {
+    font-size:   1.41rem; /* 21.2px @15px */
+    line-height: 2rem;    /* 30px @15px */
+}
+
+h4 {
+    font-size:   1rem;   /* 15px @15px */
+    line-height: 1.6rem; /* 24px @15px */
+}
+
+h5, h6 {
+  font-size:   0.8rem;
+    line-height: 1.2rem;
+    text-transform: uppercase;
+}
+
+h6 {
+  margin-left: 1.6rem;
+}
+
+p,
+ol,
+ul,
+blockquote {
+    font-size:     1rem;
+    line-height:   1.6rem;
+    margin-bottom: 1.6rem;
+}
+
+ul ul,
+ul ol,
+ol ul,
+ol ol {
+  margin-left: 1.6rem;
+  margin-top:  1.6rem;
+}
+
+#generated-toc ul ul, /* #generated-toc: added by Marked for its table of contents */
+#generated-toc ul ol,
+#generated-toc ol ul,
+#generated-toc ol ol {
+  margin-top:     0;
+  margin-bottom:  0;
+  padding-top:    0;
+  padding-bottom: 0;
+}
+
+blockquote {
+  margin: 0 0 1.6rem 2.4rem;
+  padding-left: 0.8rem; /* Voire */
+  border-left: 4px solid rgba(0,0,0,0.08);
+  font-style: normal;
+}
+
+blockquote ul {
+  margin-left: 0.8rem; /* Pour ne pas que les hanging bullets mordent sur le blockquote  */
+}
+
+ol li blockquote, /* So that blockquote work in lists */
+ul li blockquote {
+  margin-left: 0;
+}
+
+a:link {
+  text-decoration: none;
+  color: #165bd4;
+  border-bottom: 1px solid #ccc;
+}
+
+a:visited {
+  color: #7697cf;
+  border-bottom: 1px solid #ccc;
+}
+
+a:hover {
+  border-color: #165bd4;
+}
+
+a:active {
+  background-color: #e6e6e6;
+}
+
+/* ------------------------------------------------- */
+/* Tables */
+/* ------------------------------------------------- */
+
+table {
+  font-size: 0.85rem;
+  margin: 0 0 1.6rem 0;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+th,
+td {
+  padding: 0.5rem 0.75rem;
+  max-width: 20rem; /* Avoid dropping lines for nothing without having ridiculously wide tables */
+}
+
+th {
+  border-bottom: 2px solid #222;
+}
+
+tr {
+  border-bottom: 1px solid #ccc;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+table code {
+  font-size: 85%;
+}
+
+/* ------------------------------------------------- */
+/* Misc */
+/* ------------------------------------------------- */
+
+img {
+  max-width: 100%
+}
+
+caption,
+figcaption {
+  font-size:   0.85rem;
+    line-height: 1.6rem;
+  margin: 0 1.6rem;
+  text-align: left;
+}
+
+figcaption {
+  margin-bottom: 1.6rem;
+}
+
+h1, /* White-space mentions in order to force wrapping */
+h2,
+a:link,
+pre {
+  white-space:      pre;      /* CSS 2.0 */
+  white-space:      pre-wrap; /* CSS 2.1 */
+  white-space:      pre-line; /* CSS 3.0 */
+  white-space:     -pre-wrap; /* Opera 4-6 */
+  white-space:   -o-pre-wrap; /* Opera 7 */
+  white-space: -moz-pre-wrap; /* Mozilla */
+  white-space:  -hp-pre-wrap; /* HP Printers */
+  word-wrap: break-word;      /* IE 5+ */
+}
+
+code {
+  font-family: "Menlo", "Courier New", "Courier", monospace;
+  font-size: 85%;
+  color: #666;
+  background-color: rgba(0,0,0,0.08);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+pre {
+  background-color: rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 0.4rem;
+  margin-bottom: 1.6rem;
+}
+
+pre code { /* Counter the code mentions */
+  background-color: transparent;
+  padding: 0;
+}
+
+sup,
+sub,
+a.footnote { /* Keep line-height from being affected by sub, cf https://gist.github.com/unruthless/413930 */
+   font-size: 75%;
+   height: 0;
+   line-height: 1;
+   position: relative;
+}
+
+sup,
+a.footnote {
+    vertical-align:super;
+}
+
+sub {
+    vertical-align: sub;
+}
+
+dt {
+  font-weight: 600;
+}
+
+dd {
+  font-size: 1rem;
+  line-height: 1.6rem;
+  margin-bottom: 1.6rem;
+}
+
+hr {
+  clear: none;
+  height: 0.2rem;
+  border: none;
+  margin: 0 auto 1.4rem auto; /* 2.4rem auto 2.2rem auto; */
+  width: 100%;
+  color: #ccc;
+  background-color: #ccc;
+}
+
+::selection {
+  background-color: #f8dc77;
+}
+
+::-moz-selection {
+  background-color: #f8dc77;
+}
+
+a:focus {
+  outline: 2px solid;
+  outline-color: #165bd4;
+}
+
+/* ------------------------------------------------- */
+/* Animations */
+/* ------------------------------------------------- */
+
+a:hover {
+     -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+     -moz-transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+}
+
+
+
+/* ================================================ */
+/* 3. Media Queries */
+/* ================================================ */
+
+/* Base styles are for smartphones; elements are then tweaked as the viewport grows. */
+
+/* ------------------------------------------------- */
+/* iPad and desktop */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 641px) {
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    margin: 2.4rem 2.4rem 3.2rem 2.4rem;
+  }
+
+  h1 {
+      font-size:   3.57rem; /* 53.2px @15px */
+    line-height: 4rem;    /* 60px @15px */
+  }
+
+  h2 {
+    font-size:   2.24rem; /* 33.6px @15px */
+    line-height: 2.8rem;  /* 42px @15px */
+  }
+
+}
+
+/* ------------------------------------------------- */
+/* Widescreens */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 1441px) {
+
+  html {
+    font-size: 22px;
+  }
+
+}
+
+
+
+/* ================================================ */
+/* 4. Print Styles */
+/* ================================================ */
+
+/* Inconsistent and buggy across browsers */
+
+@media print {
+
+  * {
+    background: transparent !important;
+    color: #000 !important; /* Black text prints faster and browsers are inconsistent in color reproduction anyway: h5bp.com/s */
+  }
+
+  @page {
+    margin: 1cm; /* Added to any #wrapper margin*/
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    margin: 1rem !important; /* Security margins for browser without @page support */
+  }
+
+  #wrapper {
+    max-width: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    orphans: 3;
+    widows: 3;
+    page-break-after: avoid;
+  }
+
+  ul,
+  ol {
+    list-style-position: inside !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol,
+  ul p:not(:first-child),
+  ol p:not(:first-child) {
+    margin-left: 2rem !important;
+  }
+
+  a:link,
+  a:visited {
+    text-decoration: underline !important;
+    font-weight: normal !important;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  a[href^="javascript:"]:after,
+  a[href^="#"]:after {
+    content: ""; /* Do not show javascript and internal links */
+  }
+
+  a[href^="#"] {
+    text-decoration: none !important;
+  }
+
+  th {
+    background-color: rgba(0,0,0,0.2) !important;
+    border-bottom: none !important;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: rgba(0,0,0,0.1) !important;
+  }
+
+  pre {
+    border: 1px solid rgba(0,0,0,0.2);
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* #generated-toc: added by Marked for its table of contents */
+
+  #wrapper #generated-toc ul, /* Table of contents printing in Marked */
+  #wrapper #generated-toc ol {
+    list-style-type: decimal;
+  }
+
+  #wrapper #generated-toc ul li,
+  #wrapper #generated-toc ol li {
+    margin: 1rem 0;
+  }
+
+}
+
+
+
+/* ================================================ */
+/* 5. Torpedo Overrides */
+/* ================================================ */
+
+/* ------------------------------------------------- */
+/* General */
+/* ------------------------------------------------- */
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Cinta', 'Source Sans Pro', Avenir, sans-serif;
+  background-color: #F9F9F9;
+  color: #636463;
+}
+
+#wrapper {
+  max-width: 40rem;
+}
+
+/* ------------------------------------------------- */
+/* Typography */
+/* ------------------------------------------------- */
+
+h1,
+h2 {
+  color: #febf60;
+}
+
+h3 {
+  color: #b46864;
+}
+
+h4,
+h5,
+h6 {
+  font-size: 1rem;
+  color: #b46864;
+  text-transform: none;
+}
+
+h5 {
+  margin-left: 1.6rem;
+}
+
+h6 {
+  margin-left: 3.2rem;
+}
+
+p,
+ol,
+ul,
+dd,
+figcaption {
+  font-weight: 300;
+}
+
+blockquote {
+  border-color: #efefef;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:visited {
+  color: #636463;
+}
+
+a:link {
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: none;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMEAAAAJCAYAAACL+UhFAAAEJGlDQ1BJQ0MgUHJvZmlsZQAAOBGFVd9v21QUPolvUqQWPyBYR4eKxa9VU1u5GxqtxgZJk6XtShal6dgqJOQ6N4mpGwfb6baqT3uBNwb8AUDZAw9IPCENBmJ72fbAtElThyqqSUh76MQPISbtBVXhu3ZiJ1PEXPX6yznfOec7517bRD1fabWaGVWIlquunc8klZOnFpSeTYrSs9RLA9Sr6U4tkcvNEi7BFffO6+EdigjL7ZHu/k72I796i9zRiSJPwG4VHX0Z+AxRzNRrtksUvwf7+Gm3BtzzHPDTNgQCqwKXfZwSeNHHJz1OIT8JjtAq6xWtCLwGPLzYZi+3YV8DGMiT4VVuG7oiZpGzrZJhcs/hL49xtzH/Dy6bdfTsXYNY+5yluWO4D4neK/ZUvok/17X0HPBLsF+vuUlhfwX4j/rSfAJ4H1H0qZJ9dN7nR19frRTeBt4Fe9FwpwtN+2p1MXscGLHR9SXrmMgjONd1ZxKzpBeA71b4tNhj6JGoyFNp4GHgwUp9qplfmnFW5oTdy7NamcwCI49kv6fN5IAHgD+0rbyoBc3SOjczohbyS1drbq6pQdqumllRC/0ymTtej8gpbbuVwpQfyw66dqEZyxZKxtHpJn+tZnpnEdrYBbueF9qQn93S7HQGGHnYP7w6L+YGHNtd1FJitqPAR+hERCNOFi1i1alKO6RQnjKUxL1GNjwlMsiEhcPLYTEiT9ISbN15OY/jx4SMshe9LaJRpTvHr3C/ybFYP1PZAfwfYrPsMBtnE6SwN9ib7AhLwTrBDgUKcm06FSrTfSj187xPdVQWOk5Q8vxAfSiIUc7Z7xr6zY/+hpqwSyv0I0/QMTRb7RMgBxNodTfSPqdraz/sDjzKBrv4zu2+a2t0/HHzjd2Lbcc2sG7GtsL42K+xLfxtUgI7YHqKlqHK8HbCCXgjHT1cAdMlDetv4FnQ2lLasaOl6vmB0CMmwT/IPszSueHQqv6i/qluqF+oF9TfO2qEGTumJH0qfSv9KH0nfS/9TIp0Wboi/SRdlb6RLgU5u++9nyXYe69fYRPdil1o1WufNSdTTsp75BfllPy8/LI8G7AUuV8ek6fkvfDsCfbNDP0dvRh0CrNqTbV7LfEEGDQPJQadBtfGVMWEq3QWWdufk6ZSNsjG2PQjp3ZcnOWWing6noonSInvi0/Ex+IzAreevPhe+CawpgP1/pMTMDo64G0sTCXIM+KdOnFWRfQKdJvQzV1+Bt8OokmrdtY2yhVX2a+qrykJfMq4Ml3VR4cVzTQVz+UoNne4vcKLoyS+gyKO6EHe+75Fdt0Mbe5bRIf/wjvrVmhbqBN97RD1vxrahvBOfOYzoosH9bq94uejSOQGkVM6sN/7HelL4t10t9F4gPdVzydEOx83Gv+uNxo7XyL/FtFl8z9ZAHF4bBsrEwAAAE9JREFUWAnt0wENACEQBLHn/SEGK1jCGAk2pufgmp2x9pmfIxAW+MO/e53AExCBIeQFRJCfAAAR2EBeQAT5CQAQgQ3kBUSQnwAAEdhAXuACbF4CJXG10MIAAAAASUVORK5CYII=);
+  background-repeat: repeat-x;
+  background-position: 0 0.7rem;
+}
+
+a:visited { /* Doesn't work? */
+  background-position: 0 1rem;
+}
+
+a:hover {
+  font-weight: 600;
+  text-decoration: none;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMEAAAAJCAYAAACL+UhFAAAEJGlDQ1BJQ0MgUHJvZmlsZQAAOBGFVd9v21QUPolvUqQWPyBYR4eKxa9VU1u5GxqtxgZJk6XtShal6dgqJOQ6N4mpGwfb6baqT3uBNwb8AUDZAw9IPCENBmJ72fbAtElThyqqSUh76MQPISbtBVXhu3ZiJ1PEXPX6yznfOec7517bRD1fabWaGVWIlquunc8klZOnFpSeTYrSs9RLA9Sr6U4tkcvNEi7BFffO6+EdigjL7ZHu/k72I796i9zRiSJPwG4VHX0Z+AxRzNRrtksUvwf7+Gm3BtzzHPDTNgQCqwKXfZwSeNHHJz1OIT8JjtAq6xWtCLwGPLzYZi+3YV8DGMiT4VVuG7oiZpGzrZJhcs/hL49xtzH/Dy6bdfTsXYNY+5yluWO4D4neK/ZUvok/17X0HPBLsF+vuUlhfwX4j/rSfAJ4H1H0qZJ9dN7nR19frRTeBt4Fe9FwpwtN+2p1MXscGLHR9SXrmMgjONd1ZxKzpBeA71b4tNhj6JGoyFNp4GHgwUp9qplfmnFW5oTdy7NamcwCI49kv6fN5IAHgD+0rbyoBc3SOjczohbyS1drbq6pQdqumllRC/0ymTtej8gpbbuVwpQfyw66dqEZyxZKxtHpJn+tZnpnEdrYBbueF9qQn93S7HQGGHnYP7w6L+YGHNtd1FJitqPAR+hERCNOFi1i1alKO6RQnjKUxL1GNjwlMsiEhcPLYTEiT9ISbN15OY/jx4SMshe9LaJRpTvHr3C/ybFYP1PZAfwfYrPsMBtnE6SwN9ib7AhLwTrBDgUKcm06FSrTfSj187xPdVQWOk5Q8vxAfSiIUc7Z7xr6zY/+hpqwSyv0I0/QMTRb7RMgBxNodTfSPqdraz/sDjzKBrv4zu2+a2t0/HHzjd2Lbcc2sG7GtsL42K+xLfxtUgI7YHqKlqHK8HbCCXgjHT1cAdMlDetv4FnQ2lLasaOl6vmB0CMmwT/IPszSueHQqv6i/qluqF+oF9TfO2qEGTumJH0qfSv9KH0nfS/9TIp0Wboi/SRdlb6RLgU5u++9nyXYe69fYRPdil1o1WufNSdTTsp75BfllPy8/LI8G7AUuV8ek6fkvfDsCfbNDP0dvRh0CrNqTbV7LfEEGDQPJQadBtfGVMWEq3QWWdufk6ZSNsjG2PQjp3ZcnOWWing6noonSInvi0/Ex+IzAreevPhe+CawpgP1/pMTMDo64G0sTCXIM+KdOnFWRfQKdJvQzV1+Bt8OokmrdtY2yhVX2a+qrykJfMq4Ml3VR4cVzTQVz+UoNne4vcKLoyS+gyKO6EHe+75Fdt0Mbe5bRIf/wjvrVmhbqBN97RD1vxrahvBOfOYzoosH9bq94uejSOQGkVM6sN/7HelL4t10t9F4gPdVzydEOx83Gv+uNxo7XyL/FtFl8z9ZAHF4bBsrEwAAAE9JREFUWAnt0wENACEQBLHn/SEGK1jCGAk2pufgmp2x9pmfIxAW+MO/e53AExCBIeQFRJCfAAAR2EBeQAT5CQAQgQ3kBUSQnwAAEdhAXuACbF4CJXG10MIAAAAASUVORK5CYII=);
+  background-repeat: repeat;
+  background-position-y: 0 0;
+}
+
+/* ------------------------------------------------- */
+/* Tables */
+/* ------------------------------------------------- */
+
+table {
+  font-weight: 300;
+}
+
+table,
+th,
+tr {
+  border: none;
+}
+
+th {
+  border-bottom: 1px solid #da9e1a;
+  background-color: #ffd18c;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #efefef;
+}
+
+/* ------------------------------------------------- */
+/* Misc */
+/* ------------------------------------------------- */
+
+code {
+  color: #5597e7;
+  padding: 0; /* PLus besoin car plus de risque de collision avec l'arrière-plan coloré */
+  background-color: transparent;
+}
+
+pre {
+  background-color: transparent;
+}
+
+hr {
+  clear: none;
+  height: 1rem;
+  width: 14rem;
+  margin: 2.5rem auto;
+  border: none;
+  color: none;
+  background-color: transparent;
+  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjEyNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxMjYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiPgogICAgPHRpdGxlPmhyPC90aXRsZT4KICAgIDxkZXNjcmlwdGlvbj5DcmVhdGVkIHdpdGggU2tldGNoIChodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gpPC9kZXNjcmlwdGlvbj4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHNrZXRjaDp0eXBlPSJNU1BhZ2UiPgogICAgICAgIDxwYXRoIGQ9Ik0xMywzIEwzLDEzIiBpZD0iTGluZSIgc3Ryb2tlPSIjRDRERUVCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICA8cGF0aCBkPSJNMTMsMyBMMjMuMDQ5ODc1MywxMy4wNDk4NzUzIiBpZD0iTGluZSIgc3Ryb2tlPSIjRDRERUVCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICA8cGF0aCBkPSJNMzMsMyBMMjMsMTMiIGlkPSJMaW5lIiBzdHJva2U9IiNENERFRUIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPgogICAgICAgIDxwYXRoIGQ9Ik0zMywzIEw0My4wNDk4NzUzLDEzLjA0OTg3NTMiIGlkPSJMaW5lIiBzdHJva2U9IiNENERFRUIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPgogICAgICAgIDxwYXRoIGQ9Ik01MywzIEw0MywxMyIgaWQ9IkxpbmUiIHN0cm9rZT0iI0Q0REVFQiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIj48L3BhdGg+CiAgICAgICAgPHBhdGggZD0iTTUzLDMgTDYzLjA0OTg3NTMsMTMuMDQ5ODc1MyIgaWQ9IkxpbmUiIHN0cm9rZT0iI0Q0REVFQiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIj48L3BhdGg+CiAgICAgICAgPHBhdGggZD0iTTczLDMgTDYzLDEzIiBpZD0iTGluZSIgc3Ryb2tlPSIjRDRERUVCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICA8cGF0aCBkPSJNNzMsMyBMODMuMDQ5ODc1MywxMy4wNDk4NzUzIiBpZD0iTGluZSIgc3Ryb2tlPSIjRDRERUVCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICA8cGF0aCBkPSJNOTMsMyBMODMsMTMiIGlkPSJMaW5lIiBzdHJva2U9IiNENERFRUIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPgogICAgICAgIDxwYXRoIGQ9Ik05MywzIEwxMDMuMDQ5ODc1LDEzLjA0OTg3NTMiIGlkPSJMaW5lIiBzdHJva2U9IiNENERFRUIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPgogICAgICAgIDxwYXRoIGQ9Ik0xMTMsMyBMMTAzLDEzIiBpZD0iTGluZSIgc3Ryb2tlPSIjRDRERUVCIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiPjwvcGF0aD4KICAgICAgICA8cGF0aCBkPSJNMTEzLDMgTDEyMy4wNDk4NzUsMTMuMDQ5ODc1MyIgaWQ9IkxpbmUiIHN0cm9rZT0iI0Q0REVFQiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIj48L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPg==);
+  background-repeat: no-repeat;
+  background-position-x: 50%;
+}
+
+::selection {
+  background-color: #D4DEEB;
+  color: #b46864;
+  }
+
+::-moz-selection {
+  background-color: #D4DEEB;
+  color: #b46864;
+}
+
+/* #generated-toc: added by Marked for its table of contents */
+
+#generated-toc ul li a {
+  font-weight: normal;
+}
+
+/* ------------------------------------------------- */
+/* iPad and desktop */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 641px) {
+
+  html {
+    font-size: 17px;
+  }
+
+}
+
+/* ------------------------------------------------- */
+/* Widescreens */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 1441px) {
+
+  html {
+    font-size: 22px;
+  }
+
+}

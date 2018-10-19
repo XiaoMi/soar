@@ -1,0 +1,115 @@
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的address表添加索引", Content:"为列address添加索引,散粒度为: 100.00%; 为列district添加索引,散粒度为: 100.00%; ", Case:"ALTER TABLE `sakila`.`address` add index `idx_address` (`address`), add index `idx_district` (`district`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列release_year添加索引,散粒度为: 0.10%; 为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_release_year` (`release_year`), add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; 为列release_year添加索引,散粒度为: 0.10%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`), add index `idx_release_year` (`release_year`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的country表添加索引", Content:"为列last_update添加索引,散粒度为: 0.92%; ", Case:"ALTER TABLE `sakila`.`country` add index `idx_last_update` (`last_update`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的city表添加索引", Content:"为列last_update添加索引,散粒度为: 0.17%; ", Case:"ALTER TABLE `sakila`.`city` add index `idx_last_update` (`last_update`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的country表添加索引", Content:"为列last_update添加索引,散粒度为: 0.92%; ", Case:"ALTER TABLE `sakila`.`country` add index `idx_last_update` (`last_update`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+    "IDX.002": {Item:"", Severity:"L2", Summary:"为sakila库的city表添加索引", Content:"为列last_update添加索引,散粒度为: 0.17%; ", Case:"ALTER TABLE `sakila`.`city` add index `idx_last_update` (`last_update`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的country表添加索引", Content:"为列country添加索引,散粒度为: 100.00%; ", Case:"ALTER TABLE `sakila`.`country` add index `idx_country` (`country`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列length添加索引,散粒度为: 14.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_length` (`length`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的actor表添加索引", Content:"为列last_update添加索引,散粒度为: 0.50%; 为列first_name添加索引,散粒度为: 64.00%; ", Case:"ALTER TABLE `sakila`.`actor` add index `idx_last_update` (`last_update`), add index `idx_first_name` (`first_name`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的city表添加索引", Content:"为列city添加索引,散粒度为: 99.83%; ", Case:"ALTER TABLE `sakila`.`city` add index `idx_city` (`city`) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}
+map[string]advisor.Rule{
+    "IDX.001": {Item:"", Severity:"L2", Summary:"为sakila库的film表添加索引", Content:"为列description添加索引,散粒度为: 100.00%; ", Case:"ALTER TABLE `sakila`.`film` add index `idx_description` (`description`(255)) ;\n", Position:0, Func:func(*advisor.Query4Audit) advisor.Rule {...}},
+}

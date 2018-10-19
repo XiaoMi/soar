@@ -1,0 +1,83 @@
+
+# 13.7s user time, 20ms system time, 27.95M rss, 181.32M vsz
+# Current date: Thu May 17 15:24:49 2018
+# Hostname: 127.0.0.1
+# Files: slow.log
+# Overall: 75.28k total, 21 unique, 1.36 QPS, 0.22x concurrency __________
+# Time range: 2018-05-17 00:01:47 to 15:24:47
+# Attribute          total     min     max     avg     95%  stddev  median
+# ============     ======= ======= ======= ======= ======= ======= =======
+# Exec time         12368s    20ms      6s   164ms   501ms   208ms    95ms
+# Lock time             2s       0   311us    30us    38us     5us    27us
+# Rows sent         21.79M       0  28.49k  303.58   49.17   2.44k    0.99
+# Rows examine     103.77M       0  31.41k   1.41k   4.49k   2.96k  621.67
+# Query size         8.58M      17   7.78k  119.54  143.84   32.94  112.70
+
+# Profile
+# Rank Query ID           Response time    Calls R/Call V/M   Item
+# ==== ================== ================ ===== ====== ===== ============
+#    1 0x6F837C9DA962A07D 11374.6099 92.0% 67535 0.1684  0.27 SELECT test.table_?
+#    2 0x0B991403AD4E8932   803.2640  6.5%  5993 0.1340  0.24 SELECT test.table_?
+# MISC 0xMISC               190.1791  1.5%  1751 0.1086   0.0 <19 ITEMS>
+
+# Query 1: 1.22 QPS, 0.21x concurrency, ID 0x6F837C9DA962A07D at byte 6821409
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.27
+# Time range: 2018-05-17 00:01:47 to 15:24:47
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         89   67535
+# Exec time     91  11375s    20ms      6s   168ms   501ms   212ms   100ms
+# Lock time     88      2s    20us   221us    29us    38us     5us    27us
+# Rows sent      0  65.95k       1       1       1       1       0       1
+# Rows examine  72  75.13M       0  31.41k   1.14k   3.52k   1.89k  592.07
+# Query size    88   7.61M     114     119  118.23  118.34    2.50  112.70
+# String:
+# Databases    test... (50646/74%)... 2 more
+# Hosts        127.0.0.1 (13617/20%)... 4 more
+# Users        test_r
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms  ############################################################
+# 100ms  ################################################################
+#    1s  #
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `test` LIKE 'table_78'\G
+#    SHOW CREATE TABLE `test`.`table_78`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT COUNT(*) AS `count` FROM test.table_78 WHERE `id` = 824076488 AND `last_modify` > 1526044213 AND `type` = 6\G
+
+# Query 2: 0.11 QPS, 0.01x concurrency, ID 0x0B991403AD4E8932 at byte 1691609
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.24
+# Time range: 2018-05-17 00:01:54 to 15:24:43
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          7    5993
+# Exec time      6    803s    20ms      1s   134ms   552ms   181ms    56ms
+# Lock time      9   206ms    26us   179us    34us    44us     5us    31us
+# Rows sent      1 290.64k       7      50   49.66   49.17    2.98   49.17
+# Rows examine   6   7.13M       7   5.79k   1.22k   4.27k   1.40k  563.87
+# Query size     9 850.97k     142     154  145.40  143.84    1.98  143.84
+# String:
+# Databases    test... (4280/71%)... 2 more
+# Hosts        127.0.0.1 (1246/20%), 127.0.0.2 (1229/20%)... 3 more
+# Users        test_r
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms  ################################################################
+# 100ms  ####################################
+#    1s  #
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `test` LIKE 'table_83'\G
+#    SHOW CREATE TABLE `test`.`table_83`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM test.table_83 WHERE `id` = 68211602 AND `last_modify` < 1526495341 AND `type` in ('6') order by `last_modify` desc  LIMIT 0,50\G

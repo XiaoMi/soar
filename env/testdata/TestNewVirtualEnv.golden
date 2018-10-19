@@ -1,0 +1,42 @@
+create table t(id int,c1 varchar(20),PRIMARY KEY (id)); OK
+alter table t add index `idx_c1`(c1); OK
+alter table t add index `idx_c1`(c1); OK
+select * from city where country_id = 44; OK
+select * from address where address2 is not null; OK
+select * from address where address2 is null; OK
+select * from address where address2 >= 44; OK
+select * from city where country_id between 44 and 107; OK
+select * from city where city like 'Ad%'; OK
+select * from city where city = 'Aden' and country_id = 107; OK
+select * from city where country_id > 31 and city = 'Aden'; OK
+select * from address where address_id > 8 and city_id < 400 and district = 'Nantou'; OK
+select * from address where address_id > 8 and city_id < 400; OK
+select * from actor where last_update='2006-02-15 04:34:33' and last_name='CHASE' group by first_name; OK
+select * from address where last_update >='2014-09-25 22:33:47' group by district; OK
+select * from address group by address,district; OK
+select * from address where last_update='2014-09-25 22:30:27' group by district,(address_id+city_id); OK
+select * from customer where active=1 order by last_name limit 10; OK
+select * from customer order by last_name limit 10; OK
+select * from customer where address_id > 224 order by address_id limit 10; OK
+select * from customer where address_id < 224 order by address_id limit 10; OK
+select * from customer where active=1 order by last_name; OK
+select * from customer where address_id > 224 order by address_id; OK
+select * from customer where address_id in (224,510) order by last_name; OK
+select city from city where country_id = 44; OK
+select city,city_id from city where country_id = 44 and last_update='2006-02-15 04:45:25'; OK
+select city from city where country_id > 44 and last_update > '2006-02-15 04:45:25'; OK
+select * from city where country_id=1 and city='Kabul' order by last_update; OK
+select * from city where country_id>1 and city='Kabul' order by last_update; OK
+select * from city where city_id>251 order by last_update;  OK
+select * from city i inner join country o on i.country_id=o.country_id; OK
+select * from city i left join country o on i.city_id=o.country_id; OK
+select * from city i right join country o on i.city_id=o.country_id; OK
+select * from city i left join country o on i.city_id=o.country_id where o.country_id is null; OK
+select * from city i right join country o on i.city_id=o.country_id where i.city_id is null; OK
+select * from city i left join country o on i.city_id=o.country_id union select * from city i right join country o on i.city_id=o.country_id; OK
+select * from city i left join country o on i.city_id=o.country_id where o.country_id is null union select * from city i right join country o on i.city_id=o.country_id where i.city_id is null; OK
+select first_name,last_name,email from customer natural left join address; OK
+select first_name,last_name,email from customer natural left join address; OK
+select first_name,last_name,email from customer natural right join address; OK
+select first_name,last_name,email from customer STRAIGHT_JOIN address on customer.address_id=address.address_id; OK
+select ID,name from (select address from customer_list where SID=1 order by phone limit 50,10) a join customer_list l on (a.address=l.address) join city c on (c.city=l.city) order by phone desc; OK

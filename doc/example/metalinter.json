@@ -1,0 +1,23 @@
+{
+    "Vendor": true,
+    "DisableAll": true,
+    "Enable": [
+        "gofmt",
+        "goimports",
+        "interfacer",
+        "misspell",
+        "unconvert",
+        "gosimple",
+        "golint",
+        "structcheck",
+        "deadcode",
+        "ineffassign",
+        "varcheck",
+        "gas",
+        "vet"
+    ],
+    "Exclude": [
+        "MagicWordSZjYPIDgod1M8XqYEwhsdlzv2SyAtjy8"
+    ],
+    "Deadline": "5m"
+}

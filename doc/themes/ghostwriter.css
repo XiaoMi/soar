@@ -1,0 +1,413 @@
+/* ============================================================ */
+/* Base */
+/* ============================================================ */
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #fefefe;
+  color: #424242;
+  font-family: "Open Sans", arial, sans-serif;
+  font-size: 18px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 33px;
+  text-transform: none;
+}
+
+h1 {
+  font-size: 26px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+h4 {
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+
+h5 {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+h6 {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+p {
+  line-height: 1.8;
+  margin: 0 0 30px;
+}
+
+a {
+  color: #f03838;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style-position: inside;
+  line-height: 1.8;
+  margin: 0 0 40px;
+  padding: 0;
+}
+ul li, ol li {
+  margin: 0 0 10px;
+}
+
+blockquote {
+  border-left: 1px dotted #303030;
+  margin: 40px 0;
+  padding: 5px 30px;
+}
+blockquote p {
+  color: #AEADAD;
+  display: block;
+  font-style: italic;
+  margin: 0;
+  width: 100%;
+}
+
+img {
+  display: block;
+  margin: 40px 0;
+  width: auto;
+  max-width: 100%;
+}
+
+pre {
+  background: #F1F0EA;
+  border: 1px solid #DDDBCC;
+  border-radius: 3px;
+  margin: 0 0 40px;
+  padding: 15px 20px;
+}
+
+::selection {
+  background: #FFF5B8;
+  color: #000;
+  display: block;
+}
+
+::-moz-selection {
+  background: #FFF5B8;
+  color: #000;
+  display: block;
+}
+
+/* ============================================================ */
+/* General Appearance */
+/* ============================================================ */
+.container {
+  margin: 0 auto;
+  position: relative;
+  width: 100%;
+  max-width: 889px;
+}
+
+#wrapper {
+  height: auto;
+  min-height: 100%;
+  /* This must be the same as the height of the footer */
+  margin-bottom: -265px;
+}
+#wrapper:after {
+  content: "";
+  display: block;
+  /* This must be the same as the height of the footer */
+  height: 265px;
+}
+
+.button {
+  background: #303030;
+  border: none;
+  border-radius: 3px;
+  color: #FEFEFE;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 12px;
+  text-transform: uppercase;
+}
+.button:hover {
+  background: #f03838;
+}
+
+.button-square {
+  background: #f03838;
+  float: left;
+  margin: 0 0 0 10px;
+  padding: 8px;
+}
+.button-square:hover {
+  background: #303030;
+}
+
+/* ============================================================ */
+/* Site Header */
+/* ============================================================ */
+.site-header {
+  padding: 100px 0 35px;
+  overflow: auto;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.site-title-wrapper {
+  display: table;
+  margin: 0 auto;
+}
+
+.site-title {
+  float: left;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+}
+.site-title a {
+  float: left;
+  background: #f03838;
+  color: #FEFEFE;
+  padding: 5px 10px 6px;
+}
+.site-title a:hover {
+  background: #303030;
+}
+
+/* ============================================================ */
+/* Post */
+/* ============================================================ */
+.post {
+  margin: 0 40px;
+}
+
+.post-header {
+  border-bottom: 6px solid #303030;
+  margin: 0 0 50px;
+  padding: 0 0 80px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.post-title {
+  font-size: 52px;
+  font-weight: 700;
+  margin: 15px 0;
+  text-transform: uppercase;
+}
+
+.post-date {
+  color: #AEADAD;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 25px 0 0;
+}
+.post-date:after {
+  border-bottom: 1px dotted #303030;
+  content: "";
+  display: block;
+  margin: 40px auto 0;
+  width: 100px;
+}
+
+.post-content {
+  margin: 0 0 92px;
+}
+.post-content a:hover {
+  border-bottom: 1px dotted #f03838;
+  padding: 0 0 2px;
+}
+
+.post-tags {
+  color: #AEADAD;
+  font-size: 14px;
+}
+.post-tags span {
+  font-weight: 600;
+}
+
+.post-navigation {
+  display: table;
+  margin: 70px auto 100px;
+}
+
+.newer-posts,
+.older-posts {
+  float: left;
+  background: #f03838;
+  color: #FEFEFE;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 5px;
+  padding: 5px 10px 6px;
+  text-transform: uppercase;
+}
+.newer-posts:hover,
+.older-posts:hover {
+  background: #303030;
+}
+
+.page-number {
+  display: none;
+}
+
+/* ============================================================ */
+/* Post Index */
+/* ============================================================ */
+.post-list {
+  border-top: 6px solid #303030;
+  list-style: none;
+  margin: 80px 40px 0;
+  padding: 35px 0 0;
+}
+
+.post-stub {
+  border-bottom: 1px dotted #303030;
+  margin: 0;
+}
+.post-stub:first-child {
+  padding-top: 0;
+}
+.post-stub a {
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  display: block;
+  color: #424242;
+  padding: 20px 5px;
+}
+.post-stub a:hover {
+  background: #FCF5F5;
+  color: #f03838;
+  padding: 20px 12px;
+}
+
+.post-stub-title {
+  display: inline-block;
+  margin: 0;
+  text-transform: none;
+}
+
+.post-stub-date {
+  display: inline-block;
+}
+.post-stub-date:before {
+  content: "/ ";
+}
+
+.next-posts-link a,
+.previous-posts-link a {
+  display: block;
+  padding: 8px 11px;
+}
+
+/* ============================================================ */
+/* Icons */
+/* ============================================================ */
+.icon {
+  background-size: 14px 38px;
+  display: block;
+  height: 38px;
+  width: 14px;
+}
+
+.icon-menu {
+  background-position: 0 0;
+  height: 14px;
+  width: 14px;
+}
+
+.icon-up {
+  background-position: 0 -15px;
+  height: 8px;
+  width: 14px;
+}
+
+.icon-rss {
+  background-position: 0 -24px;
+  height: 14px;
+  width: 14px;
+}
+
+/* ============================================================ */
+/* Footer */
+/* ============================================================ */
+.footer {
+  background: #303030;
+  color: #D3D3D3;
+  height: 265px;
+  overflow: auto;
+}
+.footer .site-title-wrapper {
+  margin: 80px auto 35px;
+}
+.footer .site-title a:hover,
+.footer .button-square:hover {
+  background: #121212;
+}
+
+.button-jump-top {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.footer-copyright {
+  color: #656565;
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+.footer-copyright a {
+  color: #656565;
+  font-weight: 700;
+}
+.footer-copyright a:hover {
+  color: #FEFEFE;
+}
+
+/* ============================================================ */
+/* NProgress */
+/* ============================================================ */
+#nprogress .bar {
+  background: #f03838;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #f03838, 0 0 5px #f03838;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #f03838;
+  border-left-color: #f03838;
+}
+
+/* ============================================================ */
+/* Media Queries */
+/* ============================================================ */
+@media only screen and (max-width: 600px) {
+  .post-stub-title {
+    display: block;
+  }
+
+  .post-stub-date:before {
+    content: "";
+    display: block;
+  }
+}
+@media only screen and (max-width: 400px) {
+  .post-title {
+    font-size: 32px;
+  }
+}

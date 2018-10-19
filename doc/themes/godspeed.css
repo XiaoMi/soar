@@ -1,0 +1,626 @@
+/* Title: Godspeed */
+/* Author: Jocelyn Richard http://jocelynrichard.com/ */
+/* Description: A quirky, low-contrast theme. Works best with Brush Up: http://www.myfonts.com/fonts/pintassilgo/brush-up/ */
+
+/* ================================================ */
+/* 1. Reset */
+/* 2. Skeleton */
+/* 3. Media Queries */
+/* 4. Print Styles */
+/* 5. Godspeed Overrides */
+/* ================================================ */
+
+
+
+/* ================================================ */
+/* 1. Reset */
+/* ================================================ */
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {margin: 0; padding: 0; border: 0;} /* Edited from http://www.cssreset.com/scripts/eric-meyer-reset-css/ */
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section, summary {display: block;} /* Semantic tags definition for IE 6/7/8/9 and Firefox 3 */
+
+html {-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;} /* Prevents iOS text size adjust after orientation change, without disabling user zoom */
+
+
+
+/* ================================================ */
+/* 2. Skeleton */
+/* ================================================ */
+
+/* ------------------------------------------------- */
+/* General */
+/* ------------------------------------------------- */
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 1.71rem 1.71rem  3rem 1.71rem ; /* Get margins even if the Markdown rendering app doesn't include any */
+  background-color: white;
+  color: #222;
+}
+
+#wrapper { /* #wrapper: ID added by Marked */
+  max-width: 42rem;
+  margin: 0 auto;
+  margin-left: auto !important;  /* Countering toc.css added by Marked */
+  padding: 1.71rem 0 !important; /* Countering toc.css added by Marked */
+}
+
+/* ------------------------------------------------- */
+/* Typography */
+/* ------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 1.6rem;
+}
+
+h1,
+h2 {
+    margin-top: 3.2rem;
+}
+
+h1 {
+    font-size:   2.82rem; /* 42.3px @15px */
+    line-height: 3.2rem;  /* 48px @15px */
+}
+
+h2 {
+    font-size:   1.99rem; /* 29.9px @15px */
+    line-height: 2.4rem;  /* 36px @15px */
+}
+
+h3 {
+    font-size:   1.41rem; /* 21.2px @15px */
+    line-height: 2rem;    /* 30px @15px */
+}
+
+h4 {
+    font-size:   1rem;   /* 15px @15px */
+    line-height: 1.6rem; /* 24px @15px */
+}
+
+h5, h6 {
+  font-size:   0.8rem;
+    line-height: 1.2rem;
+    text-transform: uppercase;
+}
+
+h6 {
+  margin-left: 1.6rem;
+}
+
+p,
+ol,
+ul,
+blockquote {
+    font-size:     1rem;
+    line-height:   1.6rem;
+    margin-bottom: 1.6rem;
+}
+
+ul ul,
+ul ol,
+ol ul,
+ol ol {
+  margin-left: 1.6rem;
+  margin-top:  1.6rem;
+}
+
+#generated-toc ul ul, /* #generated-toc: added by Marked for its table of contents */
+#generated-toc ul ol,
+#generated-toc ol ul,
+#generated-toc ol ol {
+  margin-top:     0;
+  margin-bottom:  0;
+  padding-top:    0;
+  padding-bottom: 0;
+}
+
+blockquote {
+  margin: 0 0 1.6rem 2.4rem;
+  padding-left: 0.8rem; /* Voire */
+  border-left: 4px solid rgba(0,0,0,0.08);
+  font-style: normal;
+}
+
+blockquote ul {
+  margin-left: 0.8rem; /* Pour ne pas que les hanging bullets mordent sur le blockquote  */
+}
+
+ol li blockquote, /* So that blockquote work in lists */
+ul li blockquote {
+  margin-left: 0;
+}
+
+a:link {
+  text-decoration: none;
+  color: #165bd4;
+  border-bottom: 1px solid #ccc;
+}
+
+a:visited {
+  color: #7697cf;
+  border-bottom: 1px solid #ccc;
+}
+
+a:hover {
+  border-color: #165bd4;
+}
+
+a:active {
+  background-color: #e6e6e6;
+}
+
+/* ------------------------------------------------- */
+/* Tables */
+/* ------------------------------------------------- */
+
+table {
+  font-size: 0.85rem;
+  margin: 0 0 1.6rem 0;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+th,
+td {
+  padding: 0.5rem 0.75rem;
+  max-width: 20rem; /* Avoid dropping lines for nothing without having ridiculously wide tables */
+}
+
+th {
+  border-bottom: 2px solid #222;
+}
+
+tr {
+  border-bottom: 1px solid #ccc;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+table code {
+  font-size: 85%;
+}
+
+/* ------------------------------------------------- */
+/* Misc */
+/* ------------------------------------------------- */
+
+img {
+  max-width: 100%
+}
+
+caption,
+figcaption {
+  font-size:   0.85rem;
+    line-height: 1.6rem;
+  margin: 0 1.6rem;
+  text-align: left;
+}
+
+figcaption {
+  margin-bottom: 1.6rem;
+}
+
+h1, /* White-space mentions in order to force wrapping */
+h2,
+a:link {
+  white-space:      pre;      /* CSS 2.0 */
+  white-space:      pre-wrap; /* CSS 2.1 */
+  white-space:      pre-line; /* CSS 3.0 */
+  white-space:     -pre-wrap; /* Opera 4-6 */
+  white-space:   -o-pre-wrap; /* Opera 7 */
+  white-space: -moz-pre-wrap; /* Mozilla */
+  white-space:  -hp-pre-wrap; /* HP Printers */
+  word-wrap: break-word;      /* IE 5+ */
+}
+
+code {
+  font-family: "Menlo", "Courier New", "Courier", monospace;
+  font-size: 85%;
+  color: #666;
+  background-color: rgba(0,0,0,0.08);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+pre {
+  background-color: rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 0.4rem;
+  margin-bottom: 1.6rem;
+}
+
+pre code { /* Counter the code mentions */
+  background-color: transparent;
+  padding: 0;
+}
+
+sup,
+sub,
+a.footnote { /* Keep line-height from being affected by sub, cf https://gist.github.com/unruthless/413930 */
+   font-size: 75%;
+   height: 0;
+   line-height: 1;
+   position: relative;
+}
+
+sup,
+a.footnote {
+    vertical-align:super;
+}
+
+sub {
+    vertical-align: sub;
+}
+
+dt {
+  font-weight: 600;
+}
+
+dd {
+  font-size: 1rem;
+  line-height: 1.6rem;
+  margin-bottom: 1.6rem;
+}
+
+hr {
+  clear: none;
+  height: 0.2rem;
+  border: none;
+  margin: 0 auto 1.4rem auto; /* 2.4rem auto 2.2rem auto; */
+  width: 100%;
+  color: #ccc;
+  background-color: #ccc;
+}
+
+::selection {
+  background-color: #f8dc77;
+}
+
+::-moz-selection {
+  background-color: #f8dc77;
+}
+
+a:focus {
+  outline: 2px solid;
+  outline-color: #165bd4;
+}
+
+/* ------------------------------------------------- */
+/* Animations */
+/* ------------------------------------------------- */
+
+a:hover {
+     -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+     -moz-transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+}
+
+
+
+/* ================================================ */
+/* 3. Media Queries */
+/* ================================================ */
+
+/* Base styles are for smartphones; elements are then tweaked as the viewport grows. */
+
+/* ------------------------------------------------- */
+/* iPad and desktop */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 641px) {
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    margin: 2.4rem 2.4rem 3.2rem 2.4rem;
+  }
+
+  h1 {
+      font-size:   3.57rem; /* 53.2px @15px */
+    line-height: 4rem;    /* 60px @15px */
+  }
+
+  h2 {
+    font-size:   2.24rem; /* 33.6px @15px */
+    line-height: 2.8rem;  /* 42px @15px */
+  }
+
+}
+
+/* ------------------------------------------------- */
+/* Widescreens */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 1441px) {
+
+  html {
+    font-size: 22px;
+  }
+
+}
+
+
+
+/* ================================================ */
+/* 4. Print Styles */
+/* ================================================ */
+
+/* Inconsistent and buggy across browsers */
+
+@media print {
+
+  * {
+    background: transparent !important;
+    color: #000 !important; /* Black text prints faster and browsers are inconsistent in color reproduction anyway: h5bp.com/s */
+  }
+
+  @page {
+    margin: 1cm; /* Added to any #wrapper margin*/
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    margin: 1rem !important; /* Security margins for browser without @page support */
+  }
+
+  #wrapper {
+    max-width: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    orphans: 3;
+    widows: 3;
+    page-break-after: avoid;
+  }
+
+  ul,
+  ol {
+    list-style-position: inside !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol,
+  ul p:not(:first-child),
+  ol p:not(:first-child) {
+    margin-left: 2rem !important;
+  }
+
+  a:link,
+  a:visited {
+    text-decoration: underline !important;
+    font-weight: normal !important;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  a[href^="javascript:"]:after,
+  a[href^="#"]:after {
+    content: ""; /* Do not show javascript and internal links */
+  }
+
+  a[href^="#"] {
+    text-decoration: none !important;
+  }
+
+  th {
+    background-color: rgba(0,0,0,0.2) !important;
+    border-bottom: none !important;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: rgba(0,0,0,0.1) !important;
+  }
+
+  pre {
+    border: 1px solid rgba(0,0,0,0.2);
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* #generated-toc: added by Marked for its table of contents */
+
+  #wrapper #generated-toc ul, /* Table of contents printing in Marked */
+  #wrapper #generated-toc ol {
+    list-style-type: decimal;
+  }
+
+  #wrapper #generated-toc ul li,
+  #wrapper #generated-toc ol li {
+    margin: 1rem 0;
+  }
+
+}
+
+
+
+/* ================================================ */
+/* 5. Godspeed Overrides */
+/* ================================================ */
+
+/* ------------------------------------------------- */
+/* General */
+/* ------------------------------------------------- */
+
+body {
+  font-family: 'Source Sans Pro', Avenir, sans-serif;
+  background-color: #3c3d46;
+  color: #7d7d7a;
+  margin-bottom: 2.4rem; /* Visual tweak */
+}
+
+/* ------------------------------------------------- */
+/* Typography */
+/* ------------------------------------------------- */
+
+h1 {
+  font-family: 'Brush Up Too', 'Source Sans Pro', Avenir, sans-serif;
+  color: #e6ceaa;
+}
+
+h2,
+h3 {
+  color: #b98552;
+  text-transform: uppercase;
+}
+
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+}
+
+blockquote {
+  border-color: rgba(0,0,0,0.1); /* Pour correspondre à l'opacité des bordures ajoutées au #wrapper */
+}
+
+a:link {
+  color: #6190d2;
+  text-decoration: none;
+  border-bottom: 2px solid rgba(0,0,0,0.2);
+}
+
+a:hover {
+  color: #6190d2;
+  text-decoration: none;
+  border-bottom: 1px solid #6190d2;
+}
+
+/* ------------------------------------------------- */
+/* Tables */
+/* ------------------------------------------------- */
+
+table {
+  border: 1px solid #7d7d7a;
+  border-radius: 8px;
+}
+
+th {
+  color: #b98552;
+  border-bottom: 1px solid #7d7d7a;
+}
+
+tr {
+  border-bottom: 1px solid #7d7d7a;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: rgba(60,75,94,0.5);
+}
+
+/* ------------------------------------------------- */
+/* Misc */
+/* ------------------------------------------------- */
+
+code {
+  font-size: 75%; /* Matching better Source Sans  */
+  color: #3c3d46;
+  background-color: #7d7d7a;
+}
+
+pre {
+  background-color: rgba(60,75,94,0.5);
+}
+
+pre code {
+  color: #7d7d7a;
+}
+
+hr {
+  color: rgba(0,0,0,0.2);
+  background-color: rgba(0,0,0,0.2);
+}
+
+::selection {
+  background-color: rgba(0,0,0,0.2);
+}
+
+::-moz-selection {
+  background-color: rgba(0,0,0,0.2);
+}
+
+a:focus {
+  outline: 2px dotted;
+  outline-color: #7d7d7a;
+}
+
+/* ------------------------------------------------- */
+/* iPad and desktop */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 641px) {
+
+  html {
+    font-size: 16px;
+  }
+
+  #wrapper {
+    padding: 0 2.4rem;
+    border: 1px solid rgba(0,0,0,0.2) !important; /* !important otherwise doesn't show up in Marked */
+    box-shadow: 0 0 0 6px rgba(0,0,0,0.1);
+    padding: 2.4rem !important;
+    border-radius: 4px;
+  }
+
+}
+
+/* ------------------------------------------------- */
+/* Widescreens */
+/* ------------------------------------------------- */
+
+@media only screen and (min-width: 1441px) {
+
+  html {
+    font-size: 22px;
+  }
+
+}

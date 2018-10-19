@@ -1,0 +1,20 @@
+# 这是一个配置文件例子
+online-dsn:
+    addr:     127.0.0.1:3306
+    schema:   sakila
+    user:     root
+    password: "1tIsB1g3rt"
+    disable:  false
+
+test-dsn:
+    addr:     127.0.0.1:3306
+    schema:   sakila
+    user:     root
+    password: "1tIsB1g3rt"
+    disable:  false
+
+allow-online-as-test: true
+
+log-level:  7
+log-output: soar.log
+sampling: true

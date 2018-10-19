@@ -1,0 +1,1470 @@
+select sourcetable, if(f.lastcontent = ?, f.lastupdate, f.lastcontent) as lastactivity, f.totalcount as activity, type.class as type, (f.nodeoptions & ?) as nounsubscribe from node as f inner join contenttype as type on type.contenttypeid = f.contenttypeid inner join subscribed as sd on sd.did = f.nodeid and sd.userid = ? union all select f.name as title, f.userid as keyval, ? as sourcetable, ifnull(f.lastpost, f.joindate) as lastactivity, f.posts as activity, ? as type, ? as nounsubscribe from user as f inner join userlist as ul on ul.relationid = f.userid and ul.userid = ? where ul.type = ? and ul.aq = ? order by title limit ?
+
+SELECT  
+  sourcetable, IF( f. lastcontent  = ?, f. lastupdate, f. lastcontent) as  lastactivity, f. totalcount  as  activity, type. class  as  type, (f. nodeoptions  & ?) as  nounsubscribe  
+FROM  
+  node  as  f  
+  INNER JOIN  contenttype  as  type  on  type. contenttypeid  = f. contenttypeid  
+  INNER JOIN  subscribed  as  sd  on  sd. did  = f. nodeid  
+  AND  sd. userid  = ?  
+UNION ALL  
+SELECT  
+  f. name  as  title, f. userid  as  keyval, ?  as  sourcetable, IFNULL( f. lastpost, f. joindate) as  lastactivity, f. posts  as  activity, ?  as  type, ?  as  nounsubscribe  
+FROM  
+  USER  as  f  
+  INNER JOIN  userlist  as  ul  on  ul. relationid  = f. userid  
+  AND  ul. userid  = ?  
+WHERE  
+  ul. type  = ?  
+  AND  ul. aq  = ?  
+ORDER BY  
+  title  
+LIMIT  
+  ?
+administrator command: Init DB
+administrator  command: Init  DB
+CALL foo(1, 2, 3)
+CALL  foo( 1, 2, 3)
+### Channels ###
+					SELECT sourcetable, IF(f.lastcontent = 0, f.lastupdate, f.lastcontent) AS lastactivity,
+					f.totalcount AS activity, type.class AS type,
+					(f.nodeoptions & 512) AS noUnsubscribe
+					FROM node AS f
+					INNER JOIN contenttype AS type ON type.contenttypeid = f.contenttypeid 
+
+					INNER JOIN subscribed AS sd ON sd.did = f.nodeid AND sd.userid = 15965
+ UNION  ALL 
+
+					### Users ###
+					SELECT f.name AS title, f.userid AS keyval, 'user' AS sourcetable, IFNULL(f.lastpost, f.joindate) AS lastactivity,
+					f.posts as activity, 'Member' AS type,
+					0 AS noUnsubscribe
+					FROM user AS f
+					INNER JOIN userlist AS ul ON ul.relationid = f.userid AND ul.userid = 15965
+					WHERE ul.type = 'f' AND ul.aq = 'yes'
+ ORDER BY title ASC LIMIT 100
+### Channels ###
+SELECT  
+  sourcetable, IF( f. lastcontent  = 0, f. lastupdate, f. lastcontent) AS  lastactivity, f. totalcount  AS  activity, type. class  AS  type, (f. nodeoptions  & 512) AS  noUnsubscribe
+ 
+FROM  
+  node  AS  f
+ 
+  INNER JOIN  contenttype  AS  type  ON  type. contenttypeid  = f. contenttypeid  
+  INNER JOIN  subscribed  AS  sd  ON  sd. did  = f. nodeid  
+  AND  sd. userid  = 15965
+ 
+UNION  
+  ALL  ### Users ###
+SELECT  
+  f. name  AS  title, f. userid  AS  keyval, 'user' AS  sourcetable, IFNULL( f. lastpost, f. joindate) AS  lastactivity, f. posts  as  activity, 'Member' AS  type, 0  AS  noUnsubscribe
+ 
+FROM  
+  USER  AS  f
+ 
+  INNER JOIN  userlist  AS  ul  ON  ul. relationid  = f. userid  
+  AND  ul. userid  = 15965
+ 
+WHERE  
+  ul. type  = 'f' 
+  AND  ul. aq  = 'yes' 
+ORDER BY  
+  title  ASC  
+LIMIT  
+  100
+CREATE DATABASE org235_percona345 COLLATE 'utf8_general_ci'
+CREATE  DATABASE  org235_percona345  COLLATE  'utf8_general_ci'
+insert into abtemp.coxed select foo.bar from foo
+INSERT  into  abtemp. coxed  
+SELECT  
+  foo. bar  
+FROM  
+  foo
+insert into foo(a, b, c) value(2, 4, 5)
+INSERT  into  foo( a, b, c) value( 2, 4, 5)
+insert into foo(a, b, c) values(2, 4, 5)
+INSERT  into  foo( a, b, c) 
+VALUES( 
+  2, 4, 5)
+insert into foo(a, b, c) values(2, 4, 5) , (2,4,5)
+INSERT  into  foo( a, b, c) 
+VALUES( 
+  2, 4, 5), 
+  (2, 4, 5)
+insert into foo values (1, '(2)', 'This is a trick: ). More values.', 4)
+INSERT  into  foo  
+VALUES  
+  (1, '(2)', 
+  'This is a trick: ). More values.', 
+  4)
+insert into tb values (1)
+INSERT  into  tb  
+VALUES  
+  (1)
+INSERT INTO t (ts) VALUES ('()', '\(', '\)')
+INSERT  INTO  t  (ts) 
+VALUES  
+  (
+    '()', '\(', '\)')
+INSERT INTO t (ts) VALUES (NOW())
+INSERT  INTO  t  (ts) 
+VALUES  
+  (
+    NOW()
+  )
+INSERT INTO t () VALUES ()
+INSERT  INTO  t  (
+) 
+  VALUES  
+    (
+)
+insert into t values (1), (2), (3)
+
+	on duplicate key update query_count=1
+INSERT  into  t  
+VALUES  
+  (1), 
+  (2), 
+  (3) on  duplicate  key  
+UPDATE  
+  query_count= 1
+insert into t values (1) on duplicate key update query_count=COALESCE(query_count, 0) + VALUES(query_count)
+INSERT  into  t  
+VALUES  
+  (1) on  duplicate  key  
+UPDATE  
+  query_count= COALESCE( query_count, 0) + 
+VALUES( 
+  query_count)
+LOAD DATA INFILE '/tmp/foo.txt' INTO db.tbl
+LOAD  DATA  INFILE  '/tmp/foo.txt' INTO  db. tbl
+select 0e0, +6e-30, -6.00 from foo where a = 5.5 or b=0.5 or c=.5
+
+SELECT  
+  0e0, + 6e- 30, - 6.00  
+FROM  
+  foo  
+WHERE  
+  a  = 5.5  
+  OR  b= 0.5  
+  OR  c=.5
+select 0x0, x'123', 0b1010, b'10101' from foo
+
+SELECT  
+  0x0, x' 123', 
+  0b1010, b' 10101' 
+FROM  
+  foo
+select 123_foo from 123_foo
+
+SELECT  
+  123_foo  
+FROM  
+  123_foo
+select 123foo from 123foo
+
+SELECT  
+  123foo  
+FROM  
+  123foo
+SELECT 	1 AS one FROM calls USE INDEX(index_name)
+
+SELECT  
+  1  AS  one  
+FROM  
+  calls  USE  INDEX( index_name)
+SELECT /*!40001 SQL_NO_CACHE */ * FROM `film`
+
+SELECT  
+  */ * 
+FROM  
+  `film`
+SELECT 'a' 'b' 'c' 'd' FROM kamil
+
+SELECT  
+  'a' 'b' 'c' 'd' 
+FROM  
+  kamil
+SELECT BENCHMARK(100000000, pow(rand(), rand())), 1 FROM `-hj-7d6-shdj5-7jd-kf-g988h-`.`-aaahj-7d6-shdj5-7&^%$jd-kf-g988h-9+4-5*6ab-`
+
+SELECT  
+  BENCHMARK( 100000000, POW( RAND(
+), 
+RAND(
+)
+)
+), 
+1  
+FROM  
+  `-hj-7d6-shdj5-7jd-kf-g988h-`.`-aaahj-7d6-shdj5-7&^%$jd-kf-g988h-9+4-5*6ab-`
+SELECT c FROM org235.t WHERE id=0xdeadbeaf
+
+SELECT  
+  c  
+FROM  
+  org235. t  
+WHERE  
+  id= 0xdeadbeaf
+select c from t where i=1 order by c asc
+
+SELECT  
+  c  
+FROM  
+  t  
+WHERE  
+  i= 1  
+ORDER BY  
+  c  asc
+SELECT c FROM t WHERE id=0xdeadbeaf
+
+SELECT  
+  c  
+FROM  
+  t  
+WHERE  
+  id= 0xdeadbeaf
+SELECT c FROM t WHERE id=1
+
+SELECT  
+  c  
+FROM  
+  t  
+WHERE  
+  id= 1
+select `col` from `table-1` where `id` = 5
+
+SELECT  
+  `col` 
+FROM  
+  `table-1` 
+WHERE  
+  `id` = 5
+SELECT `db`.*, (CASE WHEN (`date_start` <=  '2014-09-10 09:17:59' AND `date_end` >=  '2014-09-10 09:17:59') THEN 'open' WHEN (`date_start` >  '2014-09-10 09:17:59' AND `date_end` >  '2014-09-10 09:17:59') THEN 'tbd' ELSE 'none' END) AS `status` FROM `foo` AS `db` WHERE (a_b in ('1', '10101'))
+
+SELECT  
+  `db`.*, 
+  (CASE  WHEN  (`date_start` <= '2014-09-10 09:17:59' 
+  AND  `date_end` >= '2014-09-10 09:17:59'
+) THEN  'open' WHEN  (`date_start` > '2014-09-10 09:17:59' 
+AND  `date_end` > '2014-09-10 09:17:59'
+) THEN  'tbd' ELSE  'none' END) AS  `status` 
+FROM  
+  `foo` AS  `db` 
+WHERE  
+  (a_b  in  (
+    '1', '10101')
+  )
+select field from `-master-db-1`.`-table-1-` order by id, ?;
+
+SELECT  
+  FIELD  
+FROM  
+  `-master-db-1`.`-table-1-` 
+ORDER BY  
+  id, ?;
+select   foo
+
+SELECT  
+  foo
+select foo_1 from foo_2_3
+
+SELECT  
+  foo_1  
+FROM  
+  foo_2_3
+select foo -- bar
+
+
+SELECT  
+  foo  -- bar
+select foo-- bar
+,foo
+
+SELECT  
+  foo- - bar
+, 
+  foo
+select '\\' from foo
+
+SELECT  
+  '\\' 
+FROM  
+  foo
+select * from foo limit 5
+
+SELECT  
+  * 
+FROM  
+  foo  
+LIMIT  
+  5
+select * from foo limit 5, 10
+
+SELECT  
+  * 
+FROM  
+  foo  
+LIMIT  
+  5, 10
+select * from foo limit 5 offset 10
+
+SELECT  
+  * 
+FROM  
+  foo  
+LIMIT  
+  5  offset  10
+SELECT * from foo where a = 5
+
+SELECT  
+  * 
+FROM  
+  foo  
+WHERE  
+  a  = 5
+select * from foo where a in (5) and b in (5, 8,9 ,9 , 10)
+
+SELECT  
+  * 
+FROM  
+  foo  
+WHERE  
+  a  in  (5) 
+  AND  b  in  (5, 8, 9, 
+  9, 
+  10)
+SELECT '' '' '' FROM kamil
+
+SELECT  
+  '' '' '' 
+FROM  
+  kamil
+ select  * from
+foo where a = 5
+
+SELECT  
+  * 
+FROM  
+  foo  
+WHERE  
+  a  = 5
+SELECT * FROM prices.rt_5min where id=1
+
+SELECT  
+  * 
+FROM  
+  prices. rt_5min  
+WHERE  
+  id= 1
+SELECT * FROM table WHERE field = 'value' /*arbitrary/31*/ 
+
+SELECT  
+  * 
+FROM  
+  table  
+WHERE  
+  FIELD  = 'value' */
+SELECT * FROM table WHERE field = 'value' /*arbitrary31*/ 
+
+SELECT  
+  * 
+FROM  
+  table  
+WHERE  
+  FIELD  = 'value' */
+SELECT *    FROM t WHERE 1=1 AND id=1
+
+SELECT  
+  * 
+FROM  
+  t  
+WHERE  
+  1= 1  
+  AND  id= 1
+select * from t where (base.nid IN  ('1412', '1410', '1411'))
+
+SELECT  
+  * 
+FROM  
+  t  
+WHERE  
+  (base. nid  IN  (
+    '1412', '1410', '1411')
+  )
+select * from t where i=1      order            by
+             a,  b          ASC, d    DESC,
+
+                                    e asc
+
+SELECT  
+  * 
+FROM  
+  t  
+WHERE  
+  i= 1  order  by
+ a, b  ASC, d  DESC, e  asc
+select * from t where i=1 order by a, b ASC, d DESC, e asc
+
+SELECT  
+  * 
+FROM  
+  t  
+WHERE  
+  i= 1  
+ORDER BY  
+  a, b  ASC, d  DESC, e  asc
+select 'hello'
+
+
+SELECT  
+  'hello'
+select 'hello', '
+hello
+', "hello", '\'' from foo
+
+SELECT  
+  'hello', 
+  '
+hello
+', 
+  "hello", 
+  '\'' 
+FROM  
+  foo
+SELECT ID, name, parent, type FROM posts WHERE _name IN ('perf','caching') AND (type = 'page' OR type = 'attachment')
+
+SELECT  
+  ID, name, parent, type  
+FROM  
+  posts  
+WHERE  
+  _name  IN  (
+    'perf', 'caching') 
+    AND  (type  = 'page' 
+    OR  type  = 'attachment'
+  )
+SELECT name, value FROM variable
+
+SELECT  
+  name, value  
+FROM  
+  variable
+select 
+-- bar
+ foo
+
+SELECT  
+  -- bar
+  foo
+select null, 5.001, 5001. from foo
+
+SELECT  
+  null, 5.001, 5001. 
+FROM  
+  foo
+select sleep(2) from test.n
+
+SELECT  
+  SLEEP( 2) 
+FROM  
+  test. n
+SELECT t FROM field WHERE  (entity_type = 'node') AND (entity_id IN  ('609')) AND (language IN  ('und')) AND (deleted = '0') ORDER BY delta ASC
+
+SELECT  
+  t  
+FROM  
+  FIELD  
+WHERE  
+  (
+    entity_type  = 'node') 
+    AND  (entity_id  IN  (
+      '609')
+    ) 
+    AND  (language  IN  (
+      'und')
+    ) 
+    AND  (
+      deleted  = '0') 
+      ORDER BY  
+        delta  ASC
+select  t.table_schema,t.table_name,engine  from information_schema.tables t  inner join information_schema.columns c  on t.table_schema=c.table_schema and t.table_name=c.table_name group by t.table_schema,t.table_name having  sum(if(column_key in ('PRI','UNI'),1,0))=0
+
+SELECT  
+  t. table_schema, t. table_name, engine  
+FROM  
+  information_schema. tables  t  
+  INNER JOIN  information_schema. columns  c  on  t. table_schema= c. table_schema  
+  AND  t. table_name= c. table_name  
+GROUP BY  
+  t. table_schema, t. table_name  
+HAVING  
+  SUM( IF( column_key  in  (
+    'PRI', 'UNI'), 
+    1, 0)
+  )= 0
+/* -- S++ SU ABORTABLE -- spd_user: rspadim */SELECT SQL_SMALL_RESULT SQL_CACHE DISTINCT centro_atividade FROM est_dia WHERE unidade_id=1001 AND item_id=67 AND item_id_red=573
+*/ 
+SELECT  
+  SQL_SMALL_RESULT  SQL_CACHE  DISTINCT  centro_atividade  
+FROM  
+  est_dia  
+WHERE  
+  unidade_id= 1001  
+  AND  item_id= 67  
+  AND  item_id_red= 573
+UPDATE groups_search SET  charter = '   -------3\'\' XXXXXXXXX.\n    \n    -----------------------------------------------------', show_in_list = 'Y' WHERE group_id='aaaaaaaa'
+
+UPDATE  
+  groups_search  
+SET  
+  charter  = '   -------3\'\' XXXXXXXXX.\n    \n    -----------------------------------------------------', 
+  show_in_list  = 'Y' 
+WHERE  
+  group_id= 'aaaaaaaa'
+use `foo`
+use  `foo`
+select sourcetable, if(f.lastcontent = ?, f.lastupdate, f.lastcontent) as lastactivity, f.totalcount as activity, type.class as type, (f.nodeoptions & ?) as nounsubscribe from node as f inner join contenttype as type on type.contenttypeid = f.contenttypeid inner join subscribed as sd on sd.did = f.nodeid and sd.userid = ? union all select f.name as title, f.userid as keyval, ? as sourcetable, ifnull(f.lastpost, f.joindate) as lastactivity, f.posts as activity, ? as type, ? as nounsubscribe from user as f inner join userlist as ul on ul.relationid = f.userid and ul.userid = ? where ul.type = ? and ul.aq = ? order by title limit ?
+
+SELECT  
+  sourcetable, IF( f. lastcontent  = ?, f. lastupdate, f. lastcontent) as  lastactivity, f. totalcount  as  activity, type. class  as  type, (f. nodeoptions  & ?) as  nounsubscribe  
+FROM  
+  node  as  f  
+  INNER JOIN  contenttype  as  type  on  type. contenttypeid  = f. contenttypeid  
+  INNER JOIN  subscribed  as  sd  on  sd. did  = f. nodeid  
+  AND  sd. userid  = ?  
+UNION ALL  
+SELECT  
+  f. name  as  title, f. userid  as  keyval, ?  as  sourcetable, IFNULL( f. lastpost, f. joindate) as  lastactivity, f. posts  as  activity, ?  as  type, ?  as  nounsubscribe  
+FROM  
+  USER  as  f  
+  INNER JOIN  userlist  as  ul  on  ul. relationid  = f. userid  
+  AND  ul. userid  = ?  
+WHERE  
+  ul. type  = ?  
+  AND  ul. aq  = ?  
+ORDER BY  
+  title  
+LIMIT  
+  ?
+CREATE INDEX part_of_name ON customer (name(10));
+CREATE  INDEX  part_of_name  ON  customer  (
+  name( 10));
+alter table `sakila`.`t1` add index `idx_col`(`col`)
+
+ALTER TABLE  
+  `sakila`.`t1` 
+ADD  
+  index  `idx_col` (
+    `col`)
+alter table `sakila`.`t1` add UNIQUE index `idx_col`(`col`)
+
+ALTER TABLE  
+  `sakila`.`t1` 
+ADD  
+  UNIQUE  index  `idx_col` (
+    `col`)
+alter table `sakila`.`t1` add index `idx_ID`(`ID`)
+
+ALTER TABLE  
+  `sakila`.`t1` 
+ADD  
+  index  `idx_ID` (
+    `ID`)
+ALTER TABLE t2 DROP COLUMN c, DROP COLUMN d;
+
+ALTER TABLE  
+  t2  
+DROP  
+  COLUMN  c, 
+DROP  
+  COLUMN  d;
+ALTER TABLE T2 ADD COLUMN C int;
+
+ALTER TABLE  
+  T2  
+ADD  
+  COLUMN  C  int;
+ALTER TABLE T2 ADD COLUMN D int FIRST;
+
+ALTER TABLE  
+  T2  
+ADD  
+  COLUMN  D  int  FIRST;
+ALTER TABLE T2 ADD COLUMN E int AFTER D;
+
+ALTER TABLE  
+  T2  
+ADD  
+  COLUMN  E  int  
+AFTER  
+  D;
+ALTER TABLE t1 RENAME COLUMN a TO b
+
+ALTER TABLE  
+  t1  RENAME  COLUMN  a  TO  b
+ALTER TABLE t1 RENAME INDEX idx_a TO idx_b
+
+ALTER TABLE  
+  t1  RENAME  INDEX  idx_a  TO  idx_b
+ALTER TABLE t1 RENAME KEY idx_a TO idx_b
+
+ALTER TABLE  
+  t1  RENAME  KEY  idx_a  TO  idx_b
+ALTER TABLE db.old_table RENAME new_table;
+
+ALTER TABLE  
+  db. old_table  RENAME  new_table;
+ALTER TABLE old_table RENAME TO new_table;
+
+ALTER TABLE  
+  old_table  RENAME  TO  new_table;
+ALTER TABLE old_table RENAME AS new_table;
+
+ALTER TABLE  
+  old_table  RENAME  AS  new_table;
+ALTER TABLE t1 MODIFY col1 BIGINT UNSIGNED DEFAULT 1 COMMENT 'my column';
+
+ALTER TABLE  
+  t1  MODIFY  col1  BIGINT  UNSIGNED  DEFAULT  1  COMMENT  'my column';
+ALTER TABLE t1 CHANGE b a INT NOT NULL;
+
+ALTER TABLE  
+  t1  CHANGE  b  a  INT  NOT  NULL;
+SELECT * FROM film WHERE length = 86;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 86;
+SELECT * FROM film WHERE length IS NULL;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  IS  NULL;
+SELECT * FROM film HAVING title = 'abc';
+
+SELECT  
+  * 
+FROM  
+  film  
+HAVING  
+  title  = 'abc';
+SELECT * FROM sakila.film WHERE length >= 60;
+
+SELECT  
+  * 
+FROM  
+  sakila. film  
+WHERE  
+  LENGTH  >= 60;
+SELECT * FROM sakila.film WHERE length >= '60';
+
+SELECT  
+  * 
+FROM  
+  sakila. film  
+WHERE  
+  LENGTH  >= '60';
+SELECT * FROM film WHERE length BETWEEN 60 AND 84;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  BETWEEN  60  
+  AND  84;
+SELECT * FROM film WHERE title LIKE 'AIR%';
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  title  LIKE  'AIR%';
+SELECT * FROM film WHERE title IS NOT NULL;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  title  IS  NOT  NULL;
+SELECT * FROM film WHERE length = 114 and title = 'ALABAMA DEVIL';
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 114  
+  AND  title  = 'ALABAMA DEVIL';
+SELECT * FROM film WHERE length > 100 and title = 'ALABAMA DEVIL';
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  title  = 'ALABAMA DEVIL';
+SELECT * FROM film WHERE length > 100 and language_id < 10 and title = 'xyz';
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  language_id  < 10  
+  AND  title  = 'xyz';
+SELECT * FROM film WHERE length > 100 and language_id < 10;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  language_id  < 10;
+SELECT release_year, sum(length) FROM film WHERE length = 123 AND language_id = 1 GROUP BY release_year;
+
+SELECT  
+  release_year, SUM( LENGTH) 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+  AND  language_id  = 1  
+GROUP BY  
+  release_year;
+SELECT release_year, sum(length) FROM film WHERE length >= 123 GROUP BY release_year;
+
+SELECT  
+  release_year, SUM( LENGTH) 
+FROM  
+  film  
+WHERE  
+  LENGTH  >= 123  
+GROUP BY  
+  release_year;
+SELECT release_year, language_id, sum(length) FROM film GROUP BY release_year, language_id;
+
+SELECT  
+  release_year, language_id, SUM( LENGTH) 
+FROM  
+  film  
+GROUP BY  
+  release_year, language_id;
+SELECT release_year, sum(length) FROM film WHERE length = 123 GROUP BY release_year,(length+language_id);
+
+SELECT  
+  release_year, SUM( LENGTH) 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year, (LENGTH+ language_id);
+SELECT release_year, sum(film_id) FROM film GROUP BY release_year;
+
+SELECT  
+  release_year, SUM( film_id) 
+FROM  
+  film  
+GROUP BY  
+  release_year;
+SELECT * FROM address GROUP BY address,district;
+
+SELECT  
+  * 
+FROM  
+  address  
+GROUP BY  
+  address, district;
+SELECT title FROM film WHERE ABS(language_id) = 3 GROUP BY title;
+
+SELECT  
+  title  
+FROM  
+  film  
+WHERE  
+  ABS( language_id) = 3  
+GROUP BY  
+  title;
+SELECT language_id FROM film WHERE length = 123 GROUP BY release_year ORDER BY language_id;
+
+SELECT  
+  language_id  
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year  
+ORDER BY  
+  language_id;
+SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year;
+
+SELECT  
+  release_year  
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year  
+ORDER BY  
+  release_year;
+SELECT * FROM film WHERE length = 123 ORDER BY release_year ASC, language_id DESC;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+ORDER BY  
+  release_year  ASC, language_id  DESC;
+SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year LIMIT 10;
+
+SELECT  
+  release_year  
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year  
+ORDER BY  
+  release_year  
+LIMIT  
+  10;
+SELECT * FROM film WHERE length = 123 ORDER BY release_year LIMIT 10;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+ORDER BY  
+  release_year  
+LIMIT  
+  10;
+SELECT * FROM film ORDER BY release_year LIMIT 10;
+
+SELECT  
+  * 
+FROM  
+  film  
+ORDER BY  
+  release_year  
+LIMIT  
+  10;
+SELECT * FROM film WHERE length > 100 ORDER BY length LIMIT 10;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+ORDER BY  
+  LENGTH  
+LIMIT  
+  10;
+SELECT * FROM film WHERE length < 100 ORDER BY length LIMIT 10;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  < 100  
+ORDER BY  
+  LENGTH  
+LIMIT  
+  10;
+SELECT * FROM customer WHERE address_id in (224,510) ORDER BY last_name;
+
+SELECT  
+  * 
+FROM  
+  customer  
+WHERE  
+  address_id  in  (224, 510) 
+ORDER BY  
+  last_name;
+SELECT * FROM film WHERE release_year = 2016 AND length != 1 ORDER BY title;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  release_year  = 2016  
+  AND  LENGTH  != 1  
+ORDER BY  
+  title;
+SELECT title FROM film WHERE release_year = 1995;
+
+SELECT  
+  title  
+FROM  
+  film  
+WHERE  
+  release_year  = 1995;
+SELECT title, replacement_cost FROM film WHERE language_id = 5 AND length = 70;
+
+SELECT  
+  title, replacement_cost  
+FROM  
+  film  
+WHERE  
+  language_id  = 5  
+  AND  LENGTH  = 70;
+SELECT title FROM film WHERE language_id > 5 AND length > 70;
+
+SELECT  
+  title  
+FROM  
+  film  
+WHERE  
+  language_id  > 5  
+  AND  LENGTH  > 70;
+SELECT * FROM film WHERE length = 100 and title = 'xyz' ORDER BY release_year;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 100  
+  AND  title  = 'xyz' 
+ORDER BY  
+  release_year;
+SELECT * FROM film WHERE length > 100 and title = 'xyz' ORDER BY release_year;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  title  = 'xyz' 
+ORDER BY  
+  release_year;
+SELECT * FROM film WHERE length > 100 ORDER BY release_year;
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+ORDER BY  
+  release_year;
+SELECT * FROM city a INNER JOIN country b ON a.country_id=b.country_id;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  INNER JOIN  country  b  ON  a. country_id= b. country_id;
+SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id;
+SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id;
+SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id WHERE b.last_update IS NULL;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  b. last_update  IS  NULL;
+SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id WHERE a.last_update IS NULL;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  a. last_update  IS  NULL;
+SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id UNION SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id;
+SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id WHERE a.last_update IS NULL UNION SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id WHERE b.last_update IS NULL;
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  a. last_update  IS  NULL  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  b. last_update  IS  NULL;
+SELECT country_id, last_update FROM city NATURAL JOIN country;
+
+SELECT  
+  country_id, last_update  
+FROM  
+  city  NATURAL  
+  JOIN  country;
+SELECT country_id, last_update FROM city NATURAL LEFT JOIN country;
+
+SELECT  
+  country_id, last_update  
+FROM  
+  city  NATURAL  
+  LEFT JOIN  country;
+SELECT country_id, last_update FROM city NATURAL RIGHT JOIN country;
+
+SELECT  
+  country_id, last_update  
+FROM  
+  city  NATURAL  
+  RIGHT JOIN  country;
+SELECT a.country_id, a.last_update FROM city a STRAIGHT_JOIN country b ON a.country_id=b.country_id;
+
+SELECT  
+  a. country_id, a. last_update  
+FROM  
+  city  a  STRAIGHT_JOIN  country  b  ON  a. country_id= b. country_id;
+SELECT d.deptno,d.dname,d.loc FROM scott.dept d WHERE d.deptno IN  (SELECT e.deptno FROM scott.emp e);
+
+SELECT  
+  d. deptno, d. dname, d. loc  
+FROM  
+  scott. dept  d  
+WHERE  
+  d. deptno  IN  (
+SELECT  
+  e. deptno  
+FROM  
+  scott. emp  e);
+SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by tsdesc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
+
+SELECT  
+  visitor_id, url  
+FROM  
+  (
+SELECT  
+  id  
+FROM  
+  LOG  
+WHERE  
+  ip= "123.45.67.89" 
+ORDER BY  
+  tsdesc  
+LIMIT  
+  50, 10) I  
+  JOIN  LOG  ON  (I. id= LOG. id) 
+  JOIN  url  ON  (url. id= LOG. url_id) 
+ORDER BY  
+  TS  desc;
+DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;
+DELETE  city, country  
+FROM  
+  city  
+  INNER JOIN  country  using  (country_id) 
+WHERE  
+  city. city_id  = 1;
+DELETE city FROM city LEFT JOIN country ON city.country_id = country.country_id WHERE country.country IS NULL;
+DELETE  city  
+FROM  
+  city  
+  LEFT JOIN  country  ON  city. country_id  = country. country_id  
+WHERE  
+  country. country  IS  NULL;
+DELETE a1, a2 FROM city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;
+DELETE  a1, a2  
+FROM  
+  city  AS  a1  
+  INNER JOIN  country  AS  a2  
+WHERE  
+  a1. country_id= a2. country_id;
+DELETE FROM a1, a2 USING city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;
+
+DELETE FROM  
+  a1, a2  USING  city  AS  a1  
+  INNER JOIN  country  AS  a2  
+WHERE  
+  a1. country_id= a2. country_id;
+DELETE FROM film WHERE length > 100;
+
+DELETE FROM  
+  film  
+WHERE  
+  LENGTH  > 100;
+UPDATE city INNER JOIN country USING(country_id) SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
+
+UPDATE  
+  city  
+  INNER JOIN  country  USING( country_id) 
+SET  
+  city. city  = 'Abha', 
+  city. last_update  = '2006-02-15 04:45:25', 
+  country. country  = 'Afghanistan' 
+WHERE  
+  city. city_id= 10;
+UPDATE city INNER JOIN country ON city.country_id = country.country_id INNER JOIN address ON city.city_id = address.city_id SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
+
+UPDATE  
+  city  
+  INNER JOIN  country  ON  city. country_id  = country. country_id  
+  INNER JOIN  address  ON  city. city_id  = address. city_id  
+SET  
+  city. city  = 'Abha', 
+  city. last_update  = '2006-02-15 04:45:25', 
+  country. country  = 'Afghanistan' 
+WHERE  
+  city. city_id= 10;
+UPDATE city, country SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.country_id = country.country_id AND city.city_id=10;
+
+UPDATE  
+  city, country  
+SET  
+  city. city  = 'Abha', 
+  city. last_update  = '2006-02-15 04:45:25', 
+  country. country  = 'Afghanistan' 
+WHERE  
+  city. country_id  = country. country_id  
+  AND  city. city_id= 10;
+UPDATE film SET length = 10 WHERE language_id = 20;
+
+UPDATE  
+  film  
+SET  
+  LENGTH  = 10  
+WHERE  
+  language_id  = 20;
+INSERT INTO city (country_id) SELECT country_id FROM country;
+INSERT  INTO  city  (country_id) 
+SELECT  
+  country_id  
+FROM  
+  country;
+INSERT INTO city (country_id) VALUES (1),(2),(3);
+INSERT  INTO  city  (country_id) 
+VALUES  
+  (1), 
+  (2), 
+  (3);
+INSERT INTO city (country_id) VALUES (10);
+INSERT  INTO  city  (country_id) 
+VALUES  
+  (10);
+INSERT INTO city (country_id) SELECT 10 FROM DUAL;
+INSERT  INTO  city  (country_id) 
+SELECT  
+  10  
+FROM  
+  DUAL;
+REPLACE INTO city (country_id) SELECT country_id FROM country;
+REPLACE  INTO  city  (country_id) 
+SELECT  
+  country_id  
+FROM  
+  country;
+REPLACE INTO city (country_id) VALUES (1),(2),(3);
+REPLACE  INTO  city  (country_id) 
+VALUES  
+  (1), 
+  (2), 
+  (3);
+REPLACE INTO city (country_id) VALUES (10);
+REPLACE  INTO  city  (country_id) 
+VALUES  
+  (10);
+REPLACE INTO city (country_id) SELECT 10 FROM DUAL;
+REPLACE  INTO  city  (country_id) 
+SELECT  
+  10  
+FROM  
+  DUAL;
+SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM  film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film;
+
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film;
+SELECT * FROM film WHERE language_id = (SELECT language_id FROM language LIMIT 1);
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  language_id  = (
+SELECT  
+  language_id  
+FROM  
+  language  
+LIMIT  
+  1);
+SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id;
+
+SELECT  
+  * 
+FROM  
+  city  i  
+  LEFT JOIN  country  o  ON  i. city_id= o. country_id  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  i  
+  RIGHT JOIN  country  o  ON  i. city_id= o. country_id;
+SELECT * FROM (SELECT * FROM actor WHERE last_update='2006-02-15 04:34:33' and last_name='CHASE') t WHERE last_update='2006-02-15 04:34:33' and last_name='CHASE' GROUP BY first_name;
+
+SELECT  
+  * 
+FROM  
+  (
+SELECT  
+  * 
+FROM  
+  actor  
+WHERE  
+  last_update= '2006-02-15 04:34:33' 
+  AND  last_name= 'CHASE'
+) t  
+WHERE  
+  last_update= '2006-02-15 04:34:33' 
+  AND  last_name= 'CHASE' 
+GROUP BY  
+  first_name;
+SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id;
+
+SELECT  
+  * 
+FROM  
+  city  i  
+  LEFT JOIN  country  o  ON  i. city_id= o. country_id  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  i  
+  RIGHT JOIN  country  o  ON  i. city_id= o. country_id;
+SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id WHERE o.country_id is null union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id WHERE i.city_id is null;
+
+SELECT  
+  * 
+FROM  
+  city  i  
+  LEFT JOIN  country  o  ON  i. city_id= o. country_id  
+WHERE  
+  o. country_id  is  null  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  i  
+  RIGHT JOIN  country  o  ON  i. city_id= o. country_id  
+WHERE  
+  i. city_id  is  null;
+SELECT first_name,last_name,email FROM customer STRAIGHT_JOIN address ON customer.address_id=address.address_id;
+
+SELECT  
+  first_name, last_name, email  
+FROM  
+  customer  STRAIGHT_JOIN  address  ON  customer. address_id= address. address_id;
+SELECT ID,name FROM (SELECT address FROM customer_list WHERE SID=1 order by phone limit 50,10) a JOIN customer_list l ON (a.address=l.address) JOIN city c ON (c.city=l.city) order by phone desc;
+
+SELECT  
+  ID, name  
+FROM  
+  (
+SELECT  
+  address  
+FROM  
+  customer_list  
+WHERE  
+  SID= 1  
+ORDER BY  
+  phone  
+LIMIT  
+  50, 10) a  
+  JOIN  customer_list  l  ON  (a. address= l. address) 
+  JOIN  city  c  ON  (c. city= l. city) 
+ORDER BY  
+  phone  desc;
+SELECT * FROM film WHERE date(last_update)='2006-02-15';
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  DATE( last_update) = '2006-02-15';
+SELECT last_update FROM film GROUP BY date(last_update);
+
+SELECT  
+  last_update  
+FROM  
+  film  
+GROUP BY  
+  DATE( last_update);
+SELECT last_update FROM film order by date(last_update);
+
+SELECT  
+  last_update  
+FROM  
+  film  
+ORDER BY  
+  DATE( last_update);
+SELECT description FROM film WHERE description IN('NEWS','asd') GROUP BY description;
+
+SELECT  
+  description  
+FROM  
+  film  
+WHERE  
+  description  IN( 'NEWS', 
+  'asd'
+) 
+GROUP BY  
+  description;
+alter table address add index idx_city_id(city_id);
+
+ALTER TABLE  
+  address  
+ADD  
+  index  idx_city_id( city_id);
+alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
+
+ALTER TABLE  
+  inventory  
+ADD  
+  index  `idx_store_film` (
+    `store_id`, `film_id`);
+alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
+
+ALTER TABLE  
+  inventory  
+ADD  
+  index  `idx_store_film` (
+    `store_id`, `film_id`), 
+      ADD  
+      index  `idx_store_film` (
+        `store_id`, `film_id`), 
+              ADD  
+          index  `idx_store_film` (
+            `store_id`, `film_id`);

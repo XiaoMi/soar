@@ -1,0 +1,102 @@
+## 配置文件说明
+
+配置文件为[yaml](https://en.wikipedia.org/wiki/YAML)格式。一般情况下只需要配置online-dsn, test-dsn, log-output等少数几个参数。即使不创建配置文件SOAR仍然会给出基本的启发式建议。
+
+```text
+# 线上环境配置
+online-dsn:
+  addr: 127.0.0.1:3306
+  schema: sakila
+  user: root
+  password: 1t'sB1g3rt
+  disable: false
+# 测试环境配置
+test-dsn:
+  addr: 127.0.0.1:3307
+  schema: test
+  user: root
+  password: 1t'sB1g3rt
+  disable: false
+# 是否允许测试环境与线上环境配置相同
+allow-online-as-test: true
+# 是否清理测试时产生的临时文件
+drop-test-temporary: true
+# 语法检查小工具
+only-syntax-check: false
+sampling-data-factor: 100
+sampling: true
+# 日志级别，[0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]
+log-level: 7
+log-output: ${BASE_DIR}/soar.log
+# 优化建议输出格式
+report-type: markdown
+ignore-rules:
+- ""
+blacklist: ${BASE_DIR}/soar.blacklist
+# 启发式算法相关配置
+max-join-table-count: 5
+max-group-by-cols-count: 5
+max-distinct-count: 5
+max-index-cols-count: 5
+max-total-rows: 9999999
+spaghetti-query-length: 2048
+allow-drop-index: false
+# EXPLAIN相关配置
+explain-sql-report-type: pretty
+explain-type: extended
+explain-format: traditional
+explain-warn-select-type:
+- ""
+explain-warn-access-type:
+- ALL
+explain-max-keys: 3
+explain-min-keys: 0
+explain-max-rows: 10000
+explain-warn-extra:
+- ""
+explain-max-filtered: 100
+explain-warn-scalability:
+- O(n)
+query: ""
+list-heuristic-rules: false
+list-test-sqls: false
+verbose: true
+```
+
+## 命令行参数
+
+几乎所有配置文件中指定的参数都通通过命令行参数进行修改，且命令行参数优先级较配置文件优先级高。
+
+```bash
+$ soar -h
+```
+
+### 命令行参数配置DSN
+
+```bash
+$ soar -online-dsn "user:password@hostname:port/database"
+
+$ soar -test-dsn "user:password@hostname:port/database"
+```
+
+#### DSN格式支持
+* "user:password@hostname:3307/database"
+* "user:password@hostname:3307"
+* "user:password@hostname:/database"
+* "user:password@:3307/database"
+* "user:password@"
+* "hostname:3307/database"
+* "@hostname:3307/database"
+* "@hostname"
+* "hostname"
+* "@/database"
+* "@hostname:3307"
+* "@:3307/database"
+* ":3307/database"
+* "/database"
+
+### SQL评分
+
+不同类型的建议指定的Severity不同，严重程度数字由低到高依次排序。满分100分，扣到0分为止。L0不扣分只给出建议，L1扣5分，L2扣10分，每级多扣5分以此类推。当由时给出L1, L2两要建议时扣分叠加，即扣15分。
+
+如果您想给出不同的扣分建议或者对指引中的文字内容不满意可以为在git中提ISSUE，也可直接修改rules.go的相应配置然后重新编译自己的版本。

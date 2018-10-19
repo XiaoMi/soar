@@ -1,0 +1,26 @@
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *country* | NULL | index | PRIMARY,<br>country\_id | country | 152 | NULL | 0 | 0.00% | ☠️ **O(n)** | Using index |
+| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id,<br>idx\_country\_id\_city,<br>idx\_all,<br>idx\_other | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 0 | 0.00% | ☠️ **O(n)** | Using index |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Type信息解读
+
+* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
+
+* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+#### Extra信息解读
+
+* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
+
+
