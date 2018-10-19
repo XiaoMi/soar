@@ -7,7 +7,7 @@
 
 ### 插件演示
 
-![Vim插件示例](http://github.com/XiaoMi/soar/raw/master/doc/images/vim_plugin.png)
+![Vim插件示例](https://raw.githubusercontent.com/XiaoMi/soar/master/doc/images/vim_plugin.png)
 
 ### 常见问题
 
