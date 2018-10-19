@@ -30,7 +30,7 @@ SOAR(SQL Optimizer And Rewriter)是一个对SQL进行优化和改写的自动化
 
 * 欢迎通过Github Issues提交问题报告与建议
 * QQ群: 779359816
-* [Gitter](https://gitter.im/xiaomi-dba/soar)
+* [Gitter](https://gitter.im/xiaomi-dba/soar) 推荐
 
 ## License
 

@@ -1,15 +1,17 @@
 ## Get Released Binary
 
 ```bash
-TODO:
-wget http://...
+wget https://github.com/XiaoMi/soar/releases/download/${tag}/soar.linux-amd64 -O soar
+
+eg.
+wget https://github.com/XiaoMi/soar/releases/download/v0.8.0/soar.linux-amd64 -O soar
 ```
 
 ## Build From Source
 
 ```bash
-go get github.com/XiaoMi/soar
-cd $GOPATH/github.com/XiaoMi/soar && make
+go get github.com/XiaoMi/soar/...
+cd ${GOPATH}/src/github.com/XiaoMi/soar && make
 ```
 
 ## Simple Test Case

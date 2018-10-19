@@ -26,9 +26,8 @@ wget https://github.com/XiaoMi/soar/releases/download/v0.8.0/soar.linux-amd64 -O
 ### 生成二进制文件
 
 ```bash
-TODO: 开源后可直接从github执行go get下载，未开源前需要git clone到指定路径
-go get github.com/XiaoMi/soar
-cd ${GOPATH}/github.com/XiaoMi/soar && make
+go get github.com/XiaoMi/soar/...
+cd ${GOPATH}/src/github.com/XiaoMi/soar && make
 ```
 
 ### 开发调试

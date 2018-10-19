@@ -123,7 +123,7 @@ vendor: vitess tidb
 .PHONY: tidb-parser
 tidb-parser: tidb
 	@echo "\033[92mimporting tidb sql parser ...\033[0m"
-	@cd ${GOPATH}/src/github.com/pingcap/tidb && git checkout -b soar ec9672cea6612481b1da845dbab620b7a5581ca4  && make parser
+	@cd ${GOPATH}/src/github.com/pingcap/tidb && git checkout ec9672cea6612481b1da845dbab620b7a5581ca4  && make parser
 
 # gometalinter
 # 如果有不想改的lint问题可以使用metalinter.sh加黑名单
