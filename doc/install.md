@@ -1,8 +1,10 @@
 ## 下载二进制安装包
 
 ```bash
-TODO: 开源后补充下载release版本链接
-wget https://github.com/XiaoMi/soar/archive/v0.7.0.zip
+wget https://github.com/XiaoMi/soar/releases/download/${tag}/soar.linux-amd64 -O soar
+
+如：
+wget https://github.com/XiaoMi/soar/releases/download/v0.8.0/soar.linux-amd64 -O soar
 ```
 
 ## 源码安装
