@@ -2,6 +2,8 @@
 
 配置文件为[yaml](https://en.wikipedia.org/wiki/YAML)格式。一般情况下只需要配置online-dsn, test-dsn, log-output等少数几个参数。即使不创建配置文件SOAR仍然会给出基本的启发式建议。
 
+默认文件会按照`/etc/soar.yaml`, `./etc/soar.yaml`, `./soar.yaml`顺序加载，找到第一个后不再继续加载后面的配置文件。如需指定其他配置文件可以通过`-config`参数指定。
+
 ```text
 # 线上环境配置
 online-dsn:

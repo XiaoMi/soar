@@ -158,7 +158,7 @@ var Config = &Configration{
 	SpaghettiQueryLength: 2048,
 	AllowDropIndex:       false,
 	LogLevel:             3,
-	LogOutput:            "/dev/stderr",
+	LogOutput:            os.Stderr.Name(),
 	ReportType:           "markdown",
 	ReportCSS:            "",
 	ReportJavascript:     "",

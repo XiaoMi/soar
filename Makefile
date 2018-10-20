@@ -4,6 +4,11 @@
 # $ checkmake Makefile
 #
 BINARY=soar
+GOPATH ?= $(shell go env GOPATH)
+# Ensure GOPATH is set before running build process.
+ifeq "$(GOPATH)" ""
+  $(error Please set the environment variable GOPATH before running `make`)
+endif
 PATH := ${GOPATH}/bin:$(PATH)
 
 # These are the values we want to pass for VERSION  and BUILD

@@ -2,9 +2,10 @@
 
 ```bash
 wget https://github.com/XiaoMi/soar/releases/download/${tag}/soar.linux-amd64 -O soar
-
+chmod a+x soar
 如：
 wget https://github.com/XiaoMi/soar/releases/download/v0.8.0/soar.linux-amd64 -O soar
+chmod a+x soar
 ```
 
 ## 源码安装
