@@ -20,11 +20,11 @@ JSON格式的EXPLAIN包含的内容很丰富，但不便于人查看，信息解
 
 表示此查询条件所过滤的数据的百分比。低版本的MySQL EXPLAIN信息不包含Filtered字段，SOAR会按 `filtered = rows/total_rows` 计算补充。
 
-5.7之前的版本Filtered计算可能出现大于100%的[BUG](https//bugs.mysql.com/bug.php?id=34124)，为了不对用户产生困扰，soar会将大于100%的Filered化整为100%。
+5.7之前的版本Filtered计算可能出现大于100%的[BUG](https://bugs.mysql.com/bug.php?id=34124)，为了不对用户产生困扰，soar会将大于100%的Filered化整为100%。
 
 ### Scalability
 
-Scalability表示单表查询的运算复杂度，是参考[explain-analyzer](https//github.com/Preetam/explain-analyzer)项目添加的。Scalability是对access\_type的映射表，由于是单表查询，所以最大复杂度为O(n)。
+Scalability表示单表查询的运算复杂度，是参考[explain-analyzer](https://github.com/Preetam/explain-analyzer)项目添加的。Scalability是对access\_type的映射表，由于是单表查询，所以最大复杂度为O(n)。
 
 | Access Type      | Scalability |
 | ---              | ---         |
