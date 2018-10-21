@@ -1,14 +1,14 @@
 language: go
 sudo: false
-go:
-  - 1.10
 
-before_install:
-  - go get -u gopkg.in/alecthomas/gometalinter.v1
-  - gometalinter.v1 --install
+go_import_path: github.com/XiaoMi/soar
+
+go:
+  - "1.10"
+  - "1.11.x"
 
 script:
-  - gometalinter.v1 --config doc/example/metalinter.json ./...
+  - make fmt
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

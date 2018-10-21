@@ -1,6 +1,8 @@
 ![SOAR](https://raw.githubusercontent.com/XiaoMi/soar/master/doc/images/logo.png)
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/xiaomi-dba/soar) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://github.com/XiaoMi/soar/blob/master/LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/XiaoMi/soar)](https://goreportcard.com/report/github.com/XiaoMi/soar) 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/xiaomi-dba/soar) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://github.com/XiaoMi/soar/blob/master/LICENSE) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/XiaoMi/soar)](https://goreportcard.com/report/github.com/XiaoMi/soar) 
 
 [文档](http://github.com/XiaoMi/soar/tree/master/doc) | [FAQ](http://github.com/XiaoMi/soar/blob/master/doc/FAQ.md) | [变更记录](http://github.com/XiaoMi/soar/blob/master/CHANGES.md) | [路线图](http://github.com/XiaoMi/soar/blob/master/doc/roadmap.md) | [English](http://github.com/XiaoMi/soar/blob/master/README_EN.md)
 
