@@ -133,6 +133,37 @@ WHERE
   col  = 'val';
 ```
 
+## EXPLAIN message analyzing
+
+```bash
+$ soar -report-type explain-digest << EOF
++----+-------------+-------+------+---------------+------+---------+------+------+-------+
+| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra |
++----+-------------+-------+------+---------------+------+---------+------+------+-------+
+|  1 | SIMPLE      | film  | ALL  | NULL          | NULL | NULL    | NULL | 1131 |       |
++----+-------------+-------+------+---------------+------+---------+------+------+-------+
+EOF
+```
+
+```text
+##  Explain message
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | 0.00% | ☠️ **O(n)** |  |
+
+
+### Explain detail
+
+#### SelectType detail
+
+* **SIMPLE**:  simple SELECT( do not use UNION / sub query etc. ).
+
+#### Type detail
+
+* ☠️ **ALL**: worst case ( full table scan )
+```
+
 ## Convert markdown to HTML
 
 md2html comes with other flags, such as `-report-css`, `-report-javascript`, `-markdown-extensions`, `-markdown-html-flags`, you can get more self control HTML report.
