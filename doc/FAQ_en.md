@@ -5,8 +5,8 @@
 * [git](https://git-scm.co): clone code from git repository
 * [go](https://golang.org/): build source
 * [govendor](https://github.com/kardianos/govendor): manager third party dependency
-* [docker](https://www.docker.com): manager test envirment
-* [mysql](https://www.mysql.com/): connect test envirment
+* [docker](https://www.docker.com): manager test environment
+* [mysql](https://www.mysql.com/): connect test environment
 * [retool](https://github.com/twitchtv/retool): manager test tools such as `gometalinter.v2`, `revive`, `golangci-lint`
 
 ### Syntax Error
@@ -61,7 +61,7 @@ soar -query "select * from film" > ./index.html
 
 ```
 
-## Add a new heuristict rule
+## Add a new heuristic rule
 
 ```bash
 advisor/rules.go HeuristicRules add a new item
