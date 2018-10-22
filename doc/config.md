@@ -76,23 +76,23 @@ $ soar -h
 ### 命令行参数配置DSN
 
 ```bash
-$ soar -online-dsn "user:password@hostname:port/database"
+$ soar -online-dsn "user:password@ip:port/database"
 
-$ soar -test-dsn "user:password@hostname:port/database"
+$ soar -test-dsn "user:password@ip:port/database"
 ```
 
 #### DSN格式支持
-* "user:password@hostname:3307/database"
-* "user:password@hostname:3307"
-* "user:password@hostname:/database"
+* "user:password@127.0.0.1:3307/database"
+* "user:password@127.0.0.1:3307"
+* "user:password@127.0.0.1:/database"
 * "user:password@:3307/database"
 * "user:password@"
-* "hostname:3307/database"
-* "@hostname:3307/database"
-* "@hostname"
-* "hostname"
+* "127.0.0.1:3307/database"
+* "@127.0.0.1:3307/database"
+* "@127.0.0.1"
+* "127.0.0.1"
 * "@/database"
-* "@hostname:3307"
+* "@127.0.0.1:3307"
 * "@:3307/database"
 * ":3307/database"
 * "/database"
