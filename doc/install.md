@@ -45,7 +45,7 @@ cd ${GOPATH}/src/github.com/XiaoMi/soar && make
 * make cover 代码测试覆盖度检查
 * make doc 自动生成命令行参数中-list-XX相关文档
 * make daily 每日构建，时刻跟进Vitess, TiDB依赖变化
-* make release 生成Linux, Windoes, Mac发布版本
+* make release 生成Linux, Windows, Mac发布版本
 
 ## 安装验证
 
