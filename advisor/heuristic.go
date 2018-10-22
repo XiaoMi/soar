@@ -44,6 +44,9 @@ func (q *Query4Audit) RuleOK() Rule {
 func (q *Query4Audit) RuleImplicitAlias() Rule {
 	var rule = q.RuleOK()
 	tkns := ast.Tokenizer(q.Query)
+	if len(tkns) == 0 {
+		return rule
+	}
 	if tkns[0].Type != sqlparser.SELECT {
 		return rule
 	}
