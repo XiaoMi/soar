@@ -228,6 +228,10 @@ type dsn struct {
 // 解析命令行DSN输入
 func parseDSN(odbc string, d *dsn) *dsn {
 	var addr, user, password, schema, charset string
+	if odbc == FormatDSN(d) {
+		return d
+	}
+
 	if d != nil {
 		addr = d.Addr
 		user = d.User
@@ -347,7 +351,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 
 // FormatDSN 格式化打印DSN
 func FormatDSN(env *dsn) string {
-	if env.Disable {
+	if env == nil || env.Disable {
 		return ""
 	}
 	// username:password@ip:port/schema?charset=xxx
@@ -468,7 +472,7 @@ func readCmdFlags() error {
 	onlySyntaxCheck := flag.Bool("only-syntax-check", Config.OnlySyntaxCheck, "OnlySyntaxCheck, 只做语法检查不输出优化建议")
 	profiling := flag.Bool("profiling", Config.Profiling, "Profiling, 开启数据采样的情况下在测试环境执行Profile")
 	trace := flag.Bool("trace", Config.Trace, "Trace, 开启数据采样的情况下在测试环境执行Trace")
-	explain := flag.Bool("explain", Config.Explain, "Explain, 是否开启Exaplin执行计划分析")
+	explain := flag.Bool("explain", Config.Explain, "Explain, 是否开启Explain执行计划分析")
 	sampling := flag.Bool("sampling", Config.Sampling, "Sampling, 数据采样开关")
 	samplingStatisticTarget := flag.Int("sampling-statistic-target", Config.SamplingStatisticTarget, "SamplingStatisticTarget, 数据采样因子，对应postgres的default_statistics_target")
 	connTimeOut := flag.Int("conn-time-out", Config.ConnTimeOut, "ConnTimeOut, 数据库连接超时时间，单位秒")
@@ -547,7 +551,7 @@ func readCmdFlags() error {
 	}
 
 	Config.OnlineDSN = parseDSN(*onlineDSN, Config.OnlineDSN)
-	Config.TestDSN = parseDSN(*testDSN, Config.OnlineDSN)
+	Config.TestDSN = parseDSN(*testDSN, Config.TestDSN)
 	Config.AllowOnlineAsTest = *allowOnlineAsTest
 	Config.DropTestTemporary = *dropTestTemporary
 	Config.OnlySyntaxCheck = *onlySyntaxCheck
