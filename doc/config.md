@@ -75,6 +75,8 @@ $ soar -h
 
 ### 命令行参数配置DSN
 
+> 账号密码中如包含特殊符号(如：'@',':','/'等)可在配置文件中设置，存在特殊字符的情况不适合在命令行中使用。
+
 ```bash
 $ soar -online-dsn "user:password@ip:port/database"
 
