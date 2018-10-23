@@ -251,9 +251,9 @@ func init() {
 		"ARG.010": {
 			Item:     "ARG.010",
 			Severity: "L1",
-			Summary:  "不要使用hint，如sql_no_cache，force index，ignore key，straight join等",
+			Summary:  "不要使用hint，如sql_no_cache, force index, ignore key, straight join等",
 			Content:  `hint是用来强制SQL按照某个执行计划来执行，但随着数据量变化我们无法保证自己当初的预判是正确的。`,
-			Case:     "SELECT 'abc '",
+			Case:     "SELECT * FROM t1 USE INDEX (i1) ORDER BY a;",
 			Func:     (*Query4Audit).RuleHint,
 		},
 		"ARG.011": {

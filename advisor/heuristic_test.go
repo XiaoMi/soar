@@ -1731,7 +1731,7 @@ func TestRuleHint(t *testing.T) {
 		{
 			`SELECT * FROM t1 USE INDEX (i1) ORDER BY a;`,
 			`SELECT * FROM t1 IGNORE INDEX (i1) ORDER BY (i2);`,
-			// vitess syntax not support now
+			// TODO: vitess syntax not support now
 			// `SELECT * FROM t1 USE INDEX (i1,i2) IGNORE INDEX (i2);`,
 			// `SELECT * FROM t1 USE INDEX (i1) IGNORE INDEX (i2) USE INDEX (i2);`,
 		},

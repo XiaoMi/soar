@@ -2044,6 +2044,7 @@ func (q *Query4Audit) RuleSpaceWithQuote() Rule {
 }
 
 // RuleHint ARG.010
+// TODO: sql_no_cache, straight join
 func (q *Query4Audit) RuleHint() Rule {
 	var rule = q.RuleOK()
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {

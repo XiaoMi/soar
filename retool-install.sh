@@ -6,7 +6,7 @@ set -euo pipefail
 which retool >/dev/null || go get -u github.com/twitchtv/retool
 
 # This tool can run other checks in a standardized way
-retool add gopkg.in/alecthomas/gometalinter.v2 v2.0.5
+retool add gopkg.in/alecthomas/gometalinter.v2 v2.0.11
 
 # check spelling
 # misspell works with gometalinter
