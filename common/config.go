@@ -26,6 +26,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -120,6 +121,14 @@ type Configration struct {
 	MaxPrettySQLLength int    `yaml:"max-pretty-sql-length"` // 超出该长度的SQL会转换成指纹输出
 }
 
+// getDefaultLogOutput get default log-output by runtime.GOOS
+func getDefaultLogOutput() string {
+	if runtime.GOOS == "windows" {
+		return "nul"
+	}
+	return os.Stderr.Name()
+}
+
 // Config 默认设置
 var Config = &Configration{
 	OnlineDSN: &dsn{
@@ -158,7 +167,7 @@ var Config = &Configration{
 	SpaghettiQueryLength: 2048,
 	AllowDropIndex:       false,
 	LogLevel:             3,
-	LogOutput:            os.Stderr.Name(),
+	LogOutput:            getDefaultLogOutput(),
 	ReportType:           "markdown",
 	ReportCSS:            "",
 	ReportJavascript:     "",
@@ -538,7 +547,7 @@ func readCmdFlags() error {
 	maxPrettySQLLength := flag.Int("max-pretty-sql-length", Config.MaxPrettySQLLength, "MaxPrettySQLLength, 超出该长度的SQL会转换成指纹输出")
 	// 一个不存在log-level，用于更新usage。
 	// 因为vitess里面也用了flag，这些vitess的参数我们不需要关注
-	if !Config.Verbose {
+	if !Config.Verbose && runtime.GOOS != "windows" {
 		flag.Usage = usage
 	}
 	flag.Parse()
@@ -570,7 +579,11 @@ func readCmdFlags() error {
 		if BaseDir == "" {
 			Config.LogOutput = *logOutput
 		} else {
-			Config.LogOutput = BaseDir + "/" + *logOutput
+			if runtime.GOOS == "windows" {
+				Config.LogOutput = *logOutput
+			} else {
+				Config.LogOutput = BaseDir + "/" + *logOutput
+			}
 		}
 	}
 	Config.ReportType = strings.ToLower(*reportType)

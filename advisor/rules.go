@@ -115,9 +115,9 @@ func init() {
 		"OK": {
 			Item:     "OK",
 			Severity: "L0",
-			Summary:  "✔️", // heavy check mark unicode
-			Content:  `✔️`,
-			Case:     "✔️",
+			Summary:  "OK",
+			Content:  `OK`,
+			Case:     "OK",
 			Func:     (*Query4Audit).RuleOK,
 		},
 		"ALI.001": {
