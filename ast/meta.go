@@ -95,7 +95,7 @@ func GetMeta(stmt sqlparser.Statement, meta common.Meta) common.Meta {
 					meta[db2] = common.NewDB(db2)
 				}
 
-				meta[db1].Table[tb2] = common.NewTable(tb2)
+				meta[db2].Table[tb2] = common.NewTable(tb2)
 			}
 
 			return false, nil
