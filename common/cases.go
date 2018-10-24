@@ -26,12 +26,12 @@ func init() {
 		// DDL
 		"create table hello.t (id int unsigned);",
 
-		//  single equality
+		// single equality
 		"SELECT * FROM film WHERE length = 86;",    // index(length)
 		"SELECT * FROM film WHERE length IS NULL;", // index(length)
 		"SELECT * FROM film HAVING title = 'abc';", // 无法使用索引
 
-		//single inequality
+		// single inequality
 		"SELECT * FROM sakila.film WHERE length >= 60;",   // any of <, <=, >=, >; but not <>, !=, IS NOT NULL"
 		"SELECT * FROM sakila.film WHERE length >= '60';", // Implicit Conversion
 		"SELECT * FROM film WHERE length BETWEEN 60 AND 84;",
@@ -63,13 +63,14 @@ func init() {
 		"SELECT * FROM film WHERE length = 123 ORDER BY release_year ASC, language_id DESC;",                     //  INDEX(length) mixture of ASC and DESC.",
 		"SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year LIMIT 10;", //  INDEX(length, release_year)",
 		"SELECT * FROM film WHERE length = 123 ORDER BY release_year LIMIT 10;",                                  //  INDEX(length, release_year)",
-		"SELECT * FROM film ORDER BY release_year LIMIT 10;",                                                     //  INDEX(release_year)",
+		"SELECT * FROM film ORDER BY release_year LIMIT 10;",                                                     //  不能单独给release_year加索引
+		"SELECT film_id FROM film ORDER BY release_year LIMIT 10;",                                               //  TODO: INDEX(release_year)，film_id是主键查询列满足索引覆盖的情况才会使用到release_year索引
 		"SELECT * FROM film WHERE length > 100 ORDER BY length LIMIT 10;",                                        //  INDEX(length) This "range" is compatible with ORDER BY
 		"SELECT * FROM film WHERE length < 100 ORDER BY length LIMIT 10;",                                        //  INDEX(length) also works
-		"SELECT * FROM customer WHERE address_id in (224,510) ORDER BY last_name;",                               // INDEX(address_id)
-		"SELECT * FROM film WHERE release_year = 2016 AND length != 1 ORDER BY title;",                           // INDEX(`release_year`, `length`, `title`)
+		"SELECT * FROM customer WHERE address_id in (224,510) ORDER BY last_name;",                               //  INDEX(address_id)
+		"SELECT * FROM film WHERE release_year = 2016 AND length != 1 ORDER BY title;",                           //  INDEX(`release_year`, `length`, `title`)
 
-		//"Covering" IdxRows
+		// "Covering" IdxRows
 		"SELECT title FROM film WHERE release_year = 1995;",                               //  INDEX(release_year, title)",
 		"SELECT title, replacement_cost FROM film WHERE language_id = 5 AND length = 70;", //  INDEX(language_id, length, title, replacement_cos film ), title, replacement_cost顺序无关，language_id, length顺序视散粒度情况.
 		"SELECT title FROM film WHERE language_id > 5 AND length > 70;",                   //  INDEX(language_id, length, title) language_id or length first (that's as far as the Algorithm goes), then the other two fields afterwards.
@@ -175,7 +176,7 @@ func init() {
 
 		// SUBQUERY
 		"SELECT * FROM film WHERE language_id = (SELECT language_id FROM language LIMIT 1);",
-		//"SELECT COUNT(*) /* no hint */ FROM t2 WHERE NOT EXISTS (SELECT * FROM t3 WHERE ROW(5 * t2.s1, 77) = (SELECT 50, 11 * s1 FROM t4 UNION SELECT 50, 77 FROM (SELECT * FROM t5) AS t5 ) ) ;",
+		// "SELECT COUNT(*) /* no hint */ FROM t2 WHERE NOT EXISTS (SELECT * FROM t3 WHERE ROW(5 * t2.s1, 77) = (SELECT 50, 11 * s1 FROM t4 UNION SELECT 50, 77 FROM (SELECT * FROM t5) AS t5 ) ) ;",
 		"SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id;",
 		"SELECT * FROM (SELECT * FROM actor WHERE last_update='2006-02-15 04:34:33' and last_name='CHASE') t WHERE last_update='2006-02-15 04:34:33' and last_name='CHASE' GROUP BY first_name;",
 		"SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id;",
