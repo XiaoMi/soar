@@ -145,7 +145,7 @@ lint: build
 release: deps build
 	@echo "\033[92mCross platform building for release ...\033[0m"
 	@for GOOS in darwin linux windows; do \
-		for GOARCH in 386 amd64; do \
+		for GOARCH in amd64; do \
 			for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 				b=$$(basename $${d}) ; \
 				echo "Building $${b}.$${GOOS}-$${GOARCH} ..."; \
