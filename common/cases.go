@@ -23,6 +23,9 @@ func init() {
 	// 所有的SQL都要以分号结尾，-list-test-sqls参数会打印这个list，以分号结尾可方便测试
 	// 如：./soar -list-test-sql | ./soar
 	TestSQLs = []string{
+		// DDL
+		"create table hello.t (id int unsigned);",
+
 		//  single equality
 		"SELECT * FROM film WHERE length = 86;",    // index(length)
 		"SELECT * FROM film WHERE length IS NULL;", // index(length)

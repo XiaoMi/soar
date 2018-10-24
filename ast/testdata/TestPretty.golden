@@ -630,6 +630,8 @@ ALTER TABLE t1 CHANGE b a INT NOT NULL;
 
 ALTER TABLE  
   t1  CHANGE  b  a  INT  NOT  NULL;
+create table hello.t (id int unsigned);
+create  table  hello. t  (id  int  unsigned);
 SELECT * FROM film WHERE length = 86;
 
 SELECT  
