@@ -869,6 +869,16 @@ ORDER BY
   release_year  
 LIMIT  
   10;
+SELECT film_id FROM film ORDER BY release_year LIMIT 10;
+
+SELECT  
+  film_id  
+FROM  
+  film  
+ORDER BY  
+  release_year  
+LIMIT  
+  10;
 SELECT * FROM film WHERE length > 100 ORDER BY length LIMIT 10;
 
 SELECT  

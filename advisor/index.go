@@ -302,11 +302,13 @@ func (idxAdv *IndexAdvisor) IndexAdvise() IndexAdvises {
 
 		// OrderBy
 		// 没有GroupBy时可以为OrderBy加索引
-		if len(idxAdv.groupBy) == 0 {
-			for _, index := range idxAdv.orderBy {
-				mergeIndex(indexList, index)
-			}
-		}
+		// 没有where条件时OrderBy的索引仅能够在索引覆盖的情况下被使用
+
+		// if len(idxAdv.groupBy) == 0 {
+		// 	for _, index := range idxAdv.orderBy {
+		// 		mergeIndex(indexList, index)
+		// 	}
+		// }
 	}
 
 	// 开始整合索引信息，添加索引
