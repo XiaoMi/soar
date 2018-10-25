@@ -23,9 +23,6 @@ func init() {
 	// 所有的SQL都要以分号结尾，-list-test-sqls参数会打印这个list，以分号结尾可方便测试
 	// 如：./soar -list-test-sql | ./soar
 	TestSQLs = []string{
-		// DDL
-		"create table hello.t (id int unsigned);",
-
 		// single equality
 		"SELECT * FROM film WHERE length = 86;",    // index(length)
 		"SELECT * FROM film WHERE length IS NULL;", // index(length)
@@ -197,5 +194,10 @@ func init() {
 		"alter table address add index idx_city_id(city_id);",
 		"alter table inventory add index `idx_store_film` (`store_id`,`film_id`);",
 		"alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);",
+
+		// https://github.com/XiaoMi/soar/issues/47
+		`SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')`,
+		// https://github.com/XiaoMi/soar/issues/17
+		"create table hello.t (id int unsigned);",
 	}
 }

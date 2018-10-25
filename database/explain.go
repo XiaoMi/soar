@@ -789,6 +789,8 @@ func parseTraditionalExplainText(content string) (explainRows []*ExplainRow, err
 		if err != nil {
 			filtered = 0.00
 		}
+		// filtered may larger than 100.00
+		// https://bugs.mysql.com/bug.php?id=34124
 		if filtered > 100.00 {
 			filtered = 100.00
 		}
@@ -981,7 +983,7 @@ func ParseExplainResult(res *QueryResult, formatType int) (exp *ExplainInfo, err
 
 // Explain 获取SQL的explain信息
 func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *ExplainInfo, err error) {
-	exp = &ExplainInfo{}
+	exp = &ExplainInfo{SQL: sql}
 	if explainType != TraditionalExplainType {
 		formatType = TraditionalFormatExplain
 	}
@@ -1004,8 +1006,6 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 	// 解析mysql结果，输出ExplainInfo
 	exp, err = ParseExplainResult(res, formatType)
 
-	// 补全SQL
-	exp.SQL = sql
 	return exp, err
 }
 

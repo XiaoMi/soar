@@ -28,6 +28,7 @@ import (
 
 // Pretty 格式化输出SQL
 func Pretty(sql string, method string) (output string) {
+	common.Log.Debug("Pretty, Query: %s, method: %s", sql, method)
 	// 超出 Config.MaxPrettySQLLength 长度的SQL会对其指纹进行pretty
 	if len(sql) > common.Config.MaxPrettySQLLength {
 		fingerprint := query.Fingerprint(sql)
@@ -216,6 +217,8 @@ func format(query string) string {
 				if j.Value.(string) == "special" {
 					if indentLevel > 0 {
 						indentLevel--
+					} else {
+						break
 					}
 				} else {
 					break

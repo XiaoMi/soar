@@ -77,9 +77,14 @@ func TestCompress(t *testing.T) {
 }
 
 func TestFormat(t *testing.T) {
-	for _, sql := range common.TestSQLs {
-		fmt.Println(sql)
-		fmt.Println(format(sql))
+	err := common.GoldenDiff(func() {
+		for _, sql := range common.TestSQLs {
+			fmt.Println(sql)
+			fmt.Println(format(sql))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }
 

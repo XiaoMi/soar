@@ -257,6 +257,7 @@ func main() {
 		// +++++++++++++++++++++语法检查[结束]+++++++++++++++++++++++}
 
 		// +++++++++++++++++++++启发式规则建议[开始]+++++++++++++++++++++++{
+		common.Log.Debug("start of heuristic advisor Query: %s", q.Query)
 		for item, rule := range advisor.HeuristicRules {
 			// 去除忽略的建议检查
 			okFunc := (*advisor.Query4Audit).RuleOK
@@ -267,11 +268,13 @@ func main() {
 				}
 			}
 		}
+		common.Log.Debug("end of heuristic advisor Query: %s", q.Query)
 		// +++++++++++++++++++++启发式规则建议[结束]+++++++++++++++++++++++}
 
 		// +++++++++++++++++++++索引优化建议[开始]+++++++++++++++++++++++{
 		// 如果配置了索引建议过滤规则，不进行索引优化建议
 		// 在配置文件ignore-rules中添加 'IDX.*'即可屏蔽索引优化建议
+		common.Log.Debug("start of index advisor Query: %s", q.Query)
 		if !advisor.IsIgnoreRule("IDX.") {
 			if vEnv.BuildVirtualEnv(rEnv, q.Query) {
 				idxAdvisor, err := advisor.NewAdvisor(vEnv, *rEnv, *q)
@@ -314,10 +317,12 @@ func main() {
 				common.Log.Error("vEnv.BuildVirtualEnv Error: prepare SQL '%s' in vEnv failed.", q.Query)
 			}
 		}
+		common.Log.Debug("end of index advisor Query: %s", q.Query)
 		// +++++++++++++++++++++索引优化建议[结束]+++++++++++++++++++++++}
 
 		// +++++++++++++++++++++EXPLAIN建议[开始]+++++++++++++++++++++++{
 		// 如果未配置Online或Test无法给Explain建议
+		common.Log.Debug("start of explain Query: %s", q.Query)
 		if !common.Config.OnlineDSN.Disable && !common.Config.TestDSN.Disable {
 			// 因为EXPLAIN依赖数据库环境，所以把这段逻辑放在启发式建议和索引建议后面
 			if common.Config.Explain {
@@ -335,6 +340,7 @@ func main() {
 						// EXPLAIN阶段给出的ERROR是ERR.002
 						mysqlSuggest["ERR.002"] = advisor.RuleMySQLError("ERR.002", err)
 						common.Log.Error("vEnv.Explain Error: %v", err)
+						continue
 					}
 				}
 				// 分析EXPLAIN结果
@@ -345,9 +351,11 @@ func main() {
 				}
 			}
 		}
+		common.Log.Debug("end of explain Query: %s", q.Query)
 		// +++++++++++++++++++++EXPLAIN建议[结束]+++++++++++++++++++++++}
 
 		// +++++++++++++++++++++Profiling[开始]+++++++++++++++++++++++++{
+		common.Log.Debug("start of profiling Query: %s", q.Query)
 		if common.Config.Profiling {
 			res, err := vEnv.Profiling(q.Query)
 			if err == nil {
@@ -360,9 +368,11 @@ func main() {
 				common.Log.Error("Profiling Error: %v", err)
 			}
 		}
+		common.Log.Debug("end of profiling Query: %s", q.Query)
 		// +++++++++++++++++++++Profiling[结束]++++++++++++++++++++++++++}
 
 		// +++++++++++++++++++++Trace [开始]+++++++++++++++++++++++++{
+		common.Log.Debug("start of trace Query: %s", q.Query)
 		if common.Config.Trace {
 			res, err := vEnv.Trace(q.Query)
 			if err == nil {
@@ -375,9 +385,11 @@ func main() {
 				common.Log.Error("Trace Error: %v", err)
 			}
 		}
+		common.Log.Debug("end of trace Query: %s", q.Query)
 		// +++++++++++++++++++++Trace [结束]++++++++++++++++++++++++++}
 
 		// +++++++++++++++++++++SQL重写[开始]+++++++++++++++++++++++++{
+		common.Log.Debug("start of rewrite Query: %s", q.Query)
 		if common.Config.ReportType == "rewrite" {
 			if strings.HasPrefix(strings.TrimSpace(strings.ToLower(sql)), "create") ||
 				strings.HasPrefix(strings.TrimSpace(strings.ToLower(sql)), "alter") ||
@@ -411,9 +423,11 @@ func main() {
 				fmt.Println(strings.TrimSpace(rw.NewSQL))
 			}
 		}
+		common.Log.Debug("end of rewrite Query: %s", q.Query)
 		// +++++++++++++++++++++SQL重写[结束]++++++++++++++++++++++++++}
 
-		// 打印单条SQL优化建议
+		// +++++++++++++++++++++打印单条SQL优化建议[开始]++++++++++++++++++++++++++{
+		common.Log.Debug("start of print suggestions, Query: %s", q.Query)
 		sug, str := advisor.FormatSuggest(q.Query, common.Config.ReportType, heuristicSuggest, idxSuggest, expSuggest, proSuggest, traceSuggest, mysqlSuggest)
 		suggestMerged[id] = sug
 		switch common.Config.ReportType {
@@ -443,6 +457,8 @@ func main() {
 		default:
 			fmt.Println(str)
 		}
+		common.Log.Debug("end of print suggestions, Query: %s", q.Query)
+		// +++++++++++++++++++++打印单条SQL优化建议[结束]++++++++++++++++++++++++++}
 	}
 
 	// 同一张表的多条ALTER语句合并为一条

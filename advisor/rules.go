@@ -1098,8 +1098,8 @@ func InBlackList(sql string) bool {
 }
 
 // FormatSuggest 格式化输出优化建议
-// 目前支持：json, text两种形式，其他形式会给结构体的pretty.Println
 func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[string]Rule, string) {
+	common.Log.Debug("FormatSuggest, Query: %s", sql)
 	var fingerprint, id string
 	var buf []string
 	var score = 100
@@ -1145,7 +1145,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 			delete(suggest, k)
 		}
 	}
-
+	common.Log.Debug("FormatSuggest, format: %s", format)
 	switch format {
 	case "json":
 		js, err := json.MarshalIndent(Result{
@@ -1192,6 +1192,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 			}
 		}
 		// MySQL
+		common.Log.Debug("FormatSuggest, start of sortedMySQLSuggest")
 		var sortedMySQLSuggest []string
 		for item := range suggest {
 			if strings.HasPrefix(item, "ERR") {
@@ -1213,6 +1214,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 		// Explain
+		common.Log.Debug("FormatSuggest, start of sortedExplainSuggest")
 		if suggest["EXP.000"].Item != "" {
 			buf = append(buf, fmt.Sprintln("## ", suggest["EXP.000"].Summary))
 			buf = append(buf, fmt.Sprintln(suggest["EXP.000"].Content))
@@ -1233,6 +1235,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 		// Profiling
+		common.Log.Debug("FormatSuggest, start of sortedProfilingSuggest")
 		var sortedProfilingSuggest []string
 		for item := range suggest {
 			if strings.HasPrefix(item, "PRO") {
@@ -1249,6 +1252,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 		// Trace
+		common.Log.Debug("FormatSuggest, start of sortedTraceSuggest")
 		var sortedTraceSuggest []string
 		for item := range suggest {
 			if strings.HasPrefix(item, "TRA") {
@@ -1265,6 +1269,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 		// Index
+		common.Log.Debug("FormatSuggest, start of sortedIdxSuggest")
 		var sortedIdxSuggest []string
 		for item := range suggest {
 			if strings.HasPrefix(item, "IDX") {
@@ -1293,6 +1298,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 		// Heuristic
+		common.Log.Debug("FormatSuggest, start of sortedHeuristicSuggest")
 		var sortedHeuristicSuggest []string
 		for item := range suggest {
 			if !strings.HasPrefix(item, "EXP") &&
@@ -1321,6 +1327,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 	default:
+		common.Log.Debug("unknown report-type %s", format)
 		buf = append(buf, fmt.Sprintln("Query: ", sql))
 		for _, rule := range suggest {
 			buf = append(buf, pretty.Sprint(rule))
@@ -1330,12 +1337,12 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 	// 打分
 	var str string
 	switch common.Config.ReportType {
-	case "explain-digest", "lint":
-		str = strings.Join(buf, "\n")
-	default:
+	case "markdown", "html":
 		if len(buf) > 1 {
 			str = buf[0] + "\n" + common.Score(score) + "\n\n" + strings.Join(buf[1:], "\n")
 		}
+	default:
+		str = strings.Join(buf, "\n")
 	}
 
 	return suggest, str

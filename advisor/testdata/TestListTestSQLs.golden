@@ -1,4 +1,3 @@
-create table hello.t (id int unsigned);
 SELECT * FROM film WHERE length = 86;
 SELECT * FROM film WHERE length IS NULL;
 SELECT * FROM film HAVING title = 'abc';
@@ -80,3 +79,5 @@ SELECT description FROM film WHERE description IN('NEWS','asd') GROUP BY descrip
 alter table address add index idx_city_id(city_id);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
+SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')
+create table hello.t (id int unsigned);
