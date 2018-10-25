@@ -9,6 +9,14 @@
 * [mysql](https://www.mysql.com/) 测试时用来连接测试环境
 * [retool](https://github.com/twitchtv/retool): 管理测试开发工具,首次安装耗时会比较长,如:`gometalinter.v2`, `revive`, `golangci-lint`
 
+### 命令行参数`test-dsn`, `online-dsn`中包含特殊字符怎么办？
+
+如果`test-dsn`或`online-dsn`中包含':', '@', '/', '!'等特殊字符建议在配置文件中配置相关信息，配置文件为YAML格式，需要遵守YAML格式的要求规范。
+
+### Windows环境下双击`soar.windows-amd64`文件无反应。
+
+`soar`是命令行工具，不是图形化桌面工具，Windows环境需要在`cmd.exe`下以命令行方式运行。使用`soar`前您需要先熟悉Windows命令行使用。
+
 ### 提示语法错误
 
 * 请检查SQL语句中是否出现了不配对的引号,如 `, ", '

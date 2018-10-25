@@ -67,6 +67,9 @@ func TestRuleImplicitConversion(t *testing.T) {
 		"SELECT * FROM t1 WHERE title >= 60;",
 		"SELECT * FROM t1, t2 WHERE t1.title = t2.title;",
 		"SELECT * FROM t1, t3 WHERE t1.title = t3.title;",
+		// TODO:
+		// "SELECT * FROM t1 WHERE title in (60);",
+		// "SELECT * FROM t1 WHERE title in (60, '60');",
 	}
 	for _, sql := range sqls {
 		stmt, syntaxErr := sqlparser.Parse(sql)

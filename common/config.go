@@ -537,7 +537,7 @@ func readCmdFlags() error {
 	// +++++++++++++++++其他+++++++++++++++++++
 	printConfig := flag.Bool("print-config", false, "Print configs")
 	ver := flag.Bool("version", false, "Print version info")
-	query := flag.String("query", Config.Query, "Queries for analyzing")
+	query := flag.String("query", Config.Query, "待评审的SQL或SQL文件，如SQL中包含特殊字符建议使用文件名。")
 	listHeuristicRules := flag.Bool("list-heuristic-rules", Config.ListHeuristicRules, "ListHeuristicRules, 打印支持的评审规则列表")
 	listRewriteRules := flag.Bool("list-rewrite-rules", Config.ListRewriteRules, "ListRewriteRules, 打印支持的重写规则列表")
 	listTestSQLs := flag.Bool("list-test-sqls", Config.ListTestSqls, "ListTestSqls, 打印测试case用于测试")

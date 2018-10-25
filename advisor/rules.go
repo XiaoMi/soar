@@ -198,7 +198,7 @@ func init() {
 			Summary:  "参数比较包含隐式转换，无法使用索引",
 			Content:  "隐式类型转换有无法命中索引的风险，在高并发、大数据量的情况下，命不中索引带来的后果非常严重。",
 			Case:     "SELECT * FROM sakila.film WHERE length >= '60';",
-			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给
+			Func:     (*Query4Audit).RuleOK, // 该建议在IndexAdvisor中给，RuleImplicitConversion
 		},
 		"ARG.004": {
 			Item:     "ARG.004",
