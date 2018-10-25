@@ -1,14 +1,30 @@
 language: go
-sudo: false
-
-go_import_path: github.com/XiaoMi/soar
 
 go:
   - "1.10"
   - "1.11.x"
 
+sudo: required
+
+go_import_path: github.com/XiaoMi/soar
+
+addons:
+  apt:
+   sources:
+    - mysql-5.7-trusty
+   packages:
+    - mysql-client
+
+services:
+  - docker
+
+before_install:
+  - docker pull mysql
+
 script:
-  - make fmt
+  - make build
+  - make docker
+  - make cover
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
