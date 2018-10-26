@@ -294,8 +294,8 @@ func (ve VirtualEnv) createDatabase(rEnv database.Connector, dbName string) erro
 		return nil
 	}
 
-	// optimizer_YYMMDD_xxxx
-	dbHash := fmt.Sprintf("optimizer_%s_%s", time.Now().Format("060102"), uniuri.New())
+	// optimizer_YYMMDDHHmmss_xxxx
+	dbHash := fmt.Sprintf("optimizer_%s_%s", time.Now().Format("060102150405"), uniuri.New())
 	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", dbName, dbName, dbHash)
 	ddl, err := rEnv.ShowCreateDatabase(dbName)
 	if err != nil {
