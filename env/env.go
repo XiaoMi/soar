@@ -18,11 +18,11 @@ package env
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
 	"github.com/XiaoMi/soar/database"
+	"strings"
+	"time"
 
 	"github.com/dchest/uniuri"
 	"vitess.io/vitess/go/vt/sqlparser"
@@ -294,7 +294,8 @@ func (ve VirtualEnv) createDatabase(rEnv database.Connector, dbName string) erro
 		return nil
 	}
 
-	dbHash := "optimizer_" + uniuri.New()
+	// optimizer_YYMMDD_xxxx
+	dbHash := fmt.Sprintf("optimizer_%s_%s", time.Now().Format("060102"), uniuri.New())
 	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", dbName, dbName, dbHash)
 	ddl, err := rEnv.ShowCreateDatabase(dbName)
 	if err != nil {
