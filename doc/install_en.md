@@ -11,7 +11,7 @@ chmod a+x soar
 ## Build From Source
 
 ```bash
-go get github.com/XiaoMi/soar/...
+go get -d github.com/XiaoMi/soar
 cd ${GOPATH}/src/github.com/XiaoMi/soar && make
 ```
 

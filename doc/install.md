@@ -27,7 +27,7 @@ chmod a+x soar
 ### 生成二进制文件
 
 ```bash
-go get github.com/XiaoMi/soar/...
+go get -d github.com/XiaoMi/soar
 cd ${GOPATH}/src/github.com/XiaoMi/soar && make
 ```
 
