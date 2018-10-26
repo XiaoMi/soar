@@ -978,6 +978,10 @@ func (idxAdvs IndexAdvises) Format() map[string]Rule {
 		for _, v := range ddl {
 			rules[adv].Case = v
 		}
+
+		// set item
+		rules[adv].Item = key
+
 		rulesMap[key] = *rules[adv]
 
 		number++
