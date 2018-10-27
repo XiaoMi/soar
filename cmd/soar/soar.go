@@ -80,6 +80,11 @@ func main() {
 	// 环境初始化，连接检查线上环境+构建测试环境
 	vEnv, rEnv := env.BuildEnv()
 
+	//如果使用CleanTestDataBase命令，则清除前1小时的数据库
+	if common.Config.CleanTestDataBase {
+		vEnv.CleanTestDataBase()
+	}
+
 	// 如果使用到测试环境，在这里环境清理
 	if common.Config.DropTestTemporary {
 		defer vEnv.CleanUp()
