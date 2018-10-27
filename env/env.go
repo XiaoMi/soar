@@ -18,11 +18,12 @@ package env
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
 	"github.com/XiaoMi/soar/database"
-	"strings"
-	"time"
 
 	"github.com/dchest/uniuri"
 	"vitess.io/vitess/go/vt/sqlparser"
@@ -147,6 +148,37 @@ func (ve VirtualEnv) CleanUp() bool {
 		common.Log.Debug("CleanUp, done")
 	}
 	return true
+}
+
+// CleanTestDataBase 清除一小时前的环境
+func (ve *VirtualEnv) CleanTestDataBase() {
+	common.Log.Debug("CleanTestDataBase ...")
+	dbs, err := ve.Query("show databases like 'optimizer%'")
+	if err == nil {
+		for index, row := range dbs.Rows {
+			s := strings.Split(row.Str(index), "_")
+			pastTime, err := time.Parse("060102150405", s[1])
+			if err != nil {
+				common.Log.Error("CleanTestDataBase compute  pastTime Error: %s", err)
+			}
+			nowTime, err := time.Parse("060102150405", time.Now().Format("060102150405"))
+			if err != nil {
+				common.Log.Error("CleanTestDataBase compute  nowTime Error: %s", err)
+			}
+			subHour := nowTime.Sub(pastTime).Hours()
+			if subHour > 1 {
+				_, err := ve.Query("drop database %s", row.Str(index))
+				if err != nil {
+					common.Log.Error("CleanTestDataBase failed Error: %s", err)
+				}
+			}
+			common.Log.Debug("CleanTestDataBase, done")
+
+		}
+	} else {
+		common.Log.Error("CleanTestDataBase  failed Error:%s", err)
+	}
+
 }
 
 // BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取

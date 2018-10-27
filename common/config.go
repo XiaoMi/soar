@@ -119,6 +119,7 @@ type Configration struct {
 	Verbose            bool   `yaml:"verbose"`               // verbose模式，会多输出一些信息
 	DryRun             bool   `yaml:"dry-run"`               // 是否在预演环境执行
 	MaxPrettySQLLength int    `yaml:"max-pretty-sql-length"` // 超出该长度的SQL会转换成指纹输出
+	CleanTestDataBase  bool   `yaml:"clean-test-database"`   // 清理数据库  issue #48
 }
 
 // getDefaultLogOutput get default log-output by runtime.GOOS
@@ -219,6 +220,7 @@ var Config = &Configration{
 	ListTestSqls:       false,
 	ListReportTypes:    false,
 	MaxPrettySQLLength: 1024,
+	CleanTestDataBase:  false,
 }
 
 type dsn struct {
@@ -545,6 +547,7 @@ func readCmdFlags() error {
 	verbose := flag.Bool("verbose", Config.Verbose, "Verbose")
 	dryrun := flag.Bool("dry-run", Config.DryRun, "是否在预演环境执行")
 	maxPrettySQLLength := flag.Int("max-pretty-sql-length", Config.MaxPrettySQLLength, "MaxPrettySQLLength, 超出该长度的SQL会转换成指纹输出")
+	cleanTestDataBase := flag.Bool("clean-test-database", Config.CleanTestDataBase, "由于程序异常退出，导致临时数据库的存在，可用此命令删除。")
 	// 一个不存在log-level，用于更新usage。
 	// 因为vitess里面也用了flag，这些vitess的参数我们不需要关注
 	if !Config.Verbose && runtime.GOOS != "windows" {
@@ -648,6 +651,7 @@ func readCmdFlags() error {
 	Config.DryRun = *dryrun
 	Config.MaxPrettySQLLength = *maxPrettySQLLength
 	Config.MaxVarcharLength = *maxVarcharLength
+	Config.CleanTestDataBase = *cleanTestDataBase
 
 	if *ver {
 		version()
