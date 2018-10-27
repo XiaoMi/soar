@@ -171,8 +171,8 @@ func (ve *VirtualEnv) CleanTestDataBase() {
 				if err != nil {
 					common.Log.Error("CleanTestDataBase failed Error: %s", err)
 				}
+				common.Log.Debug("CleanTestDataBase, done")
 			}
-			common.Log.Debug("CleanTestDataBase, done")
 
 		}
 	} else {
