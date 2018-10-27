@@ -43,6 +43,7 @@ type Configration struct {
 	TestDSN                 *dsn   `yaml:"test-dsn"`                  // 测试环境数据库配置
 	AllowOnlineAsTest       bool   `yaml:"allow-online-as-test"`      // 允许Online环境也可以当作Test环境
 	DropTestTemporary       bool   `yaml:"drop-test-temporary"`       // 是否清理Test环境产生的临时库表
+	CleanupTestDatabase     bool   `yaml:"cleanup-test-database"`     // 清理残余的测试数据库（程序异常退出或未开启drop-test-temporary）  issue #48
 	OnlySyntaxCheck         bool   `yaml:"only-syntax-check"`         // 只做语法检查不输出优化建议
 	SamplingStatisticTarget int    `yaml:"sampling-statistic-target"` // 数据采样因子，对应postgres的default_statistics_target
 	Sampling                bool   `yaml:"sampling"`                  // 数据采样开关
@@ -119,7 +120,6 @@ type Configration struct {
 	Verbose            bool   `yaml:"verbose"`               // verbose模式，会多输出一些信息
 	DryRun             bool   `yaml:"dry-run"`               // 是否在预演环境执行
 	MaxPrettySQLLength int    `yaml:"max-pretty-sql-length"` // 超出该长度的SQL会转换成指纹输出
-	CleanTestDataBase  bool   `yaml:"clean-test-database"`   // 清理数据库  issue #48
 }
 
 // getDefaultLogOutput get default log-output by runtime.GOOS
@@ -146,6 +146,7 @@ var Config = &Configration{
 	},
 	AllowOnlineAsTest:       false,
 	DropTestTemporary:       true,
+	CleanupTestDatabase:     false,
 	DryRun:                  true,
 	OnlySyntaxCheck:         false,
 	SamplingStatisticTarget: 100,
@@ -220,7 +221,6 @@ var Config = &Configration{
 	ListTestSqls:       false,
 	ListReportTypes:    false,
 	MaxPrettySQLLength: 1024,
-	CleanTestDataBase:  false,
 }
 
 type dsn struct {
@@ -480,6 +480,7 @@ func readCmdFlags() error {
 	testDSN := flag.String("test-dsn", FormatDSN(Config.TestDSN), "TestDSN, 测试环境数据库配置, username:password@ip:port/schema")
 	allowOnlineAsTest := flag.Bool("allow-online-as-test", Config.AllowOnlineAsTest, "AllowOnlineAsTest, 允许线上环境也可以当作测试环境")
 	dropTestTemporary := flag.Bool("drop-test-temporary", Config.DropTestTemporary, "DropTestTemporary, 是否清理测试环境产生的临时库表")
+	cleanupTestDatabase := flag.Bool("cleanup-test-database", Config.CleanupTestDatabase, "单次运行清理历史1小时前残余的测试库。")
 	onlySyntaxCheck := flag.Bool("only-syntax-check", Config.OnlySyntaxCheck, "OnlySyntaxCheck, 只做语法检查不输出优化建议")
 	profiling := flag.Bool("profiling", Config.Profiling, "Profiling, 开启数据采样的情况下在测试环境执行Profile")
 	trace := flag.Bool("trace", Config.Trace, "Trace, 开启数据采样的情况下在测试环境执行Trace")
@@ -547,7 +548,6 @@ func readCmdFlags() error {
 	verbose := flag.Bool("verbose", Config.Verbose, "Verbose")
 	dryrun := flag.Bool("dry-run", Config.DryRun, "是否在预演环境执行")
 	maxPrettySQLLength := flag.Int("max-pretty-sql-length", Config.MaxPrettySQLLength, "MaxPrettySQLLength, 超出该长度的SQL会转换成指纹输出")
-	cleanTestDataBase := flag.Bool("clean-test-database", Config.CleanTestDataBase, "由于程序异常退出，导致临时数据库的存在，可用此命令删除。")
 	// 一个不存在log-level，用于更新usage。
 	// 因为vitess里面也用了flag，这些vitess的参数我们不需要关注
 	if !Config.Verbose && runtime.GOOS != "windows" {
@@ -566,6 +566,7 @@ func readCmdFlags() error {
 	Config.TestDSN = parseDSN(*testDSN, Config.TestDSN)
 	Config.AllowOnlineAsTest = *allowOnlineAsTest
 	Config.DropTestTemporary = *dropTestTemporary
+	Config.CleanupTestDatabase = *cleanupTestDatabase
 	Config.OnlySyntaxCheck = *onlySyntaxCheck
 	Config.Profiling = *profiling
 	Config.Trace = *trace
@@ -651,7 +652,6 @@ func readCmdFlags() error {
 	Config.DryRun = *dryrun
 	Config.MaxPrettySQLLength = *maxPrettySQLLength
 	Config.MaxVarcharLength = *maxVarcharLength
-	Config.CleanTestDataBase = *cleanTestDataBase
 
 	if *ver {
 		version()

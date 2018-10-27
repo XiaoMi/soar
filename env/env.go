@@ -150,35 +150,42 @@ func (ve VirtualEnv) CleanUp() bool {
 	return true
 }
 
-// CleanTestDataBase 清除一小时前的环境
-func (ve *VirtualEnv) CleanTestDataBase() {
-	common.Log.Debug("CleanTestDataBase ...")
+// CleanupTestDatabase 清除一小时前的环境
+func (ve *VirtualEnv) CleanupTestDatabase() {
+	common.Log.Debug("CleanupTestDatabase ...")
 	dbs, err := ve.Query("show databases like 'optimizer%'")
 	if err == nil {
-		for index, row := range dbs.Rows {
-			s := strings.Split(row.Str(index), "_")
+		for _, row := range dbs.Rows {
+			testDatabase := row.Str(0)
+			// test temporary database format `opimtizer_YYMMDDHHmmss_randomString(16)`
+			if len(testDatabase) != 39 {
+				common.Log.Debug("CleanupTestDatabase by pass %s", testDatabase)
+				continue
+			}
+			s := strings.Split(testDatabase, "_")
 			pastTime, err := time.Parse("060102150405", s[1])
 			if err != nil {
-				common.Log.Error("CleanTestDataBase compute  pastTime Error: %s", err)
+				common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err)
 			}
 			nowTime, err := time.Parse("060102150405", time.Now().Format("060102150405"))
 			if err != nil {
-				common.Log.Error("CleanTestDataBase compute  nowTime Error: %s", err)
+				common.Log.Error("CleanupTestDatabase compute nowTime Error: %s", err)
 			}
+			// TODO: 1 hour should be configable
 			subHour := nowTime.Sub(pastTime).Hours()
 			if subHour > 1 {
-				_, err := ve.Query("drop database %s", row.Str(index))
+				_, err := ve.Query("drop database %s", testDatabase)
 				if err != nil {
-					common.Log.Error("CleanTestDataBase failed Error: %s", err)
+					common.Log.Error("CleanupTestDatabase failed Error: %s", err)
 				}
-				common.Log.Debug("CleanTestDataBase, done")
+				common.Log.Debug("CleanupTestDatabase drop database %s", testDatabase)
+			} else {
+				common.Log.Debug("CleanupTestDatabase by pass database %s, less than %d hours", testDatabase, subHour)
 			}
-
 		}
 	} else {
-		common.Log.Error("CleanTestDataBase  failed Error:%s", err)
+		common.Log.Error("CleanupTestDatabase  failed Error:%s", err)
 	}
-
 }
 
 // BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取

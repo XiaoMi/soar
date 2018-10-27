@@ -80,14 +80,15 @@ func main() {
 	// 环境初始化，连接检查线上环境+构建测试环境
 	vEnv, rEnv := env.BuildEnv()
 
-	//如果使用CleanTestDataBase命令，则清除前1小时的数据库
-	if common.Config.CleanTestDataBase {
-		vEnv.CleanTestDataBase()
-	}
-
 	// 如果使用到测试环境，在这里环境清理
 	if common.Config.DropTestTemporary {
 		defer vEnv.CleanUp()
+	}
+
+	// 使用CleanupTestDatabase命令手动清理残余的`optimizer_xxx`数据库
+	// 为了保护当前正在评审的SQL，只清除前1小时前的残余
+	if common.Config.CleanupTestDatabase {
+		vEnv.CleanupTestDatabase()
 	}
 
 	// 对指定的库表进行索引重复检查

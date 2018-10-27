@@ -113,9 +113,34 @@ func TestNewVirtualEnv(t *testing.T) {
 	}, t.Name(), update)
 }
 
+func TestCleanupTestDatabase(t *testing.T) {
+	vEnv, _ := BuildEnv()
+	vEnv.Query("drop database if exists optimizer_100000000000_xxxxxxxxxxxxxxxx")
+	_, err := vEnv.Query("create database optimizer_100000000000_xxxxxxxxxxxxxxxx")
+	if err != nil {
+		t.Error(err)
+	}
+	vEnv.CleanupTestDatabase()
+	_, err = vEnv.Query("drop database optimizer_100000000000_xxxxxxxxxxxxxxxx")
+	if err == nil {
+		t.Error("optimizer_100000000000_xxxxxxxxxxxxxxxx exist, should be droped")
+	}
+
+	vEnv.Query("drop database if exists optimizer_100000000000")
+	_, err = vEnv.Query("create database optimizer_100000000000")
+	if err != nil {
+		t.Error(err)
+	}
+	vEnv.CleanupTestDatabase()
+	_, err = vEnv.Query("drop database optimizer_100000000000")
+	if err != nil {
+		t.Error("optimizer_100000000000 not exist, should not be droped")
+	}
+}
+
 func TestGenTableColumns(t *testing.T) {
 	vEnv, rEnv := BuildEnv()
-	vEnv.CleanTestDataBase()
+	vEnv.CleanupTestDatabase()
 	defer vEnv.CleanUp()
 
 	pretty.Println(common.Config.TestDSN.Disable)
