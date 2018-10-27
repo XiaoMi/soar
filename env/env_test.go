@@ -140,7 +140,6 @@ func TestCleanupTestDatabase(t *testing.T) {
 
 func TestGenTableColumns(t *testing.T) {
 	vEnv, rEnv := BuildEnv()
-	vEnv.CleanupTestDatabase()
 	defer vEnv.CleanUp()
 
 	pretty.Println(common.Config.TestDSN.Disable)
