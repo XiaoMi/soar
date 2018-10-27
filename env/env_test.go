@@ -115,6 +115,7 @@ func TestNewVirtualEnv(t *testing.T) {
 
 func TestGenTableColumns(t *testing.T) {
 	vEnv, rEnv := BuildEnv()
+	vEnv.CleanTestDataBase()
 	defer vEnv.CleanUp()
 
 	pretty.Println(common.Config.TestDSN.Disable)
