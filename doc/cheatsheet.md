@@ -8,6 +8,16 @@
 echo "select title from sakila.film" | ./soar -log-output=soar.log
 ```
 
+## 指定输入源
+
+```bash
+# 从文件读取SQL
+./soar -query file.sql
+
+# 从管道读取SQL
+cat file.sql | ./soar
+```
+
 ## 指定配置文件
 
 ```bash
@@ -170,5 +180,15 @@ EOF
 
 ```bash
 $ cat test.md | soar -report-type md2html > test.html
+```
+
+## 清理测试环境残余的临时库表
+
+如配置了`-drop-test-temporary=false`或`soar`异常中止，`-test-dsn`中会残余以`optimizer_`为前缀的临时库表。手工清理这些库表可以使用如下命令。
+
+注意：为了不影响正在进行的其他SQL评审，`-cleanup-test-database`中会删除1小时前生成的临时库表。
+
+```bash
+./soar -cleanup-test-database
 ```
 
