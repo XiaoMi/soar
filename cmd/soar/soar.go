@@ -21,8 +21,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/XiaoMi/soar/advisor"
 	"github.com/XiaoMi/soar/ast"
@@ -50,6 +52,15 @@ func main() {
 		panic(err)
 	}
 	common.BaseDir = filepath.Dir(ex) // binary文件所在路径
+
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc,
+		os.Kill,
+		os.Interrupt,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT) //通过信号量的形式让程序优雅退出并且清理测试环境
 
 	// 配置文件&命令行参数解析
 	err = common.ParseConfig("")
@@ -80,16 +91,28 @@ func main() {
 	// 环境初始化，连接检查线上环境+构建测试环境
 	vEnv, rEnv := env.BuildEnv()
 
-	// 如果使用到测试环境，在这里环境清理
-	if common.Config.DropTestTemporary {
-		defer vEnv.CleanUp()
-	}
-
 	// 使用CleanupTestDatabase命令手动清理残余的`optimizer_xxx`数据库
 	// 为了保护当前正在评审的SQL，只清除前1小时前的残余
 	if common.Config.CleanupTestDatabase {
 		vEnv.CleanupTestDatabase()
 	}
+
+	// 如果使用到测试环境，在这里环境清理
+	if common.Config.DropTestTemporary {
+		defer vEnv.CleanUp()
+	}
+
+	go func() {
+
+		select {
+		case n := <-sc:
+			common.Log.Info("receive signal %v, closing", n)
+			// 如果使用到测试环境，在这里环境清理
+			if common.Config.DropTestTemporary {
+				vEnv.CleanUp()
+			}
+		}
+	}()
 
 	// 对指定的库表进行索引重复检查
 	if common.Config.ReportType == "duplicate-key-checker" {
