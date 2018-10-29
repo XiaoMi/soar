@@ -92,7 +92,7 @@ func main() {
 	}
 
 	//当程序卡死的时候，或者由于某些原因程序没有退出，可以通过捕获信号量的形式让程序优雅退出并且清理测试环境
-	go common.SignalNotify(func() {
+	common.HandleSignal(func() {
 		if common.Config.DropTestTemporary {
 			vEnv.CleanUp()
 		}
