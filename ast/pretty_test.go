@@ -122,6 +122,9 @@ var TestSqlsPretty = []string{
 	// MODIFY & CHANGE
 	"ALTER TABLE t1 MODIFY col1 BIGINT UNSIGNED DEFAULT 1 COMMENT 'my column';",
 	"ALTER TABLE t1 CHANGE b a INT NOT NULL;",
+
+	// COMMENT
+	"/*!40000 select 1*/;",
 }
 
 func TestPretty(t *testing.T) {

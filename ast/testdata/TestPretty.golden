@@ -176,6 +176,8 @@ FROM
 SELECT /*!40001 SQL_NO_CACHE */ * FROM `film`
 
 SELECT  
+  
+  /*!40001 SQL_NO_CACHE 
   */ * 
 FROM  
   `film`
@@ -363,7 +365,9 @@ SELECT
 FROM  
   table  
 WHERE  
-  FIELD  = 'value' */
+  FIELD  = 'value' 
+  /*arbitrary/31
+  */
 SELECT * FROM table WHERE field = 'value' /*arbitrary31*/ 
 
 SELECT  
@@ -371,7 +375,9 @@ SELECT
 FROM  
   table  
 WHERE  
-  FIELD  = 'value' */
+  FIELD  = 'value' 
+  /*arbitrary31
+  */
 SELECT *    FROM t WHERE 1=1 AND id=1
 
 SELECT  
@@ -503,6 +509,8 @@ HAVING
     1, 0)
   )= 0
 /* -- S++ SU ABORTABLE -- spd_user: rspadim */SELECT SQL_SMALL_RESULT SQL_CACHE DISTINCT centro_atividade FROM est_dia WHERE unidade_id=1001 AND item_id=67 AND item_id_red=573
+
+/* -- S++ SU ABORTABLE -- spd_user: rspadim 
 */ 
 SELECT  
   SQL_SMALL_RESULT  SQL_CACHE  DISTINCT  centro_atividade  
@@ -630,6 +638,10 @@ ALTER TABLE t1 CHANGE b a INT NOT NULL;
 
 ALTER TABLE  
   t1  CHANGE  b  a  INT  NOT  NULL;
+/*!40000 select 1*/;
+
+/*!40000 select 1
+*/;
 SELECT * FROM film WHERE length = 86;
 
 SELECT  
