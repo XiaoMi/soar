@@ -205,7 +205,7 @@ func init() {
 			Severity: "L4",
 			Summary:  "IN (NULL)/NOT IN (NULL)永远非真",
 			Content:  "正确的作法是col IN ('val1', 'val2', 'val3') OR col IS NULL",
-			Case:     "SELECT * FROM sakila.film WHERE length >= '60';",
+			Case:     "SELECT * FROM tb WHERE col IN (NULL);",
 			Func:     (*Query4Audit).RuleIn,
 		},
 		"ARG.005": {

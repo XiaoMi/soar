@@ -110,7 +110,7 @@ SELECT * FROM sakila.film WHERE length >= '60';
 * **Case**:
 
 ```sql
-SELECT * FROM sakila.film WHERE length >= '60';
+SELECT * FROM tb WHERE col IN (NULL);
 ```
 ## IN要慎用，元素过多会导致全表扫描
 
