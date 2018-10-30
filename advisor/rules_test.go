@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
+
+	"github.com/kr/pretty"
 )
 
 var update = flag.Bool("update", false, "update .golden files")
@@ -50,5 +52,22 @@ func TestIsIgnoreRule(t *testing.T) {
 	common.Config.IgnoreRules = []string{"test"}
 	if !IsIgnoreRule("test") {
 		t.Error("should be true")
+	}
+}
+
+func TestTranslation(t *testing.T) {
+	languages := []string{"english"}
+	testRules := make(map[string]Rule)
+	for item, rule := range HeuristicRules {
+		testRules[item] = rule
+	}
+	err := common.GoldenDiff(func() {
+		for _, language := range languages {
+			common.Log.Debug("TestTranslation %s", language)
+			pretty.Println(Translation(language, testRules))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }

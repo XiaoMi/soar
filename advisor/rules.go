@@ -1116,13 +1116,9 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		id = query.Id(fingerprint)
 	}
 
-	// 合并重复的建议
-	suggest := make(map[string]Rule)
-	for _, s := range suggests {
-		for item, rule := range s {
-			suggest[item] = rule
-		}
-	}
+	// merge and translation suggestions
+	suggest := Translation(common.Config.Language, suggests...)
+
 	suggest = MergeConflictHeuristicRules(suggest)
 
 	// 是否忽略显示OK建议，测试的时候大家都喜欢看OK，线上跑起来的时候OK太多反而容易看花眼
@@ -1376,4 +1372,39 @@ func ListTestSQLs() {
 	for _, sql := range common.TestSQLs {
 		fmt.Println(sql)
 	}
+}
+
+// Translation i18n support
+func Translation(language string, suggests ...map[string]Rule) map[string]Rule {
+	// 合并重复的建议
+	suggest := make(map[string]Rule)
+	for _, s := range suggests {
+		for item, rule := range s {
+			suggest[item] = rule
+		}
+	}
+
+	// i18n translation
+	var i18nSuggest map[string]Rule
+
+	common.Log.Debug("Translation into : %s language", language)
+	switch language {
+	case "english", "en":
+		i18nSuggest = HeuristicRulesEnglish
+	}
+	for item, rule := range suggest {
+		// check if item exists
+		if _, ok := i18nSuggest[item]; !ok {
+			continue
+		}
+
+		// check empty mistake
+		if i18nSuggest[item].Summary == "" || i18nSuggest[item].Content == "" {
+			continue
+		}
+		rule.Summary = i18nSuggest[item].Summary
+		rule.Content = i18nSuggest[item].Content
+		suggest[item] = rule
+	}
+	return suggest
 }

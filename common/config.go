@@ -52,6 +52,7 @@ type Configration struct {
 	ConnTimeOut             int    `yaml:"conn-time-out"`             // 数据库连接超时时间，单位秒
 	QueryTimeOut            int    `yaml:"query-time-out"`            // 数据库SQL执行超时时间，单位秒
 	Delimiter               string `yaml:"delimiter"`                 // SQL分隔符
+	Language                string `yaml:"language"`                  // 支持的语言
 
 	// +++++++++++++++日志相关+++++++++++++++++
 	// 日志级别，这里使用了beego的log包
@@ -155,6 +156,7 @@ var Config = &Configration{
 	ConnTimeOut:             3,
 	QueryTimeOut:            30,
 	Delimiter:               ";",
+	Language:                "", // default "" or "chinese" means Chinese
 
 	MaxJoinTableCount:    5,
 	MaxGroupByColsCount:  5,
@@ -487,6 +489,7 @@ func readCmdFlags() error {
 	connTimeOut := flag.Int("conn-time-out", Config.ConnTimeOut, "ConnTimeOut, 数据库连接超时时间，单位秒")
 	queryTimeOut := flag.Int("query-time-out", Config.QueryTimeOut, "QueryTimeOut, 数据库SQL执行超时时间，单位秒")
 	delimiter := flag.String("delimiter", Config.Delimiter, "Delimiter, SQL分隔符")
+	language := flag.String("language", Config.Language, "Output language, chinese or english")
 	// +++++++++++++++日志相关+++++++++++++++++
 	logLevel := flag.Int("log-level", Config.LogLevel, "LogLevel, 日志级别, [0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]")
 	logOutput := flag.String("log-output", Config.LogOutput, "LogOutput, 日志输出位置")
@@ -571,6 +574,7 @@ func readCmdFlags() error {
 	Config.SamplingStatisticTarget = *samplingStatisticTarget
 	Config.ConnTimeOut = *connTimeOut
 	Config.QueryTimeOut = *queryTimeOut
+	Config.Language = *language
 
 	Config.LogLevel = *logLevel
 	if strings.HasPrefix(*logOutput, "/") {
