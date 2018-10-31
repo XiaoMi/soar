@@ -100,6 +100,12 @@ func TestSplitStatement(t *testing.T) {
         ;*/
         from test;hello`),
 		[]byte(`select * from test`),
+		// https://github.com/XiaoMi/soar/issues/66
+		[]byte(`/*comment*/`),
+		[]byte(`/*comment*/;`),
+		[]byte(`--`),
+		[]byte(`-- comment`),
+		[]byte(`# comment`),
 	}
 	for _, buf := range bufs {
 		fmt.Println(SplitStatement(buf, []byte(common.Config.Delimiter)))

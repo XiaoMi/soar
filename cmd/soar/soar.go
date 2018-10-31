@@ -153,6 +153,7 @@ func main() {
 		mysqlSuggest := make(map[string]advisor.Rule)     // MySQL返回的ERROR信息
 
 		if buf == "" {
+			common.Log.Debug("buf: %s, sql: %s empty", buf, sql)
 			break
 		}
 		// 查询请求切分
@@ -167,7 +168,10 @@ func main() {
 		// 去除无用的备注和空格
 		sql = strings.TrimSpace(sql)
 		sql = string(database.RemoveSQLComments([]byte(sql)))
-
+		if sql == "" {
+			common.Log.Debug("empty query or comment, buf: %s", buf)
+			continue
+		}
 		common.Log.Debug("main loop SQL: %s", sql)
 
 		// +++++++++++++++++++++小工具集[开始]+++++++++++++++++++++++{

@@ -944,6 +944,14 @@ func SplitStatement(buf []byte, delimiter []byte) (string, []byte) {
 			if multiLineComment && !quoted && !singleLineComment {
 				i = i + 2
 				multiLineComment = false
+				// '/*comment*/'
+				if i == len(buf) {
+					sql = string(buf[:i])
+				}
+				// '/*comment*/;', 'select 1/*comment*/;'
+				if string(buf[i:]) == string(delimiter) {
+					sql = string(buf)
+				}
 				continue
 			}
 		}
