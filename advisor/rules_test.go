@@ -18,10 +18,10 @@ package advisor
 
 import (
 	"flag"
+	"sort"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
-
 	"github.com/kr/pretty"
 )
 
@@ -56,15 +56,25 @@ func TestIsIgnoreRule(t *testing.T) {
 }
 
 func TestTranslation(t *testing.T) {
-	languages := []string{"english"}
+	languages := []string{"english", "", "cn", "en", "chinese"}
 	testRules := make(map[string]Rule)
 	for item, rule := range HeuristicRules {
-		testRules[item] = rule
+		if item != "OK" {
+			testRules[item] = rule
+		}
 	}
 	err := common.GoldenDiff(func() {
 		for _, language := range languages {
 			common.Log.Debug("TestTranslation %s", language)
-			pretty.Println(Translation(language, testRules))
+			suggests := Translation(language, testRules)
+			var sortedSuggest []string
+			for item := range suggests {
+				sortedSuggest = append(sortedSuggest, item)
+			}
+			sort.Strings(sortedSuggest)
+			for _, item := range sortedSuggest {
+				pretty.Println(suggests[item])
+			}
 		}
 	}, t.Name(), update)
 	if nil != err {

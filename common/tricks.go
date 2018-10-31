@@ -67,9 +67,6 @@ func captureOutput(f func()) string {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	// execute function
-	f()
-
 	outC := make(chan string)
 	// copy the output in a separate goroutine so printing can't block indefinitely
 	go func() {
@@ -80,6 +77,9 @@ func captureOutput(f func()) string {
 		}
 		outC <- buf.String()
 	}()
+
+	// execute function
+	f()
 
 	// back to normal state
 	err := w.Close()

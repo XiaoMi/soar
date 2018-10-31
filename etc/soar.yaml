@@ -17,4 +17,4 @@ allow-online-as-test: true
 
 log-level:  7
 log-output: soar.log
-sampling: true
+sampling: false
