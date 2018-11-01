@@ -116,9 +116,9 @@ tidb:
 	@echo "\033[92mUpdate tidb deps ...\033[0m"
 	@echo -n "Current TiDB commit hash: "
 	@(cd ${GOPATH}/src/github.com/pingcap/tidb/ 2>/dev/null && git checkout master && git rev-parse HEAD) || echo "(init)"
-	go get -v -u github.com/pingcap/tidb/store/tikv
+	@(go get -v -d github.com/pingcap/tidb/... || echo "go get tidb")
 	@echo -n "TiDB update to: "
-	@cd ${GOPATH}/src/github.com/pingcap/tidb/ && git rev-parse HEAD
+	@cd ${GOPATH}/src/github.com/pingcap/tidb/ && git pull && git rev-parse HEAD
 
 # Update all vendor
 .PHONY: vendor
