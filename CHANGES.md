@@ -1,6 +1,15 @@
 # 更新日志
 
+
+## 2018-11
+- TODO: english translation
+
 ## 2018-10
+- Fix SplitStatement mulitstatement eof bug #66
+- Fix pretty func hangup issue #47
+- Fix some foolish code spell error
+- Use travis for CI
+- Fix Go 1.8 defapth GOPATH compatible issue BUG #5
 - 2018-10-20 开源先锋日(OSCAR)对外正式开源发布代码
 
 ## 2018-09
