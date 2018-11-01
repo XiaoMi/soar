@@ -38,18 +38,18 @@ import (
 
 func main() {
 	// 全局变量
-	var sql string                                            // 单条评审指定的sql或explain
+	var sql string                                            // 单条评审指定的 sql 或 explain
 	sqlCounter := 1                                           // SQL 计数器
 	lineCounter := 1                                          // 行计数器
-	var alterSqls []string                                    // 待评审的SQL中所有ALTER请求
-	alterTableTimes := make(map[string]int)                   // 待评审的SQL中同一经表ALTER请求计数器
-	suggestMerged := make(map[string]map[string]advisor.Rule) // 优化建议去重,key为sql的fingerprint.ID
+	var alterSqls []string                                    // 待评审的 SQL 中所有 ALTER 请求
+	alterTableTimes := make(map[string]int)                   // 待评审的 SQL 中同一经表 ALTER 请求计数器
+	suggestMerged := make(map[string]map[string]advisor.Rule) // 优化建议去重, key 为 sql 的 fingerprint.ID
 
 	ex, err := os.Executable()
 	if err != nil {
 		panic(err)
 	}
-	common.BaseDir = filepath.Dir(ex) // binary文件所在路径
+	common.BaseDir = filepath.Dir(ex) // binary 文件所在路径
 
 	// 配置文件&命令行参数解析
 	err = common.ParseConfig("")
@@ -61,17 +61,17 @@ func main() {
 		advisor.ListHeuristicRules(advisor.HeuristicRules)
 		return
 	}
-	// 打印支持的SQL重写规则
+	// 打印支持的 SQL 重写规则
 	if common.Config.ListRewriteRules {
 		ast.ListRewriteRules(ast.RewriteRules)
 		return
 	}
-	// 打印所有的测试SQL
+	// 打印所有的测试 SQL
 	if common.Config.ListTestSqls {
 		advisor.ListTestSQLs()
 		return
 	}
-	// 打印支持的report-type
+	// 打印支持的 report-type
 	if common.Config.ListReportTypes {
 		common.ListReportTypes()
 		return
@@ -97,7 +97,7 @@ func main() {
 		return
 	}
 
-	// 读入待优化SQL，当配置文件或命令行参数未指定SQL时从管道读取
+	// 读入待优化 SQL ，当配置文件或命令行参数未指定 SQL 时从管道读取
 	if common.Config.Query == "" {
 		var data []byte
 		data, err = ioutil.ReadAll(os.Stdin)
@@ -123,7 +123,7 @@ func main() {
 
 	switch common.Config.ReportType {
 	case "html":
-		// HTML格式输入CSS加载
+		// HTML 格式输入 CSS 加载
 		fmt.Println(common.MarkdownHTMLHeader())
 	case "md2html":
 		// markdown2html 转换小工具
@@ -131,8 +131,8 @@ func main() {
 		fmt.Println(common.Markdown2HTML(sql))
 		return
 	case "explain-digest":
-		// 当用户输入为EXPLAIN信息，只对Explain信息进行分析
-		// 注意： 这里只能处理一条SQL的EXPLAIN信息，用户一次反馈多条SQL的EXPLAIN信息无法处理
+		// 当用户输入为 EXPLAIN信 息，只对 Explain 信息进行分析
+		// 注意： 这里只能处理一条 SQL 的 EXPLAIN 信息，用户一次反馈多条 SQL 的 EXPLAIN 信息无法处理
 		advisor.DigestExplainText(sql)
 		return
 	case "remove-comment":
@@ -146,11 +146,11 @@ func main() {
 	for ; ; sqlCounter++ {
 		var id string                                     // fingerprint.ID
 		heuristicSuggest := make(map[string]advisor.Rule) // 启发式建议
-		expSuggest := make(map[string]advisor.Rule)       // EXPLAIN解读
+		expSuggest := make(map[string]advisor.Rule)       // EXPLAIN 解读
 		idxSuggest := make(map[string]advisor.Rule)       // 索引建议
-		proSuggest := make(map[string]advisor.Rule)       // Profiling信息
-		traceSuggest := make(map[string]advisor.Rule)     // Trace信息
-		mysqlSuggest := make(map[string]advisor.Rule)     // MySQL返回的ERROR信息
+		proSuggest := make(map[string]advisor.Rule)       // Profiling 信息
+		traceSuggest := make(map[string]advisor.Rule)     // Trace 信息
+		mysqlSuggest := make(map[string]advisor.Rule)     // MySQL 返回的 ERROR 信息
 
 		if buf == "" {
 			common.Log.Debug("buf: %s, sql: %s empty", buf, sql)
@@ -178,15 +178,15 @@ func main() {
 		fingerprint := strings.TrimSpace(query.Fingerprint(sql))
 		switch common.Config.ReportType {
 		case "fingerprint":
-			// SQL指纹
+			// SQL 指纹
 			fmt.Println(fingerprint)
 			continue
 		case "pretty":
-			// SQL美化
+			// SQL 美化
 			fmt.Println(ast.Pretty(sql, "builtin") + common.Config.Delimiter)
 			continue
 		case "compress":
-			// SQL压缩
+			// SQL 压缩
 			fmt.Println(ast.Compress(sql) + common.Config.Delimiter)
 			continue
 		case "ast":
@@ -210,10 +210,10 @@ func main() {
 			common.LogIfWarn(err, "")
 			continue
 		default:
-			// SQL签名
+			// SQL 签名
 			id = query.Id(fingerprint)
 			// 建议去重，减少评审整个文件耗时
-			// TODO: 由于 a = 11和a = '11'的fingerprint相同，这里一旦跳过即无法检查有些建议了，如：ARG.003
+			// TODO: 由于 a = 11 和 a = '11' 的 fingerprint 相同，这里一旦跳过即无法检查有些建议了，如： ARG.003
 			if _, ok := suggestMerged[id]; ok {
 				continue
 			}
@@ -230,7 +230,7 @@ func main() {
 
 		switch stmt.(type) {
 		case *sqlparser.DDL:
-			// 因为vitess的parser对于DDL语法支持不好，通过在测试环境执行辅助进行语法检查
+			// 因为 vitess 的 parser 对于 DDL 语法支持不好，通过在测试环境执行辅助进行语法检查
 			if common.Config.OnlySyntaxCheck && vEnv.BuildVirtualEnv(rEnv, sql) {
 				syntaxErr = vEnv.Error
 			}
@@ -248,7 +248,7 @@ func main() {
 			if !common.Config.DryRun {
 				os.Exit(1)
 			}
-			// vitess 语法检查给出的建议ERR.000
+			// vitess 语法检查给出的建议 ERR.000
 			if common.Config.TestDSN.Disable {
 				mysqlSuggest["ERR.000"] = advisor.RuleMySQLError("ERR.000", syntaxErr)
 			}
@@ -277,14 +277,14 @@ func main() {
 
 		// +++++++++++++++++++++索引优化建议[开始]+++++++++++++++++++++++{
 		// 如果配置了索引建议过滤规则，不进行索引优化建议
-		// 在配置文件ignore-rules中添加 'IDX.*'即可屏蔽索引优化建议
+		// 在配置文件 ignore-rules 中添加 'IDX.*' 即可屏蔽索引优化建议
 		common.Log.Debug("start of index advisor Query: %s", q.Query)
 		if !advisor.IsIgnoreRule("IDX.") {
 			if vEnv.BuildVirtualEnv(rEnv, q.Query) {
 				idxAdvisor, err := advisor.NewAdvisor(vEnv, *rEnv, *q)
 				if err != nil || (idxAdvisor == nil && vEnv.Error == nil) {
 					if idxAdvisor == nil {
-						// 如果SQL是DDL语句，则返回的idxAdvisor为nil，可以忽略不处理
+						// 如果 SQL 是 DDL 语句，则返回的 idxAdvisor 为 nil，可以忽略不处理
 						// TODO alter table add index 语句检查索引是否已经存在
 						common.Log.Debug("idxAdvisor by pass Query: %s", q.Query)
 					} else {
@@ -311,7 +311,7 @@ func main() {
 								Case:     sql,
 							}
 						default:
-							// vEnv.VEnvBuild阶段给出的ERROR是ERR.001
+							// vEnv.VEnvBuild 阶段给出的 ERROR 是 ERR.001
 							mysqlSuggest["ERR.001"] = advisor.RuleMySQLError("ERR.001", vEnv.Error)
 							common.Log.Error("BuildVirtualEnv DDL Execute Error : %v", vEnv.Error)
 						}
@@ -324,30 +324,30 @@ func main() {
 		common.Log.Debug("end of index advisor Query: %s", q.Query)
 		// +++++++++++++++++++++索引优化建议[结束]+++++++++++++++++++++++}
 
-		// +++++++++++++++++++++EXPLAIN建议[开始]+++++++++++++++++++++++{
-		// 如果未配置Online或Test无法给Explain建议
+		// +++++++++++++++++++++EXPLAIN 建议[开始]+++++++++++++++++++++++{
+		// 如果未配置 Online 或 Test 无法给 Explain 建议
 		common.Log.Debug("start of explain Query: %s", q.Query)
 		if !common.Config.OnlineDSN.Disable && !common.Config.TestDSN.Disable {
-			// 因为EXPLAIN依赖数据库环境，所以把这段逻辑放在启发式建议和索引建议后面
+			// 因为 EXPLAIN 依赖数据库环境，所以把这段逻辑放在启发式建议和索引建议后面
 			if common.Config.Explain {
-				// 执行EXPLAIN
+				// 执行 EXPLAIN
 				explainInfo, err := rEnv.Explain(q.Query,
 					database.ExplainType[common.Config.ExplainType],
 					database.ExplainFormatType[common.Config.ExplainFormat])
 				if err != nil {
-					// 线上环境执行失败才到测试环境EXPLAIN，比如在用户提供建表语句及查询语句的场景
+					// 线上环境执行失败才到测试环境 EXPLAIN，比如在用户提供建表语句及查询语句的场景
 					common.Log.Warn("rEnv.Explain Warn: %v", err)
 					explainInfo, err = vEnv.Explain(q.Query,
 						database.ExplainType[common.Config.ExplainType],
 						database.ExplainFormatType[common.Config.ExplainFormat])
 					if err != nil {
-						// EXPLAIN阶段给出的ERROR是ERR.002
+						// EXPLAIN 阶段给出的 ERROR 是 ERR.002
 						mysqlSuggest["ERR.002"] = advisor.RuleMySQLError("ERR.002", err)
 						common.Log.Error("vEnv.Explain Error: %v", err)
 						continue
 					}
 				}
-				// 分析EXPLAIN结果
+				// 分析 EXPLAIN 结果
 				if explainInfo != nil {
 					expSuggest = advisor.ExplainAdvisor(explainInfo)
 				} else {
@@ -356,9 +356,9 @@ func main() {
 			}
 		}
 		common.Log.Debug("end of explain Query: %s", q.Query)
-		// +++++++++++++++++++++EXPLAIN建议[结束]+++++++++++++++++++++++}
+		// +++++++++++++++++++++ EXPLAIN 建议[结束]+++++++++++++++++++++++}
 
-		// +++++++++++++++++++++Profiling[开始]+++++++++++++++++++++++++{
+		// +++++++++++++++++++++ Profiling [开始]+++++++++++++++++++++++++{
 		common.Log.Debug("start of profiling Query: %s", q.Query)
 		if common.Config.Profiling {
 			res, err := vEnv.Profiling(q.Query)
@@ -373,9 +373,9 @@ func main() {
 			}
 		}
 		common.Log.Debug("end of profiling Query: %s", q.Query)
-		// +++++++++++++++++++++Profiling[结束]++++++++++++++++++++++++++}
+		// +++++++++++++++++++++ Profiling [结束]++++++++++++++++++++++++++}
 
-		// +++++++++++++++++++++Trace [开始]+++++++++++++++++++++++++{
+		// +++++++++++++++++++++ Trace [开始]+++++++++++++++++++++++++{
 		common.Log.Debug("start of trace Query: %s", q.Query)
 		if common.Config.Trace {
 			res, err := vEnv.Trace(q.Query)
@@ -392,14 +392,14 @@ func main() {
 		common.Log.Debug("end of trace Query: %s", q.Query)
 		// +++++++++++++++++++++Trace [结束]++++++++++++++++++++++++++}
 
-		// +++++++++++++++++++++SQL重写[开始]+++++++++++++++++++++++++{
+		// +++++++++++++++++++++SQL 重写[开始]+++++++++++++++++++++++++{
 		common.Log.Debug("start of rewrite Query: %s", q.Query)
 		if common.Config.ReportType == "rewrite" {
 			if strings.HasPrefix(strings.TrimSpace(strings.ToLower(sql)), "create") ||
 				strings.HasPrefix(strings.TrimSpace(strings.ToLower(sql)), "alter") ||
 				strings.HasPrefix(strings.TrimSpace(strings.ToLower(sql)), "rename") {
-				// 依赖上下文件的SQL重写，如：多条ALTER SQL合并
-				// vitess对DDL语法的支持不好，大部分DDL会语法解析出错，但即使出错了还是会生成一个stmt而且里面的db.table还是准确的。
+				// 依赖上下文件的 SQL 重写，如：多条 ALTER SQL 合并
+				// vitess 对 DDL 语法的支持不好，大部分 DDL 会语法解析出错，但即使出错了还是会生成一个 stmt 而且里面的 db.table 还是准确的。
 
 				alterSqls = append(alterSqls, sql)
 				alterTbl := ast.AlterAffectTable(stmt)
@@ -412,25 +412,25 @@ func main() {
 					}
 				}
 			} else {
-				// 其他不依赖上下文件的SQL重写
+				// 其他不依赖上下文件的 SQL 重写
 				rw := ast.NewRewrite(sql)
 				if rw == nil {
-					// 都到这一步了sql不会语法不正确，因此rw一般不会为nil
+					// 都到这一步了 sql 不会语法不正确，因此 rw 一般不会为 nil
 					common.Log.Critical("NewRewrite nil point error, SQL: %s", sql)
 					os.Exit(1)
 				}
-				// SQL转写需要的源信息采集，如果没有配置环境则只做有限改写
+				// SQL 转写需要的源信息采集，如果没有配置环境则只做有限改写
 				meta := ast.GetMeta(rw.Stmt, nil)
 				rw.Columns = vEnv.GenTableColumns(meta)
-				// 执行定义好的SQL重写规则
+				// 执行定义好的 SQL 重写规则
 				rw.Rewrite()
 				fmt.Println(strings.TrimSpace(rw.NewSQL))
 			}
 		}
 		common.Log.Debug("end of rewrite Query: %s", q.Query)
-		// +++++++++++++++++++++SQL重写[结束]++++++++++++++++++++++++++}
+		// +++++++++++++++++++++ SQL 重写[结束]++++++++++++++++++++++++++}
 
-		// +++++++++++++++++++++打印单条SQL优化建议[开始]++++++++++++++++++++++++++{
+		// +++++++++++++++++++++打印单条 SQL 优化建议[开始]++++++++++++++++++++++++++{
 		common.Log.Debug("start of print suggestions, Query: %s", q.Query)
 		sug, str := advisor.FormatSuggest(q.Query, common.Config.ReportType, heuristicSuggest, idxSuggest, expSuggest, proSuggest, traceSuggest, mysqlSuggest)
 		suggestMerged[id] = sug
@@ -462,10 +462,10 @@ func main() {
 			fmt.Println(str)
 		}
 		common.Log.Debug("end of print suggestions, Query: %s", q.Query)
-		// +++++++++++++++++++++打印单条SQL优化建议[结束]++++++++++++++++++++++++++}
+		// +++++++++++++++++++++打印单条 SQL 优化建议[结束]++++++++++++++++++++++++++}
 	}
 
-	// 同一张表的多条ALTER语句合并为一条
+	// 同一张表的多条 ALTER 语句合并为一条
 	if ast.RewriteRuleMatch("mergealter") {
 		for _, v := range ast.MergeAlterTables(alterSqls...) {
 			fmt.Println(strings.TrimSpace(v))
@@ -473,7 +473,7 @@ func main() {
 		return
 	}
 
-	// 以JSON格式化输出
+	// 以 JSON 格式化输出
 	if common.Config.ReportType == "json" {
 		js, err := json.MarshalIndent(suggestMerged, "", "  ")
 		if err == nil {
