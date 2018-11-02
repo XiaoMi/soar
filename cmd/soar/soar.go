@@ -83,6 +83,7 @@ func main() {
 	// 使用 -cleanup-test-database 命令手动清理残余的 optimizer_xxx 数据库
 	if common.Config.CleanupTestDatabase {
 		vEnv.CleanupTestDatabase()
+		return
 	}
 
 	// 如果使用到测试环境，在这里环境清理
