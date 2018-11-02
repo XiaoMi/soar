@@ -19,6 +19,7 @@ package env
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
@@ -147,6 +148,42 @@ func (ve VirtualEnv) CleanUp() bool {
 		common.Log.Debug("CleanUp, done")
 	}
 	return true
+}
+
+// CleanupTestDatabase 清除一小时前的环境
+func (ve *VirtualEnv) CleanupTestDatabase() {
+	common.Log.Debug("CleanupTestDatabase ...")
+	dbs, err := ve.Query("show databases like 'optimizer%'")
+	if err == nil {
+		for _, row := range dbs.Rows {
+			testDatabase := row.Str(0)
+			// test temporary database format `optimizer_YYMMDDHHmmss_randomString(16)`
+			if len(testDatabase) != 39 {
+				common.Log.Debug("CleanupTestDatabase by pass %s", testDatabase)
+				continue
+			}
+			s := strings.Split(testDatabase, "_")
+			pastTime, err := time.Parse("060102150405", s[1])
+			if err != nil {
+				common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err.Error())
+				continue
+			}
+			// TODO: 1 hour should be config-able
+			subHour := time.Now().Sub(pastTime).Hours()
+			if subHour > 1 {
+				_, err := ve.Query("drop database %s", testDatabase)
+				if err != nil {
+					common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
+					continue
+				}
+				common.Log.Debug("CleanupTestDatabase drop database %s success", testDatabase)
+			} else {
+				common.Log.Debug("CleanupTestDatabase by pass database %s, less than %d hours", testDatabase, subHour)
+			}
+		}
+	} else {
+		common.Log.Error("CleanupTestDatabase failed Error:%s", err.Error())
+	}
 }
 
 // BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取
@@ -294,7 +331,8 @@ func (ve VirtualEnv) createDatabase(rEnv database.Connector, dbName string) erro
 		return nil
 	}
 
-	dbHash := "optimizer_" + uniuri.New()
+	// optimizer_YYMMDDHHmmss_xxxx
+	dbHash := fmt.Sprintf("optimizer_%s_%s", time.Now().Format("060102150405"), uniuri.New())
 	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", dbName, dbName, dbHash)
 	ddl, err := rEnv.ShowCreateDatabase(dbName)
 	if err != nil {

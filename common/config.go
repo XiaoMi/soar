@@ -43,6 +43,7 @@ type Configration struct {
 	TestDSN                 *dsn   `yaml:"test-dsn"`                  // 测试环境数据库配置
 	AllowOnlineAsTest       bool   `yaml:"allow-online-as-test"`      // 允许Online环境也可以当作Test环境
 	DropTestTemporary       bool   `yaml:"drop-test-temporary"`       // 是否清理Test环境产生的临时库表
+	CleanupTestDatabase     bool   `yaml:"cleanup-test-database"`     // 清理残余的测试数据库（程序异常退出或未开启drop-test-temporary）  issue #48
 	OnlySyntaxCheck         bool   `yaml:"only-syntax-check"`         // 只做语法检查不输出优化建议
 	SamplingStatisticTarget int    `yaml:"sampling-statistic-target"` // 数据采样因子，对应postgres的default_statistics_target
 	Sampling                bool   `yaml:"sampling"`                  // 数据采样开关
@@ -145,6 +146,7 @@ var Config = &Configration{
 	},
 	AllowOnlineAsTest:       false,
 	DropTestTemporary:       true,
+	CleanupTestDatabase:     false,
 	DryRun:                  true,
 	OnlySyntaxCheck:         false,
 	SamplingStatisticTarget: 100,
@@ -478,6 +480,7 @@ func readCmdFlags() error {
 	testDSN := flag.String("test-dsn", FormatDSN(Config.TestDSN), "TestDSN, 测试环境数据库配置, username:password@ip:port/schema")
 	allowOnlineAsTest := flag.Bool("allow-online-as-test", Config.AllowOnlineAsTest, "AllowOnlineAsTest, 允许线上环境也可以当作测试环境")
 	dropTestTemporary := flag.Bool("drop-test-temporary", Config.DropTestTemporary, "DropTestTemporary, 是否清理测试环境产生的临时库表")
+	cleanupTestDatabase := flag.Bool("cleanup-test-database", Config.CleanupTestDatabase, "单次运行清理历史1小时前残余的测试库。")
 	onlySyntaxCheck := flag.Bool("only-syntax-check", Config.OnlySyntaxCheck, "OnlySyntaxCheck, 只做语法检查不输出优化建议")
 	profiling := flag.Bool("profiling", Config.Profiling, "Profiling, 开启数据采样的情况下在测试环境执行Profile")
 	trace := flag.Bool("trace", Config.Trace, "Trace, 开启数据采样的情况下在测试环境执行Trace")
@@ -563,6 +566,7 @@ func readCmdFlags() error {
 	Config.TestDSN = parseDSN(*testDSN, Config.TestDSN)
 	Config.AllowOnlineAsTest = *allowOnlineAsTest
 	Config.DropTestTemporary = *dropTestTemporary
+	Config.CleanupTestDatabase = *cleanupTestDatabase
 	Config.OnlySyntaxCheck = *onlySyntaxCheck
 	Config.Profiling = *profiling
 	Config.Trace = *trace
