@@ -174,10 +174,10 @@ func startSampling(conn, localConn mysql.Conn, database, table string, factor fl
 				// str = ""
 			case []byte:
 				// 先尝试转成数字，如果报错则转换成string
-				v, err := row.Int64Err(i)
-				values[i] = strconv.FormatInt(v, 10)
-				if err != nil {
+				if v, err := row.Int64Err(i); err != nil {
 					values[i] = string(data)
+				} else {
+					values[i] = strconv.FormatInt(v, 10)
 				}
 			case time.Time:
 				values[i] = mysql.TimeString(data)

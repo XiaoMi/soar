@@ -153,37 +153,42 @@ func (ve VirtualEnv) CleanUp() bool {
 // CleanupTestDatabase 清除一小时前的环境
 func (ve *VirtualEnv) CleanupTestDatabase() {
 	common.Log.Debug("CleanupTestDatabase ...")
-	dbs, err := ve.Query("show databases like 'optimizer%'")
-	if err == nil {
-		for _, row := range dbs.Rows {
-			testDatabase := row.Str(0)
-			// test temporary database format `optimizer_YYMMDDHHmmss_randomString(16)`
-			if len(testDatabase) != 39 {
-				common.Log.Debug("CleanupTestDatabase by pass %s", testDatabase)
-				continue
-			}
-			s := strings.Split(testDatabase, "_")
-			pastTime, err := time.Parse("060102150405", s[1])
-			if err != nil {
-				common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err.Error())
-				continue
-			}
-			// TODO: 1 hour should be config-able
-			subHour := time.Now().Sub(pastTime).Hours()
-			if subHour > 1 {
-				_, err := ve.Query("drop database %s", testDatabase)
-				if err != nil {
-					common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
-					continue
-				}
-				common.Log.Debug("CleanupTestDatabase drop database %s success", testDatabase)
-			} else {
-				common.Log.Debug("CleanupTestDatabase by pass database %s, less than %d hours", testDatabase, subHour)
-			}
-		}
-	} else {
+	dbs, err := ve.Query("show databases like 'optimizer%%'")
+	if err != nil {
 		common.Log.Error("CleanupTestDatabase failed Error:%s", err.Error())
+		return
 	}
+
+	// TODO: 1 hour should be config-able
+	minHour := 1
+	for _, row := range dbs.Rows {
+		testDatabase := row.Str(0)
+		// test temporary database format `optimizer_YYMMDDHHmmss_randomString(16)`
+		if len(testDatabase) != 39 {
+			common.Log.Debug("CleanupTestDatabase by pass %s", testDatabase)
+			continue
+		}
+		s := strings.Split(testDatabase, "_")
+		pastTime, err := time.Parse("060102150405", s[1])
+		if err != nil {
+			common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err.Error())
+			continue
+		}
+
+		subHour := time.Now().Sub(pastTime).Hours()
+		if subHour > float64(minHour) {
+			if _, err := ve.Query("drop database %s", testDatabase); err != nil {
+				common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
+				continue
+			}
+			common.Log.Debug("CleanupTestDatabase drop database %s success", testDatabase)
+			continue
+		}
+		common.Log.Debug("CleanupTestDatabase by pass database %s, %.2f less than %d hours", testDatabase, subHour, minHour)
+	}
+
+	common.Log.Debug("CleanupTestDatabase done")
+	return
 }
 
 // BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取
