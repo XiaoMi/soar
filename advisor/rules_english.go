@@ -35,75 +35,75 @@ func init() {
 		},
 		"ALI.001": {
 			Summary: "It is recommended to declare an alias using the AS keyword.",
-			Content: `在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。`,
+			Content: `In the alias of the column or table(such as "tbl AS alias"),it is easier to understand to use the keyword of AS clearly than implicit alias(such as "tbl alias")`,
 		},
 		"ALI.002": {
 			Summary: "An alias is not recommended for the column wildcard '*'.",
-			Content: `例: "SELECT tbl.* col1, col2"上面这条SQL给列通配符设置了别名，这样的SQL可能存在逻辑错误。您可能意在查询col1, 但是代替它的是重命名的是tbl的最后一列。`,
+			Content: `Eg:"SELECT tbl.* col1, col2",the SQL above set alias for wildcard of column,which may cause logical error.You may want to query col1,but the result will be renamed last column of tbl.`,
 		},
 		"ALI.003": {
-			Summary: "alias shouldn't be the same with column name or table name.",
-			Content: `表或列的别名与其真实名称相同, 这样的别名会使得查询更难去分辨。`,
+			Summary: "Alias shouldn't be the same with column name or table name.",
+			Content:`It will be hard to distinguish Alias of table or colomn when the alias is the same as it's real name.`,
 		},
 		"ALT.001": {
 			Summary: "modify the default character set will not modify the character set of each field in the table.",
-			Content: `很多初学者会将ALTER TABLE tbl_name [DEFAULT] CHARACTER SET 'UTF8'误认为会修改所有字段的字符集，但实际上它只会影响后续新增的字段不会改表已有字段的字符集。如果想修改整张表所有字段的字符集建议使用ALTER TABLE tbl_name CONVERT TO CHARACTER SET charset_name;`,
+			Content:`Many beginner would think that "ALTER TABLE tbl_name [DEFAULT] CHARACTER SET 'UTF8' " will modify character set of all fields,but actually it can only influence new fileds but not that already exits.You may use "ALTER TABLE tbl_name CONVERT TO CHARACTER SET charset_name;" if you want to modify character set of all fields.`,
 		},
 		"ALT.002": {
 			Summary: "recommend to merge multiple ALTER request if it's in the same table.",
-			Content: `每次表结构变更对线上服务都会产生影响，即使是能够通过在线工具进行调整也请尽量通过合并ALTER请求的试减少操作次数。`,
+			Content:`Once the structure of table changed,the online service will be influenced.Please merge requests of ALTER to reduce the number of operations even though you can adjust it by online tools.`,
 		},
 		"ALT.003": {
 			Summary: "It's danger to delete column,please check if the business logic is still dependent before operation.",
-			Content: `如业务逻辑依赖未完全消除，列被删除后可能导致数据无法写入或无法查询到已删除列数据导致程序异常的情况。这种情况下即使通过备份数据回滚也会丢失用户请求写入的数据。`,
+			Content:`If the business logic dosen't eliminated compeletly, you may can't write data or query the data of column begin deleted after column deleted,in which case you may lost data requested by users even by backup and recover.`,
 		},
 		"ALT.004": {
 			Summary: "It's danger to delete primary key and foreign key ,please check with DBA before operation.",
-			Content: `主键和外键为关系型数据库中两种重要约束，删除已有约束会打破已有业务逻辑，操作前请业务开发与DBA确认影响，三思而行。`,
+			Content:`Primary key and foreign key are two important constraint in relational database,delete existing constraints may broken existing business logic,you may check the influence with DBA.` ,
 		},
 		"ARG.001": {
 			Summary: "The use of the preceding wildcard query is not recommended.",
-			Content: `例如“％foo”，查询参数有一个前项通配符的情况无法使用已有索引。`,
+			Content: `Eg:"%foo",parameter of query has preceding wildcard will not use existing index.`,
 		},
 		"ARG.002": {
 			Summary: "LIKE query without wildcard.",
-			Content: `不包含通配符的LIKE查询可能存在逻辑错误，因为逻辑上它与等值查询相同。`,
+			Content: `LIKE query without wildcard may cause logic error,because it is the same as the equivalent query logically`,
 		},
 		"ARG.003": {
 			Summary: "Parameter comparisons contain implicit conversions, and indexes cannot be used.",
-			Content: "隐式类型转换有无法命中索引的风险，在高并发、大数据量的情况下，命不中索引带来的后果非常严重。",
+			Content: "Implicit conversions has risk of unable to hit index,which may cause serious problem in case of high concurrency and large amount of data",
 		},
 		"ARG.004": {
 			Summary: "IN (NULL)/NOT IN (NULL) , always false.",
-			Content: "正确的作法是col IN ('val1', 'val2', 'val3') OR col IS NULL",
+			Content: `You may use "col IN ('val1', 'val2', 'val3') OR col IS NULL"`,
 		},
 		"ARG.005": {
 			Summary: "Use IN with caution,too many elements will lead to a full table scan.",
-			Content: ` 如：select id from t where num in(1,2,3)对于连续的数值，能用BETWEEN就不要用IN了：select id from t where num between 1 and 3。而当IN值过多时MySQL也可能会进入全表扫描导致性能急剧下降。`,
+			Content: ` Eg："select id from t where num in(1,2,3)" as mentioned above,use BETWEEN instead of IN as you can for continuous values,such as "select id from t where num between 1 and 3".because MYSQL may scan the whole table when there are too many IN values,which may make sharp decline in performance`,
 		},
 		"ARG.006": {
 			Summary: "Try to avoid judge NULL values in WHERE clause.",
-			Content: `使用IS NULL或IS NOT NULL将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中num列没有null值，然后这样查询： select id from t where num=0;`,
+			Content: `The engine may scan the whole table instead of use index when you use "IS NULL" or "IS NOT NULL",such as "select id from t where num is null".You can set num as 0 by default to make sure there is no null value in the colnumn of num,then you can use "select id from t where num=0"`,
 		},
 		"ARG.007": {
 			Summary: "Avoid string match",
-			Content: `性能问题是使用模式匹配操作符的最大缺点。使用LIKE或正则表达式进行模式匹配进行查询的另一个问题，是可能会返回意料之外的结果。最好的方案就是使用特殊的搜索引擎技术来替代SQL，比如Apache Lucene。另一个可选方案是将结果保存起来从而减少重复的搜索开销。如果一定要使用SQL，请考虑在MySQL中使用像FULLTEXT索引这样的第三方扩展。但更广泛地说，您不一定要使用SQL来解决所有问题。`,
+			Content: `Performance are the biggest problem of using pattern matching operators,another problem that it may return unexpected results will be caused by using LIKE or regular expression to pattern matching,so a better program is to use special search engine technology instead of SQL such as "Apache Lucene".Besides,another optional program is to save results to reduce overhead from Repeated search.If you really want to use SQL,please consider to use third party extension like FULLTEXT index in MySQL.Acctually,SQL is not the one way to solve all problem.`,
 		},
 		"ARG.008": {
 			Summary: "Try to use IN when you execute an OR query in an index column.",
-			Content: `IN-list谓词可以用于索引检索，并且优化器可以对IN-list进行排序，以匹配索引的排序序列，从而获得更有效的检索。请注意，IN-list必须只包含常量，或在查询块执行期间保持常量的值，例如外引用。`,
+			Content: `The predicate of IN-list can be used by index to search,and optimizer can sort to IN-list to match the sorted sequence of index,which can make more effective search.Please pay attention to that IN-list must include constant only,or keep value of constant during query block execution such as external reference.`,
 		},
 		"ARG.009": {
 			Summary: "The string in the quotation mark contains white space at the beginning or the ending.",
-			Content: `如果VARCHAR列的前后存在空格将可能引起逻辑问题，如在MySQL 5.5中'a'和'a '可能会在查询中被认为是相同的值。`,
+			Content: `The space before or after the column of VARCHAR may cause logic problem,for example, it will be considered the same that 'a' and 'a ' in MySQL 5.5`,
 		},
 		"ARG.010": {
 			Summary: "Don't use hint，such as : sql_no_cache, force index, ignore key, straight join.",
-			Content: `hint是用来强制SQL按照某个执行计划来执行，但随着数据量变化我们无法保证自己当初的预判是正确的。`,
+			Content: `hint is used to force SQL executes according to a executing plan,but we can't promise which we predict at the beginning  correct as data changed`,
 		},
 		"ARG.011": {
 			Summary: "Don't use negative query，such as：NOT IN/NOT LIKE",
-			Content: `请尽量不要使用负向查询，这将导致全表扫描，对查询性能影响较大。`,
+			Content: `Don't use negative query,which may cause whole table scanned and affect query performance`,
 		},
 		"CLA.001": {
 			Summary: "No where condition for select statement",
