@@ -495,4 +495,5 @@ func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {
 	if common.Config.DropTestTemporary {
 		vEnv.CleanUp()
 	}
+	os.Exit(0)
 }
