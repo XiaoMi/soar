@@ -80,8 +80,7 @@ func main() {
 	// 环境初始化，连接检查线上环境+构建测试环境
 	vEnv, rEnv := env.BuildEnv()
 
-	// 使用CleanupTestDatabase命令手动清理残余的`optimizer_xxx`数据库
-	// 为了保护当前正在评审的SQL，只清除前1小时前的残余
+	// 使用 -cleanup-test-database 命令手动清理残余的 optimizer_xxx 数据库
 	if common.Config.CleanupTestDatabase {
 		vEnv.CleanupTestDatabase()
 	}
@@ -91,11 +90,9 @@ func main() {
 		defer vEnv.CleanUp()
 	}
 
-	//当程序卡死的时候，或者由于某些原因程序没有退出，可以通过捕获信号量的形式让程序优雅退出并且清理测试环境
+	// 当程序卡死的时候，或者由于某些原因程序没有退出，可以通过捕获信号量的形式让程序优雅退出并且清理测试环境
 	common.HandleSignal(func() {
-		if common.Config.DropTestTemporary {
-			vEnv.CleanUp()
-		}
+		shutdown(vEnv, rEnv)
 	})
 
 	// 对指定的库表进行索引重复检查
@@ -491,5 +488,11 @@ func main() {
 			common.Log.Error("FormatSuggest json.Marshal Error: %v", err)
 		}
 		return
+	}
+}
+
+func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {
+	if common.Config.DropTestTemporary {
+		vEnv.CleanUp()
 	}
 }

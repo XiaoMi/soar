@@ -157,7 +157,7 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 	if err == nil {
 		for _, row := range dbs.Rows {
 			testDatabase := row.Str(0)
-			// test temporary database format `opimtizer_YYMMDDHHmmss_randomString(16)`
+			// test temporary database format `optimizer_YYMMDDHHmmss_randomString(16)`
 			if len(testDatabase) != 39 {
 				common.Log.Debug("CleanupTestDatabase by pass %s", testDatabase)
 				continue
@@ -165,26 +165,24 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 			s := strings.Split(testDatabase, "_")
 			pastTime, err := time.Parse("060102150405", s[1])
 			if err != nil {
-				common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err)
+				common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err.Error())
+				continue
 			}
-			nowTime, err := time.Parse("060102150405", time.Now().Format("060102150405"))
-			if err != nil {
-				common.Log.Error("CleanupTestDatabase compute nowTime Error: %s", err)
-			}
-			// TODO: 1 hour should be configable
-			subHour := nowTime.Sub(pastTime).Hours()
+			// TODO: 1 hour should be config-able
+			subHour := time.Now().Sub(pastTime).Hours()
 			if subHour > 1 {
 				_, err := ve.Query("drop database %s", testDatabase)
 				if err != nil {
-					common.Log.Error("CleanupTestDatabase failed Error: %s", err)
+					common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
+					continue
 				}
-				common.Log.Debug("CleanupTestDatabase drop database %s", testDatabase)
+				common.Log.Debug("CleanupTestDatabase drop database %s success", testDatabase)
 			} else {
 				common.Log.Debug("CleanupTestDatabase by pass database %s, less than %d hours", testDatabase, subHour)
 			}
 		}
 	} else {
-		common.Log.Error("CleanupTestDatabase  failed Error:%s", err)
+		common.Log.Error("CleanupTestDatabase failed Error:%s", err.Error())
 	}
 }
 
