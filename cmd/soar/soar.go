@@ -52,7 +52,7 @@ func main() {
 	common.BaseDir = filepath.Dir(ex) // binary 文件所在路径
 
 	// 配置文件&命令行参数解析
-	err = common.ParseConfig("")
+	err = common.ParseConfig(common.ArgConfig())
 	common.LogIfWarn(err, "")
 
 	// 打印支持启发式建议
