@@ -28,7 +28,7 @@ import (
 	"sort"
 )
 
-// GoldenDiff 从gofmt学来的测试方法
+// GoldenDiff 从 gofmt 学来的测试方法
 // https://medium.com/soon-london/testing-with-golden-files-in-go-7fccc71c43d3
 func GoldenDiff(f func(), name string, update *bool) error {
 	var b bytes.Buffer

@@ -21,7 +21,7 @@ import (
 	"strings"
 )
 
-// Meta 以'database'为key, DB的map，按db->table->column组织的元数据
+// Meta 以 'database' 为 key, DB 的 map, 按 db->table->column 组织的元数据
 type Meta map[string]*DB
 
 // DB 数据库相关的结构体
@@ -110,7 +110,7 @@ func JoinColumnsName(cols []*Column, sep string) string {
 	return strings.Trim(name, sep)
 }
 
-// Tables 获取Meta中指定db的所有表名
+// Tables 获取 Meta 中指定 db 的所有表名
 // Input:数据库名
 // Output:表名组成的list
 func (b Meta) Tables(db string) []string {
@@ -132,7 +132,7 @@ func (b Meta) SetDefault(defaultDB string) Meta {
 
 	for db := range b {
 		if db == "" {
-			// 当获取到的join中的DB为空的时候，说明SQL未显示的指定DB，即使用的是rEnv默认DB，需要将表合并到原DB中
+			// 当获取到的 join 中的 DB 为空的时候，说明 SQL 未显示的指定 DB，即使用的是 rEnv 默认 DB, 需要将表合并到原 DB 中
 			if _, ok := b[defaultDB]; ok {
 				for tbName, table := range b[""].Table {
 					if _, ok := b[defaultDB].Table[tbName]; ok {
@@ -156,8 +156,8 @@ func (b Meta) SetDefault(defaultDB string) Meta {
 	return b
 }
 
-// MergeColumn 将使用到的列按db->table组织去重
-// 注意：Column中的db, table信息可能为空，需要提前通过env环境补齐再调用该函数。
+// MergeColumn 将使用到的列按 db->table 组织去重
+// 注意：Column 中的 db, table 信息可能为空，需要提前通过env环境补齐再调用该函数。
 // @input: 目标列list, 源列list（可以将多个源合并到一个目标列list）
 // @output: 合并后的列list
 func MergeColumn(dst []*Column, src ...*Column) []*Column {

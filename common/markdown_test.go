@@ -50,7 +50,7 @@ func TestMarkdown2Html(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// golden文件拷贝成html文件，这步是给人看的
+	// golden 文件拷贝成 html 文件，这步是给人看的
 	gd, err := os.OpenFile("testdata/"+t.Name()+".golden", os.O_RDONLY, 0666)
 	if nil != err {
 		t.Fatal(err)

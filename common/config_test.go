@@ -18,6 +18,7 @@ package common
 
 import (
 	"flag"
+	"os"
 	"runtime"
 	"testing"
 
@@ -81,5 +82,31 @@ func TestListReportTypes(t *testing.T) {
 	err := GoldenDiff(func() { ListReportTypes() }, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
+	}
+}
+
+func TestArgConfig(t *testing.T) {
+	testArgs1 := [][]string{
+		{"soar", "-config", "=", "soar.yaml"},
+		{"soar", "-print-config", "-config", "soar.yaml"},
+	}
+	testArgs2 := [][]string{
+		{"soar", "-config", "soar.yaml"},
+		{"soar", "-config", "=soar.yaml"},
+		{"soar", "-config=soar.yaml"},
+	}
+	for _, args := range testArgs1 {
+		os.Args = args
+		configFile := ArgConfig()
+		if configFile != "" {
+			t.Errorf("should return '', but got %s", configFile)
+		}
+	}
+	for _, args := range testArgs2 {
+		os.Args = args
+		configFile := ArgConfig()
+		if configFile != "soar.yaml" {
+			t.Errorf("should return soar.yaml, but got %s", configFile)
+		}
 	}
 }

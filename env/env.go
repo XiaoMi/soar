@@ -175,7 +175,7 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 			continue
 		}
 
-		subHour := time.Now().Sub(pastTime).Hours()
+		subHour := time.Since(pastTime).Hours()
 		if subHour > float64(minHour) {
 			if _, err := ve.Query("drop database %s", testDatabase); err != nil {
 				common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
@@ -188,7 +188,6 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 	}
 
 	common.Log.Debug("CleanupTestDatabase done")
-	return
 }
 
 // BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取
@@ -375,7 +374,7 @@ func (ve VirtualEnv) createDatabase(rEnv database.Connector, dbName string) erro
 			如果一个SQL中存在多个数据库，则只能有一个数据库是没有在SQL中被显示指定的（即DSN中指定的数据库）
 	TODO:
 		在一些可能的情况下，由于数据库配置的不一致（如SQL_MODE不同）导致remote环境的库表无法正确的在测试环境进行同步，
-		soar能够做出判断并进行session级别的修改，但是这一阶段可用性保证应该是由用户提供两个完全相同（或测试环境兼容线上环境）
+		soar 能够做出判断并进行 session 级别的修改，但是这一阶段可用性保证应该是由用户提供两个完全相同（或测试环境兼容线上环境）
 		的数据库环境来实现的。
 */
 func (ve VirtualEnv) createTable(rEnv database.Connector, dbName, tbName string) error {

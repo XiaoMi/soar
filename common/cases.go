@@ -20,7 +20,7 @@ package common
 var TestSQLs []string
 
 func init() {
-	// 所有的SQL都要以分号结尾，-list-test-sqls参数会打印这个list，以分号结尾可方便测试
+	// 所有的SQL都要以分号结尾，-list-test-sqls 参数会打印这个 list，以分号结尾可方便测试
 	// 如：./soar -list-test-sql | ./soar
 	TestSQLs = []string{
 		// single equality
@@ -61,7 +61,7 @@ func init() {
 		"SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year LIMIT 10;", //  INDEX(length, release_year)",
 		"SELECT * FROM film WHERE length = 123 ORDER BY release_year LIMIT 10;",                                  //  INDEX(length, release_year)",
 		"SELECT * FROM film ORDER BY release_year LIMIT 10;",                                                     //  不能单独给release_year加索引
-		"SELECT film_id FROM film ORDER BY release_year LIMIT 10;",                                               //  TODO: INDEX(release_year)，film_id是主键查询列满足索引覆盖的情况才会使用到release_year索引
+		"SELECT film_id FROM film ORDER BY release_year LIMIT 10;",                                               //  TODO: INDEX(release_year)，film_id 是主键查询列满足索引覆盖的情况才会使用到 release_year 索引
 		"SELECT * FROM film WHERE length > 100 ORDER BY length LIMIT 10;",                                        //  INDEX(length) This "range" is compatible with ORDER BY
 		"SELECT * FROM film WHERE length < 100 ORDER BY length LIMIT 10;",                                        //  INDEX(length) also works
 		"SELECT * FROM customer WHERE address_id in (224,510) ORDER BY last_name;",                               //  INDEX(address_id)
@@ -82,8 +82,8 @@ func init() {
 		// Join
 		// 内连接 INNER JOIN
 		// 在mysql中，inner join...on , join...on , 逗号...WHERE ，cross join...on是一样的含义。
-		// 但是在标准SQL中，它们并不等价，标准SQL中INNER JOIN与ON共同使用, CROSS JOIN用于其他情况。
-		// 逗号不支持on和using语法, 逗号的优先级要低于INNER JOIN, CROSS JOIN, LEFT JOIN
+		// 但是在标准SQL中，它们并不等价，标准 SQL 中 INNER JOIN 与 ON共同使用, CROSS JOIN用于其他情况。
+		// 逗号不支持 on 和 using 语法, 逗号的优先级要低于INNER JOIN, CROSS JOIN, LEFT JOIN
 		// ON子句的语法格式为：tb1.col1 = tb2.col2列名可以不同，筛选连接后的结果，两表的对应列值相同才在结果集中。
 		// 当模式设计对联接表的列采用了相同的命名样式时，就可以使用 USING 语法来简化 ON 语法
 
@@ -130,7 +130,7 @@ func init() {
 		"SELECT country_id, last_update FROM city NATURAL RIGHT JOIN country;",
 
 		// STRAIGHT_JOIN 实际上与内连接 INNER JOIN 表现完全一致，
-		// 不同的是使用了 STRAIGHT_JOIN后指定表载入的顺序，city先于country载入
+		// 不同的是使用了 STRAIGHT_JOIN 后指定表载入的顺序，city 先于 country 载入
 		"SELECT a.country_id, a.last_update FROM city a STRAIGHT_JOIN country b ON a.country_id=b.country_id;",
 
 		// SEMI JOIN

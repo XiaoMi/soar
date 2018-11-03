@@ -65,7 +65,7 @@ func (db *Connector) Query(sql string, params ...interface{}) (*QueryResult, err
 		return nil, errors.New("TestDsn Disable")
 	}
 
-	// 数据库安全性检查：如果Connector的IP端口与TEST环境不一致，则启用SQL白名单
+	// 数据库安全性检查：如果 Connector 的 IP 端口与 TEST 环境不一致，则启用SQL白名单
 	// 不在白名单中的SQL不允许执行
 	// 执行环境与test环境不相同
 	if db.Addr != common.Config.TestDSN.Addr && db.dangerousQuery(sql) {
@@ -97,7 +97,7 @@ func (db *Connector) Query(sql string, params ...interface{}) (*QueryResult, err
 			}
 		}
 
-		// SHOW WARNINGS并不会影响last_query_cost
+		// SHOW WARNINGS 并不会影响 last_query_cost
 		if common.Config.ShowLastQueryCost {
 			cost, _, err := conn.Query("SHOW SESSION STATUS LIKE 'last_query_cost'")
 			if err == nil {
@@ -278,7 +278,7 @@ func RemoveSQLComments(sql []byte) []byte {
 	})
 }
 
-// 为了防止在Online环境进行误操作，通过dangerousQuery来判断能否在Online执行
+// 为了防止在 Online 环境进行误操作，通过 dangerousQuery 来判断能否在 Online 执行
 func (db *Connector) dangerousQuery(query string) bool {
 	queries, err := sqlparser.SplitStatementToPieces(strings.TrimSpace(strings.ToLower(query)))
 	if err != nil {

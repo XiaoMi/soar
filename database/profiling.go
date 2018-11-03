@@ -42,7 +42,7 @@ type ProfilingRow struct {
 
 // Profiling 执行SQL，并对其Profiling
 func (db *Connector) Profiling(sql string, params ...interface{}) (*QueryResult, error) {
-	// 过滤不需要profiling的SQL
+	// 过滤不需要 profiling 的 SQL
 	switch sqlparser.Preview(sql) {
 	case sqlparser.StmtSelect, sqlparser.StmtUpdate, sqlparser.StmtDelete:
 	default:
@@ -54,7 +54,7 @@ func (db *Connector) Profiling(sql string, params ...interface{}) (*QueryResult,
 		return nil, errors.New("TestDsn Disable")
 	}
 
-	// 数据库安全性检查：如果Connector的IP端口与TEST环境不一致，则启用SQL白名单
+	// 数据库安全性检查：如果 Connector 的 IP 端口与 TEST 环境不一致，则启用 SQL 白名单
 	// 不在白名单中的SQL不允许执行
 	// 执行环境与test环境不相同
 	if db.Addr != common.Config.TestDSN.Addr && db.dangerousQuery(sql) {

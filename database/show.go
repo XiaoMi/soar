@@ -41,7 +41,7 @@ type tableStatusRow struct {
 	Engine       string // 该表使用的存储引擎
 	Version      int    // 该表的 .frm 文件版本号
 	RowFormat    string // 该表使用的行存储格式
-	Rows         int64  // 表行数，InnoDB 引擎中为预估值，甚至可能会有40%~50%的数值偏差
+	Rows         int64  // 表行数, InnoDB 引擎中为预估值，甚至可能会有40%~50%的数值偏差
 	AvgRowLength int    // 平均行长度
 
 	// MyISAM: Data_length 为数据文件的大小，单位为 bytes
@@ -333,7 +333,7 @@ func NewTableDesc(tableName string) *TableDesc {
 	}
 }
 
-// ShowColumns 获取DB中所有的columns
+// ShowColumns 获取 DB 中所有的 columns
 func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 	tbDesc := NewTableDesc(tableName)
 
@@ -545,8 +545,8 @@ type ReferenceValue struct {
 // ShowReference 查找所有的外键信息
 func (db *Connector) ShowReference(dbName string, tbName ...string) ([]ReferenceValue, error) {
 	var referenceValues []ReferenceValue
-	sql := `SELECT C.REFERENCED_TABLE_SCHEMA,C.REFERENCED_TABLE_NAME,C.TABLE_SCHEMA,C.TABLE_NAME,C.CONSTRAINT_NAME 
-FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C JOIN INFORMATION_SCHEMA. TABLES T ON T.TABLE_NAME = C.TABLE_NAME 
+	sql := `SELECT C.REFERENCED_TABLE_SCHEMA,C.REFERENCED_TABLE_NAME,C.TABLE_SCHEMA,C.TABLE_NAME,C.CONSTRAINT_NAME
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C JOIN INFORMATION_SCHEMA. TABLES T ON T.TABLE_NAME = C.TABLE_NAME
 WHERE C.REFERENCED_TABLE_NAME IS NOT NULL`
 	sql = sql + fmt.Sprintf(` AND C.TABLE_SCHEMA = "%s"`, dbName)
 

@@ -35,14 +35,14 @@ func TestLogger(t *testing.T) {
 func TestCaller(t *testing.T) {
 	caller := Caller()
 	if caller != "testing.tRunner" {
-		t.Error("get caller failer")
+		t.Error("get caller failed")
 	}
 }
 
 func TestGetFunctionName(t *testing.T) {
 	f := GetFunctionName()
 	if f != "TestGetFunctionName" {
-		t.Error("get functionname failer")
+		t.Error("get functionname failed")
 	}
 }
 

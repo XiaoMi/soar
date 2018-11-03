@@ -52,7 +52,7 @@ func (db *Connector) SamplingData(remote Connector, tables ...string) error {
 	// 计算需要泵取的数据量
 	wantRowsCount := 300 * common.Config.SamplingStatisticTarget
 
-	// 设置数据采样单条SQL中value的数量
+	// 设置数据采样单条 SQL 中 value 的数量
 	// 该数值越大，在内存中缓存的data就越多，但相对的，插入时速度就越快
 	maxValCount := 200
 
@@ -188,7 +188,7 @@ func startSampling(conn, localConn mysql.Conn, database, table string, factor fl
 			}
 
 			// 非text/varchar类的数据类型，如果dump出的数据为空，则说明该值为null值
-			// 应转换其value为null，如果用空（''）进行替代，会导致出现语法错误。
+			// 应转换其 value 为 null，如果用空（''）进行替代，会导致出现语法错误。
 			if len(dataTypes) == len(res.Fields()) && values[i] == "" &&
 				(!strings.Contains(dataTypes[i], "char") ||
 					!strings.Contains(dataTypes[i], "text")) {
