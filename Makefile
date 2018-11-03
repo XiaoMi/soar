@@ -67,9 +67,11 @@ cover: test
 # Builds the project
 build: fmt tidb-parser
 	@echo "\033[92mBuilding ...\033[0m"
+	@mkdir -p bin
 	@bash ./genver.sh $(GO_VERSION_MIN)
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
-		go build $$d || ret=$$? ; \
+		b=$$(basename $${d}) ; \
+		go build -o bin/$${b} $$d || ret=$$? ; \
 	done ; exit $$ret
 	@echo "build Success!"
 
@@ -78,7 +80,8 @@ fast:
 	@echo "\033[92mBuilding ...\033[0m"
 	@bash ./genver.sh $(GO_VERSION_MIN)
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
-		go build $$d || ret=$$? ; \
+		b=$$(basename $${d}) ; \
+		go build -o bin/$${b} $$d || ret=$$? ; \
 	done ; exit $$ret
 	@echo "build Success!"
 
@@ -92,9 +95,9 @@ install: build
 .PHONY: doc
 doc: fast
 	@echo "\033[92mAuto generate doc ...\033[0m"
-	./soar -list-heuristic-rules > doc/heuristic.md
-	./soar -list-rewrite-rules > doc/rewrite.md
-	./soar -list-report-types > doc/report_type.md
+	./bin/soar -list-heuristic-rules > doc/heuristic.md
+	./bin/soar -list-rewrite-rules > doc/rewrite.md
+	./bin/soar -list-report-types > doc/report_type.md
 
 # Add or change a heuristic rule
 .PHONY: heuristic
@@ -144,12 +147,13 @@ lint: build
 .PHONY: release
 release: deps build
 	@echo "\033[92mCross platform building for release ...\033[0m"
+	@mkdir -p release
 	@for GOOS in darwin linux windows; do \
 		for GOARCH in amd64; do \
 			for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 				b=$$(basename $${d}) ; \
 				echo "Building $${b}.$${GOOS}-$${GOARCH} ..."; \
-				GOOS=$${GOOS} GOARCH=$${GOARCH} go build -ldflags="-s -w" -v -o $${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
+				GOOS=$${GOOS} GOARCH=$${GOARCH} go build -ldflags="-s -w" -v -o release/$${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
 			done ; \
 		done ;\
 	done

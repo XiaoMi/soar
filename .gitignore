@@ -1,10 +1,5 @@
-soar
-soar.darwin-386
-soar.darwin-amd64
-soar.linux-386
-soar.linux-amd64
-soar.windows-386
-soar.windows-amd64
+bin/
+release/
 common/version.go
 doc/blueprint/
 *.iml
