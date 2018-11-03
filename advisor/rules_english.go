@@ -107,16 +107,17 @@ func init() {
 		},
 		"CLA.001": {
 			Summary: "No where condition for select statement",
-			Content: `SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。`,
+			Content: `No WHERE clause in SELECT statement will check more rows than that you predict(whole table scanned).It is recommended to use "SHOW TABLE STATUS" or "EXPLAIN" when precision is not required in the type of request like "SELECT COUNT(*)".`,
 		},
 		"CLA.002": {
 			Summary: "Use ORDER BY RAND() isn't recommended.",
-			Content: `ORDER BY RAND()是从结果集中检索随机行的一种非常低效的方法，因为它会对整个结果进行排序并丢弃其大部分数据。`,
+			Content: `It's inefficiency to search random rows from result concentrically by using "ORDER BY RAND()",which may sort all of result and discard most of data.`,
 		},
 
 		"CLA.003": {
 			Summary: "The use of LIMIT query with OFFSET is not recommended.",
 			Content: `使用LIMIT和OFFSET对结果集分页的复杂度是O(n^2)，并且会随着数据增大而导致性能问题。采用“书签”扫描的方法实现分页效率更高。`,
+			Content: ``,
 		},
 		"CLA.004": {
 			Summary: "GROUP BY is not recommended for constants.",
