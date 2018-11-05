@@ -77,27 +77,15 @@ func GetMeta(stmt sqlparser.Statement, meta common.Meta) common.Meta {
 		switch expr := node.(type) {
 		case *sqlparser.DDL:
 			// 如果SQL是一个DDL，则不需要继续遍历语法树了
-			db1 := expr.Table.Qualifier.String()
-			tb1 := expr.Table.Name.String()
-			db2 := expr.NewName.Qualifier.String()
-			tb2 := expr.NewName.Name.String()
-
-			if tb1 != "" {
-				if _, ok := meta[db1]; !ok {
-					meta[db1] = common.NewDB(db1)
-				}
-
-				meta[db1].Table[tb1] = common.NewTable(tb1)
+			for _, tb := range expr.FromTables {
+				appendTable(tb, "", meta)
 			}
 
-			if tb2 != "" {
-				if _, ok := meta[db2]; !ok {
-					meta[db2] = common.NewDB(db2)
-				}
-
-				meta[db2].Table[tb2] = common.NewTable(tb2)
+			for _, tb := range expr.ToTables {
+				appendTable(tb, "", meta)
 			}
 
+			appendTable(expr.Table, "", meta)
 			return false, nil
 		case *sqlparser.AliasedTableExpr:
 			// 非 DDL 情况下处理 TableExpr
@@ -110,26 +98,7 @@ func GetMeta(stmt sqlparser.Statement, meta common.Meta) common.Meta {
 			// 表名存放在 AST 中 TableName 里，包含表名与表前缀名。
 			// 当与 As 相对应的 Expr 为 TableName 的时候，别名才是一张实体表的别名，否则为结果集的别名。
 			case sqlparser.TableName:
-				db := table.Qualifier.String()
-				tb := table.Name.String()
-
-				if meta[db] == nil {
-					meta[db] = common.NewDB(db)
-				}
-
-				meta[db].Table[tb] = common.NewTable(tb)
-
-				// alias去重
-				aliasExist := false
-				for _, existedAlias := range meta[db].Table[tb].TableAliases {
-					if existedAlias == expr.As.String() {
-						aliasExist = true
-					}
-				}
-				if !aliasExist {
-					meta[db].Table[tb].TableAliases = append(meta[db].Table[tb].TableAliases, expr.As.String())
-				}
-
+				appendTable(table, expr.As.String(), meta)
 			default:
 				// 如果 AliasedTableExpr 中的 Expr 不是 TableName 结构体，则表示该表为一个查询结果集（子查询或临时表）。
 				// 在这里记录一下别名，但将列名制空，用来保证在其他环节中判断列前缀的时候不会有遗漏
@@ -150,6 +119,49 @@ func GetMeta(stmt sqlparser.Statement, meta common.Meta) common.Meta {
 	}, stmt)
 	common.LogIfWarn(err, "")
 	return meta
+}
+
+// appendTable 将 sqlparser.TableName 中的库表信息提取后放到 meta 中
+// @tb 为 sqlparser.TableName 对象
+// @as 为该表的别名，无别名时为空
+// @meta 为信息集合
+func appendTable(tb sqlparser.TableName, as string, meta map[string]*common.DB) map[string]*common.DB {
+	if meta == nil {
+		return meta
+	}
+
+	dbName := tb.Qualifier.String()
+	tbName := tb.Name.String()
+	if tbName == "" {
+		return meta
+	}
+
+	if meta[dbName] == nil {
+		meta[dbName] = common.NewDB(dbName)
+	}
+
+	meta[dbName].Table[tbName] = common.NewTable(tbName)
+	mergeAlias(dbName, tbName, as, meta)
+
+	return meta
+}
+
+// mergeAlias 将所有的表别名归并到一个表下
+func mergeAlias(db, tb, as string, meta map[string]*common.DB) {
+	if meta == nil || as == "" {
+		return
+	}
+
+	aliasExist := false
+	for _, existedAlias := range meta[db].Table[tb].TableAliases {
+		if existedAlias == as {
+			aliasExist = true
+		}
+	}
+
+	if !aliasExist {
+		meta[db].Table[tb].TableAliases = append(meta[db].Table[tb].TableAliases, as)
+	}
 }
 
 // eqOperators 等值条件判断关键字

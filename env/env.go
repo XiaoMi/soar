@@ -248,18 +248,37 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 
 			// 为了支持并发，需要将DB进行映射，但db.table这种形式无法保证DB的映射是正确的
 			// TODO：暂不支持 create db.tableName (id int) 形式的建表语句
-			if stmt.Table.Qualifier.String() != "" || stmt.NewName.Qualifier.String() != "" {
+			if stmt.Table.Qualifier.String() != "" {
 				common.Log.Error("BuildVirtualEnv DDL Not support '.'")
 				return false
+			}
+
+			for _, tb := range stmt.FromTables {
+				if tb.Qualifier.String() != "" {
+					common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+					return false
+				}
+			}
+
+			for _, tb := range stmt.ToTables {
+				if tb.Qualifier.String() != "" {
+					common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+					return false
+				}
 			}
 
 			// 拉取表结构
 			table := stmt.Table.Name.String()
 			if table != "" {
 				err = ve.createTable(*rEnv, rEnv.Database, table)
+				// 这里如果报错可能有两种可能：
+				// 1. SQL 是 Create 语句，线上环境并没有相关的库表结构
+				// 2. 在测试环境中执行 SQL 报错
+				// 如果是因为 Create 语句报错，后续会在测试环境中直接执行 create 语句，不会对程序有负面影响
+				// 如果是因为执行 SQL 报错，那么其他地方执行 SQL 的时候也一定会报错
+				// 所以这里不需要 `return false`，可以继续执行
 				if err != nil {
 					common.Log.Error("BuildVirtualEnv Error : %v", err)
-					return false
 				}
 			}
 
