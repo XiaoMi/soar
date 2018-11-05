@@ -48,7 +48,7 @@ type IndexInfo struct {
 	Name          string           `json:"name"`           // 索引名称
 	Database      string           `json:"database"`       // 数据库名
 	Table         string           `json:"table"`          // 表名
-	DDL           string           `json:"ddl"`            // ALTER, CREATE等类型的DDL语句
+	DDL           string           `json:"ddl"`            // ALTER, CREATE 等类型的 DDL 语句
 	ColumnDetails []*common.Column `json:"column_details"` // 列详情
 }
 
@@ -96,7 +96,7 @@ func NewAdvisor(env *env.VirtualEnv, rEnv database.Connector, q Query4Audit) (*I
 				dbRef = rEnv.Database
 			}
 
-			// DDL在Env初始化的时候已经执行过了
+			// DDL 在 Env 初始化的时候已经执行过了
 			if _, ok := env.TableMap[dbRef]; !ok {
 				env.TableMap[dbRef] = make(map[string]string)
 			}
@@ -279,15 +279,15 @@ func (idxAdv *IndexAdvisor) IndexAdvise() IndexAdvises {
 		if len(idxAdv.whereINEQ) > 0 {
 			mergeIndex(indexList, idxAdv.whereINEQ[0])
 		}
-		// 有WHERE条件，但WHERE条件未能给出索引建议就不能再加GROUP BY和ORDER BY建议了
+		// 有WHERE条件，但 WHERE 条件未能给出索引建议就不能再加 GROUP BY 和 ORDER BY 建议了
 		if len(ignore) == 0 {
-			// 没有非等值查询条件时可以再为GroupBy和OrderBy添加索引
+			// 没有非等值查询条件时可以再为 GroupBy 和 OrderBy 添加索引
 			for _, index := range idxAdv.groupBy {
 				mergeIndex(indexList, index)
 			}
 
 			// OrderBy
-			// 没有GroupBy时可以为OrderBy加索引
+			// 没有 GroupBy 时可以为 OrderBy 加索引
 			if len(idxAdv.groupBy) == 0 {
 				for _, index := range idxAdv.orderBy {
 					mergeIndex(indexList, index)
@@ -295,14 +295,14 @@ func (idxAdv *IndexAdvisor) IndexAdvise() IndexAdvises {
 			}
 		}
 	} else {
-		// 未指定Where条件的，只需要GroupBy和OrderBy的索引建议
+		// 未指定 Where 条件的，只需要 GroupBy 和 OrderBy 的索引建议
 		for _, index := range idxAdv.groupBy {
 			mergeIndex(indexList, index)
 		}
 
 		// OrderBy
-		// 没有GroupBy时可以为OrderBy加索引
-		// 没有where条件时OrderBy的索引仅能够在索引覆盖的情况下被使用
+		// 没有GroupBy 时可以为 OrderBy 加索引
+		// 没有 where 条件时 OrderBy 的索引仅能够在索引覆盖的情况下被使用
 
 		// if len(idxAdv.groupBy) == 0 {
 		// 	for _, index := range idxAdv.orderBy {
@@ -329,8 +329,8 @@ func (idxAdv *IndexAdvisor) IndexAdvise() IndexAdvises {
 	indexes = mergeAdvices(indexes, idxAdv.buildJoinIndex(joinTableMeta)...)
 
 	if common.Config.TestDSN.Disable || common.Config.OnlineDSN.Disable {
-		// 无env环境下只提供单列索引，无法确定table时不给予优化建议
-		// 仅有table信息时给出的建议不包含DB信息
+		// 无 env 环境下只提供单列索引，无法确定 table 时不给予优化建议
+		// 仅有 table 信息时给出的建议不包含 DB 信息
 		indexes = mergeAdvices(indexes, idxAdv.buildIndexWithNoEnv(indexList)...)
 	} else {
 		// 给出尽可能详细的索引建议
@@ -339,16 +339,16 @@ func (idxAdv *IndexAdvisor) IndexAdvise() IndexAdvises {
 
 	indexes = mergeAdvices(indexes, subQueryAdvises...)
 
-	// 在开启env的情况下，检查数据库版本，字段类型，索引总长度
+	// 在开启 env 的情况下，检查数据库版本，字段类型，索引总长度
 	indexes = idxAdv.idxColsTypeCheck(indexes)
 
-	// 在开启env的情况下，会对索引进行检查，对全索引进行过滤
-	// 在前几步都不会对idx生成DDL语句，DDL语句在这里生成
+	// 在开启 env 的情况下，会对索引进行检查，对全索引进行过滤
+	// 在前几步都不会对 idx 生成 DDL 语句，DDL语句在这里生成
 	return idxAdv.mergeIndexes(indexes)
 }
 
 // idxColsTypeCheck 对超长的字段添加前缀索引，剔除无法添索引字段的列
-// TODO 暂不支持fulltext索引，
+// TODO: 暂不支持 fulltext 索引，
 func (idxAdv *IndexAdvisor) idxColsTypeCheck(idxList []IndexInfo) []IndexInfo {
 	if common.Config.TestDSN.Disable {
 		return rmSelfDupIndex(idxList)
@@ -363,7 +363,7 @@ func (idxAdv *IndexAdvisor) idxColsTypeCheck(idxList []IndexInfo) []IndexInfo {
 		idxBytesTotal := 0
 		isOverFlow := false
 		for _, col := range idx.ColumnDetails {
-			// 获取字段bytes
+			// 获取字段 bytes
 			bytes := col.GetDataBytes(common.Config.OnlineDSN.Version)
 			tmpCol := col.Name
 			overFlow := 0
@@ -474,7 +474,7 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 
 	var indexes []IndexInfo
 	for _, idx := range idxList {
-		// 将DB替换成vEnv中的数据库名称
+		// 将 DB 替换成 vEnv 中的数据库名称
 		dbInVEnv := idx.Database
 		if _, ok := idxAdv.vEnv.DBRef[idx.Database]; ok {
 			dbInVEnv = idxAdv.vEnv.DBRef[idx.Database]
@@ -503,7 +503,7 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 				var cols []string
 				var colsDetail []*common.Column
 
-				// 把已经存在的key摘出来遍历一遍对比是否是包含关系
+				// 把已经存在的 key 摘出来遍历一遍对比是否是包含关系
 				for _, col := range indexMeta.FindIndex(database.IndexKeyName, existedIdx.KeyName) {
 					cols = append(cols, col.ColumnName)
 					colsDetail = append(colsDetail, &common.Column{
@@ -532,7 +532,7 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 					}
 
 					// 库、表、列名需要用反撇转义
-					// TODO 关于外键索引去重的优雅解决方案
+					// TODO: 关于外键索引去重的优雅解决方案
 					if !isConstraint {
 						if common.Config.AllowDropIndex {
 							alterSQL := fmt.Sprintf("alter table `%s`.`%s` drop index `%s`", idx.Database, idx.Table, idxName)
@@ -736,12 +736,12 @@ func CompleteColumnsInfo(stmt sqlparser.Statement, cols []*common.Column, env *e
 		return cols
 	}
 
-	// 从Ast中拿到DBStructure，包含所有表的相关信息
+	// 从 Ast 中拿到 DBStructure，包含所有表的相关信息
 	dbs := ast.GetMeta(stmt, nil)
 
-	// 此处生成的meta信息中不应该含有""db的信息，若DB为空则认为是已传入的db为默认db并进行信息补全
+	// 此处生成的 meta 信息中不应该含有""db的信息，若 DB 为空则认为是已传入的 db 为默认 db 并进行信息补全
 	// BUG Fix:
-	// 修补dbs中空DB的导致后续补全列信息时无法获取正确table名称的问题
+	// 修补 dbs 中空 DB 的导致后续补全列信息时无法获取正确 table 名称的问题
 	if _, ok := dbs[""]; ok {
 		dbs[env.Database] = dbs[""]
 		delete(dbs, "")
@@ -829,7 +829,7 @@ func CompleteColumnsInfo(stmt sqlparser.Statement, cols []*common.Column, env *e
 			// 将已经获取到正确表信息的列信息带入到env中，利用show columns where table 获取库表信息
 			// 此出会传入之前从ast中，该 db 下获取的所有表来作为where限定条件，
 			// 防止与SQL无关的库表信息干扰准确性
-			// 此处传入的是测试环境，DB是经过变换的，所以在寻找列名的时候需要将DB名称转换成测试环境中经过hash的DB名称
+			// 此处传入的是测试环境，DB 是经过变换的，所以在寻找列名的时候需要将 DB 名称转换成测试环境中经过 hash 的 DB 名称
 			// 不然会找不到col的信息
 			realCols, err := env.FindColumn(col.Name, env.DBHash(db), dbs.Tables(db)...)
 			if err != nil {
@@ -840,7 +840,7 @@ func CompleteColumnsInfo(stmt sqlparser.Statement, cols []*common.Column, env *e
 			// 对比 column 信息中的表名与从 env 中获取的库表名的一致性
 			for _, realCol := range realCols {
 				if col.Name == realCol.Name {
-					// 如果查询到了列名一致，但从ast中获取的列的前缀与env中的表信息不符
+					// 如果查询到了列名一致，但从 ast 中获取的列的前缀与 env 中的表信息不符
 					// 1.存在一个同名列，但不同表，该情况下忽略
 					// 2.存在一个未正确转换的别名(如表名为)，该情况下修正，大概率是正确的
 					if col.Table != "" && col.Table != realCol.Table {
@@ -897,7 +897,7 @@ func (idxAdv *IndexAdvisor) calcCardinality(cols []*common.Column) []*common.Col
 				continue
 			}
 
-			// 将获取的索引信息以db.tb维度组织到IndexMeta中
+			// 将获取的索引信息以db.tb 维度组织到 IndexMeta 中
 			idxAdv.IndexMeta[realDB][col.Table] = indexInfo
 		}
 
@@ -1039,7 +1039,7 @@ func DuplicateKeyChecker(conn *database.Connector, databases ...string) map[stri
 		}
 	}
 
-	// 不指定DB的时候检查online dsn中的DB
+	// 不指定 DB 的时候检查 online dsn 中的 DB
 	if len(databases) == 0 {
 		databases = append(databases, tmpOnline.Database)
 	}

@@ -78,18 +78,18 @@ type Configration struct {
 	RewriteRules         []string `yaml:"rewrite-rules"`             // 生效的重写规则
 	BlackList            string   `yaml:"blacklist"`                 // blacklist 中的 SQL 不会被评审，可以是指纹，也可以是正则
 	MaxJoinTableCount    int      `yaml:"max-join-table-count"`      // 单条 SQL 中 JOIN 表的最大数量
-	MaxGroupByColsCount  int      `yaml:"max-group-by-cols-count"`   // 单条SQL中GroupBy包含列的最大数量
-	MaxDistinctCount     int      `yaml:"max-distinct-count"`        // 单条SQL中Distinct的最大数量
+	MaxGroupByColsCount  int      `yaml:"max-group-by-cols-count"`   // 单条 SQL 中 GroupBy 包含列的最大数量
+	MaxDistinctCount     int      `yaml:"max-distinct-count"`        // 单条 SQL 中 Distinct 的最大数量
 	MaxIdxColsCount      int      `yaml:"max-index-cols-count"`      // 复合索引中包含列的最大数量
-	MaxTotalRows         int64    `yaml:"max-total-rows"`            // 计算散粒度时，当数据行数大于 MaxTotalRows即开启数据库保护模式，散粒度返回结果可信度下降
+	MaxTotalRows         int64    `yaml:"max-total-rows"`            // 计算散粒度时，当数据行数大于 MaxTotalRows 即开启数据库保护模式，散粒度返回结果可信度下降
 	MaxQueryCost         int64    `yaml:"max-query-cost"`            // last_query_cost 超过该值时将给予警告
 	SpaghettiQueryLength int      `yaml:"spaghetti-query-length"`    // SQL最大长度警告，超过该长度会给警告
 	AllowDropIndex       bool     `yaml:"allow-drop-index"`          // 允许输出删除重复索引的建议
 	MaxInCount           int      `yaml:"max-in-count"`              // IN()最大数量
 	MaxIdxBytesPerColumn int      `yaml:"max-index-bytes-percolumn"` // 索引中单列最大字节数，默认767
 	MaxIdxBytes          int      `yaml:"max-index-bytes"`           // 索引总长度限制，默认3072
-	TableAllowCharsets   []string `yaml:"table-allow-charsets"`      // Table允许使用的DEFAULT CHARSET
-	TableAllowEngines    []string `yaml:"table-allow-engines"`       // Table允许使用的Engine
+	TableAllowCharsets   []string `yaml:"table-allow-charsets"`      // Table 允许使用的 DEFAULT CHARSET
+	TableAllowEngines    []string `yaml:"table-allow-engines"`       // Table 允许使用的 Engine
 	MaxIdxCount          int      `yaml:"max-index-count"`           // 单张表允许最多索引数
 	MaxColCount          int      `yaml:"max-column-count"`          // 单张表允许最大列数
 	IdxPrefix            string   `yaml:"index-prefix"`              // 普通索引建议使用的前缀
@@ -98,16 +98,16 @@ type Configration struct {
 	MaxVarcharLength     int      `yaml:"max-varchar-length"`        // varchar最大长度
 
 	// ++++++++++++++EXPLAIN检查项+++++++++++++
-	ExplainSQLReportType   string   `yaml:"explain-sql-report-type"`  // EXPLAIN markdown格式输出SQL样式，支持sample, fingerprint, pretty
+	ExplainSQLReportType   string   `yaml:"explain-sql-report-type"`  // EXPLAIN markdown 格式输出 SQL 样式，支持 sample, fingerprint, pretty 等
 	ExplainType            string   `yaml:"explain-type"`             // EXPLAIN方式 [traditional, extended, partitions]
 	ExplainFormat          string   `yaml:"explain-format"`           // FORMAT=[json, traditional]
-	ExplainWarnSelectType  []string `yaml:"explain-warn-select-type"` // 哪些select_type不建议使用
-	ExplainWarnAccessType  []string `yaml:"explain-warn-access-type"` // 哪些access type不建议使用
-	ExplainMaxKeyLength    int      `yaml:"explain-max-keys"`         // 最大key_len
-	ExplainMinPossibleKeys int      `yaml:"explain-min-keys"`         // 最小possible_keys警告
+	ExplainWarnSelectType  []string `yaml:"explain-warn-select-type"` // 哪些 select_type 不建议使用
+	ExplainWarnAccessType  []string `yaml:"explain-warn-access-type"` // 哪些 access type 不建议使用
+	ExplainMaxKeyLength    int      `yaml:"explain-max-keys"`         // 最大 key_len
+	ExplainMinPossibleKeys int      `yaml:"explain-min-keys"`         // 最小 possible_keys 警告
 	ExplainMaxRows         int      `yaml:"explain-max-rows"`         // 最大扫描行数警告
-	ExplainWarnExtra       []string `yaml:"explain-warn-extra"`       // 哪些extra信息会给警告
-	ExplainMaxFiltered     float64  `yaml:"explain-max-filtered"`     // filtered大于该配置给出警告
+	ExplainWarnExtra       []string `yaml:"explain-warn-extra"`       // 哪些 extra 信息会给警告
+	ExplainMaxFiltered     float64  `yaml:"explain-max-filtered"`     // filtered 大于该配置给出警告
 	ExplainWarnScalability []string `yaml:"explain-warn-scalability"` // 复杂度警告名单
 	ShowWarnings           bool     `yaml:"show-warnings"`            // explain extended with show warnings
 	ShowLastQueryCost      bool     `yaml:"show-last-query-cost"`     // switch with show status like 'last_query_cost'
@@ -376,7 +376,7 @@ func version() {
 	fmt.Println("GitDirty:", GitDirty)
 }
 
-// 因为vitess sqlparser使用了glog中也会使用flag，为了不让用户困扰我们单独写一个usage
+// 因为vitess sqlparser 使用了 glog 中也会使用 flag，为了不让用户困扰我们单独写一个 usage
 func usage() {
 	regPwd := regexp.MustCompile(`:.*@`)
 	vitessHelp := []string{

@@ -989,7 +989,7 @@ func init() {
 			Case:     "SELECT DISTINCT c.c_id, c.c_name FROM c,e WHERE e.c_id = c.c_id",
 			Func:     (*Query4Audit).RuleDistinctJoinUsage,
 		},
-		// TODO: 5.6有了semi join还要把in转成exists么？
+		// TODO: 5.6有了semi join 还要把 in 转成e xists 么？
 		// Use EXISTS instead of IN to check existence of data.
 		// http://www.winwire.com/25-tips-to-improve-sql-query-performance/
 		"SUB.004": {

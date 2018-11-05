@@ -38,6 +38,7 @@ import (
 
 func main() {
 	// 全局变量
+	var err error
 	var sql string                                            // 单条评审指定的 sql 或 explain
 	sqlCounter := 1                                           // SQL 计数器
 	lineCounter := 1                                          // 行计数器
@@ -45,15 +46,8 @@ func main() {
 	alterTableTimes := make(map[string]int)                   // 待评审的 SQL 中同一经表 ALTER 请求计数器
 	suggestMerged := make(map[string]map[string]advisor.Rule) // 优化建议去重, key 为 sql 的 fingerprint.ID
 
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	common.BaseDir = filepath.Dir(ex) // binary 文件所在路径
-
 	// 配置文件&命令行参数解析
-	err = common.ParseConfig(common.ArgConfig())
-	common.LogIfWarn(err, "")
+	initConfig()
 
 	// 打印支持启发式建议
 	if common.Config.ListHeuristicRules {
@@ -494,6 +488,33 @@ func main() {
 		}
 		return
 	}
+}
+
+func initConfig() {
+	// 更新 binary 文件所在路径为 BaseDir
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	common.BaseDir = filepath.Dir(ex)
+
+	for i, c := range os.Args {
+		// 如果指定了 -config, 它必须是第一个参数
+		if strings.HasPrefix(c, "-config") && i != 1 {
+			fmt.Println("-config must be the first arg")
+			os.Exit(1)
+		}
+		// 等号两边请不要加空格
+		if c == "=" {
+			// -config = soar.yaml not support
+			fmt.Println("wrong format, no space between '=', eg: -config=soar.yaml")
+			os.Exit(1)
+		}
+	}
+
+	// 加载配置文件，处理命令行参数
+	err = common.ParseConfig(common.ArgConfig())
+	common.LogIfWarn(err, "")
 }
 
 func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {

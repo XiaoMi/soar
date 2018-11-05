@@ -58,7 +58,7 @@ func checkExplainSelectType(exp *database.ExplainInfo) {
 
 	if exp.ExplainFormat == database.JSONFormatExplain {
 		// TODO
-		// JSON形式遍历分析不方便，转成Row格式也没有SelectType暂不处理
+		// JSON 形式遍历分析不方便，转成 Row 格式也没有 SelectType 暂不处理
 		return
 	}
 	for _, v := range common.Config.ExplainWarnSelectType {
