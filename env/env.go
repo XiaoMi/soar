@@ -273,7 +273,6 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 				err = ve.createTable(*rEnv, rEnv.Database, table)
 				if err != nil {
 					common.Log.Error("BuildVirtualEnv Error : %v", err)
-					return false
 				}
 			}
 
