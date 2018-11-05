@@ -271,6 +271,12 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 			table := stmt.Table.Name.String()
 			if table != "" {
 				err = ve.createTable(*rEnv, rEnv.Database, table)
+				// 这里如果报错可能有两种可能：
+				// 1. SQL 是 Create 语句，线上环境并没有相关的库表结构
+				// 2. 在测试环境中执行 SQL 报错
+				// 如果是因为 Create 语句报错，后续会在测试环境中直接执行 create 语句，不会对程序有负面影响
+				// 如果是因为执行 SQL 报错，那么其他地方执行 SQL 的时候也一定会报错
+				// 所以这里不需要 `return false`，可以继续执行
 				if err != nil {
 					common.Log.Error("BuildVirtualEnv Error : %v", err)
 				}
