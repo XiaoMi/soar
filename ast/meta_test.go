@@ -59,7 +59,7 @@ func TestFindCondition(t *testing.T) {
 	for _, sql := range common.TestSQLs {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -143,7 +143,7 @@ func TestFindJoinTable(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -167,7 +167,7 @@ func TestFindJoinCols(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -189,7 +189,7 @@ func TestFindJoinColBeWhereEQ(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -211,7 +211,7 @@ func TestFindJoinColBeWhereINEQ(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -239,7 +239,7 @@ func TestFindAllCondition(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -258,7 +258,7 @@ func TestFindColumn(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -286,7 +286,7 @@ func TestFindAllCols(t *testing.T) {
 	for _, sql := range sqlList {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
-		//pretty.Println(stmt)
+		// pretty.Println(stmt)
 		if err != nil {
 			panic(err)
 		}
@@ -320,5 +320,49 @@ func TestGetSubqueryDepth(t *testing.T) {
 
 		dep := GetSubqueryDepth(stmt)
 		fmt.Println(dep)
+	}
+}
+
+func TestAppendTable(t *testing.T) {
+	sqlList := []string{
+		"select ID,name from (select address from customer_list where SID=1 order by phone limit 50,10) a join customer_list l on (a.address=l.address) join city c on (c.city=l.city) order by phone desc;",
+	}
+
+	meta := make(map[string]*common.DB)
+	for _, sql := range sqlList {
+		fmt.Println(sql)
+		stmt, err := sqlparser.Parse(sql)
+		if err != nil {
+			t.Error("syntax check error.")
+		}
+
+		err = sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+			switch expr := node.(type) {
+			case *sqlparser.AliasedTableExpr:
+				switch table := expr.Expr.(type) {
+				case sqlparser.TableName:
+					appendTable(table, expr.As.String(), meta)
+				default:
+					if meta == nil {
+						meta = make(map[string]*common.DB)
+					}
+					if meta[""] == nil {
+						meta[""] = common.NewDB("")
+					}
+					meta[""].Table[""] = common.NewTable("")
+					meta[""].Table[""].TableAliases = append(meta[""].Table[""].TableAliases, expr.As.String())
+				}
+			}
+			return true, nil
+		}, stmt)
+
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	// 仅对第一条测试SQL进行测试，验证别名正确性
+	if meta[""].Table["customer_list"].TableAliases[0] != "l" || meta[""].Table["city"].TableAliases[0] != "c" {
+		t.Error("alias filed\n", pretty.Sprint(meta))
 	}
 }

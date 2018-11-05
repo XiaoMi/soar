@@ -2305,7 +2305,7 @@ func (q *Query4Audit) RuleCreateDualTable() Rule {
 	var rule = q.RuleOK()
 	switch s := q.Stmt.(type) {
 	case *sqlparser.DDL:
-		if s.NewName.Name.String() == "dual" {
+		if s.Table.Name.String() == "dual" {
 			rule = HeuristicRules["TBL.003"]
 
 		}

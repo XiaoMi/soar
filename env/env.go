@@ -248,9 +248,23 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 
 			// 为了支持并发，需要将DB进行映射，但db.table这种形式无法保证DB的映射是正确的
 			// TODO：暂不支持 create db.tableName (id int) 形式的建表语句
-			if stmt.Table.Qualifier.String() != "" || stmt.NewName.Qualifier.String() != "" {
+			if stmt.Table.Qualifier.String() != "" {
 				common.Log.Error("BuildVirtualEnv DDL Not support '.'")
 				return false
+			}
+
+			for _, tb := range stmt.FromTables {
+				if tb.Qualifier.String() != "" {
+					common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+					return false
+				}
+			}
+
+			for _, tb := range stmt.ToTables {
+				if tb.Qualifier.String() != "" {
+					common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+					return false
+				}
 			}
 
 			// 拉取表结构
