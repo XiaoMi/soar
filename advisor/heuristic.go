@@ -1228,6 +1228,17 @@ func (q *Query4Audit) RuleImpossibleWhere() Rule {
 // RuleMeaninglessWhere RES.007
 func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 	var rule = q.RuleOK()
+	// SELECT * FROM tb WHERE 1
+	switch n := q.Stmt.(type) {
+	case *sqlparser.Select:
+		if n.Where != nil {
+			switch n.Where.Expr.(type) {
+			case *sqlparser.SQLVal:
+				rule = HeuristicRules["RES.007"]
+				return rule
+			}
+		}
+	}
 	// 1=1, 0=0
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
@@ -1266,7 +1277,6 @@ func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 			}
 			return false, nil
 		}
-
 		return true, nil
 	}, q.Stmt)
 	common.LogIfError(err, "")

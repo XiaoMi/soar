@@ -854,6 +854,10 @@ func TestRuleMeaninglessWhere(t *testing.T) {
 			"select * from tbl where 1 = 1;",
 			"select * from tbl where 'a' = 'a';",
 			"select * from tbl where 'a' != 1;",
+			"select * from tbl where 'a';",
+			"select * from tbl where 'a' limit 1;",
+			"select * from tbl where 1;",
+			"select * from tbl where 1 limit 1;",
 		},
 		{
 			"select * from tbl where 2 = 1;",
