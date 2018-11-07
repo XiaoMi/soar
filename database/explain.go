@@ -350,12 +350,12 @@ var ExplainExtra = map[string]string{
 	"Start materialize":                 "Materialized subquery Start",
 	"End materialize":                   "Materialized subquery End",
 	"unique row not found":              "For a query such as SELECT ... FROM tbl_name, no rows satisfy the condition for a UNIQUE index or PRIMARY KEY on the table.",
-	//"Scan":                                                "",
-	//"Impossible ON condition":                             "",
-	//"Ft_hints:":                                           "",
-	//"Backward index scan":                                 "",
-	//"Recursive":                                           "",
-	//"Table function:":                                     "",
+	// "Scan":                                                "",
+	// "Impossible ON condition":                             "",
+	// "Ft_hints:":                                           "",
+	// "Backward index scan":                                 "",
+	// "Recursive":                                           "",
+	// "Table function:":                                     "",
 	"Index dive skipped due to FORCE":                     "This item applies to NDB tables only. It means that MySQL Cluster is using the Condition Pushdown optimization to improve the efficiency of a direct comparison between a nonindexed column and a constant. In such cases, the condition is “pushed down” to the cluster's data nodes and is evaluated on all data nodes simultaneously. This eliminates the need to send nonmatching rows over the network, and can speed up such queries by a factor of 5 to 10 times over cases where Condition Pushdown could be but is not used.",
 	"Impossible WHERE noticed after reading const tables": "查询了所有const(和system)表, 但发现WHERE查询条件不起作用.",
 	"Using where":                              "WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.",
@@ -480,10 +480,11 @@ func (db *Connector) supportExplainWrite() (bool, error) {
 		}
 		superReadOnly, err := db.SingleIntValue("super_read_only")
 		// Percona, MariaDB 5.6就已经有super_read_only了，但社区版5.6还没有这个参数
-		if strings.Contains(err.Error(), "Unknown system variable") {
+		if err != nil {
+			if !strings.Contains(err.Error(), "Unknown system variable") {
+				return false, err
+			}
 			superReadOnly = readOnly
-		} else if err != nil {
-			return false, err
 		}
 
 		if readOnly == 1 || superReadOnly == 1 {
