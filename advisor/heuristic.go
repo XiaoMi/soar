@@ -176,14 +176,15 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 		var values []*sqlparser.SQLVal
 
 		// condition 左右两侧有且只有如下几种可能：
-		// 1. 左列 & 右列
-		// 2. 左列 & 右值(含函数)          (或相反)
-		// 3. 左值(含函数) & 右值(含函数)	 (无需关注)
+		// 1. 列与列比较，如： col1 = col2
+		// 2. 列与值比较，如： col = val
+		// 3. 值与值比较，如： val1 = val2 暂不处理
+		// 如果列包含在一个函数中，认为这个条件为值，如： col = func(col) 认定为 列与值比较
 		switch node := cond.(type) {
 		case *sqlparser.ComparisonExpr:
-			// 获取condition左侧的信息
+			// 获取 condition 左侧的信息
 			switch nLeft := node.Left.(type) {
-			case *sqlparser.SQLVal, *sqlparser.ValTuple:
+			case *sqlparser.SQLVal, sqlparser.ValTuple:
 				err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 					switch val := node.(type) {
 					case *sqlparser.SQLVal:
@@ -201,9 +202,9 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 				colList = append(colList, left)
 			}
 
-			// 获取condition右侧的信息
+			// 获取 condition 右侧的信息
 			switch nRight := node.Right.(type) {
-			case *sqlparser.SQLVal, *sqlparser.ValTuple:
+			case *sqlparser.SQLVal, sqlparser.ValTuple:
 				err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 					switch val := node.(type) {
 					case *sqlparser.SQLVal:
@@ -309,14 +310,14 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 			// 列与值比较
 			for _, val := range values {
 				if colList[0].DataType == "" {
-					common.Log.Debug("Can't get %s datatype", colList[0].Name)
+					common.Log.Debug("Can't get %s data type", colList[0].Name)
 					break
 				}
 
 				isCovered := true
-				if types, ok := typMap[val.Type]; ok {
-					for _, t := range types {
-						if strings.HasPrefix(colList[0].DataType, t) {
+				if tps, ok := typMap[val.Type]; ok {
+					for _, tp := range tps {
+						if strings.HasPrefix(colList[0].DataType, tp) {
 							isCovered = false
 						}
 					}
