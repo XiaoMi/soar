@@ -104,6 +104,19 @@ func main() {
 
 	// 读入待优化 SQL ，当配置文件或命令行参数未指定 SQL 时从管道读取
 	if common.Config.Query == "" {
+		// check stdin is pipe or terminal
+		// https://stackoverflow.com/questions/22744443/check-if-there-is-something-to-read-on-stdin-in-golang
+		stat, err := os.Stdin.Stat()
+		if stat == nil {
+			common.Log.Critical("os.Stdin.Stat Error: %v", err)
+			os.Exit(1)
+		}
+		if (stat.Mode() & os.ModeCharDevice) != 0 {
+			// stdin is from a terminal
+			fmt.Println("Args format error, use --help see how to use it!")
+			os.Exit(1)
+		}
+		// read from pipe
 		var data []byte
 		data, err = ioutil.ReadAll(os.Stdin)
 		if err != nil {
