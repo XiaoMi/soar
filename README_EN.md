@@ -37,4 +37,4 @@ SOAR (SQL Optimizer And Rewriter) is a tool, which can help SQL optimization and
 
 ## License
 
-[Apache License 2.0](http://github.com/XiaoMi/soar/blob/master/LICENSE).
+[Apache License 2.0](https://github.com/XiaoMi/soar/blob/master/LICENSE).

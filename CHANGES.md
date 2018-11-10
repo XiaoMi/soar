@@ -1,8 +1,12 @@
-# 更新日志
-
+# CHANGELOG
 
 ## 2018-11
-- TODO: english translation
+- DOING: english translation
+- add -cleanup-test-database command-line arg
+- fix -config arg load file error
+- fix #87 RuleImplicitConversion value type mistach check bug
+- fix #38 always true where condition check
+- abandon stdin terminal interactive mod, which may seems like hangup
 
 ## 2018-10
 - Fix SplitStatement mulitstatement eof bug #66

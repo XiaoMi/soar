@@ -42,4 +42,4 @@ SOAR(SQL Optimizer And Rewriter)是一个对SQL进行优化和改写的自动化
 
 ## License
 
-[Apache License 2.0](http://github.com/XiaoMi/soar/blob/master/LICENSE).
+[Apache License 2.0](https://github.com/XiaoMi/soar/blob/master/LICENSE).

@@ -35,8 +35,8 @@ type VirtualEnv struct {
 	*database.Connector
 
 	// 保存DB测试环境映射关系，防止vEnv环境冲突。
-	DBRef   map[string]string
-	hash2Db map[string]string
+	DBRef   map[string]string // db -> optimizer_xxx
+	hash2Db map[string]string // optimizer_xxx -> db
 	// 保存Table创建关系，防止重复创建表
 	TableMap map[string]map[string]string
 	// 错误

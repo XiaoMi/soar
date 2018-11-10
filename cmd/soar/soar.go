@@ -352,7 +352,7 @@ func main() {
 				explainInfo, err := rEnv.Explain(q.Query,
 					database.ExplainType[common.Config.ExplainType],
 					database.ExplainFormatType[common.Config.ExplainFormat])
-				if err != nil {
+				if err != nil && strings.HasPrefix(vEnv.Database, "optimizer_") {
 					// 线上环境执行失败才到测试环境 EXPLAIN，比如在用户提供建表语句及查询语句的场景
 					common.Log.Warn("rEnv.Explain Warn: %v", err)
 					explainInfo, err = vEnv.Explain(q.Query,
