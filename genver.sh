@@ -16,7 +16,7 @@ if [[ ${GO_VERSION_ARR[0]} -lt ${GO_VERSION_REQ[0]} || (${GO_VERSION_ARR[0]} -eq
 fi
 
 ## Generate Repository Version
-version=$(git log --date=iso --pretty=format:"%cd @%h" -1)
+version="$(git log --date=iso --pretty=format:"%cd" -1) $(git describe --tags --always)"
 if [ "X${version}" == "X" ]; then
     version="not a git repo"
 fi
