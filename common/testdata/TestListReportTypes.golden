@@ -19,7 +19,7 @@ soar -report-type lint -query test.sql
 echo "select * from film" | soar
 ```
 ## rewrite
-* **Description**:SQL重写功能，配合-rewrite-rules参数一起使用，可以通过-list-rewrite-rules查看所有支持的SQL重写规则
+* **Description**:SQL重写功能，配合-rewrite-rules参数一起使用，可以通过-list-rewrite-rules 查看所有支持的 SQL 重写规则
 
 * **Example**:
 
@@ -27,7 +27,7 @@ echo "select * from film" | soar
 echo "select * from film" | soar -rewrite-rules star2columns,delimiter -report-type rewrite
 ```
 ## ast
-* **Description**:输出SQL的抽象语法树，主要用于测试
+* **Description**:输出 SQL 的抽象语法树，主要用于测试
 
 * **Example**:
 
@@ -35,7 +35,7 @@ echo "select * from film" | soar -rewrite-rules star2columns,delimiter -report-t
 echo "select * from film" | soar -report-type ast
 ```
 ## tiast
-* **Description**:输出SQL的TiDB抽象语法树，主要用于测试
+* **Description**:输出 SQL 的 TiDB抽象语法树，主要用于测试
 
 * **Example**:
 
@@ -51,7 +51,7 @@ echo "select * from film" | soar -report-type tiast
 echo "select * from film where language_id=1" | soar -report-type fingerprint
 ```
 ## md2html
-* **Description**:markdown格式转html格式小工具
+* **Description**:markdown 格式转 html 格式小工具
 
 * **Example**:
 
@@ -59,7 +59,7 @@ echo "select * from film where language_id=1" | soar -report-type fingerprint
 soar -list-heuristic-rules | soar -report-type md2html > heuristic_rules.html
 ```
 ## explain-digest
-* **Description**:输入为EXPLAIN的表格，JSON或Vertical格式，对其进行分析，给出分析结果
+* **Description**:输入为EXPLAIN的表格，JSON 或 Vertical格式，对其进行分析，给出分析结果
 
 * **Example**:
 
@@ -73,12 +73,12 @@ soar -report-type explain-digest << EOF
 EOF
 ```
 ## duplicate-key-checker
-* **Description**:对OnlineDsn中指定的DB进行索引重复检查
+* **Description**:对 OnlineDsn 中指定的 database 进行索引重复检查
 
 * **Example**:
 
 ```bash
-soar -report-type duplicate-key-checker -online-dsn user:passwd@127.0.0.1:3306/db
+soar -report-type duplicate-key-checker -online-dsn user:password@127.0.0.1:3306/db
 ```
 ## html
 * **Description**:以HTML格式输出报表

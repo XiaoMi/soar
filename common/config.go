@@ -257,7 +257,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 		return &dsn{Disable: true}
 	}
 
-	// username:password@ip:port/dbname
+	// username:password@ip:port/database
 	l1 := strings.Split(odbc, "@")
 	if len(l1) < 2 {
 		if strings.HasPrefix(l1[0], ":") {
@@ -279,7 +279,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 			l2 := strings.TrimLeft(l1[0], "/")
 			schema = l2
 		} else {
-			// ip:port/dbname
+			// ip:port/database
 			l2 := strings.Split(l1[0], "/")
 			if len(l2) == 2 {
 				addr = l2[0]
@@ -297,7 +297,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 		} else {
 			user = l2[0]
 		}
-		// ip:port/dbname
+		// ip:port/database
 		l3 := strings.Split(l1[1], "/")
 		if len(l3) == 2 {
 			addr = l3[0]
@@ -486,7 +486,7 @@ func readCmdFlags() error {
 	trace := flag.Bool("trace", Config.Trace, "Trace, 开启数据采样的情况下在测试环境执行Trace")
 	explain := flag.Bool("explain", Config.Explain, "Explain, 是否开启Explain执行计划分析")
 	sampling := flag.Bool("sampling", Config.Sampling, "Sampling, 数据采样开关")
-	samplingStatisticTarget := flag.Int("sampling-statistic-target", Config.SamplingStatisticTarget, "SamplingStatisticTarget, 数据采样因子，对应 postgres 的 default_statistics_target")
+	samplingStatisticTarget := flag.Int("sampling-statistic-target", Config.SamplingStatisticTarget, "SamplingStatisticTarget, 数据采样因子，对应 PostgreSQL 的 default_statistics_target")
 	connTimeOut := flag.Int("conn-time-out", Config.ConnTimeOut, "ConnTimeOut, 数据库连接超时时间，单位秒")
 	queryTimeOut := flag.Int("query-time-out", Config.QueryTimeOut, "QueryTimeOut, 数据库SQL执行超时时间，单位秒")
 	delimiter := flag.String("delimiter", Config.Delimiter, "Delimiter, SQL分隔符")
@@ -503,7 +503,7 @@ func readCmdFlags() error {
 	// ++++++++++++++优化建议相关++++++++++++++
 	ignoreRules := flag.String("ignore-rules", strings.Join(Config.IgnoreRules, ","), "IgnoreRules, 忽略的优化建议规则")
 	rewriteRules := flag.String("rewrite-rules", strings.Join(Config.RewriteRules, ","), "RewriteRules, 生效的重写规则")
-	blackList := flag.String("blacklist", Config.BlackList, "blacklist 中的 SQ L不会被评审，可以是指纹，也可以是正则")
+	blackList := flag.String("blacklist", Config.BlackList, "指定 blacklist 配置文件的位置，文件中的 SQL 不会被评审。一行一条SQL，可以是指纹，也可以是正则")
 	maxJoinTableCount := flag.Int("max-join-table-count", Config.MaxJoinTableCount, "MaxJoinTableCount, 单条 SQL 中 JOIN 表的最大数量")
 	maxGroupByColsCount := flag.Int("max-group-by-cols-count", Config.MaxGroupByColsCount, "MaxGroupByColsCount, 单条 SQL 中 GroupBy 包含列的最大数量")
 	maxDistinctCount := flag.Int("max-distinct-count", Config.MaxDistinctCount, "MaxDistinctCount, 单条 SQL 中 Distinct 的最大数量")
@@ -595,7 +595,8 @@ func readCmdFlags() error {
 	if strings.HasPrefix(*blackList, "/") || *blackList == "" {
 		Config.BlackList = *blackList
 	} else {
-		Config.BlackList = BaseDir + "/" + *blackList
+		pwd, _ := os.Getwd()
+		Config.BlackList = pwd + "/" + *blackList
 	}
 	Config.MaxJoinTableCount = *maxJoinTableCount
 	Config.MaxGroupByColsCount = *maxGroupByColsCount
@@ -743,17 +744,17 @@ var ReportTypes = []ReportType{
 	},
 	{
 		Name:        "rewrite",
-		Description: "SQL重写功能，配合-rewrite-rules参数一起使用，可以通过-list-rewrite-rules查看所有支持的SQL重写规则",
+		Description: "SQL重写功能，配合-rewrite-rules参数一起使用，可以通过-list-rewrite-rules 查看所有支持的 SQL 重写规则",
 		Example:     `echo "select * from film" | soar -rewrite-rules star2columns,delimiter -report-type rewrite`,
 	},
 	{
 		Name:        "ast",
-		Description: "输出SQL的抽象语法树，主要用于测试",
+		Description: "输出 SQL 的抽象语法树，主要用于测试",
 		Example:     `echo "select * from film" | soar -report-type ast`,
 	},
 	{
 		Name:        "tiast",
-		Description: "输出SQL的TiDB抽象语法树，主要用于测试",
+		Description: "输出 SQL 的 TiDB抽象语法树，主要用于测试",
 		Example:     `echo "select * from film" | soar -report-type tiast`,
 	},
 	{
@@ -763,12 +764,12 @@ var ReportTypes = []ReportType{
 	},
 	{
 		Name:        "md2html",
-		Description: "markdown格式转html格式小工具",
+		Description: "markdown 格式转 html 格式小工具",
 		Example:     `soar -list-heuristic-rules | soar -report-type md2html > heuristic_rules.html`,
 	},
 	{
 		Name:        "explain-digest",
-		Description: "输入为EXPLAIN的表格，JSON或Vertical格式，对其进行分析，给出分析结果",
+		Description: "输入为EXPLAIN的表格，JSON 或 Vertical格式，对其进行分析，给出分析结果",
 		Example: `soar -report-type explain-digest << EOF
 +----+-------------+-------+------+---------------+------+---------+------+------+-------+
 | id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra |
@@ -779,8 +780,8 @@ EOF`,
 	},
 	{
 		Name:        "duplicate-key-checker",
-		Description: "对OnlineDsn中指定的DB进行索引重复检查",
-		Example:     `soar -report-type duplicate-key-checker -online-dsn user:passwd@127.0.0.1:3306/db`,
+		Description: "对 OnlineDsn 中指定的 database 进行索引重复检查",
+		Example:     `soar -report-type duplicate-key-checker -online-dsn user:password@127.0.0.1:3306/db`,
 	},
 	{
 		Name:        "html",
