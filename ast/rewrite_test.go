@@ -18,6 +18,7 @@ package ast
 
 import (
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -574,8 +575,27 @@ func TestMergeAlterTables(t *testing.T) {
 		// MODIFY & CHANGE
 		"ALTER TABLE t1 MODIFY col1 BIGINT UNSIGNED DEFAULT 1 COMMENT 'my column';",
 		"ALTER TABLE t1 CHANGE b a INT NOT NULL;",
+
+		// table name quote in back ticks
+		"alter table `t3`add index `idx_a`(a)",
+		"alter table`t3`drop index`idx_b`(b)",
 	}
-	fmt.Println(MergeAlterTables(sqls...))
+
+	alterSQLs := MergeAlterTables(sqls...)
+	var sortedAlterSQLs []string
+	for item := range alterSQLs {
+		sortedAlterSQLs = append(sortedAlterSQLs, item)
+	}
+	sort.Strings(sortedAlterSQLs)
+
+	err := common.GoldenDiff(func() {
+		for _, tb := range sortedAlterSQLs {
+			fmt.Println(tb, ":", alterSQLs[tb])
+		}
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestRewriteUnionAll(t *testing.T) {

@@ -1659,12 +1659,15 @@ func MergeAlterTables(sqls ...string) map[string]string {
 	alterStrs := make(map[string][]string)
 	mergedAlterStr := make(map[string]string)
 
-	alterExp := regexp.MustCompile(`(?i)alter\s*table\s*[^\s]*\s*`)   // ALTER TABLE
-	renameExp := regexp.MustCompile(`(?i)rename\s*table\s*[^\s]*\s*`) // RENAME TABLE
+	// table/column/index name can be quoted in back ticks
+	backTicks := "(`[^\\s]*`)"
+
+	alterExp := regexp.MustCompile(`(?i)alter\s*table\s*(` + backTicks + `|([^\s]*))\s*`)   // ALTER TABLE
+	renameExp := regexp.MustCompile(`(?i)rename\s*table\s*(` + backTicks + `|([^\s]*))\s*`) // RENAME TABLE
 	// CREATE [UNIQUE|FULLTEXT|SPATIAL|PRIMARY] [KEY|INDEX] idx_name ON tbl_name
 	createIndexExp := regexp.MustCompile(`(?i)create((unique)|(fulltext)|(spatial)|(primary)|(\s*)\s*)((index)|(key))\s*`)
-	indexNameExp := regexp.MustCompile(`(?i)[^\s]*\s*`)
-	indexColsExp := regexp.MustCompile(`(?i)[^\s]*\s*on\s*[^\s]*\s*`)
+	indexNameExp := regexp.MustCompile(`(?i)(` + backTicks + `|([^\s]*))\s*`)
+	indexColsExp := regexp.MustCompile(`(?i)(` + backTicks + `|([^\s]*))\s*on\s*(` + backTicks + `|([^\s]*))\s*`)
 
 	for _, sql := range sqls {
 		sql = strings.Trim(sql, common.Config.Delimiter)
