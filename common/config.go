@@ -32,12 +32,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// BlackList 黑名单中的SQL不会被评审
-var BlackList []string
-var hasParsed bool
+var (
+	// BlackList 黑名单中的SQL不会被评审
+	BlackList []string
+	// PrintConfig -print-config
+	PrintConfig bool
+	// PrintVersion -print-config
+	PrintVersion bool
+	// CheckConfig -check-config
+	CheckConfig bool
+	// 防止 readCmdFlags 函数重入
+	hasParsed bool
+)
 
-// Configration 配置文件定义结构体
-type Configration struct {
+// Configuration 配置文件定义结构体
+type Configuration struct {
 	// +++++++++++++++测试环境+++++++++++++++++
 	OnlineDSN               *dsn   `yaml:"online-dsn"`                // 线上环境数据库配置
 	TestDSN                 *dsn   `yaml:"test-dsn"`                  // 测试环境数据库配置
@@ -131,7 +140,7 @@ func getDefaultLogOutput() string {
 }
 
 // Config 默认设置
-var Config = &Configration{
+var Config = &Configuration{
 	OnlineDSN: &dsn{
 		Schema:  "information_schema",
 		Charset: "utf8mb4",
@@ -369,7 +378,8 @@ func FormatDSN(env *dsn) string {
 	return fmt.Sprintf("%s:%s@%s/%s?charset=%s", env.User, env.Password, env.Addr, env.Schema, env.Charset)
 }
 
-func version() {
+// SoarVersion soar version information
+func SoarVersion() {
 	fmt.Println("Version:", Version)
 	fmt.Println("Branch:", Branch)
 	fmt.Println("Compile:", Compile)
@@ -444,8 +454,19 @@ func usage() {
 	}
 }
 
+// PrintConfiguration for `-print-config` flag
+func PrintConfiguration() {
+	// 打印配置的时候密码不显示
+	if !Config.Verbose {
+		Config.OnlineDSN.Password = "********"
+		Config.TestDSN.Password = "********"
+	}
+	data, _ := yaml.Marshal(Config)
+	fmt.Print(string(data))
+}
+
 // 加载配置文件
-func (conf *Configration) readConfigFile(path string) error {
+func (conf *Configuration) readConfigFile(path string) error {
 	configFile, err := os.Open(path)
 	if err != nil {
 		Log.Warning("readConfigFile(%s) os.Open failed: %v", path, err)
@@ -539,7 +560,8 @@ func readCmdFlags() error {
 	showLastQueryCost := flag.Bool("show-last-query-cost", Config.ShowLastQueryCost, "ShowLastQueryCost")
 	// +++++++++++++++++其他+++++++++++++++++++
 	printConfig := flag.Bool("print-config", false, "Print configs")
-	ver := flag.Bool("version", false, "Print version info")
+	checkConfig := flag.Bool("check-config", false, "Check configs")
+	printVersion := flag.Bool("version", false, "Print version info")
 	query := flag.String("query", Config.Query, "待评审的 SQL 或 SQL 文件，如 SQL 中包含特殊字符建议使用文件名。")
 	listHeuristicRules := flag.Bool("list-heuristic-rules", Config.ListHeuristicRules, "ListHeuristicRules, 打印支持的评审规则列表")
 	listRewriteRules := flag.Bool("list-rewrite-rules", Config.ListRewriteRules, "ListRewriteRules, 打印支持的重写规则列表")
@@ -647,21 +669,9 @@ func readCmdFlags() error {
 	Config.MaxPrettySQLLength = *maxPrettySQLLength
 	Config.MaxVarcharLength = *maxVarcharLength
 
-	if *ver {
-		version()
-		os.Exit(0)
-	}
-
-	if *printConfig {
-		// 打印配置的时候密码不显示
-		if !Config.Verbose {
-			Config.OnlineDSN.Password = "********"
-			Config.TestDSN.Password = "********"
-		}
-		data, _ := yaml.Marshal(Config)
-		fmt.Print(string(data))
-		os.Exit(0)
-	}
+	PrintVersion = *printVersion
+	PrintConfig = *printConfig
+	CheckConfig = *checkConfig
 
 	hasParsed = true
 	return nil
@@ -697,6 +707,7 @@ func ParseConfig(configFile string) error {
 	err = readCmdFlags()
 	if err != nil {
 		Log.Error("ParseConfig readCmdFlags Error: %v", err)
+		return err
 	}
 
 	// parse blacklist & ignore blacklist file parse error

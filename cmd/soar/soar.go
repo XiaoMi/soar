@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/XiaoMi/soar/advisor"
@@ -49,27 +48,8 @@ func main() {
 	// 配置文件&命令行参数解析
 	initConfig()
 
-	// 打印支持启发式建议
-	if common.Config.ListHeuristicRules {
-		// 只打印支持的优化建议
-		advisor.ListHeuristicRules(advisor.HeuristicRules)
-		return
-	}
-	// 打印支持的 SQL 重写规则
-	if common.Config.ListRewriteRules {
-		ast.ListRewriteRules(ast.RewriteRules)
-		return
-	}
-	// 打印所有的测试 SQL
-	if common.Config.ListTestSqls {
-		advisor.ListTestSQLs()
-		return
-	}
-	// 打印支持的 report-type
-	if common.Config.ListReportTypes {
-		common.ListReportTypes()
-		return
-	}
+	// 命令行帮助工具，如 -list-report-types, -check-config等。
+	helpTools()
 
 	// 环境初始化，连接检查线上环境+构建测试环境
 	vEnv, rEnv := env.BuildEnv()
@@ -87,7 +67,7 @@ func main() {
 
 	// 当程序卡死的时候，或者由于某些原因程序没有退出，可以通过捕获信号量的形式让程序优雅退出并且清理测试环境
 	common.HandleSignal(func() {
-		shutdown(vEnv, rEnv)
+		shutdown(vEnv)
 	})
 
 	// 对指定的库表进行索引重复检查
@@ -501,38 +481,4 @@ func main() {
 		}
 		return
 	}
-}
-
-func initConfig() {
-	// 更新 binary 文件所在路径为 BaseDir
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	common.BaseDir = filepath.Dir(ex)
-
-	for i, c := range os.Args {
-		// 如果指定了 -config, 它必须是第一个参数
-		if strings.HasPrefix(c, "-config") && i != 1 {
-			fmt.Println("-config must be the first arg")
-			os.Exit(1)
-		}
-		// 等号两边请不要加空格
-		if c == "=" {
-			// -config = soar.yaml not support
-			fmt.Println("wrong format, no space between '=', eg: -config=soar.yaml")
-			os.Exit(1)
-		}
-	}
-
-	// 加载配置文件，处理命令行参数
-	err = common.ParseConfig(common.ArgConfig())
-	common.LogIfWarn(err, "")
-}
-
-func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {
-	if common.Config.DropTestTemporary {
-		vEnv.CleanUp()
-	}
-	os.Exit(0)
 }

@@ -1,0 +1,94 @@
+online-dsn:
+  addr: ""
+  schema: information_schema
+  user: ""
+  password: ""
+  charset: utf8mb4
+  disable: true
+test-dsn:
+  addr: ""
+  schema: information_schema
+  user: ""
+  password: ""
+  charset: utf8mb4
+  disable: true
+allow-online-as-test: false
+drop-test-temporary: true
+cleanup-test-database: false
+only-syntax-check: false
+sampling-statistic-target: 100
+sampling: false
+profiling: false
+trace: false
+explain: true
+conn-time-out: 3
+query-time-out: 30
+delimiter: ;
+log-level: 3
+log-output: /dev/stderr
+report-type: markdown
+report-css: ""
+report-javascript: ""
+report-title: SQL优化分析报告
+markdown-extensions: 94
+markdown-html-flags: 0
+ignore-rules:
+- COL.011
+rewrite-rules:
+- delimiter
+- orderbynull
+- groupbyconst
+- dmlorderby
+- having
+- star2columns
+- insertcolumns
+- distinctstar
+blacklist: ""
+max-join-table-count: 5
+max-group-by-cols-count: 5
+max-distinct-count: 5
+max-index-cols-count: 5
+max-total-rows: 9999999
+max-query-cost: 9999
+spaghetti-query-length: 2048
+allow-drop-index: false
+max-in-count: 10
+max-index-bytes-percolumn: 767
+max-index-bytes: 3072
+table-allow-charsets:
+- utf8
+- utf8mb4
+table-allow-engines:
+- innodb
+max-index-count: 10
+max-column-count: 40
+index-prefix: idx_
+unique-key-prefix: uk_
+max-subquery-depth: 5
+max-varchar-length: 1024
+explain-sql-report-type: pretty
+explain-type: extended
+explain-format: traditional
+explain-warn-select-type:
+- ""
+explain-warn-access-type:
+- ALL
+explain-max-keys: 3
+explain-min-keys: 0
+explain-max-rows: 10000
+explain-warn-extra:
+- Using temporary
+- Using filesort
+explain-max-filtered: 100
+explain-warn-scalability:
+- O(n)
+show-warnings: false
+show-last-query-cost: false
+query: ""
+list-heuristic-rules: false
+list-rewrite-rules: false
+list-test-sqls: false
+list-report-types: false
+verbose: true
+dry-run: true
+max-pretty-sql-length: 1024

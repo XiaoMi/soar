@@ -36,7 +36,8 @@ log-output: ${your_log_dir}/soar.log
 report-type: markdown
 ignore-rules:
 - ""
-blacklist: ${BASE_DIR}/soar.blacklist
+# 黑名单中的 SQL 将不会给评审意见。一行一条 SQL，可以是正则也可以是指纹，填写指纹时注意问号需要加反斜线转义。
+blacklist: ${your_config_dir}/soar.blacklist
 # 启发式算法相关配置
 max-join-table-count: 5
 max-group-by-cols-count: 5

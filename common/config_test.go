@@ -47,7 +47,7 @@ func TestParseConfig(t *testing.T) {
 
 func TestReadConfigFile(t *testing.T) {
 	if Config == nil {
-		Config = new(Configration)
+		Config = new(Configuration)
 	}
 	Config.readConfigFile("../soar.yaml")
 }
@@ -109,4 +109,10 @@ func TestArgConfig(t *testing.T) {
 			t.Errorf("should return soar.yaml, but got %s", configFile)
 		}
 	}
+}
+
+func TestPrintConfiguration(t *testing.T) {
+	Config.Verbose = true
+	PrintConfiguration()
+
 }
