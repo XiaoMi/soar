@@ -29,6 +29,11 @@ import (
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
+const (
+	// https://dev.mysql.com/doc/refman/8.0/en/identifiers.html
+	IndexNameMaxLength = 64
+)
+
 // IndexAdvisor 索引建议需要使用到的所有信息
 type IndexAdvisor struct {
 	vEnv      *env.VirtualEnv     // 线下虚拟测试环境（测试环境）
@@ -447,9 +452,9 @@ func (idxAdv *IndexAdvisor) idxColsTypeCheck(idxList []IndexInfo) []IndexInfo {
 		}
 
 		// 索引名称最大长度64
-		if len(idxName) > 64 {
-			common.Log.Warn("index '%s' name large than 64", idxName)
-			idxName = strings.TrimRight(idxName[:64], "_")
+		if len(idxName) > IndexNameMaxLength {
+			common.Log.Warn("index '%s' name large than IndexNameMaxLength", idxName)
+			idxName = strings.TrimRight(idxName[:IndexNameMaxLength], "_")
 		}
 
 		// 新的alter语句
@@ -557,10 +562,11 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 			// 检测索引名称是否重复?
 			if existedIndexes := indexMeta.FindIndex(database.IndexKeyName, idx.Name); len(existedIndexes) > 0 {
 				var newName string
-				if len(idx.Name) < 59 {
-					newName = idx.Name + "_" + uniuri.New()[:4]
+				idxSuffix := getIndexNameSuffix()
+				if len(idx.Name) < IndexNameMaxLength-len(idxSuffix) {
+					newName = idx.Name + idxSuffix
 				} else {
-					newName = idx.Name[:59] + "_" + uniuri.New()[:4]
+					newName = idx.Name[:IndexNameMaxLength-len(idxSuffix)] + idxSuffix
 				}
 
 				common.Log.Warning("duplicate index name '%s', new name is '%s'", idx.Name, newName)
@@ -576,6 +582,10 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 
 	// 对索引进行去重
 	return rmSelfDupIndex(indexes)
+}
+
+func getIndexNameSuffix() string {
+	return fmt.Sprintf("_%s", uniuri.New()[:4])
 }
 
 // rmSelfDupIndex 去重传入的[]IndexInfo中重复的索引
@@ -654,9 +664,9 @@ func (idxAdv *IndexAdvisor) buildIndex(idxList map[string]map[string][]*common.C
 			idxName := "idx_" + strings.Join(colNames, "_")
 
 			// 索引名称最大长度64
-			if len(idxName) > 64 {
-				common.Log.Warn("index '%s' name large than 64", idxName)
-				idxName = strings.TrimRight(idxName[:64], "_")
+			if len(idxName) > IndexNameMaxLength {
+				common.Log.Warn("index '%s' name large than IndexNameMaxLength", idxName)
+				idxName = strings.TrimRight(idxName[:IndexNameMaxLength], "_")
 			}
 
 			alterSQL := fmt.Sprintf("alter table `%s`.`%s` add index `%s` (`%s`)", idxAdv.vEnv.RealDB(db), tb,
