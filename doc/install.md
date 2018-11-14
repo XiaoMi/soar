@@ -1,10 +1,10 @@
 ## 下载二进制安装包
 
 ```bash
-wget https://github.com/XiaoMi/soar/releases/download/${tag}/soar.linux-amd64 -O soar
+wget https://github.com/XiaoMi/soar/releases/download/${tag}/soar.${OS}-amd64 -O soar
 chmod a+x soar
 如：
-wget https://github.com/XiaoMi/soar/releases/download/v0.8.1/soar.linux-amd64 -O soar
+wget https://github.com/XiaoMi/soar/releases/download/v0.9.0/soar.linux-amd64 -O soar
 chmod a+x soar
 ```
 

@@ -73,20 +73,21 @@ verbose: true
 几乎所有配置文件中指定的参数都通通过命令行参数进行修改，且命令行参数优先级较配置文件优先级高。
 
 ```bash
-$ soar -h
+soar -h
 ```
 
 ### 命令行参数配置DSN
 
-> 账号密码中如包含特殊符号(如：'@',':','/'等)可在配置文件中设置，存在特殊字符的情况不适合在命令行中使用。目前`soar`只支持tcp协议的MySQL数据库连接方式，如需要配置本机MySQL环境建议将`localhost`修改为'127.0.0.1'，并检查对应的'user'@'127.0.0.1'账号是否存在。
+> 账号密码中如包含特殊符号(如：'@',':','/'等)可在配置文件中设置，存在特殊字符的情况不适合在命令行中使用。目前`soar`只支持 tcp 协议的 MySQL 数据库连接方式，如需要配置本机MySQL环境建议将`localhost`修改为'127.0.0.1'，并检查对应的 'user'@'127.0.0.1' 账号是否存在。
 
 ```bash
-$ soar -online-dsn "user:password@ip:port/database"
+soar -online-dsn "user:password@ip:port/database"
 
-$ soar -test-dsn "user:password@ip:port/database"
+soar -test-dsn "user:password@ip:port/database"
 ```
 
 #### DSN格式支持
+
 * "user:password@127.0.0.1:3307/database"
 * "user:password@127.0.0.1:3307"
 * "user:password@127.0.0.1:/database"
@@ -106,6 +107,6 @@ $ soar -test-dsn "user:password@ip:port/database"
 
 不同类型的建议指定的Severity不同，严重程度数字由低到高依次排序。满分100分，扣到0分为止。L0不扣分只给出建议，L1扣5分，L2扣10分，每级多扣5分以此类推。当由时给出L1, L2两要建议时扣分叠加，即扣15分。
 
-如果您想给出不同的扣分建议或者对指引中的文字内容不满意可以为在git中提ISSUE，也可直接修改rules.go的相应配置然后重新编译自己的版本。
+如果您想给出不同的扣分建议或者对指引中的文字内容不满意可以为在 git 中提 ISSUE，也可直接修改 rules.go 的相应配置然后重新编译自己的版本。
 
 注意：目前只有`markdown`和`html`两种`-report-type`支持评分输出显示，其他输出格式如有评分需求可以按上述规则自行计算。

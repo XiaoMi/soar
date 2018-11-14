@@ -10,4 +10,3 @@
 | Trace              | ✔️    | ❌       | ❌               | ❌          | ❌        | ❌            |
 | Execute SQL Online | ❌   | ❌       | ❌               | ❌          | ✔️         | ❌            |
 | Backup Data        | ❌   | ❌       | ❌               | ❌          | ✔️         | ❌            |
-

@@ -1,6 +1,7 @@
-[toc]
 
 # Useful Commands
+
+[toc]
 
 ## Basic suggest
 
@@ -35,36 +36,36 @@ echo "select title from sakila.film" | ./soar -test-dsn="root:1t'sB1g3rt@127.0.0
 ## List supported heuristic rules
 
 ```bash
-$ soar -list-heuristic-rules
+soar -list-heuristic-rules
 ```
 
 ## Ignore Rules
 
 ```bash
-$ soar -ignore-rules "ALI.001,IDX.*"
+soar -ignore-rules "ALI.001,IDX.*"
 ```
 
 ## List supported report-type
 
 ```bash
-$ soar -list-report-types
+soar -list-report-types
 ```
 
 ## Set report-type for output
 
 ```bash
-$ soar -report-type json
+soar -report-type json
 ```
 
 ## Syntax Check
 
 ```bash
-$ echo "select * from tb" | soar -only-syntax-check
-$ echo $?
+echo "select * from tb" | soar -only-syntax-check
+echo $?
 0
 
-$ echo "select * fromtb" | soar -only-syntax-check
-At SQL 0 : syntax error at position 16 near 'fromtb'
+echo "select * frm tb" | soar -only-syntax-check
+At SQL 1 : syntax error at position 13 near 'frm'
 $ echo $?
 1
 
@@ -73,16 +74,15 @@ $ echo $?
 ## Slow log analyzing
 
 ```bash
-$ pt-query-digest slow.log > slow.log.digest
+pt-query-digest slow.log > slow.log.digest
 # parse pt-query-digest's output which example script
-$ python2.7 doc/example/digest_pt.py slow.log.digest > slow.md
+python2.7 doc/example/digest_pt.py slow.log.digest > slow.md
 ```
-
 
 ## SQL FingerPrint
 
 ```bash
-$ echo "select * from film where col='abc'" | soar -report-type=fingerprint
+echo "select * from film where col='abc'" | soar -report-type=fingerprint
 ```
 
 Output
@@ -94,7 +94,7 @@ select * from film where col=?
 ## Convert UPDATE/DELETE/INSERT into SELECT
 
 ```bash
-$ echo "update film set title = 'abc'" | soar -rewrite-rules dml2select,delimiter  -report-type rewrite
+echo "update film set title = 'abc'" | soar -rewrite-rules dml2select,delimiter  -report-type rewrite
 ```
 
 Output
@@ -103,11 +103,10 @@ Output
 select * from film;
 ```
 
-
 ## Merge ALTER SQLs
 
 ```bash
-$ echo "alter table tb add column a int; alter table tb add column b int;" | soar -report-type rewrite -rewrite-rules mergealter
+echo "alter table tb add column a int; alter table tb add column b int;" | soar -report-type rewrite -rewrite-rules mergealter
 ```
 
 Output
@@ -119,7 +118,7 @@ ALTER TABLE `tb` add column a int, add column b int ;
 ## SQL Pretty
 
 ```bash
-$ echo "select * from tbl where col = 'val'" | ./soar -report-type=pretty
+echo "select * from tbl where col = 'val'" | ./soar -report-type=pretty
 ```
 
 Output
@@ -138,6 +137,5 @@ WHERE
 md2html comes with other flags, such as `-report-css`, `-report-javascript`, `-markdown-extensions`, `-markdown-html-flags`, you can get more self control HTML report.
 
 ```bash
-$ cat test.md | soar -report-type md2html > test.html
+cat test.md | soar -report-type md2html > test.html
 ```
-
