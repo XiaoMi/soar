@@ -180,7 +180,7 @@ docker:
 
 .PHONY: connect
 connect:
-	mysql -h 127.0.0.1 -u root -p1tIsB1g3rt
+	mysql -h 127.0.0.1 -u root -p1tIsB1g3rt -c
 
 .PHONY: main_test
 main_test: install

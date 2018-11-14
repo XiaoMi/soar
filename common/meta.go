@@ -377,19 +377,19 @@ func timeStorageReq(dataType string, version int) int {
 	case "date":
 		return 3
 	case "time":
-		if version < 564 {
+		if version < 50604 {
 			return 3
 		}
 		// 3 bytes + fractional seconds storage
 		return 3 + extr(typeLength[0])
 	case "datetime":
-		if version < 564 {
+		if version < 50604 {
 			return 8
 		}
 		// 5 bytes + fractional seconds storage
 		return 5 + extr(typeLength[0])
 	case "timestamp":
-		if version < 564 {
+		if version < 50604 {
 			return 4
 		}
 		// 4 bytes + fractional seconds storage

@@ -56,7 +56,7 @@ func TestGetDataTypeBase(t *testing.T) {
 }
 
 func TestGetDataBytes(t *testing.T) {
-	cols564 := map[*Column]int{
+	cols50604 := map[*Column]int{
 		// numeric type
 		{Name: "col000", DataType: "tinyint", Character: "utf8"}:        1,
 		{Name: "col001", DataType: "SMALLINT", Character: "utf8"}:       2,
@@ -91,13 +91,13 @@ func TestGetDataBytes(t *testing.T) {
 		{Name: "col025", DataType: "varchar(191)", Character: "utf8mb4"}: 765,
 	}
 
-	for col, bytes := range cols564 {
-		if got := col.GetDataBytes(564); got != bytes {
-			t.Errorf("Version 564, %s Not match, want %d, got %d", col.Name, bytes, got)
+	for col, bytes := range cols50604 {
+		if got := col.GetDataBytes(50604); got != bytes {
+			t.Errorf("Version 5.6.4, %s Not match, want %d, got %d", col.Name, bytes, got)
 		}
 	}
 
-	cols550 := map[*Column]int{
+	cols50500 := map[*Column]int{
 		// numeric type
 		{Name: "col000", DataType: "tinyint", Character: "utf8"}:        1,
 		{Name: "col001", DataType: "SMALLINT", Character: "utf8"}:       2,
@@ -132,9 +132,9 @@ func TestGetDataBytes(t *testing.T) {
 		{Name: "col025", DataType: "varchar(191)", Character: "utf8mb4"}: 765,
 	}
 
-	for col, bytes := range cols550 {
-		if got := col.GetDataBytes(550); got != bytes {
-			t.Errorf("Version: 550, %s Not match, want %d, got %d", col.Name, bytes, got)
+	for col, bytes := range cols50500 {
+		if got := col.GetDataBytes(50500); got != bytes {
+			t.Errorf("Version: 5.5.0, %s Not match, want %d, got %d", col.Name, bytes, got)
 		}
 	}
 }

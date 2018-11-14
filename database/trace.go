@@ -45,7 +45,7 @@ type TraceRow struct {
 // Trace 执行SQL，并对其Trace
 func (db *Connector) Trace(sql string, params ...interface{}) (*QueryResult, error) {
 	common.Log.Debug("Trace SQL: %s", sql)
-	if common.Config.TestDSN.Version < 560 {
+	if common.Config.TestDSN.Version < 50600 {
 		return nil, errors.New("version < 5.6, not support trace")
 	}
 

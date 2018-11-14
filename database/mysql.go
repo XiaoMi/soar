@@ -121,29 +121,23 @@ func (db *Connector) Query(sql string, params ...interface{}) (*QueryResult, err
 
 // Version 获取MySQL数据库版本
 func (db *Connector) Version() (int, error) {
+	version := 99999
 	// 从数据库中获取版本信息
 	res, err := db.Query("select @@version")
 	if err != nil {
 		common.Log.Warn("(db *Connector) Version() Error: %v", err)
-		return -1, err
+		return version, err
 	}
 
-	// 从MySQL版本中获取版本号
-	var reg *regexp.Regexp
-	var v int
-	reg, err = regexp.Compile(`[^0-9]+`)
-	if err != nil {
-		// 如果获取不到version信息，则以最新版本为准
-		v = 999
-		return v, err
+	// MariaDB https://mariadb.com/kb/en/library/comment-syntax/
+	// MySQL https://dev.mysql.com/doc/refman/8.0/en/comments.html
+	versionStr := strings.Split(res.Rows[0].Str(0), "-")[0]
+	versionSeg := strings.Split(versionStr, ".")
+	if len(versionSeg) == 3 {
+		versionStr = fmt.Sprintf("%s%02s%02s", versionSeg[0], versionSeg[1], versionSeg[2])
+		version, err = strconv.Atoi(versionStr)
 	}
-	version := reg.ReplaceAllString(res.Rows[0].Str(0), "")[:3]
-	v, err = strconv.Atoi(version)
-	if err != nil {
-		// 如果获取不到version信息，则以最新版本为准
-		v = 999
-	}
-	return v, err
+	return version, err
 }
 
 // Source execute sql from file

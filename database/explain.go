@@ -473,7 +473,7 @@ func (db *Connector) supportExplainWrite() (bool, error) {
 
 	// 5.6以上版本支持 EXPLAIN UPDATE/DELETE 等语句，但需要开启写入
 	// 如开启了 read_only, EXPLAIN UPDATE/DELETE 也会受限制
-	if common.Config.TestDSN.Version >= 560 {
+	if common.Config.TestDSN.Version >= 50600 {
 		readOnly, err := db.SingleIntValue("read_only")
 		if err != nil {
 			return false, err
@@ -541,7 +541,7 @@ func (db *Connector) executeExplain(sql string, explainType int, formatType int)
 	explainFormat := ""
 	switch formatType {
 	case JSONFormatExplain:
-		if common.Config.TestDSN.Version >= 560 {
+		if common.Config.TestDSN.Version >= 50600 {
 			explainFormat = "FORMAT=JSON"
 		}
 	}
@@ -550,7 +550,7 @@ func (db *Connector) executeExplain(sql string, explainType int, formatType int)
 	switch explainType {
 	case ExtendedExplainType:
 		// 5.6以上extended关键字已经不推荐使用，8.0废弃了这个关键字
-		if common.Config.TestDSN.Version >= 560 {
+		if common.Config.TestDSN.Version >= 50600 {
 			res, err = db.Query("explain %s", sql)
 		} else {
 			res, err = db.Query("explain extended %s", sql)
