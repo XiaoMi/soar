@@ -16,8 +16,11 @@ BUILD_TIME=`date +%Y%m%d%H%M`
 COMMIT_VERSION=`git rev-parse HEAD`
 GO_VERSION_MIN=1.10
 
-# Add mysql version for testing `MYSQL_VERSION=5.7 make docker`
+# Add mysql version for testing `MYSQL_RELEASE=percona MYSQL_VERSION=5.7 make docker`
+# MYSQL_RELEASE: mysql, percona, mariadb ...
+# MYSQL_VERSION: latest, 8.0, 5.7, 5.6, 5.5 ...
 # use mysql:latest as default
+MYSQL_RELEASE := $(or ${MYSQL_RELEASE}, ${MYSQL_RELEASE}, mysql)
 MYSQL_VERSION := $(or ${MYSQL_VERSION}, ${MYSQL_VERSION}, latest)
 
 .PHONY: all
@@ -162,13 +165,13 @@ release: deps build
 docker:
 	@echo "\033[92mBuild mysql test enviorment\033[0m"
 	@docker stop soar-mysql 2>/dev/null || true
-	@echo "docker run --name soar-mysql mysql:$(MYSQL_VERSION)"
+	@echo "docker run --name soar-mysql $(MYSQL_RELEASE):$(MYSQL_VERSION)"
 	@docker run --name soar-mysql --rm -d \
 	-e MYSQL_ROOT_PASSWORD=1tIsB1g3rt \
 	-e MYSQL_DATABASE=sakila \
 	-p 3306:3306 \
 	-v `pwd`/doc/example/sakila.sql.gz:/docker-entrypoint-initdb.d/sakila.sql.gz \
-	mysql:$(MYSQL_VERSION)
+	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
 	@echo -n "waiting for sakila database initializing "
 	@while ! mysql -h 127.0.0.1 -u root sakila -p1tIsB1g3rt -NBe "do 1;" 2>/dev/null; do \
