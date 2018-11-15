@@ -881,7 +881,7 @@ func init() {
 			Item:     "RES.005",
 			Severity: "L4",
 			Summary:  "UPDATE可能存在逻辑错误，导致数据损坏",
-			Content:  "",
+			Content:  "在一条UPDATE语句中，如果要更新多个字段，字段间不能使用 AND ，而应该用逗号分隔。",
 			Case:     "update tbl set col = 1 and cl = 2 where col=3;",
 			Func:     (*Query4Audit).RuleUpdateSetAnd,
 		},

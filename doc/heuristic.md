@@ -916,7 +916,7 @@ UPDATE film SET length = 120 WHERE title = 'abc' ORDER BY title
 
 * **Item**:RES.005
 * **Severity**:L4
-* **Content**:
+* **Content**:在一条UPDATE语句中，如果要更新多个字段，字段间不能使用 AND ，而应该用逗号分隔。
 * **Case**:
 
 ```sql
