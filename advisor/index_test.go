@@ -19,6 +19,7 @@ package advisor
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -461,6 +462,15 @@ func TestIdxColsTypeCheck(t *testing.T) {
 					t.Error(pretty.Sprint(rule))
 				}
 			}
+		}
+	}
+}
+
+func TestGetRandomIndexSuffix(t *testing.T) {
+	for i := 0; i < 5; i++ {
+		r := getRandomIndexSuffix()
+		if !(strings.HasPrefix(r, "_") && len(r) == 5) {
+			t.Errorf("getRandomIndexSuffix should return a string with prefix `_` and 5 length, but got:%s", r)
 		}
 	}
 }

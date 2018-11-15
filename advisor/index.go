@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	// https://dev.mysql.com/doc/refman/8.0/en/identifiers.html
+	// IndexNameMaxLength Ref. https://dev.mysql.com/doc/refman/8.0/en/identifiers.html
 	IndexNameMaxLength = 64
 )
 
@@ -562,7 +562,7 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 			// 检测索引名称是否重复?
 			if existedIndexes := indexMeta.FindIndex(database.IndexKeyName, idx.Name); len(existedIndexes) > 0 {
 				var newName string
-				idxSuffix := getIndexNameSuffix()
+				idxSuffix := getRandomIndexSuffix()
 				if len(idx.Name) < IndexNameMaxLength-len(idxSuffix) {
 					newName = idx.Name + idxSuffix
 				} else {
@@ -584,7 +584,8 @@ func (idxAdv *IndexAdvisor) mergeIndexes(idxList []IndexInfo) []IndexInfo {
 	return rmSelfDupIndex(indexes)
 }
 
-func getIndexNameSuffix() string {
+// getRandomIndexSuffix format: _xxxx, length: 5
+func getRandomIndexSuffix() string {
 	return fmt.Sprintf("_%s", uniuri.New()[:4])
 }
 
