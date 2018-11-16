@@ -116,7 +116,7 @@ SELECT * FROM tb WHERE col IN (NULL);
 
 * **Item**:ARG.005
 * **Severity**:L1
-* **Content**: 如：select id from t where num in(1,2,3)对于连续的数值，能用BETWEEN就不要用IN了：select id from t where num between 1 and 3。而当IN值过多时MySQL也可能会进入全表扫描导致性能急剧下降。
+* **Content**: 如：select id from t where num in(1,2,3)对于连续的数值，能用 BETWEEN 就不要用 IN 了：select id from t where num between 1 and 3。而当IN值过多时MySQL也可能会进入全表扫描导致性能急剧下降。
 * **Case**:
 
 ```sql
@@ -136,13 +136,13 @@ select id from t where num is null
 
 * **Item**:ARG.007
 * **Severity**:L3
-* **Content**:性能问题是使用模式匹配操作符的最大缺点。使用LIKE或正则表达式进行模式匹配进行查询的另一个问题，是可能会返回意料之外的结果。最好的方案就是使用特殊的搜索引擎技术来替代SQL，比如Apache Lucene。另一个可选方案是将结果保存起来从而减少重复的搜索开销。如果一定要使用SQL，请考虑在MySQL中使用像FULLTEXT索引这样的第三方扩展。但更广泛地说，您不一定要使用SQL来解决所有问题。
+* **Content**:性能问题是使用模式匹配操作符的最大缺点。使用LIKE或正则表达式进行模式匹配进行查询的另一个问题，是可能会返回意料之外的结果。最好的方案就是使用特殊的搜索引擎技术来替代SQL，比如 Apache Lucene。另一个可选方案是将结果保存起来从而减少重复的搜索开销。如果一定要使用SQL，请考虑在 MySQL 中使用像 FULLTEXT 索引这样的第三方扩展。但更广泛地说，您不一定要使用SQL来解决所有问题。
 * **Case**:
 
 ```sql
 select c_id,c2,c3 from tbl where c2 like 'test%'
 ```
-## OR查询索引列时请尽量使用IN谓词
+## OR 查询索引列时请尽量使用 IN 谓词
 
 * **Item**:ARG.008
 * **Severity**:L1
@@ -156,7 +156,7 @@ SELECT c1,c2,c3 FROM tbl WHERE c1 = 14 OR c1 = 17
 
 * **Item**:ARG.009
 * **Severity**:L1
-* **Content**:如果VARCHAR列的前后存在空格将可能引起逻辑问题，如在MySQL 5.5中'a'和'a '可能会在查询中被认为是相同的值。
+* **Content**:如果VARCHAR列的前后存在空格将可能引起逻辑问题，如在MySQL 5.5中 'a' 和 'a ' 可能会在查询中被认为是相同的值。
 * **Case**:
 
 ```sql
@@ -166,7 +166,7 @@ SELECT 'abc '
 
 * **Item**:ARG.010
 * **Severity**:L1
-* **Content**:hint是用来强制SQL按照某个执行计划来执行，但随着数据量变化我们无法保证自己当初的预判是正确的。
+* **Content**:hint 是用来强制 SQL 按照某个执行计划来执行，但随着数据量变化我们无法保证自己当初的预判是正确的。
 * **Case**:
 
 ```sql
@@ -536,23 +536,23 @@ SELECT COUNT(DISTINCT col, col2) FROM tbl;
 
 * **Item**:DIS.003
 * **Severity**:L3
-* **Content**:当表已经有主键时，对所有列进行DISTINCT的输出结果与不进行DISTINCT操作的结果相同，请不要画蛇添足。
+* **Content**:当表已经有主键时，对所有列进行 DISTINCT 的输出结果与不进行 DISTINCT 操作的结果相同，请不要画蛇添足。
 * **Case**:
 
 ```sql
 SELECT DISTINCT * FROM film;
 ```
-## 避免在WHERE条件中使用函数或其他运算符
+## 避免在 WHERE 条件中使用函数或其他运算符
 
 * **Item**:FUN.001
 * **Severity**:L2
-* **Content**:虽然在SQL中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。
+* **Content**:虽然在 SQL 中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。也不建议在查询比较条件两侧书写多余的括号，这会对阅读产生比较大的困扰。
 * **Case**:
 
 ```sql
 select id from t where substring(name,1,3)='abc'
 ```
-## 指定了WHERE条件或非MyISAM引擎时使用COUNT(\*)操作性能不佳
+## 指定了 WHERE 条件或非 MyISAM 引擎时使用 COUNT(\*) 操作性能不佳
 
 * **Item**:FUN.002
 * **Severity**:L1
@@ -606,13 +606,13 @@ SELECT SUM(COL) FROM tbl;
 
 * **Item**:GRP.001
 * **Severity**:L2
-* **Content**:GROUP BY中的列在前面的WHERE条件中使用了等值查询，对这样的列进行GROUP BY意义不大。
+* **Content**:GROUP BY 中的列在前面的 WHERE 条件中使用了等值查询，对这样的列进行GROUP BY意义不大。
 * **Case**:
 
 ```sql
 select film_id, title from film where release_year='2006' group by release_year
 ```
-## JOIN语句混用逗号和ANSI模式
+## JOIN 语句混用逗号和 ANSI 模式
 
 * **Item**:JOI.001
 * **Severity**:L2
@@ -636,7 +636,7 @@ select tb1.col from (tb1, tb2) join tb2 on tb1.id=tb.id where tb1.id=1
 
 * **Item**:JOI.003
 * **Severity**:L4
-* **Content**:由于WHERE条件错误使得OUTER JOIN的外部表无数据返回，这会将查询隐式转换为 INNER JOIN 。如：select c from L left join R using(c) where L.a=5 and R.b=10。这种SQL逻辑上可能存在错误或程序员对OUTER JOIN如何工作存在误解，因为LEFT/RIGHT JOIN是LEFT/RIGHT OUTER JOIN的缩写。
+* **Content**:由于 WHERE 条件错误使得 OUTER JOIN 的外部表无数据返回，这会将查询隐式转换为 INNER JOIN 。如：select c from L left join R using(c) where L.a=5 and R.b=10。这种SQL逻辑上可能存在错误或程序员对OUTER JOIN如何工作存在误解，因为LEFT/RIGHT JOIN是LEFT/RIGHT OUTER JOIN的缩写。
 * **Case**:
 
 ```sql
@@ -646,7 +646,7 @@ select c1,c2,c3 from t1 left outer join t2 using(c1) where t1.c2=2 and t2.c3=4
 
 * **Item**:JOI.004
 * **Severity**:L4
-* **Content**:只在右侧表为NULL的带WHERE子句的LEFT OUTER JOIN语句，有可能是在WHERE子句中使用错误的列，如：“... FROM l LEFT OUTER JOIN r ON l.l = r.r WHERE r.z IS NULL”，这个查询正确的逻辑可能是 WHERE r.r IS NULL。
+* **Content**:只在右侧表为 NULL 的带 WHERE 子句的LEFT OUTER JOIN语句，有可能是在WHERE子句中使用错误的列，如：“... FROM l LEFT OUTER JOIN r ON l.l = r.r WHERE r.z IS NULL”，这个查询正确的逻辑可能是 WHERE r.r IS NULL。
 * **Case**:
 
 ```sql
@@ -666,7 +666,7 @@ select bp1.p_id, b1.d_d as l, b1.b_id from b1 join bp1 on (b1.b_id = bp1.b_id) l
 
 * **Item**:JOI.006
 * **Severity**:L4
-* **Content**:一般来说，非嵌套子查询总是用于关联子查询，最多是来自FROM子句中的一个表，这些子查询用于ANY、ALL和EXISTS的谓词。如果可以根据查询语义决定子查询最多返回一个行，那么一个不相关的子查询或来自FROM子句中的多个表的子查询就被压平了。
+* **Content**:一般来说，非嵌套子查询总是用于关联子查询，最多是来自FROM子句中的一个表，这些子查询用于 ANY, ALL 和 EXISTS 的谓词。如果可以根据查询语义决定子查询最多返回一个行，那么一个不相关的子查询或来自FROM子句中的多个表的子查询就被压平了。
 * **Case**:
 
 ```sql
@@ -682,11 +682,11 @@ SELECT s,p,d FROM tbl WHERE p.p_id = (SELECT s.p_id FROM tbl WHERE s.c_id = 1009
 ```sql
 UPDATE users u LEFT JOIN hobby h ON u.id = h.uid SET u.name = 'pianoboy' WHERE h.hobby = 'piano';
 ```
-## 不要使用跨DB的Join查询
+## 不要使用跨数据库的 JOIN 查询
 
 * **Item**:JOI.008
 * **Severity**:L4
-* **Content**:一般来说，跨DB的Join查询意味着查询语句跨越了两个不同的子系统，这可能意味着系统耦合度过高或库表结构设计不合理。
+* **Content**:一般来说，跨数据库的 JOIN 查询意味着查询语句跨越了两个不同的子系统，这可能意味着系统耦合度过高或库表结构设计不合理。
 * **Case**:
 
 ```sql
@@ -752,11 +752,11 @@ CREATE TABLE tbl ( a int, b int, c int, KEY idx_a (`a`),KEY idx_b(`b`),KEY idx_c
 ```sql
 CREATE TABLE tbl ( a int, b int, c int, PRIMARY KEY(`a`,`b`,`c`));
 ```
-## 未指定主键或主键非int或bigint
+## 未指定主键或主键非 int 或 bigint
 
 * **Item**:KEY.007
 * **Severity**:L4
-* **Content**:未指定主键或主键非int或bigint，建议将主键设置为int unsigned或bigint unsigned。
+* **Content**:未指定主键或主键非 int 或 bigint，建议将主键设置为 int unsigned 或 bigint unsigned。
 * **Case**:
 
 ```sql
@@ -782,7 +782,7 @@ SELECT * FROM tbl ORDER BY a DESC, b ASC;
 ```sql
 CREATE UNIQUE INDEX part_of_name ON customer (name(10));
 ```
-## SQL\_CALC\_FOUND\_ROWS效率低下
+## SQL\_CALC\_FOUND\_ROWS 效率低下
 
 * **Item**:KWR.001
 * **Severity**:L2
@@ -866,7 +866,7 @@ select c1,c2,c3,c4 from tab1 where col_id REGEXP '[[:<:]]12[[:>:]]'
 
 * **Item**:LIT.004
 * **Severity**:L1
-* **Content**:USE database, SHOW DATABASES等命令也需要使用使用分号或已设定的DELIMITER结尾。
+* **Content**:USE database, SHOW DATABASES 等命令也需要使用使用分号或已设定的 DELIMITER 结尾。
 * **Case**:
 
 ```sql
@@ -882,11 +882,11 @@ USE db
 ```sql
 select c1,c2,c3 from t1 where c2='foo' group by c2
 ```
-## 未使用ORDER BY的LIMIT查询
+## 未使用 ORDER BY 的 LIMIT 查询
 
 * **Item**:RES.002
 * **Severity**:L4
-* **Content**:没有ORDER BY的LIMIT会导致非确定性的结果，这取决于查询执行计划。
+* **Content**:没有 ORDER BY 的 LIMIT 会导致非确定性的结果，这取决于查询执行计划。
 * **Case**:
 
 ```sql
@@ -936,7 +936,7 @@ select * from tbl where 1 != 1;
 
 * **Item**:RES.007
 * **Severity**:L4
-* **Content**:查询条件永远为真，这将导致WHERE条件失效进行全表查询。
+* **Content**:查询条件永远为真，可能导致 WHERE 条件失效进行全表查询。
 * **Case**:
 
 ```sql
@@ -946,7 +946,7 @@ select * from tbl where 1 = 1;
 
 * **Item**:RES.008
 * **Severity**:L2
-* **Content**:SELECT INTO OUTFILE需要授予FILE权限，这通过会引入安全问题。LOAD DATA虽然可以提高数据导入速度，但同时也可能导致从库同步延迟过大。
+* **Content**:SELECT INTO OUTFILE 需要授予 FILE 权限，这通过会引入安全问题。LOAD DATA 虽然可以提高数据导入速度，但同时也可能导致从库同步延迟过大。
 * **Case**:
 
 ```sql
@@ -996,7 +996,7 @@ select col1,col2 from tbl where type!=0
 
 * **Item**:STA.002
 * **Severity**:L1
-* **Content**:当使用db.table或table.column格式访问表或字段时，请不要在点号后面添加空格，虽然这样语法正确。
+* **Content**:当使用 db.table 或 table.column 格式访问表或字段时，请不要在点号后面添加空格，虽然这样语法正确。
 * **Case**:
 
 ```sql
@@ -1032,7 +1032,7 @@ CREATE TABLE ` abc` (a int);
 ```sql
 select col1,col2,col3 from table1 where col2 in(select col from table2)
 ```
-## 如果您不在乎重复的话，建议使用UNION ALL替代UNION
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item**:SUB.002
 * **Severity**:L2
@@ -1042,11 +1042,11 @@ select col1,col2,col3 from table1 where col2 in(select col from table2)
 ```sql
 select teacher_id as id,people_name as name from t1,t2 where t1.teacher_id=t2.people_id union select student_id as id,people_name as name from t1,t2 where t1.student_id=t2.people_id
 ```
-## 考虑使用EXISTS而不是DISTINCT子查询
+## 考虑使用 EXISTS 而不是 DISTINCT 子查询
 
 * **Item**:SUB.003
 * **Severity**:L3
-* **Content**:DISTINCT关键字在对元组排序后删除重复。相反，考虑使用一个带有EXISTS关键字的子查询，您可以避免返回整个表。
+* **Content**:DISTINCT 关键字在对元组排序后删除重复。相反，考虑使用一个带有 EXISTS 关键字的子查询，您可以避免返回整个表。
 * **Case**:
 
 ```sql
@@ -1066,7 +1066,7 @@ SELECT * from tb where id in (select id from (select id from tb))
 
 * **Item**:SUB.005
 * **Severity**:L8
-* **Content**:当前MySQL版本不支持在子查询中进行'LIMIT & IN/ALL/ANY/SOME'。
+* **Content**:当前 MySQL 版本不支持在子查询中进行 'LIMIT & IN/ALL/ANY/SOME'。
 * **Case**:
 
 ```sql

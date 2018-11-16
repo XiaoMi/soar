@@ -2181,9 +2181,40 @@ func (q *Query4Audit) RuleDataDrop() Rule {
 func (q *Query4Audit) RuleCompareWithFunction() Rule {
 	var rule = q.RuleOK()
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+		// Vitess 中有些函数进行了单独定义不在 FuncExpr 中，如: substring。所以不能直接用 FuncExpr 判断。
 		switch n := node.(type) {
 		case *sqlparser.ComparisonExpr:
-			if strings.HasSuffix(sqlparser.String(n.Left), ")") {
+			switch n.Left.(type) {
+			case *sqlparser.SQLVal, *sqlparser.ColName:
+			default:
+				rule = HeuristicRules["FUN.001"]
+				return false, nil
+			}
+			/*
+				// func always has bracket
+				if strings.HasSuffix(sqlparser.String(n.Left), ")") {
+					rule = HeuristicRules["FUN.001"]
+					return false, nil
+				}
+			*/
+
+		// func(a) between func(c) and func(d)
+		case *sqlparser.RangeCond:
+			switch n.Left.(type) {
+			case *sqlparser.SQLVal, *sqlparser.ColName:
+			default:
+				rule = HeuristicRules["FUN.001"]
+				return false, nil
+			}
+			switch n.From.(type) {
+			case *sqlparser.SQLVal, *sqlparser.ColName:
+			default:
+				rule = HeuristicRules["FUN.001"]
+				return false, nil
+			}
+			switch n.To.(type) {
+			case *sqlparser.SQLVal, *sqlparser.ColName:
+			default:
 				rule = HeuristicRules["FUN.001"]
 				return false, nil
 			}

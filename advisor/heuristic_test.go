@@ -679,7 +679,7 @@ func TestRuleNoDeterministicGroupby(t *testing.T) {
 func TestRuleNoDeterministicLimit(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		"select col1,col2 from tbl where name='zhangsan' limit 10",
+		"select col1,col2 from tbl where name='tony' limit 10",
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1194,7 +1194,7 @@ func TestRuleImpreciseDataType(t *testing.T) {
 			`select * from tb where col = 0.00001;`,
 		},
 		{
-			"REPLACE INTO `binks3` (`hostname`,`storagehost`, `filename`, `starttime`, `binlogstarttime`, `uploadname`, `binlogsize`, `filesize`, `md5`, `status`) VALUES (1, 1, 1, 1, 1, 1, ?, ?);",
+			"REPLACE INTO `storage` (`hostname`,`storagehost`, `filename`, `starttime`, `binlogstarttime`, `uploadname`, `binlogsize`, `filesize`, `md5`, `status`) VALUES (1, 1, 1, 1, 1, 1, ?, ?);",
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -1249,8 +1249,8 @@ func TestRuleValuesInDefinition(t *testing.T) {
 func TestRuleIndexAttributeOrder(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`create index idx1 on tabl(last_name,first_name);`,
-		`alter table tabl add index idx1 (last_name,first_name);`,
+		`create index idx1 on tab(last_name,first_name);`,
+		`alter table tab add index idx1 (last_name,first_name);`,
 		`CREATE TABLE test (id int,blob_col BLOB, INDEX(blob_col(10),id));`,
 	}
 	for _, sql := range sqls {
@@ -1271,7 +1271,7 @@ func TestRuleIndexAttributeOrder(t *testing.T) {
 func TestRuleNullUsage(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`select c1,c2,c3 from tabl where c4 is null or c4 <> 1;`,
+		`select c1,c2,c3 from tab where c4 is null or c4 <> 1;`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1291,7 +1291,7 @@ func TestRuleNullUsage(t *testing.T) {
 func TestRuleStringConcatenation(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`select c1 || coalesce(' ' || c2 || ' ', ' ') || c3 as c from tabl;`,
+		`select c1 || coalesce(' ' || c2 || ' ', ' ') || c3 as c from tab;`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1609,7 +1609,7 @@ func TestRuleForbiddenSyntax(t *testing.T) {
 func TestRuleNestedSubQueries(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`SELECT s,p,d FROM tabl WHERE p.p_id = (SELECT s.p_id FROM tabl WHERE s.c_id = 100996 AND s.q = 1 );`,
+		`SELECT s,p,d FROM tab WHERE p.p_id = (SELECT s.p_id FROM tab WHERE s.c_id = 100996 AND s.q = 1 );`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1672,7 +1672,7 @@ func TestRuleMultiDBJoin(t *testing.T) {
 func TestRuleORUsage(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`SELECT c1,c2,c3 FROM tabl WHERE c1 = 14 OR c2 = 17;`,
+		`SELECT c1,c2,c3 FROM tab WHERE c1 = 14 OR c2 = 17;`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1969,9 +1969,15 @@ func TestRuleDataDrop(t *testing.T) {
 func TestCompareWithFunction(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
-		{`select id from t where substring(name,1,3)='abc';`},
+		{
+			`select id from t where substring(name,1,3)='abc';`,
+			`SELECT * FROM tbl WHERE UNIX_TIMESTAMP(loginTime) BETWEEN UNIX_TIMESTAMP('2018-11-16 09:46:00 +0800 CST') AND UNIX_TIMESTAMP('2018-11-22 00:00:00 +0800 CST')`,
+		},
 		// TODO: 右侧使用函数比较
-		{`select id from t where 'abc'=substring(name,1,3);`},
+		{
+			`select id from t where 'abc'=substring(name,1,3);`,
+			`select id from t where col = (select 1)`,
+		},
 	}
 	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
@@ -2062,7 +2068,7 @@ func TestRuleIn(t *testing.T) {
 }
 
 // ARG.006
-func TestRuleisNullIsNotNull(t *testing.T) {
+func TestRuleIsNullIsNotNull(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`select id from t where num is null;`,
@@ -2249,10 +2255,10 @@ func TestRuleAlterDropKey(t *testing.T) {
 func TestRuleCantBeNull(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		"CREATE TABLE `sbtest` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
-		"alter TABLE `sbtest` add column `c` longblob;",
-		"alter TABLE `sbtest` add column `c` text;",
-		"alter TABLE `sbtest` add column `c` blob;",
+		"CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
+		"alter TABLE `tbl` add column `c` longblob;",
+		"alter TABLE `tbl` add column `c` text;",
+		"alter TABLE `tbl` add column `c` blob;",
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)

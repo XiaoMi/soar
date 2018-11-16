@@ -134,13 +134,13 @@ vendor: vitess tidb
 .PHONY: tidb-parser
 tidb-parser: tidb
 	@echo "\033[92mimporting tidb sql parser ...\033[0m"
-	@cd ${GOPATH}/src/github.com/pingcap/tidb && git checkout ec9672cea6612481b1da845dbab620b7a5581ca4  && make parser
+	@cd ${GOPATH}/src/github.com/pingcap/tidb && git checkout --quiet ec9672cea6612481b1da845dbab620b7a5581ca4  && make parser
 
 # gometalinter
 # 如果有不想改的lint问题可以使用metalinter.sh加黑名单
 #@bash doc/example/metalinter.sh
 .PHONY: lint
-lint: build
+lint: fast
 	@echo "\033[92mRun linter check ...\033[0m"
 	CGO_ENABLED=0 retool do gometalinter.v2 -j 1 --config doc/example/metalinter.json ./...
 	retool do revive -formatter friendly --exclude vendor/... -config doc/example/revive.toml ./...
@@ -195,6 +195,11 @@ main_test: install
 .PHONY: daily
 daily: | deps fmt vendor tidb-parser docker cover doc lint release install main_test clean logo
 	@echo "\033[92mdaily build finished\033[0m"
+
+# vendor, tidb-parser, docker will cost long time, if all those are ready, daily-quick will much more fast.
+.PHONY: daily-quick
+daily-quick: | deps fmt cover doc lint logo
+	@echo "\033[92mdaily-quick build finished\033[0m"
 
 .PHONY: logo
 logo:
