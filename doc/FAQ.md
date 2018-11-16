@@ -13,6 +13,12 @@
 
 如果 `test-dsn` 或 `online-dsn` 中包含':', '@', '/', '!'等特殊字符建议在配置文件中配置相关信息，配置文件为YAML格式，需要遵守YAML格式的要求规范。
 
+## Windows 环境如下安装使用？
+
+SOAR是命令行工具，开源版本无UI界面需要在 `cmd.exe` 下运行。下图为社区同学帮忙录制的 Windows 环境下载、安装及使用演示。
+
+![SOAR__Windows_Installation](https://wx4.sinaimg.cn/large/7143d93fly1fx9z0lw0k8g211j0jlkjo.gif)
+
 ## Windows环境下双击`soar.windows-amd64`文件无反应。
 
 `soar` 是命令行工具，不是图形化桌面工具，Windows环境需要在 `cmd.exe` 下以命令行方式运行。使用 `soar` 前您需要先熟悉Windows命令行使用。
@@ -26,6 +32,15 @@
 ```bash
 type query.sql | soar.windows-amd64
 ```
+
+## 文件无法执行
+
+```bash
+./soar.linux-amd64
+bash: ./soar.linux-amd64: cannot execute binary file
+```
+
+请注意您操作系统类型，`soar.linux-amd64` 为 Linux 系统使用的二进制文件，`soar.darwin-amd64` 为苹果系统使用的二进制文件，`soar.windows-amd64` 是微软用户使用的二进制文件。下载文件后 Linux 和苹果用户需要为文件添加可执行权限 `chmod a+x filename`。
 
 ## 提示语法错误
 
