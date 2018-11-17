@@ -321,8 +321,8 @@ func TestRuleOrderByExpr(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
-			"SELECT col FROM tbl order by cola - colb;",              // order by 列运算
-			"SELECT cola - colb col FROM tbl order by col;",          // 别名为列运算
+			"SELECT col FROM tbl order by cola - cl;",                // order by 列运算
+			"SELECT cola - cl col FROM tbl order by col;",            // 别名为列运算
 			"SELECT cola FROM tbl order by from_unixtime(col);",      // order by 函数运算
 			"SELECT from_unixtime(col) cola FROM tbl order by cola;", // 别名为函数运算
 		},
@@ -363,8 +363,8 @@ func TestRuleOrderByExpr(t *testing.T) {
 func TestRuleGroupByExpr(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		"SELECT col FROM tbl GROUP by cola - colb;",
-		"SELECT cola - colb col FROM tbl GROUP by col;",
+		"SELECT col FROM tbl GROUP by cola - col;",
+		"SELECT cola - col col FROM tbl GROUP by col;",
 		"SELECT cola FROM tbl GROUP by from_unixtime(col);",
 		"SELECT from_unixtime(col) cola FROM tbl GROUP by cola;",
 
@@ -397,7 +397,7 @@ func TestRuleTblCommentCheck(t *testing.T) {
 			" `c3` varchar(32) DEFAULT NULL, `c4` int(11) NOT NULL, `c5` double NOT NULL," +
 			" `c6` text NOT NULL, PRIMARY KEY (`ID`), KEY `idx_c3_c2_c4_c5_c6` " +
 			"(`c3`,`c2`(255),`c4`,`c5`,`c6`(255)), KEY `idx_c3_c2_c4` (`c3`,`c2`,`c4`)) " +
-			"ENGINE=InnoDB DEFAULT CHARSET=utf8",
+			"ENGINE = InnoDB DEFAULT CHARSET=utf8",
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1484,7 +1484,7 @@ func TestRuleReduceNumberOfJoin(t *testing.T) {
 func TestRuleDistinctUsage(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`SELECT DISTINCT c.c_id,count(DISTINCT c.c_name),count(DISTINCT c.c_e),count(DISTINCT c.c_n),count(DISTINCT c.c_me),c.c_d FROM (select distinct xing, name from B) as e WHERE e.country_id = c.country_id;`,
+		`SELECT DISTINCT c.c_id,count(DISTINCT c.c_name),count(DISTINCT c.c_e),count(DISTINCT c.c_n),count(DISTINCT c.c_me),c.c_d FROM (select distinct id, name from B) as e WHERE e.country_id = c.country_id;`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -1604,7 +1604,7 @@ func TestRuleForbiddenSyntax(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`create view v_today (today) AS SELECT CURRENT_DATE;`,
-		`CREATE VIEW v (mycol) AS SELECT 'abc';`,
+		`CREATE VIEW v (col) AS SELECT 'abc';`,
 		`CREATE FUNCTION hello (s CHAR(20));`,
 		`CREATE PROCEDURE simpleproc (OUT param1 INT)`,
 	}
@@ -2292,8 +2292,8 @@ func TestRuleCantBeNull(t *testing.T) {
 func TestRuleTooManyKeyParts(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		"CREATE TABLE `sbtest` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
-		"alter TABLE `sbtest` add index idx_idx (`id`);",
+		"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
+		"alter TABLE `tb` add index idx_idx (`id`);",
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -2498,7 +2498,7 @@ func TestRuleAutoIncrementInitNotZero(t *testing.T) {
 	sqls := [][]string{
 		// 正面的例子
 		{
-			"CREATE TABLE `sbtest` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  `pad` char(60) NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=13",
+			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  `pad` char(60) NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=13",
 		},
 		// 反面的例子
 		{
@@ -2543,7 +2543,7 @@ func TestRuleColumnWithCharset(t *testing.T) {
 		},
 		// 反面的例子
 		{
-			"CREATE TABLE `sbtest` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` char(120) NOT NULL DEFAULT '', PRIMARY KEY (`id`))",
+			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` char(120) NOT NULL DEFAULT '', PRIMARY KEY (`id`))",
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -2615,12 +2615,12 @@ func TestRuleBlobDefaultValue(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
-			"CREATE TABLE `sbtest` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
-			"alter table `sbtest` add column `c` blob NOT NULL DEFAULT '';",
+			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
+			"alter table `tb` add column `c` blob NOT NULL DEFAULT '';",
 		},
 		{
-			"CREATE TABLE `sbtest` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL, PRIMARY KEY (`id`));",
-			"alter table `sbtest` add column `c` blob NOT NULL DEFAULT NULL;",
+			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL, PRIMARY KEY (`id`));",
+			"alter table `tb` add column `c` blob NOT NULL DEFAULT NULL;",
 		},
 	}
 
@@ -2655,18 +2655,18 @@ func TestRuleIntPrecision(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
-			"CREATE TABLE `sbtest` ( `id` int(1) );",
-			"CREATE TABLE `sbtest` ( `id` bigint(1) );",
-			"alter TABLE `sbtest` add column `id` bigint(1);",
-			"alter TABLE `sbtest` add column `id` int(1);",
+			"CREATE TABLE `tb` ( `id` int(1) );",
+			"CREATE TABLE `tb` ( `id` bigint(1) );",
+			"alter TABLE `tb` add column `id` bigint(1);",
+			"alter TABLE `tb` add column `id` int(1);",
 		},
 		{
-			"CREATE TABLE `sbtest` ( `id` int(10));",
-			"CREATE TABLE `sbtest` ( `id` bigint(20));",
-			"alter TABLE `sbtest` add column `id` bigint(20);",
-			"alter TABLE `sbtest` add column `id` int(10);",
-			"CREATE TABLE `sbtest` ( `id` int);",
-			"alter TABLE `sbtest` add column `id` bigint;",
+			"CREATE TABLE `tb` ( `id` int(10));",
+			"CREATE TABLE `tb` ( `id` bigint(20));",
+			"alter TABLE `tb` add column `id` bigint(20);",
+			"alter TABLE `tb` add column `id` int(10);",
+			"CREATE TABLE `tb` ( `id` int);",
+			"alter TABLE `tb` add column `id` bigint;",
 		},
 	}
 
@@ -2701,14 +2701,14 @@ func TestRuleVarcharLength(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
-			"CREATE TABLE `sbtest` ( `id` varchar(4000) );",
-			"CREATE TABLE `sbtest` ( `id` varchar(3500) );",
-			"alter TABLE `sbtest` add column `id` varchar(3500);",
+			"CREATE TABLE `tb` ( `id` varchar(4000) );",
+			"CREATE TABLE `tb` ( `id` varchar(3500) );",
+			"alter TABLE `tb` add column `id` varchar(3500);",
 		},
 		{
-			"CREATE TABLE `sbtest` ( `id` varchar(1024));",
-			"CREATE TABLE `sbtest` ( `id` varchar(20));",
-			"alter TABLE `sbtest` add column `id` varchar(35);",
+			"CREATE TABLE `tb` ( `id` varchar(1024));",
+			"CREATE TABLE `tb` ( `id` varchar(20));",
+			"alter TABLE `tb` add column `id` varchar(35);",
 		},
 	}
 
@@ -2804,8 +2804,8 @@ func TestRuleAllowEngine(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
-			"CREATE TABLE tbl (a int) engine=myisam;",
-			"ALTER TABLE tbl engine=myisam;",
+			"CREATE TABLE tbl (a int) engine=MyISAM;",
+			"ALTER TABLE tbl engine=MyISAM;",
 			"CREATE TABLE tbl (a int);",
 		},
 		{
@@ -2868,7 +2868,7 @@ func TestRulePartitionNotAllowed(t *testing.T) {
 func TestRuleAutoIncUnsigned(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		"CREATE TABLE `sbtest` ( `id` int(10) NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
+		"CREATE TABLE `tb` ( `id` int(10) NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
 		"ALTER TABLE `tbl` ADD COLUMN `id` int(10) NOT NULL AUTO_INCREMENT;",
 	}
 	for _, sql := range sqls {

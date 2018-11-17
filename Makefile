@@ -79,7 +79,7 @@ build: fmt tidb-parser
 	@echo "build Success!"
 
 .PHONY: fast
-fast:
+fast: fmt
 	@echo "\033[92mBuilding ...\033[0m"
 	@bash ./genver.sh $(GO_VERSION_MIN)
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \

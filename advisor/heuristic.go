@@ -530,7 +530,6 @@ func (q *Query4Audit) RuleDiffGroupByOrderBy() Rule {
 						groupbyTbls = append(groupbyTbls, g.Qualifier.Name)
 						if len(groupbyTbls) > 1 {
 							rule = HeuristicRules["CLA.006"]
-
 							return false, nil
 						}
 					}
@@ -551,7 +550,6 @@ func (q *Query4Audit) RuleDiffGroupByOrderBy() Rule {
 						orderbyTbls = append(orderbyTbls, o.Qualifier.Name)
 						if len(orderbyTbls) > 1 {
 							rule = HeuristicRules["CLA.006"]
-
 							return false, nil
 						}
 					}
@@ -573,7 +571,6 @@ func (q *Query4Audit) RuleDiffGroupByOrderBy() Rule {
 			}
 			if !tblExist && len(orderbyTbls) > 0 {
 				rule = HeuristicRules["CLA.006"]
-
 				return rule
 			}
 		}
@@ -593,7 +590,6 @@ func (q *Query4Audit) RuleMixOrderBy() Rule {
 				// 比较相邻两个order by列的方向
 				if direction != "" && order.Direction != direction {
 					rule = HeuristicRules["CLA.007"]
-
 					return false, nil
 				}
 				direction = order.Direction
@@ -614,7 +610,6 @@ func (q *Query4Audit) RuleExplicitOrderBy() Rule {
 			// 有group by，但没有order by
 			if n.GroupBy != nil && n.OrderBy == nil {
 				rule = HeuristicRules["CLA.008"]
-
 				return false, nil
 			}
 		}
@@ -638,7 +633,6 @@ func (q *Query4Audit) RuleOrderByExpr() Rule {
 			// 函数名方式，如：from_unixtime(col)
 			if funcExp.MatchString(orderBy) {
 				rule = HeuristicRules["CLA.009"]
-
 				return false, nil
 			}
 
@@ -648,7 +642,6 @@ func (q *Query4Audit) RuleOrderByExpr() Rule {
 			})
 			if string(trim) != "" {
 				rule = HeuristicRules["CLA.009"]
-
 				return false, nil
 			}
 
@@ -678,12 +671,10 @@ func (q *Query4Audit) RuleOrderByExpr() Rule {
 				})
 				if string(trim) != "" {
 					rule = HeuristicRules["CLA.009"]
-
 				}
 				// 函数
 				if funcExp.MatchString(s) {
 					rule = HeuristicRules["CLA.009"]
-
 				}
 			}
 		}
@@ -705,7 +696,6 @@ func (q *Query4Audit) RuleGroupByExpr() Rule {
 			// 函数名方式，如：from_unixtime(col)
 			if funcExp.MatchString(groupBy) {
 				rule = HeuristicRules["CLA.010"]
-
 				return false, nil
 			}
 
@@ -715,7 +705,6 @@ func (q *Query4Audit) RuleGroupByExpr() Rule {
 			})
 			if string(trim) != "" {
 				rule = HeuristicRules["CLA.010"]
-
 				return false, nil
 			}
 
@@ -745,12 +734,10 @@ func (q *Query4Audit) RuleGroupByExpr() Rule {
 				})
 				if string(trim) != "" {
 					rule = HeuristicRules["CLA.010"]
-
 				}
 				// 函数
 				if funcExp.MatchString(s) {
 					rule = HeuristicRules["CLA.010"]
-
 				}
 			}
 		}
