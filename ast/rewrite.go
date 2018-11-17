@@ -300,7 +300,7 @@ func (rw *Rewrite) RewriteDelimiter() *Rewrite {
 	return rw
 }
 
-// RewriteStandard standard: 使用vitess提供的String功能将抽象语法树转写回SQL，注意：这可能转写失败。
+// RewriteStandard standard: 使用 vitess 提供的 String 功能将抽象语法树转写回 SQL，注意：这可能转写失败。
 func (rw *Rewrite) RewriteStandard() *Rewrite {
 	if _, err := sqlparser.Parse(rw.SQL); err == nil {
 		rw.NewSQL = sqlparser.String(rw.Stmt)
@@ -313,7 +313,7 @@ func (rw *Rewrite) RewriteAlwaysTrue() (reWriter *Rewrite) {
 	array := NewNodeList(rw.Stmt)
 	tNode := array.Head
 	for {
-		omitAwaysTrue(tNode)
+		omitAlwaysTrue(tNode)
 		tNode = tNode.Next
 		if tNode == nil {
 			break
@@ -380,8 +380,8 @@ func isAlwaysTrue(expr *sqlparser.ComparisonExpr) bool {
 	return result
 }
 
-// omitAwaysTrue 移除AST中的恒真条件
-func omitAwaysTrue(node *NodeItem) {
+// omitAlwaysTrue 移除AST中的恒真条件
+func omitAlwaysTrue(node *NodeItem) {
 	if node == nil {
 		return
 	}
@@ -568,7 +568,7 @@ func omitAwaysTrue(node *NodeItem) {
 		}
 	}
 
-	omitAwaysTrue(node.Prev)
+	omitAlwaysTrue(node.Prev)
 }
 
 // RewriteCountStar countstar: 将COUNT(col)改写为COUNT(*)
@@ -594,7 +594,7 @@ func (rw *Rewrite) RewriteCountStar() *Rewrite {
 	return rw
 }
 
-// RewriteInnoDB innodb: 为未指定Engine的表默认添加InnoDB引擎，将其他存储引擎转为InnoDB
+// RewriteInnoDB InnoDB: 为未指定 Engine 的表默认添加 InnoDB 引擎，将其他存储引擎转为 InnoDB
 func (rw *Rewrite) RewriteInnoDB() *Rewrite {
 	switch create := rw.Stmt.(type) {
 	case *sqlparser.DDL:

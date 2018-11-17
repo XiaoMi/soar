@@ -48,7 +48,7 @@ var cacheHits int
 var cacheMisses int
 var tokenCache map[string]Token
 
-var tokenBoudaries = []string{",", ";", ":", ")", "(", ".", "=", "<", ">", "+", "-", "*", "/", "!", "^", "%", "|", "&", "#"}
+var tokenBoundaries = []string{",", ";", ":", ")", "(", ".", "=", "<", ">", "+", "-", "*", "/", "!", "^", "%", "|", "&", "#"}
 
 var tokenReserved = []string{
 	"ACCESSIBLE", "ACTION", "AGAINST", "AGGREGATE", "ALGORITHM", "ALL", "ALTER", "ANALYSE", "ANALYZE", "AS", "ASC",
@@ -117,14 +117,14 @@ var tokenReservedNewLine = []string{
 }
 
 var regBoundariesString string
-var regResrvedToplevelString string
+var regReservedToplevelString string
 var regReservedNewlineString string
 var regReservedString string
 var regFunctionString string
 
 func init() {
 	var regs []string
-	for _, reg := range tokenBoudaries {
+	for _, reg := range tokenBoundaries {
 		regs = append(regs, regexp.QuoteMeta(reg))
 	}
 	regBoundariesString = "(" + strings.Join(regs, "|") + ")"
@@ -133,7 +133,7 @@ func init() {
 	for _, reg := range tokenReservedTopLevel {
 		regs = append(regs, regexp.QuoteMeta(reg))
 	}
-	regResrvedToplevelString = "(" + strings.Join(regs, "|") + ")"
+	regReservedToplevelString = "(" + strings.Join(regs, "|") + ")"
 
 	regs = make([]string, 0)
 	for _, reg := range tokenReservedNewLine {
@@ -300,7 +300,7 @@ var TokenString = map[int]string{
 	sqlparser.BIGINT:                  "bigint",
 	sqlparser.INTNUM:                  "intnum",
 	sqlparser.REAL:                    "real",
-	sqlparser.DOUBLE:                  "bouble",
+	sqlparser.DOUBLE:                  "double",
 	sqlparser.FLOAT_TYPE:              "float_type",
 	sqlparser.DECIMAL:                 "decimal",
 	sqlparser.NUMERIC:                 "numeric",
@@ -662,7 +662,7 @@ func IsMysqlKeyword(name string) bool {
 	return ok
 }
 
-// getNextToken 从buf中获取token
+// getNextToken 从 buf 中获取 token
 func getNextToken(buf string, previous Token) Token {
 	var typ int // TOKEN_TYPE
 
@@ -756,7 +756,7 @@ func getNextToken(buf string, previous Token) Token {
 	// this makes it so in "mytable.from", "from" is not considered a reserved word
 	if previous.Val != "." {
 		// Top Level Reserved Word
-		reservedToplevelReg := regexp.MustCompile(`^(` + regResrvedToplevelString + `)($|\s|` + regBoundariesString + `)`)
+		reservedToplevelReg := regexp.MustCompile(`^(` + regReservedToplevelString + `)($|\s|` + regBoundariesString + `)`)
 		if reservedToplevelReg.MatchString(sqlUpper) {
 			return Token{
 				Type: TokenTypeReservedToplevel,

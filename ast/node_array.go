@@ -28,7 +28,7 @@ import (
 
 // NodeItem 链表节点
 type NodeItem struct {
-	ID    int               // NodeItem在List中的编号，与顺序有关
+	ID    int               // NodeItem 在 List 中的编号，与顺序有关
 	Prev  *NodeItem         // 前一个节点
 	Self  sqlparser.SQLNode // 自身指向的AST Node
 	Next  *NodeItem         // 后一个节点

@@ -76,7 +76,7 @@ func GetMeta(stmt sqlparser.Statement, meta common.Meta) common.Meta {
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch expr := node.(type) {
 		case *sqlparser.DDL:
-			// 如果SQL是一个DDL，则不需要继续遍历语法树了
+			// 如果 SQL 是一个 DDL，则不需要继续遍历语法树了
 			for _, tb := range expr.FromTables {
 				appendTable(tb, "", meta)
 			}
@@ -196,7 +196,7 @@ var inEqOperators = map[string]string{
 	// 比如"not in"，比如"exists"、 "not exists"等
 }
 
-// FindColumn 从传入的node中获取所有可能加索引的的column信息
+// FindColumn 从传入的 node 中获取所有可能加索引的的 column 信息
 func FindColumn(node sqlparser.SQLNode) []*common.Column {
 	common.Log.Debug("Enter:  FindColumn, Caller: %s", common.Caller())
 	var result []*common.Column
@@ -228,7 +228,7 @@ func inEqIndexAble(node sqlparser.SQLNode) bool {
 	switch expr := node.(type) {
 	case *sqlparser.ComparisonExpr:
 		// like前百分号查询无法使用索引
-		// TODO date类型的like属于隐式数据类型转换，会导致无法使用索引
+		// TODO: date 类型的 like 属于隐式数据类型转换，会导致无法使用索引
 		if expr.Operator == "like" || expr.Operator == "not like" {
 			switch right := expr.Right.(type) {
 			case *sqlparser.SQLVal:
@@ -326,7 +326,7 @@ func FindEQColsInWhere(node sqlparser.SQLNode) []*common.Column {
 
 // FindINEQColsInWhere 获取非等值条件中可能需要加索引的列
 // 将所有值得加索引的condition条件信息进行过滤
-// TODO: 将where条件中隐含的join条件合并到join condition中
+// TODO: 将 where 条件中隐含的 join 条件合并到 join condition中
 func FindINEQColsInWhere(node sqlparser.SQLNode) []*common.Column {
 	common.Log.Debug("Enter:  FindINEQColsInWhere(), Caller: %s", common.Caller())
 	var columns []*common.Column
@@ -520,8 +520,8 @@ func findJoinTable(expr sqlparser.TableExpr, meta common.Meta) {
 }
 
 // FindJoinCols 获取 join condition 中使用到的列（必须是 `列 operator 列` 的情况。
-// 如果列对应的值或是function，则应该移到where condition中）
-// 某些where条件隐含在Join条件中（INNER JOIN）
+// 如果列对应的值或是 function，则应该移到where condition中）
+// 某些 where 条件隐含在 join 条件中（INNER JOIN）
 func FindJoinCols(node sqlparser.SQLNode) [][]*common.Column {
 	common.Log.Debug("Enter:  FindJoinCols(), Caller: %s", common.Caller())
 	var columns [][]*common.Column
@@ -658,7 +658,7 @@ func FindSubquery(depth int, node sqlparser.SQLNode, queries ...string) []string
 	return queries
 }
 
-// FindAllCondition 获取AST中所有的condition条件
+// FindAllCondition 获取 AST 中所有的 condition 条件
 func FindAllCondition(node sqlparser.SQLNode) []interface{} {
 	common.Log.Debug("Enter:  FindAllCondition(), Caller: %s", common.Caller())
 	var conditions []interface{}
@@ -673,7 +673,7 @@ func FindAllCondition(node sqlparser.SQLNode) []interface{} {
 	return conditions
 }
 
-// FindAllCols 获取AST中某个节点下所有的columns
+// FindAllCols 获取 AST 中某个节点下所有的 columns
 func FindAllCols(node sqlparser.SQLNode, targets ...string) []*common.Column {
 	var result []*common.Column
 	// 获取节点内所有的列
@@ -744,7 +744,7 @@ func GetSubqueryDepth(node sqlparser.SQLNode) int {
 	return depth
 }
 
-// getColumnName 获取node中Column具体的定义以及名称
+// getColumnName 获取 node 中 column 具体的定义以及名称
 func getColumnName(node sqlparser.SQLNode) (*sqlparser.ColName, string) {
 	var colName *sqlparser.ColName
 	str := ""

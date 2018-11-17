@@ -65,9 +65,9 @@ func TestFindCondition(t *testing.T) {
 		}
 		eq := FindEQColsInWhere(stmt)
 		inEq := FindINEQColsInWhere(stmt)
-		fmt.Println("WherEQ:")
+		fmt.Println("WhereEQ:")
 		pretty.Println(eq)
-		fmt.Println("WherINEQ:")
+		fmt.Println("WhereINEQ:")
 		pretty.Println(inEq)
 		fmt.Println()
 	}
