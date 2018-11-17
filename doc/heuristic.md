@@ -506,7 +506,7 @@ CREATE TABLE tab (a INT(1));
 
 * **Item**:COL.017
 * **Severity**:L2
-* **Content**:varchar 是可变长字符串，不预先分配存储空间，长度不要超过1024，如果存储长度过长MySQL将定义字段类型为text，独立出来一张表，用主键来对应，避免影响其它字段索引效率。
+* **Content**:varchar 是可变长字符串，不预先分配存储空间，长度不要超过1024，如果存储长度过长 MySQL 将定义字段类型为 text，独立出来一张表，用主键来对应，避免影响其它字段索引效率。
 * **Case**:
 
 ```sql
@@ -636,7 +636,7 @@ select tb1.col from (tb1, tb2) join tb2 on tb1.id=tb.id where tb1.id=1
 
 * **Item**:JOI.003
 * **Severity**:L4
-* **Content**:由于 WHERE 条件错误使得 OUTER JOIN 的外部表无数据返回，这会将查询隐式转换为 INNER JOIN 。如：select c from L left join R using(c) where L.a=5 and R.b=10。这种 SQL 逻辑上可能存在错误或程序员对 OUTER JOIN 如何工作存在误解，因为LEFT/RIGHT JOIN是LEFT/RIGHT OUTER JOIN的缩写。
+* **Content**:由于 WHERE 条件错误使得 OUTER JOIN 的外部表无数据返回，这会将查询隐式转换为 INNER JOIN 。如：select c from L left join R using(c) where L.a=5 and R.b=10。这种 SQL 逻辑上可能存在错误或程序员对 OUTER JOIN 如何工作存在误解，因为 LEFT/RIGHT JOIN 是 LEFT/RIGHT OUTER JOIN 的缩写。
 * **Case**:
 
 ```sql
@@ -872,11 +872,11 @@ select c1,c2,c3,c4 from tab1 where col_id REGEXP '[[:<:]]12[[:>:]]'
 ```sql
 USE db
 ```
-## 非确定性的GROUP BY
+## 非确定性的 GROUP BY
 
 * **Item**:RES.001
 * **Severity**:L4
-* **Content**:SQL返回的列既不在聚合函数中也不是GROUP BY表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该SQL返回的结果就是不确定的。
+* **Content**:SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
 * **Case**:
 
 ```sql
@@ -892,31 +892,31 @@ select c1,c2,c3 from t1 where c2='foo' group by c2
 ```sql
 select col1,col2 from tbl where name=xx limit 10
 ```
-## UPDATE/DELETE操作使用了LIMIT条件
+## UPDATE/DELETE 操作使用了 LIMIT 条件
 
 * **Item**:RES.003
 * **Severity**:L4
-* **Content**:UPDATE/DELETE操作使用LIMIT条件和不添加WHERE条件一样危险，它可将会导致主从数据不一致或从库同步中断。
+* **Content**:UPDATE/DELETE 操作使用 LIMIT 条件和不添加 WHERE 条件一样危险，它可将会导致主从数据不一致或从库同步中断。
 * **Case**:
 
 ```sql
 UPDATE film SET length = 120 WHERE title = 'abc' LIMIT 1;
 ```
-## UPDATE/DELETE操作指定了ORDER BY条件
+## UPDATE/DELETE 操作指定了 ORDER BY 条件
 
 * **Item**:RES.004
 * **Severity**:L4
-* **Content**:UPDATE/DELETE操作不要指定ORDER BY条件。
+* **Content**:UPDATE/DELETE 操作不要指定 ORDER BY 条件。
 * **Case**:
 
 ```sql
 UPDATE film SET length = 120 WHERE title = 'abc' ORDER BY title
 ```
-## UPDATE可能存在逻辑错误，导致数据损坏
+## UPDATE 语句可能存在逻辑错误，导致数据损坏
 
 * **Item**:RES.005
 * **Severity**:L4
-* **Content**:在一条UPDATE语句中，如果要更新多个字段，字段间不能使用 AND ，而应该用逗号分隔。
+* **Content**:在一条 UPDATE 语句中，如果要更新多个字段，字段间不能使用 AND ，而应该用逗号分隔。
 * **Case**:
 
 ```sql
@@ -956,7 +956,7 @@ LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;
 
 * **Item**:SEC.001
 * **Severity**:L0
-* **Content**:一般来说想清空一张表最快速的做法就是使用TRUNCATE TABLE tbl\_name;语句。但TRUNCATE操作也并非是毫无代价的，TRUNCATE TABLE无法返回被删除的准确行数，如果需要返回被删除的行数建议使用DELETE语法。TRUNCATE操作还会重置AUTO\_INCREMENT，如果不想重置该值建议使用DELETE FROM tbl\_name WHERE 1;替代。TRUNCATE操作会对数据字典添加源数据锁(MDL)，当一次需要TRUNCATE很多表时会影响整个实例的所有请求，因此如果要TRUNCATE多个表建议用DROP+CREATE的方式以减少锁时长。
+* **Content**:一般来说想清空一张表最快速的做法就是使用TRUNCATE TABLE tbl\_name;语句。但TRUNCATE操作也并非是毫无代价的，TRUNCATE TABLE无法返回被删除的准确行数，如果需要返回被删除的行数建议使用DELETE语法。TRUNCATE 操作还会重置 AUTO\_INCREMENT，如果不想重置该值建议使用 DELETE FROM tbl\_name WHERE 1;替代。TRUNCATE 操作会对数据字典添加源数据锁(MDL)，当一次需要 TRUNCATE 很多表时会影响整个实例的所有请求，因此如果要 TRUNCATE 多个表建议用 DROP+CREATE 的方式以减少锁时长。
 * **Case**:
 
 ```sql
@@ -1022,11 +1022,11 @@ select col from now where type!=0
 ```sql
 CREATE TABLE ` abc` (a int);
 ```
-## MySQL对子查询的优化效果不佳
+## MySQL 对子查询的优化效果不佳
 
 * **Item**:SUB.001
 * **Severity**:L4
-* **Content**:MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为JOIN或LEFT OUTER JOIN。
+* **Content**:MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
 * **Case**:
 
 ```sql
