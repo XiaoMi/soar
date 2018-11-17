@@ -319,24 +319,38 @@ func TestRuleExplicitOrderBy(t *testing.T) {
 // CLA.009
 func TestRuleOrderByExpr(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"SELECT col FROM tbl order by cola - colb;",              // order by 列运算
-		"SELECT cola - colb col FROM tbl order by col;",          // 别名为列运算
-		"SELECT cola FROM tbl order by from_unixtime(col);",      // order by 函数运算
-		"SELECT from_unixtime(col) cola FROM tbl order by cola;", // 别名为函数运算
-
-		// 反面例子
-		// `SELECT tbl.col FROM tbl ORDER BY col`,
-		// "SELECT sum(col) AS col FROM tbl ORDER BY dt",
-		// "SELECT tbl.col FROM tb, tbl WHERE tbl.tag_id = tb.id ORDER BY tbl.col",
-		// "SELECT col FROM tbl order by `timestamp`;", // 列名为关键字
+	sqls := [][]string{
+		{
+			"SELECT col FROM tbl order by cola - colb;",              // order by 列运算
+			"SELECT cola - colb col FROM tbl order by col;",          // 别名为列运算
+			"SELECT cola FROM tbl order by from_unixtime(col);",      // order by 函数运算
+			"SELECT from_unixtime(col) cola FROM tbl order by cola;", // 别名为函数运算
+		},
+		{
+			`SELECT tbl.col FROM tbl ORDER BY col`,
+			"SELECT sum(col) AS col FROM tbl ORDER BY dt",
+			"SELECT tbl.col FROM tb, tbl WHERE tbl.tag_id = tb.id ORDER BY tbl.col",
+			"SELECT col FROM tbl order by `timestamp`;",           // 列名为关键字
+			"select col from tb where cl = 1 order by APPLY_TIME", // issue #104 case sensitive
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleOrderByExpr()
 			if rule.Item != "CLA.009" {
 				t.Error("Rule not match:", rule.Item, "Expect : CLA.009")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleOrderByExpr()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)

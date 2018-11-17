@@ -629,8 +629,8 @@ func (q *Query4Audit) RuleOrderByExpr() Rule {
 	var rule = q.RuleOK()
 	var orderByCols []string
 	var selectCols []string
-	funcExp := regexp.MustCompile(`[a-z0-9]\(`)
-	allowExp := regexp.MustCompile("[a-z0-9_,.` ()]")
+	funcExp := regexp.MustCompile(`(?i)[a-z0-9]\(`)
+	allowExp := regexp.MustCompile("(?i)[a-z0-9_,.` ()]")
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
 		case sqlparser.OrderBy:
