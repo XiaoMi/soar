@@ -141,7 +141,7 @@ func init() {
 
 		// Delayed Join
 		// https://www.percona.com/blog/2007/04/06/using-delayed-join-to-optimize-count-and-limit-queries/
-		`SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by tsdesc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;`,
+		`SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by ts desc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;`,
 
 		// DELETE
 		"DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;",

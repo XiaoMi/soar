@@ -112,7 +112,7 @@ func TestSplitStatement(t *testing.T) {
 	}
 	buf2s := [][]byte{
 		[]byte("select * from test\\Ghello"),
-		[]byte("select 'asd\\Gfas', col from test\\Ghello"),
+		[]byte("select 'hello\\Gworld', col from test\\Ghello"),
 		[]byte("-- select * from test\\Ghello"),
 		[]byte("#select * from test\\Ghello"),
 		[]byte("select * /*comment*/from test\\Ghello"),

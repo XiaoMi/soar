@@ -46,7 +46,7 @@ SELECT country_id, last_update FROM city NATURAL LEFT JOIN country;
 SELECT country_id, last_update FROM city NATURAL RIGHT JOIN country;
 SELECT a.country_id, a.last_update FROM city a STRAIGHT_JOIN country b ON a.country_id=b.country_id;
 SELECT d.deptno,d.dname,d.loc FROM scott.dept d WHERE d.deptno IN  (SELECT e.deptno FROM scott.emp e);
-SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by tsdesc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
+SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by ts desc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
 DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;
 DELETE city FROM city LEFT JOIN country ON city.country_id = country.country_id WHERE country.country IS NULL;
 DELETE a1, a2 FROM city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;

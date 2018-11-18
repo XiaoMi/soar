@@ -36,7 +36,7 @@ type Rule struct {
 	Description string                  `json:"Description"`
 	Original    string                  `json:"Original"` // 错误示范。为空或"暂不支持"不会出现在list-rewrite-rules中
 	Suggest     string                  `json:"Suggest"`  // 正确示范。
-	Func        func(*Rewrite) *Rewrite `json:"-"`        // 如果不定义Func需要多条SQL联动改写
+	Func        func(*Rewrite) *Rewrite `json:"-"`        // 如果不定义 Func 需要多条 SQL 联动改写
 }
 
 // RewriteRules SQL重写规则，注意这个规则是有序的，先后顺序不能乱
@@ -64,50 +64,50 @@ var RewriteRules = []Rule{
 	},
 	{
 		Name:        "having",
-		Description: "将查询的HAVING子句改写为WHERE中的查询条件",
+		Description: "将查询的 HAVING 子句改写为 WHERE 中的查询条件",
 		Original:    "SELECT state, COUNT(*) FROM Drivers GROUP BY state HAVING state IN ('GA', 'TX') ORDER BY state",
 		Suggest:     "select state, COUNT(*) from Drivers where state in ('GA', 'TX') group by state order by state asc",
 		Func:        (*Rewrite).RewriteHaving,
 	},
 	{
 		Name:        "orderbynull",
-		Description: "如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加ORDER BY NULL",
+		Description: "如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 ORDER BY NULL",
 		Original:    "SELECT sum(col1) FROM tbl GROUP BY col",
 		Suggest:     "select sum(col1) from tbl group by col order by null",
 		Func:        (*Rewrite).RewriteAddOrderByNull,
 	},
 	{
 		Name:        "unionall",
-		Description: "可以接受重复的时间，使用UNION ALL替代UNION以提高查询效率",
+		Description: "可以接受重复的时间，使用 UNION ALL 替代 UNION 以提高查询效率",
 		Original:    "select country_id from city union select country_id from country",
 		Suggest:     "select country_id from city union all select country_id from country",
 		Func:        (*Rewrite).RewriteUnionAll,
 	},
 	{
 		Name:        "or2in",
-		Description: "将同一列不同条件的OR查询转写为IN查询",
+		Description: "将同一列不同条件的 OR 查询转写为 IN 查询",
 		Original:    "select country_id from city where col1 = 1 or (col2 = 1 or col2 = 2 ) or col1 = 3;",
 		Suggest:     "select country_id from city where (col2 in (1, 2)) or col1 in (1, 3);",
 		Func:        (*Rewrite).RewriteOr2In,
 	},
 	{
 		Name:        "innull",
-		Description: "如果IN条件中可能有NULL值而又想匹配NULL值时，建议添加OR col IS NULL",
+		Description: "如果 IN 条件中可能有 NULL 值而又想匹配 NULL 值时，建议添加OR col IS NULL",
 		Original:    "暂不支持",
 		Suggest:     "暂不支持",
 		Func:        (*Rewrite).RewriteInNull,
 	},
-	// 把所有跟or相关的重写完之后才进行or转union的重写
+	// 把所有跟 or 相关的重写完之后才进行 or 转 union 的重写
 	{
 		Name:        "or2union",
-		Description: "将不同列的OR查询转为UNION查询，建议结合unionall重写策略一起使用",
+		Description: "将不同列的 OR 查询转为 UNION 查询，建议结合 unionall 重写策略一起使用",
 		Original:    "暂不支持",
 		Suggest:     "暂不支持",
 		Func:        (*Rewrite).RewriteOr2Union,
 	},
 	{
 		Name:        "dmlorderby",
-		Description: "删除DML更新操作中无意义的ORDER BY",
+		Description: "删除 DML 更新操作中无意义的 ORDER BY",
 		Original:    "DELETE FROM tbl WHERE col1=1 ORDER BY col",
 		Suggest:     "delete from tbl where col1 = 1",
 		Func:        (*Rewrite).RewriteRemoveDMLOrderBy,
@@ -171,7 +171,7 @@ var RewriteRules = []Rule{
 	},
 	{
 		Name:        "innodb",
-		Description: "建表时建议使用InnoDB引擎，非InnoDB引擎表自动转InnoDB",
+		Description: "建表时建议使用InnoDB引擎，非 InnoDB 引擎表自动转 InnoDB",
 		Original:    "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT);",
 		Suggest:     "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB;",
 		Func:        (*Rewrite).RewriteInnoDB,
@@ -192,7 +192,7 @@ var RewriteRules = []Rule{
 	},
 	{
 		Name:        "truncate",
-		Description: "不带WHERE条件的DELETE操作建议修改为TRUNCATE",
+		Description: "不带 WHERE 条件的 DELETE 操作建议修改为 TRUNCATE",
 		Original:    "DELETE FROM tbl",
 		Suggest:     "truncate table tbl",
 		Func:        (*Rewrite).RewriteTruncate,
@@ -632,7 +632,7 @@ func (rw *Rewrite) RewriteAutoIncrement() *Rewrite {
 	return rw
 }
 
-// RewriteIntWidth intwidth: int类型转为int(10)，bigint类型转为bigint(20)
+// RewriteIntWidth intwidth: int 类型转为 int(10)，bigint 类型转为 bigint(20)
 func (rw *Rewrite) RewriteIntWidth() *Rewrite {
 	switch create := rw.Stmt.(type) {
 	case *sqlparser.DDL:
@@ -788,17 +788,17 @@ func (rw *Rewrite) RewriteInsertColumns() *Rewrite {
 	return rw
 }
 
-// RewriteHaving having: 对应CLA.013，使用WHERE过滤条件替代HAVING
+// RewriteHaving having: 对应CLA.013，使用 WHERE 过滤条件替代 HAVING
 func (rw *Rewrite) RewriteHaving() *Rewrite {
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
 		case *sqlparser.Select:
 			if n.Having != nil {
 				if n.Where == nil {
-					// WHERE条件为空直接用HAVING替代WHERE即可
+					// WHERE 条件为空直接用 HAVING 替代 WHERE 即可
 					n.Where = n.Having
 				} else {
-					// WHERE条件不为空，需要对已有的条件进行括号保护，然后再AND+HAVING
+					// WHERE 条件不为空，需要对已有的条件进行括号保护，然后再 AND+HAVING
 					n.Where = &sqlparser.Where{
 						Expr: &sqlparser.AndExpr{
 							Left: &sqlparser.ParenExpr{
@@ -808,7 +808,7 @@ func (rw *Rewrite) RewriteHaving() *Rewrite {
 						},
 					}
 				}
-				// 别忘了重置HAVING和Where.Type
+				// 别忘了重置 HAVING 和 Where.Type
 				n.Where.Type = "where"
 				n.Having = nil
 			}
@@ -820,7 +820,7 @@ func (rw *Rewrite) RewriteHaving() *Rewrite {
 	return rw
 }
 
-// RewriteAddOrderByNull orderbynull: 对应CLA.008，GROUP BY无排序要求时添加ORDER BY NULL
+// RewriteAddOrderByNull orderbynull: 对应 CLA.008，GROUP BY 无排序要求时添加 ORDER BY NULL
 func (rw *Rewrite) RewriteAddOrderByNull() *Rewrite {
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
@@ -841,13 +841,13 @@ func (rw *Rewrite) RewriteAddOrderByNull() *Rewrite {
 	return rw
 }
 
-// RewriteOr2Union or2union: 将OR查询转写为UNION ALL TODO: 暂无对应HeuristicRules
+// RewriteOr2Union or2union: 将 OR 查询转写为 UNION ALL TODO: 暂无对应 HeuristicRules
 // https://sqlperformance.com/2014/09/sql-plan/rewriting-queries-improve-performance
 func (rw *Rewrite) RewriteOr2Union() *Rewrite {
 	return rw
 }
 
-// RewriteUnionAll unionall: 不介意重复数据的情况下使用union all替换union
+// RewriteUnionAll unionall: 不介意重复数据的情况下使用 union all 替换 union
 func (rw *Rewrite) RewriteUnionAll() *Rewrite {
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
@@ -861,9 +861,9 @@ func (rw *Rewrite) RewriteUnionAll() *Rewrite {
 	return rw
 }
 
-// RewriteOr2In or2in: 同一列的OR过滤条件使用IN()替代，如果值有相等的会进行合并
+// RewriteOr2In or2in: 同一列的 OR 过滤条件使用 IN() 替代，如果值有相等的会进行合并
 func (rw *Rewrite) RewriteOr2In() *Rewrite {
-	// 通过AST生成node的双向链表，链表顺序为书写顺序
+	// 通过 AST 生成 node 的双向链表，链表顺序为书写顺序
 	nodeList := NewNodeList(rw.Stmt)
 	tNode := nodeList.First()
 
@@ -879,7 +879,7 @@ func (rw *Rewrite) RewriteOr2In() *Rewrite {
 	return rw
 }
 
-// or2in 用于将or转换成in
+// or2in 用于将 or 转换成 in
 func (node *NodeItem) or2in() {
 	if node == nil || node.Self == nil {
 		return
@@ -889,7 +889,7 @@ func (node *NodeItem) or2in() {
 	case *sqlparser.OrExpr:
 		newExpr := mergeExprs(selfNode.Left, selfNode.Right)
 		if newExpr != nil {
-			// or 自身两个节点可以合并的情况下，将父节点中的expr替换成新的
+			// or 自身两个节点可以合并的情况下，将父节点中的 expr 替换成新的
 			switch pre := node.Prev.Self.(type) {
 			case *sqlparser.OrExpr:
 				if pre.Left == node.Self {
@@ -911,25 +911,26 @@ func (node *NodeItem) or2in() {
 				node.Self = newExpr
 				pre.Expr = newExpr
 			case *sqlparser.ParenExpr:
-				// 如果SQL书写中带了括号，暂不会进行跨括号的合并，TODO：无意义括号打平，加个rewrite rule
+				// 如果 SQL 书写中带了括号，暂不会进行跨括号的合并
+				// TODO: 无意义括号打平，加个 rewrite rule
 				node.Self = newExpr
 				pre.Expr = newExpr
 			}
 		} else {
 			// or 自身两个节点如不可以合并，则检测是否可以与父节点合并
 			// 与父节点的合并不能跨越and、括号等，可能会改变语义
-			// 检查自身左右节点是否能与上层节点中合并，or只能与or合并
+			// 检查自身左右节点是否能与上层节点中合并，or 只能与 or 合并
 			switch pre := node.Prev.Self.(type) {
 			case *sqlparser.OrExpr:
-				// AST中如果出现复合条件，则一定在左树，所以只需要判断左边就可以
+				// AST 中如果出现复合条件，则一定在左树，所以只需要判断左边就可以
 				if pre.Left == selfNode {
 					switch n := pre.Right.(type) {
 					case *sqlparser.ComparisonExpr:
 						newLeftExpr := mergeExprs(selfNode.Left, n)
 						newRightExpr := mergeExprs(selfNode.Right, n)
 
-						// newLeftExpr 与 newRightExpr 一定有一个是nil，
-						// 否则说明该orExpr下的两个节点可合并，可以通过最后的向前递归合并pre节点中的expr
+						// newLeftExpr 与 newRightExpr 一定有一个是 nil，
+						// 否则说明该 orExpr 下的两个节点可合并，可以通过最后的向前递归合并 pre 节点中的 expr
 						if newLeftExpr == nil || newRightExpr == nil {
 							if newLeftExpr != nil {
 								pre.Right = newLeftExpr
@@ -951,11 +952,11 @@ func (node *NodeItem) or2in() {
 		}
 	}
 
-	// 逆向合并由更改AST后产生的新的可合并节点
+	// 逆向合并由更改 AST 后产生的新的可合并节点
 	node.Prev.or2in()
 }
 
-// mergeExprs 将两个属于同一个列的ComparisonExpr合并成一个，如果不能合并则返回nil
+// mergeExprs 将两个属于同一个列的 ComparisonExpr 合并成一个，如果不能合并则返回 nil
 func mergeExprs(left, right sqlparser.Expr) *sqlparser.ComparisonExpr {
 	// 用于对比两个列是否相同
 	colInLeft := ""
@@ -963,10 +964,10 @@ func mergeExprs(left, right sqlparser.Expr) *sqlparser.ComparisonExpr {
 	lOperator := ""
 	rOperator := ""
 
-	// 用于存放expr左右子树中的值
+	// 用于存放 expr 左右子树中的值
 	var values []sqlparser.SQLNode
 
-	// SQL中使用到的列
+	// SQL 中使用到的列
 	var colName *sqlparser.ColName
 
 	// 左子树
@@ -981,7 +982,7 @@ func mergeExprs(left, right sqlparser.Expr) *sqlparser.ComparisonExpr {
 				values = append(values, v)
 			}
 		}
-		// 获取operator
+		// 获取 operator
 		lOperator = l.Operator
 	default:
 		return nil
@@ -1002,13 +1003,13 @@ func mergeExprs(left, right sqlparser.Expr) *sqlparser.ComparisonExpr {
 				values = append(values, v)
 			}
 		}
-		// 获取operator
+		// 获取 operator
 		rOperator = r.Operator
 	default:
 		return nil
 	}
 
-	// operator替换，用于在之后判断是否可以合并
+	// operator 替换，用于在之后判断是否可以合并
 	switch lOperator {
 	case "in", "=":
 		lOperator = "="
@@ -1044,14 +1045,14 @@ func mergeExprs(left, right sqlparser.Expr) *sqlparser.ComparisonExpr {
 		}
 	}
 
-	// 去expr中除重复的value,
+	// 去 expr 中除重复的 value,
 	newValTuple = removeDup(newValTuple...)
 	newExpr := &sqlparser.ComparisonExpr{
 		Operator: "in",
 		Left:     colName,
 		Right:    newValTuple,
 	}
-	// 如果只有一个值则是一个等式，没有必要转写成in
+	// 如果只有一个值则是一个等式，没有必要转写成 in
 	if len(newValTuple) == 1 {
 		newExpr = &sqlparser.ComparisonExpr{
 			Operator: lOperator,
@@ -1063,7 +1064,7 @@ func mergeExprs(left, right sqlparser.Expr) *sqlparser.ComparisonExpr {
 	return newExpr
 }
 
-// removeDup 清除sqlparser.ValTuple中重复的值
+// removeDup 清除 sqlparser.ValTuple 中重复的值
 func removeDup(vt ...sqlparser.Expr) sqlparser.ValTuple {
 	uni := make(sqlparser.ValTuple, 0)
 	m := make(map[string]sqlparser.SQLNode)
@@ -1071,7 +1072,7 @@ func removeDup(vt ...sqlparser.Expr) sqlparser.ValTuple {
 	for _, value := range vt {
 		switch v := value.(type) {
 		case *sqlparser.SQLVal:
-			// Type:Val, 冒号用于分隔Type和Val，防止两种不同类型拼接后出现同一个值
+			// Type:Val, 冒号用于分隔 Type 和 Val，防止两种不同类型拼接后出现同一个值
 			if _, ok := m[string(v.Type)+":"+sqlparser.String(v)]; !ok {
 				uni = append(uni, v)
 				m[string(v.Type)+":"+sqlparser.String(v)] = v
@@ -1202,7 +1203,7 @@ func (rw *Rewrite) rmParenthesis() {
 	}
 }
 
-// RewriteRemoveDMLOrderBy dmlorderby: 对应RES.004，删除无LIMIT条件时UPDATE, DELETE中包含的ORDER BY
+// RewriteRemoveDMLOrderBy dmlorderby: 对应 RES.004，删除无 LIMIT 条件时 UPDATE, DELETE 中包含的 ORDER BY
 func (rw *Rewrite) RewriteRemoveDMLOrderBy() *Rewrite {
 	switch st := rw.Stmt.(type) {
 	case *sqlparser.Update:
@@ -1268,10 +1269,10 @@ func (rw *Rewrite) RewriteGroupByConst() *Rewrite {
 	return rw
 }
 
-// RewriteSubQuery2Join 将subquery转写成join
+// RewriteSubQuery2Join 将 subquery 转写成 join
 func (rw *Rewrite) RewriteSubQuery2Join() *Rewrite {
 	var err error
-	// 如果未配置mysql环境或从环境中获取失败
+	// 如果未配置 mysql 环境或从环境中获取失败
 	if common.Config.TestDSN.Disable || len(rw.Columns) == 0 {
 		common.Log.Debug("(rw *Rewrite) RewriteSubQuery2Join(): Rewrite failed. TestDSN.Disable: %v, len(rw.Columns):%d",
 			common.Config.TestDSN.Disable, len(rw.Columns))
@@ -1334,7 +1335,7 @@ func (rw *Rewrite) RewriteSubQuery2Join() *Rewrite {
 	return rw
 }
 
-// sub2Join 将subquery转写成join
+// sub2Join 将 subquery 转写成 join
 func (rw *Rewrite) sub2Join(parent, sub string) (string, error) {
 	// 只处理SelectStatement
 	if sqlparser.Preview(parent) != sqlparser.StmtSelect || sqlparser.Preview(sub) != sqlparser.StmtSelect {
@@ -1457,7 +1458,7 @@ func (rw *Rewrite) sub2Join(parent, sub string) (string, error) {
 							return true, nil
 						}, subWhereExpr)
 						common.LogIfError(err, "")
-						// 如果subquery中存在Where条件，怼在parent的where中后面
+						// 如果 subquery 中存在 Where 条件，怼在 parent 的 where 中后面
 						if subWhereExpr != nil {
 							if stmt.(*sqlparser.Select).Where != nil {
 								stmt.(*sqlparser.Select).Where.Expr = &sqlparser.AndExpr{
@@ -1471,7 +1472,7 @@ func (rw *Rewrite) sub2Join(parent, sub string) (string, error) {
 
 						switch cachingOperator {
 						case "in":
-							// 将表以inner join的形式追加到parent的from中
+							// 将表以 inner join 的形式追加到 parent 的 from 中
 							var newTables []sqlparser.TableExpr
 							for _, subExpr := range subStmt.(*sqlparser.Select).From {
 								has := false
@@ -1486,8 +1487,8 @@ func (rw *Rewrite) sub2Join(parent, sub string) (string, error) {
 							}
 							stmt.(*sqlparser.Select).From = append(stmt.(*sqlparser.Select).From, newTables...)
 						case "not in":
-							// 将表以left join 的形式 追加到parent的from中
-							// TODO
+							// 将表以left join 的形式 追加到 parent 的 from 中
+							// TODO:
 						}
 					}
 
@@ -1561,7 +1562,7 @@ func (rw *Rewrite) RewriteDistinctStar() *Rewrite {
 	return rw
 }
 
-// RewriteTruncate truncate: DELETE全表修改为TRUNCATE TABLE
+// RewriteTruncate truncate: DELETE 全表修改为 TRUNCATE TABLE
 func (rw *Rewrite) RewriteTruncate() *Rewrite {
 	switch n := rw.Stmt.(type) {
 	case *sqlparser.Delete:
@@ -1577,7 +1578,7 @@ func (rw *Rewrite) RewriteTruncate() *Rewrite {
 	return rw
 }
 
-// RewriteDML2Select dml2select: DML转成SELECT，兼容低版本的EXPLAIN
+// RewriteDML2Select dml2select: DML 转成 SELECT，兼容低版本的 EXPLAIN
 func (rw *Rewrite) RewriteDML2Select() *Rewrite {
 	if rw.Stmt == nil {
 		return rw
@@ -1597,7 +1598,7 @@ func (rw *Rewrite) RewriteDML2Select() *Rewrite {
 	return rw
 }
 
-// delete2Select 将Delete语句改写成Select
+// delete2Select 将 Delete 语句改写成 Select
 func delete2Select(stmt *sqlparser.Delete) string {
 	newSQL := &sqlparser.Select{
 		SelectExprs: []sqlparser.SelectExpr{
@@ -1610,7 +1611,7 @@ func delete2Select(stmt *sqlparser.Delete) string {
 	return sqlparser.String(newSQL)
 }
 
-// update2Select 将Update语句改写成Select
+// update2Select 将 Update 语句改写成 Select
 func update2Select(stmt *sqlparser.Update) string {
 	newSQL := &sqlparser.Select{
 		SelectExprs: []sqlparser.SelectExpr{
@@ -1624,7 +1625,7 @@ func update2Select(stmt *sqlparser.Update) string {
 	return sqlparser.String(newSQL)
 }
 
-// insert2Select 将Insert语句改写成Select
+// insert2Select 将 Insert 语句改写成 Select
 func insert2Select(stmt *sqlparser.Insert) string {
 	switch row := stmt.Rows.(type) {
 	// 如果insert包含子查询，只需要explain该子树
@@ -1652,11 +1653,11 @@ func AlterAffectTable(stmt sqlparser.Statement) string {
 	return ""
 }
 
-// MergeAlterTables mergealter: 将同一张表的多条ALTER语句合成一条ALTER语句
+// MergeAlterTables mergealter: 将同一张表的多条 ALTER 语句合成一条 ALTER 语句
 // @input: sql, alter string
-// @output: [[db.]table]sql, 如果找不到DB，key为表名；如果找得到DB，key为db.table
+// @output: [[db.]table]sql, 如果找不到 DB，key 为表名；如果找得到 DB，key 为 db.table
 func MergeAlterTables(sqls ...string) map[string]string {
-	alterStrs := make(map[string][]string)
+	alterSQLs := make(map[string][]string)
 	mergedAlterStr := make(map[string]string)
 
 	// table/column/index name can be quoted in back ticks
@@ -1672,7 +1673,7 @@ func MergeAlterTables(sqls ...string) map[string]string {
 	for _, sql := range sqls {
 		sql = strings.Trim(sql, common.Config.Delimiter)
 		stmt, _ := sqlparser.Parse(sql)
-		alterStr := ""
+		alterSQL := ""
 		dbName := ""
 		tableName := ""
 		switch n := stmt.(type) {
@@ -1684,37 +1685,37 @@ func MergeAlterTables(sqls ...string) map[string]string {
 			case "rename":
 				if alterExp.MatchString(sql) {
 					common.Log.Debug("rename alterExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
-					alterStr = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
+					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
 				} else if renameExp.MatchString(sql) {
 					common.Log.Debug("rename renameExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
-					alterStr = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
+					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
 				} else {
 					common.Log.Warn("rename not match: ALTER %v %v", tableName, sql)
 				}
 			case "alter":
 				if alterExp.MatchString(sql) {
 					common.Log.Debug("rename alterExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
-					alterStr = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
+					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
 				} else if createIndexExp.MatchString(sql) {
 					buf := createIndexExp.ReplaceAllString(sql, "")
 					idxName := strings.TrimSpace(indexNameExp.FindString(buf))
 					buf = indexColsExp.ReplaceAllString(buf, "")
 					common.Log.Debug("alter createIndexExp: ALTER %v ADD INDEX %v %v", tableName, "ADD INDEX", idxName, buf)
-					alterStr = fmt.Sprint("ADD INDEX", " "+idxName+" ", buf)
+					alterSQL = fmt.Sprint("ADD INDEX", " "+idxName+" ", buf)
 				}
 			default:
 
 			}
 		}
-		if alterStr != "" && tableName != "" && tableName != "dual" {
+		if alterSQL != "" && tableName != "" && tableName != "dual" {
 			if dbName == "" {
-				alterStrs["`"+tableName+"`"] = append(alterStrs["`"+tableName+"`"], alterStr)
+				alterSQLs["`"+tableName+"`"] = append(alterSQLs["`"+tableName+"`"], alterSQL)
 			} else {
-				alterStrs["`"+dbName+"`.`"+tableName+"`"] = append(alterStrs["`"+dbName+"`.`"+tableName+"`"], alterStr)
+				alterSQLs["`"+dbName+"`.`"+tableName+"`"] = append(alterSQLs["`"+dbName+"`.`"+tableName+"`"], alterSQL)
 			}
 		}
 	}
-	for k, v := range alterStrs {
+	for k, v := range alterSQLs {
 		mergedAlterStr[k] = fmt.Sprintln("ALTER TABLE", k, strings.Join(v, ", "), common.Config.Delimiter)
 	}
 	return mergedAlterStr

@@ -45,7 +45,7 @@ insert into film values(1,2,3,4,5)
 insert into film(film_id, title, description, release_year, language_id) values (1, 2, 3, 4, 5)
 ```
 ## having
-* **Description**:将查询的HAVING子句改写为WHERE中的查询条件
+* **Description**:将查询的 HAVING 子句改写为 WHERE 中的查询条件
 
 * **Original**:
 
@@ -59,7 +59,7 @@ SELECT state, COUNT(*) FROM Drivers GROUP BY state HAVING state IN ('GA', 'TX') 
 select state, COUNT(*) from Drivers where state in ('GA', 'TX') group by state order by state asc
 ```
 ## orderbynull
-* **Description**:如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加ORDER BY NULL
+* **Description**:如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 ORDER BY NULL
 
 * **Original**:
 
@@ -73,7 +73,7 @@ SELECT sum(col1) FROM tbl GROUP BY col
 select sum(col1) from tbl group by col order by null
 ```
 ## unionall
-* **Description**:可以接受重复的时间，使用UNION ALL替代UNION以提高查询效率
+* **Description**:可以接受重复的时间，使用 UNION ALL 替代 UNION 以提高查询效率
 
 * **Original**:
 
@@ -87,7 +87,7 @@ select country_id from city union select country_id from country
 select country_id from city union all select country_id from country
 ```
 ## or2in
-* **Description**:将同一列不同条件的OR查询转写为IN查询
+* **Description**:将同一列不同条件的 OR 查询转写为 IN 查询
 
 * **Original**:
 
@@ -101,7 +101,7 @@ select country_id from city where col1 = 1 or (col2 = 1 or col2 = 2 ) or col1 = 
 select country_id from city where (col2 in (1, 2)) or col1 in (1, 3);
 ```
 ## dmlorderby
-* **Description**:删除DML更新操作中无意义的ORDER BY
+* **Description**:删除 DML 更新操作中无意义的 ORDER BY
 
 * **Original**:
 
@@ -185,7 +185,7 @@ SELECT count(col) FROM tbl GROUP BY 1;
 SELECT count(*) FROM tbl GROUP BY 1;
 ```
 ## innodb
-* **Description**:建表时建议使用InnoDB引擎，非InnoDB引擎表自动转InnoDB
+* **Description**:建表时建议使用InnoDB引擎，非 InnoDB 引擎表自动转 InnoDB
 
 * **Original**:
 
@@ -229,7 +229,7 @@ create table t1 (id int(20) not null auto_increment) ENGINE=InnoDB;
 create table t1 (id int(10) not null auto_increment) ENGINE=InnoDB;
 ```
 ## truncate
-* **Description**:不带WHERE条件的DELETE操作建议修改为TRUNCATE
+* **Description**:不带 WHERE 条件的 DELETE 操作建议修改为 TRUNCATE
 
 * **Original**:
 

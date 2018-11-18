@@ -183,7 +183,7 @@ type ExplainJSONOrderingOperation struct {
 	Table             ExplainJSONTable             `json:"table"`
 	DuplicatesRemoval ExplainJSONDuplicatesRemoval `json:"duplicates_removal"`
 	GroupingOperation ExplainJSONGroupingOperation `json:"grouping_operation"`
-	OderbySubqueries  []ExplainJSONSubqueries      `json:"order_by_subqueries"`
+	OrderbySubqueries []ExplainJSONSubqueries      `json:"order_by_subqueries"`
 }
 
 // ExplainJSONQueryBlock JSON
@@ -1016,7 +1016,7 @@ func PrintMarkdownExplainTable(exp *ExplainInfo) string {
 	rows := exp.ExplainRows
 	// JSON 转换为 TRADITIONAL 格式
 	if exp.ExplainFormat == JSONFormatExplain {
-		buf = append(buf, fmt.Sprint("以下为JSON格式转为传统格式EXPLAIN表格", "\n\n"))
+		buf = append(buf, fmt.Sprint("以下为 JSON 格式转为传统格式 EXPLAIN 表格", "\n\n"))
 		rows = ConvertExplainJSON2Row(exp.ExplainJSON)
 	}
 

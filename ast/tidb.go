@@ -41,19 +41,19 @@ func PrintPrettyStmtNode(sql, charset, collation string) {
 	}
 }
 
-// TiVisitor TODO
+// TiVisitor TODO:
 type TiVisitor struct {
 	EnterFunc func(node ast.Node) bool
 	LeaveFunc func(node ast.Node) bool
 }
 
-// Enter TODO
+// Enter TODO:
 func (visitor *TiVisitor) Enter(n ast.Node) (node ast.Node, skip bool) {
 	skip = visitor.EnterFunc(n)
 	return
 }
 
-// Leave TODO
+// Leave TODO:
 func (visitor *TiVisitor) Leave(n ast.Node) (node ast.Node, ok bool) {
 	ok = visitor.LeaveFunc(n)
 	return

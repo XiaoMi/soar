@@ -456,7 +456,7 @@ SELECT
   e. deptno  
 FROM  
   scott. emp  e);
-SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by tsdesc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
+SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by ts desc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
 
 SELECT  
   visitor_id, url  
@@ -469,7 +469,7 @@ FROM
 WHERE  
   ip= "123.45.67.89" 
 ORDER BY  
-  tsdesc  
+  ts  desc  
 LIMIT  
   50, 10) I  
   JOIN  LOG  ON  (I. id= LOG. id) 
