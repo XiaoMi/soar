@@ -9,6 +9,9 @@ GOPATH ?= $(shell go env GOPATH)
 ifeq "$(GOPATH)" ""
   $(error Please set the environment variable GOPATH before running `make`)
 endif
+GCFLAGS=-gcflags "all=-trimpath=${GOPATH}"
+LDFLAGS=-ldflags="-s -w"
+
 PATH := ${GOPATH}/bin:$(PATH)
 
 # These are the values we want to pass for VERSION  and BUILD
@@ -74,7 +77,7 @@ build: fmt tidb-parser
 	@bash ./genver.sh $(GO_VERSION_MIN)
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
-		go build -o bin/$${b} $$d || ret=$$? ; \
+		go build ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
 	done ; exit $$ret
 	@echo "build Success!"
 
@@ -84,7 +87,7 @@ fast: fmt
 	@bash ./genver.sh $(GO_VERSION_MIN)
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
-		go build -o bin/$${b} $$d || ret=$$? ; \
+		go build ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
 	done ; exit $$ret
 	@echo "build Success!"
 
@@ -156,7 +159,7 @@ release: deps build
 			for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 				b=$$(basename $${d}) ; \
 				echo "Building $${b}.$${GOOS}-$${GOARCH} ..."; \
-				GOOS=$${GOOS} GOARCH=$${GOARCH} go build -ldflags="-s -w" -v -o release/$${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
+				GOOS=$${GOOS} GOARCH=$${GOARCH} go build ${GCFLAGS} ${LDFLAGS} -v -o release/$${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
 			done ; \
 		done ;\
 	done
