@@ -700,6 +700,7 @@ func ParseConfig(configFile string) error {
 			if err != nil {
 				Log.Error("ParseConfig Config.readConfigFile Error: %v", err)
 			}
+			Log.Debug("ParseConfig use config file: %s", config)
 			break
 		}
 	}
