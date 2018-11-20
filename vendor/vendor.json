@@ -418,12 +418,6 @@
 			"revisionTime": "2018-08-20T15:09:00Z"
 		},
 		{
-			"checksumSHA1": "11D2ZLtDH4gRO/S6BhYcDgsTiCs=",
-			"path": "github.com/pingcap/tidb/util/charset",
-			"revision": "6d0bcf50ac9eb25d2e6f8fbd686d488a701eba55",
-			"revisionTime": "2018-08-20T15:09:00Z"
-		},
-		{
 			"checksumSHA1": "5yYzS0BTxlmELR9P/OB4RV/yw0o=",
 			"path": "github.com/pingcap/tidb/util/chunk",
 			"revision": "6d0bcf50ac9eb25d2e6f8fbd686d488a701eba55",
@@ -545,6 +539,12 @@
 			"path": "github.com/russross/blackfriday",
 			"revision": "11635eb403ff09dbc3a6b5a007ab5ab09151c229",
 			"revisionTime": "2018-04-28T10:25:19Z"
+		},
+		{
+			"checksumSHA1": "EEXppdradk5G/UaQUQ95BQ9n7uw=",
+			"path": "github.com/saintfish/chardet",
+			"revision": "3af4cd4741ca4f3eb0c407c034571a6fb0ea529c",
+			"revisionTime": "2012-08-16T06:12:21Z"
 		},
 		{
 			"checksumSHA1": "p7FQsKPOhh5D4XkBZ7VKDU/rkLI=",

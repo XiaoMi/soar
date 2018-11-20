@@ -828,6 +828,11 @@ from
 		Description: "去除SQL语句中的注释，支持单行多行注释的去除",
 		Example:     `echo "select/*comment*/ * from film" | soar -report-type remove-comment`,
 	},
+	{
+		Name:        "chardet",
+		Description: "猜测输入的 SQL 使用的字符集",
+		Example:     "echo '中文' | soar -report-type chardet",
+	},
 }
 
 // ListReportTypes 查看所有支持的report-type

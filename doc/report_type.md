@@ -131,3 +131,11 @@ echo "select * from film" | soar -report-type pretty
 ```bash
 echo "select/*comment*/ * from film" | soar -report-type remove-comment
 ```
+## chardet
+* **Description**:猜测输入的 SQL 使用的字符集
+
+* **Example**:
+
+```bash
+echo '中文' | soar -report-type chardet
+```

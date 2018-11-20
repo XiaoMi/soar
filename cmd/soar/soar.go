@@ -133,6 +133,10 @@ func main() {
 		// 注意： 这里只能处理一条 SQL 的 EXPLAIN 信息，用户一次反馈多条 SQL 的 EXPLAIN 信息无法处理
 		advisor.DigestExplainText(sql)
 		return
+	case "chardet":
+		// Get charset of input
+		fmt.Println(common.Chardet([]byte(sql)))
+		return
 	case "remove-comment":
 		fmt.Println(string(database.RemoveSQLComments([]byte(sql))))
 		return
