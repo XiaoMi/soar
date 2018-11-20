@@ -700,7 +700,8 @@ func ParseConfig(configFile string) error {
 			if err != nil {
 				Log.Error("ParseConfig Config.readConfigFile Error: %v", err)
 			}
-			Log.Debug("ParseConfig use config file: %s", config)
+			// LogOutput now is "console", if add Log.Debug here will print into stdout anyway.
+			// Log.Debug("ParseConfig use config file: %s", config)
 			break
 		}
 	}
