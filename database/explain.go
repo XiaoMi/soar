@@ -532,7 +532,7 @@ func (db *Connector) explainAbleSQL(sql string) (string, error) {
 // 执行explain请求，返回mysql.Result执行结果
 func (db *Connector) executeExplain(sql string, explainType int, formatType int) (*QueryResult, error) {
 	var err error
-	sql, _ = db.explainAbleSQL(sql)
+	sql, err = db.explainAbleSQL(sql)
 	if sql == "" {
 		return nil, err
 	}

@@ -17,6 +17,7 @@
 package common
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -36,5 +37,28 @@ func TestChardet(t *testing.T) {
 		if name != c {
 			t.Errorf("file: %s, Want: %s, Get: %s", fileName, c, name)
 		}
+	}
+}
+
+func TestRemoveBOM(t *testing.T) {
+	fileName := DevPath + "/common/testdata/UTF-8.bom.sql"
+	buf, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		t.Errorf("ioutil.ReadFile %s, Error: %s", fileName, err.Error())
+	}
+	GoldenDiff(func() {
+		fmt.Println(RemoveBOM(buf))
+	}, t.Name(), update)
+}
+
+func TestCheckCharsetByBOM(t *testing.T) {
+	fileName := DevPath + "/common/testdata/UTF-8.bom.sql"
+	buf, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		t.Errorf("ioutil.ReadFile %s, Error: %s", fileName, err.Error())
+	}
+
+	if CheckCharsetByBOM(buf) != "UTF-8" {
+		t.Errorf("checkCharsetByBOM Want: UTF-8, Get: %s", CheckCharsetByBOM(buf))
 	}
 }
