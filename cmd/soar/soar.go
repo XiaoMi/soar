@@ -19,7 +19,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -41,7 +40,7 @@ func main() {
 	var sql string                                            // 单条评审指定的 sql 或 explain
 	sqlCounter := 1                                           // SQL 计数器
 	lineCounter := 1                                          // 行计数器
-	var alterSqls []string                                    // 待评审的 SQL 中所有 ALTER 请求
+	var alterSQLs []string                                    // 待评审的 SQL 中所有 ALTER 请求
 	alterTableTimes := make(map[string]int)                   // 待评审的 SQL 中同一经表 ALTER 请求计数器
 	suggestMerged := make(map[string]map[string]advisor.Rule) // 优化建议去重, key 为 sql 的 fingerprint.ID
 
@@ -49,7 +48,9 @@ func main() {
 	initConfig()
 
 	// 命令行帮助工具，如 -list-report-types, -check-config等。
-	helpTools()
+	if isContinue, exitCode := helpTools(); !isContinue {
+		os.Exit(exitCode)
+	}
 
 	// 环境初始化，连接检查线上环境+构建测试环境
 	vEnv, rEnv := env.BuildEnv()
@@ -83,76 +84,19 @@ func main() {
 	}
 
 	// 读入待优化 SQL ，当配置文件或命令行参数未指定 SQL 时从管道读取
-	if common.Config.Query == "" {
-		// check stdin is pipe or terminal
-		// https://stackoverflow.com/questions/22744443/check-if-there-is-something-to-read-on-stdin-in-golang
-		stat, err := os.Stdin.Stat()
-		if stat == nil {
-			common.Log.Critical("os.Stdin.Stat Error: %v", err)
-			os.Exit(1)
-		}
-		if (stat.Mode() & os.ModeCharDevice) != 0 {
-			// stdin is from a terminal
-			fmt.Println("Args format error, use --help see how to use it!")
-			os.Exit(1)
-		}
-		// read from pipe
-		var data []byte
-		data, err = ioutil.ReadAll(os.Stdin)
-		if err != nil {
-			common.Log.Critical("ioutil.ReadAll Error: %v", err)
-		}
-		lineCounter += ast.LeftNewLines(data)
-		sql = strings.TrimSpace(string(data))
-	} else {
-		if _, err = os.Stat(common.Config.Query); err == nil {
-			var data []byte
-			data, err = ioutil.ReadFile(common.Config.Query)
-			if err != nil {
-				common.Log.Critical("ioutil.ReadFile Error: %v", err)
-			}
-			lineCounter += ast.LeftNewLines(data)
-			sql = strings.TrimSpace(string(data))
-		} else {
-			lineCounter += ast.LeftNewLines([]byte(common.Config.Query))
-			sql = strings.TrimSpace(common.Config.Query)
-		}
-	}
+	buf := initQuery(common.Config.Query)
+	lineCounter += ast.LeftNewLines([]byte(buf))
+	buf = strings.TrimSpace(buf)
 
 	// remove bom from file header
 	var bom []byte
-	sql, bom = common.RemoveBOM([]byte(sql))
+	buf, bom = common.RemoveBOM([]byte(buf))
 
-	switch common.Config.ReportType {
-	case "html":
-		// HTML 格式输入 CSS 加载
-		fmt.Println(common.MarkdownHTMLHeader())
-	case "md2html":
-		// markdown2html 转换小工具
-		fmt.Println(common.MarkdownHTMLHeader())
-		fmt.Println(common.Markdown2HTML(sql))
-		return
-	case "explain-digest":
-		// 当用户输入为 EXPLAIN 信息，只对 Explain 信息进行分析
-		// 注意： 这里只能处理一条 SQL 的 EXPLAIN 信息，用户一次反馈多条 SQL 的 EXPLAIN 信息无法处理
-		advisor.DigestExplainText(sql)
-		return
-	case "chardet":
-		// Get charset of input
-		charset := common.CheckCharsetByBOM(bom)
-		if charset == "" {
-			charset = common.Chardet([]byte(sql))
-		}
-		fmt.Println(charset)
-		return
-	case "remove-comment":
-		fmt.Println(string(database.RemoveSQLComments([]byte(sql))))
-		return
+	if isContinue, exitCode := reportTool(buf, bom); !isContinue {
+		os.Exit(exitCode)
 	}
 
 	// 逐条SQL给出优化建议
-	lineCounter += ast.LeftNewLines([]byte(sql))
-	buf := strings.TrimSpace(sql)
 	for ; ; sqlCounter++ {
 		var id string                                     // fingerprint.ID
 		heuristicSuggest := make(map[string]advisor.Rule) // 启发式建议
@@ -411,7 +355,7 @@ func main() {
 				// 依赖上下文件的 SQL 重写，如：多条 ALTER SQL 合并
 				// vitess 对 DDL 语法的支持不好，大部分 DDL 会语法解析出错，但即使出错了还是会生成一个 stmt 而且里面的 db.table 还是准确的。
 
-				alterSqls = append(alterSqls, sql)
+				alterSQLs = append(alterSQLs, sql)
 				alterTbl := ast.AlterAffectTable(stmt)
 				if alterTbl != "" && alterTbl != "dual" {
 					if _, ok := alterTableTimes[alterTbl]; ok {
@@ -477,7 +421,7 @@ func main() {
 
 	// 同一张表的多条 ALTER 语句合并为一条
 	if ast.RewriteRuleMatch("mergealter") {
-		for _, v := range ast.MergeAlterTables(alterSqls...) {
+		for _, v := range ast.MergeAlterTables(alterSQLs...) {
 			fmt.Println(strings.TrimSpace(v))
 		}
 		return

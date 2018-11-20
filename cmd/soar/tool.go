@@ -18,6 +18,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -109,41 +110,113 @@ func checkConfig() int {
 }
 
 // helpTools help tools in cmd flags
-func helpTools() {
+func helpTools() (isContinue bool, exitCode int) {
 	// environment error check, eg. MySQL password error
 	if common.CheckConfig {
-		os.Exit(checkConfig())
+		return false, checkConfig()
 	}
 	// 打印 SOAR 版本信息
 	if common.PrintVersion {
 		common.SoarVersion()
-		os.Exit(0)
+		return false, 0
 	}
 	// 打印已加载配置的各配置项，检查配置是否生效
 	if common.PrintConfig {
 		common.PrintConfiguration()
-		os.Exit(0)
+		return false, 0
 	}
 	// 打印支持启发式建议
 	if common.Config.ListHeuristicRules {
 		advisor.ListHeuristicRules(advisor.HeuristicRules)
-		os.Exit(0)
+		return false, 0
 	}
 	// 打印支持的 SQL 重写规则
 	if common.Config.ListRewriteRules {
 		ast.ListRewriteRules(ast.RewriteRules)
-		os.Exit(0)
+		return false, 0
 	}
 	// 打印所有的测试 SQL
 	if common.Config.ListTestSqls {
 		advisor.ListTestSQLs()
-		os.Exit(0)
+		return false, 0
 	}
 	// 打印支持的 report-type
 	if common.Config.ListReportTypes {
 		common.ListReportTypes()
-		os.Exit(0)
+		return false, 0
 	}
+
+	return true, 0
+}
+
+// reportTool tools in report type
+func reportTool(sql string, bom []byte) (isContinue bool, exitCode int) {
+	switch common.Config.ReportType {
+	case "html":
+		// HTML 格式输入 CSS 加载
+		fmt.Println(common.MarkdownHTMLHeader())
+		return true, 0
+	case "md2html":
+		// markdown2html 转换小工具
+		fmt.Println(common.MarkdownHTMLHeader())
+		fmt.Println(common.Markdown2HTML(sql))
+		return false, 0
+	case "explain-digest":
+		// 当用户输入为 EXPLAIN 信息，只对 Explain 信息进行分析
+		// 注意： 这里只能处理一条 SQL 的 EXPLAIN 信息，用户一次反馈多条 SQL 的 EXPLAIN 信息无法处理
+		advisor.DigestExplainText(sql)
+		return false, 0
+	case "chardet":
+		// Get charset of input
+		charset := common.CheckCharsetByBOM(bom)
+		if charset == "" {
+			charset = common.Chardet([]byte(sql))
+		}
+		fmt.Println(charset)
+		return false, 0
+	case "remove-comment":
+		fmt.Println(string(database.RemoveSQLComments([]byte(sql))))
+		return false, 0
+	default:
+		return true, 0
+	}
+}
+
+// initQuery
+func initQuery(query string) string {
+	// 读入待优化 SQL ，当配置文件或命令行参数未指定 SQL 时从管道读取
+	if query == "" {
+		// check stdin is pipe or terminal
+		// https://stackoverflow.com/questions/22744443/check-if-there-is-something-to-read-on-stdin-in-golang
+		stat, err := os.Stdin.Stat()
+		if stat == nil {
+			common.Log.Critical("os.Stdin.Stat Error: %v", err)
+			os.Exit(1)
+		}
+		if (stat.Mode() & os.ModeCharDevice) != 0 {
+			// stdin is from a terminal
+			fmt.Println("Args format error, use --help see how to use it!")
+			os.Exit(1)
+		}
+		// read from pipe
+		var data []byte
+		data, err = ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			common.Log.Critical("ioutil.ReadAll Error: %v", err)
+		}
+		return string(data)
+	}
+
+	if _, err := os.Stat(query); err == nil {
+		var data []byte
+		data, err = ioutil.ReadFile(query)
+		if err != nil {
+			common.Log.Critical("ioutil.ReadFile Error: %v", err)
+		}
+		return string(data)
+	}
+
+	return query
 }
 
 func shutdown(vEnv *env.VirtualEnv) {
