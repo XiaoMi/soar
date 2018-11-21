@@ -42,7 +42,7 @@ func Chardet(buf []byte) string {
 
 	// SOAR's main user speak Chinese, GB-18030, UTF-8 are higher suggested
 	for _, r := range result {
-		if confidence >= r.Confidence && r.Confidence != 0 {
+		if confidence > r.Confidence && r.Confidence != 0 {
 			return charset
 		}
 		confidence = r.Confidence
