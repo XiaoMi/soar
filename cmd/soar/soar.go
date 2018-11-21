@@ -202,7 +202,7 @@ func main() {
 			if !common.Config.DryRun {
 				os.Exit(1)
 			}
-			// vitess 语法检查给出的建议 ERR.000
+			// tidb parser 语法检查给出的建议 ERR.000
 			if common.Config.TestDSN.Disable {
 				mysqlSuggest["ERR.000"] = advisor.RuleMySQLError("ERR.000", syntaxErr)
 			}
