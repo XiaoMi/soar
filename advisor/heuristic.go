@@ -2185,8 +2185,8 @@ func (q *Query4Audit) RuleCompareWithFunction() Rule {
 				}
 			*/
 
-		// func(a) between func(c) and func(d)
 		case *sqlparser.RangeCond:
+			// func(a) between func(c) and func(d)
 			switch n.Left.(type) {
 			case *sqlparser.SQLVal, *sqlparser.ColName:
 			default:
@@ -3231,12 +3231,12 @@ func RuleMySQLError(item string, err error) Rule {
 		ErrString string
 	}
 
-	// vitess 语法检查出错返回的是ERR.000
+	// tidb parser 语法检查出错返回的是ERR.000
 	switch item {
 	case "ERR.000":
 		return Rule{
 			Item:     item,
-			Summary:  "MySQL执行出错 " + err.Error(),
+			Summary:  "No available MySQL environment, build-in sql parse failed: " + err.Error(),
 			Severity: "L8",
 			Content:  err.Error(),
 		}
@@ -3270,14 +3270,14 @@ func RuleMySQLError(item string, err error) Rule {
 	case "", "1146":
 		return Rule{
 			Item:     item,
-			Summary:  "MySQL执行出错",
+			Summary:  "MySQL execute failed: ",
 			Severity: "L0",
 			Content:  "",
 		}
 	default:
 		return Rule{
 			Item:     item,
-			Summary:  "MySQL执行出错 " + mysqlError.ErrString,
+			Summary:  "MySQL execute failed: " + mysqlError.ErrString,
 			Severity: "L8",
 			Content:  mysqlError.ErrString,
 		}

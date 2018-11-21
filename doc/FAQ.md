@@ -9,6 +9,12 @@
 * [mysql](https://www.mysql.com/) 测试时用来连接测试环境
 * [retool](https://github.com/twitchtv/retool): 管理测试开发工具,首次安装耗时会比较长,如: `gometalinter.v2`, `revive`, `golangci-lint`
 
+## Web 界面支持
+
+官方不会提供 Web 界面支持，但社区已经有相当多的同学基于 SOAR 开发了衍生的 Web 平台。可以参考如下 ISSUE 的讨论。
+
+> https://github.com/XiaoMi/soar/issues/51
+
 ## 命令行参数 `test-dsn`, `online-dsn` 中包含特殊字符怎么办？
 
 如果 `test-dsn` 或 `online-dsn` 中包含':', '@', '/', '!'等特殊字符建议在配置文件中配置相关信息，配置文件为YAML格式，需要遵守YAML格式的要求规范。

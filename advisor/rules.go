@@ -42,7 +42,7 @@ type Query4Audit struct {
 
 // NewQuery4Audit return a struct for Query4Audit
 func NewQuery4Audit(sql string, options ...string) (*Query4Audit, error) {
-	var err, tiErr error
+	var err, vErr error
 	var charset string
 	var collation string
 
@@ -55,15 +55,15 @@ func NewQuery4Audit(sql string, options ...string) (*Query4Audit, error) {
 	}
 
 	q := &Query4Audit{Query: sql}
-	// vitess语法解析
-	q.Stmt, err = sqlparser.Parse(sql)
-
-	// TiDB 语法解析仅作为补充，不检查语法错误
-	// TODO: charset, collation
-	q.TiStmt, tiErr = ast.TiParse(sql, charset, collation)
-	if tiErr != nil {
-		common.Log.Warn("NewQuery4Audit ast.Tiparse Error: %s", tiErr.Error())
+	// vitess 语法解析不上报，以 tidb parser 为主
+	q.Stmt, vErr = sqlparser.Parse(sql)
+	if vErr != nil {
+		common.Log.Warn("NewQuery4Audit vitess parse Error: %s", vErr.Error())
 	}
+
+	// TODO: charset, collation
+	// tdib parser 语法解析
+	q.TiStmt, err = ast.TiParse(sql, charset, collation)
 	return q, err
 }
 
@@ -1205,7 +1205,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 		sort.Strings(sortedMySQLSuggest)
 		if len(sortedMySQLSuggest) > 0 {
-			buf = append(buf, "## MySQL执行出错\n")
+			buf = append(buf, "## MySQL execute failed\n")
 		}
 		for _, item := range sortedMySQLSuggest {
 			buf = append(buf, fmt.Sprintln(suggest[item].Content))
