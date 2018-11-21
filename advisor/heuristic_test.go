@@ -1164,7 +1164,7 @@ func TestRuleRecursiveDependency(t *testing.T) {
 			`ALTER TABLE tbl2 add FOREIGN KEY (p_id) REFERENCES tab1(p_id);`,
 		},
 		{
-			`ALTER TABLE tbl2 ADD KEY (p_id) p_id;`,
+			`ALTER TABLE tbl2 ADD KEY p_id (p_id);`,
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -2128,7 +2128,7 @@ func TestRuleVarcharVSChar(t *testing.T) {
 func TestRuleCreateDualTable(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`create table dual(id int, primary key (id));`,
+		"create table `dual`(id int, primary key (id));",
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)

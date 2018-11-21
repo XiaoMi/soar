@@ -2185,7 +2185,7 @@ func (q *Query4Audit) RuleCompareWithFunction() Rule {
 				}
 			*/
 
-		// func(a) between func(c) and func(d)
+			// func(a) between func(c) and func(d)
 		case *sqlparser.RangeCond:
 			switch n.Left.(type) {
 			case *sqlparser.SQLVal, *sqlparser.ColName:
@@ -3236,7 +3236,7 @@ func RuleMySQLError(item string, err error) Rule {
 	case "ERR.000":
 		return Rule{
 			Item:     item,
-			Summary:  "MySQL执行出错 " + err.Error(),
+			Summary:  "no available MySQL environment, sql parse failed: " + err.Error(),
 			Severity: "L8",
 			Content:  err.Error(),
 		}
