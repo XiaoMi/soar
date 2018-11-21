@@ -9,15 +9,13 @@ GOPATH ?= $(shell go env GOPATH)
 ifeq "$(GOPATH)" ""
   $(error Please set the environment variable GOPATH before running `make`)
 endif
+PATH := ${GOPATH}/bin:$(PATH)
 GCFLAGS=-gcflags "all=-trimpath=${GOPATH}"
 LDFLAGS=-ldflags="-s -w"
-
-PATH := ${GOPATH}/bin:$(PATH)
 
 # These are the values we want to pass for VERSION  and BUILD
 BUILD_TIME=`date +%Y%m%d%H%M`
 COMMIT_VERSION=`git rev-parse HEAD`
-GO_VERSION_MIN=1.10
 
 # Add mysql version for testing `MYSQL_RELEASE=percona MYSQL_VERSION=5.7 make docker`
 # MYSQL_RELEASE: mysql, percona, mariadb ...
@@ -28,6 +26,18 @@ MYSQL_VERSION := $(or ${MYSQL_VERSION}, ${MYSQL_VERSION}, latest)
 
 .PHONY: all
 all: | fmt build
+
+.PHONY: go_version_check
+GO_VERSION_MIN=1.10
+# Parse out the x.y or x.y.z version and output a single value x*10000+y*100+z (e.g., 1.9 is 10900)
+# that allows the three components to be checked in a single comparison.
+VER_TO_INT:=awk '{split(substr($$0, match ($$0, /[0-9\.]+/)), a, "."); print a[1]*10000+a[2]*100+a[3]}'
+go_version_check:
+	@echo "\033[92mGo version check\033[0m"
+	@if test $(shell go version | $(VER_TO_INT) ) -lt \
+  	$(shell echo "$(GO_VERSION_MIN)" | $(VER_TO_INT)); \
+  	then printf "go version $(GO_VERSION_MIN)+ required, found: "; go version; exit 1; \
+		else echo "go version check pass";	fi
 
 # Dependency check
 .PHONY: deps
@@ -40,7 +50,7 @@ deps:
 
 # Code format
 .PHONY: fmt
-fmt:
+fmt: go_version_check
 	@echo "\033[92mRun gofmt on all source files ...\033[0m"
 	@echo "gofmt -l -s -w ..."
 	@ret=0 && for d in $$(go list -f '{{.Dir}}' ./... | grep -v /vendor/); do \
@@ -74,7 +84,7 @@ cover: test
 build: fmt tidb-parser
 	@echo "\033[92mBuilding ...\033[0m"
 	@mkdir -p bin
-	@bash ./genver.sh $(GO_VERSION_MIN)
+	@bash ./genver.sh
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
 		go build ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
@@ -84,7 +94,7 @@ build: fmt tidb-parser
 .PHONY: fast
 fast: fmt
 	@echo "\033[92mBuilding ...\033[0m"
-	@bash ./genver.sh $(GO_VERSION_MIN)
+	@bash ./genver.sh
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
 		go build ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \

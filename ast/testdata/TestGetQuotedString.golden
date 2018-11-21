@@ -1,0 +1,24 @@
+orignal: "hello world"
+quoted: "hello world"
+orignal: `hello world`
+quoted: `hello world`
+orignal: 'hello world'
+quoted: 'hello world'
+orignal: hello world
+quoted: 
+orignal: 'hello \'world'
+quoted: 'hello \'world'
+orignal: "hello \"wor\"ld"
+quoted: "hello \"wor\"ld"
+orignal: "hello \"world"
+quoted: "hello \"world"
+orignal: ""
+quoted: ""
+orignal: ''
+quoted: ''
+orignal: ``
+quoted: ``
+orignal: 'hello 'world'
+quoted: 'hello '
+orignal: "hello "world"
+quoted: "hello "

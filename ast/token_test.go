@@ -25,7 +25,19 @@ import (
 	"github.com/kr/pretty"
 )
 
-func TestTokenizer(_ *testing.T) {
+func TestTokenize(t *testing.T) {
+	err := common.GoldenDiff(func() {
+		for _, sql := range common.TestSQLs {
+			fmt.Println(sql)
+			fmt.Println(Tokenize(sql))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestTokenizer(t *testing.T) {
 	sqls := []string{
 		"select c1,c2,c3 from t1,t2 join t3 on t1.c1=t2.c1 and t1.c3=t3.c1 where id>1000",
 		"select sourcetable, if(f.lastcontent = ?, f.lastupdate, f.lastcontent) as lastactivity, f.totalcount as activity, type.class as type, (f.nodeoptions & ?) as nounsubscribe from node as f inner join contenttype as type on type.contenttypeid = f.contenttypeid inner join subscribed as sd on sd.did = f.nodeid and sd.userid = ? union all select f.name as title, f.userid as keyval, ? as sourcetable, ifnull(f.lastpost, f.joindate) as lastactivity, f.posts as activity, ? as type, ? as nounsubscribe from user as f inner join userlist as ul on ul.relationid = f.userid and ul.userid = ? where ul.type = ? and ul.aq = ? order by title limit ?",
@@ -37,8 +49,13 @@ func TestTokenizer(_ *testing.T) {
 		"SELECT * FROM tb WHERE id between 1 and 3;",
 		"alter table inventory add index idx_store_film` (`store_id`,`film_id`);",
 	}
-	for _, sql := range sqls {
-		pretty.Println(Tokenizer(sql))
+	err := common.GoldenDiff(func() {
+		for _, sql := range sqls {
+			pretty.Println(Tokenizer(sql))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }
 
@@ -57,23 +74,27 @@ func TestGetQuotedString(t *testing.T) {
 		`'hello 'world'`,
 		`"hello "world"`,
 	}
-	for _, s := range str {
-		fmt.Printf("orignal: %s\nquoted: %s\n", s, getQuotedString(s))
-	}
-}
-
-func TestTokenizer2(t *testing.T) {
-	for _, sql := range common.TestSQLs {
-		fmt.Println(sql)
-		fmt.Println(Tokenize(sql))
+	err := common.GoldenDiff(func() {
+		for _, s := range str {
+			fmt.Printf("orignal: %s\nquoted: %s\n", s, getQuotedString(s))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }
 
 func TestCompress(t *testing.T) {
-	for _, sql := range common.TestSQLs {
-		fmt.Println(sql)
-		fmt.Println(Compress(sql))
+	err := common.GoldenDiff(func() {
+		for _, sql := range common.TestSQLs {
+			fmt.Println(sql)
+			fmt.Println(Compress(sql))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
+
 }
 
 func TestFormat(t *testing.T) {
@@ -97,8 +118,8 @@ func TestSplitStatement(t *testing.T) {
 		[]byte("select * /*comment*/from test;hello"),
 		[]byte("select * /*comment;*/from test;hello"),
 		[]byte(`select * /*comment
-        ;*/
-        from test;hello`),
+		;*/
+		from test;hello`),
 		[]byte(`select * from test`),
 		// https://github.com/XiaoMi/soar/issues/66
 		[]byte(`/*comment*/`),
@@ -106,9 +127,11 @@ func TestSplitStatement(t *testing.T) {
 		[]byte(`--`),
 		[]byte(`-- comment`),
 		[]byte(`# comment`),
-	}
-	for _, buf := range bufs {
-		fmt.Println(SplitStatement(buf, []byte(common.Config.Delimiter)))
+		[]byte(`select
+*
+-- comment
+from tb
+where col = 1`),
 	}
 	buf2s := [][]byte{
 		[]byte("select * from test\\Ghello"),
@@ -121,8 +144,18 @@ func TestSplitStatement(t *testing.T) {
         \\G*/
         from test\\Ghello`),
 	}
-	for _, buf := range buf2s {
-		fmt.Println(SplitStatement(buf, []byte("\\G")))
+	err := common.GoldenDiff(func() {
+		for i, buf := range bufs {
+			sql, _, _ := SplitStatement(buf, []byte(common.Config.Delimiter))
+			fmt.Println(i, sql)
+		}
+		for i, buf := range buf2s {
+			sql, _, _ := SplitStatement(buf, []byte(common.Config.Delimiter))
+			fmt.Println(i, sql)
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }
 
@@ -135,8 +168,13 @@ func TestLeftNewLines(t *testing.T) {
         from test;hello`),
 		[]byte(`select * from test`),
 	}
-	for _, buf := range bufs {
-		fmt.Println(LeftNewLines(buf))
+	err := common.GoldenDiff(func() {
+		for _, buf := range bufs {
+			fmt.Println(LeftNewLines(buf))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }
 
@@ -149,7 +187,12 @@ func TestNewLines(t *testing.T) {
         from test;hello`),
 		[]byte(`select * from test`),
 	}
-	for _, buf := range bufs {
-		fmt.Println(NewLines(buf))
+	err := common.GoldenDiff(func() {
+		for _, buf := range bufs {
+			fmt.Println(NewLines(buf))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
 	}
 }

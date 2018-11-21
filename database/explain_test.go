@@ -83,6 +83,7 @@ var sqls = []string{
 	`select first_name,last_name,email from customer natural right join address;`,
 	`select first_name,last_name,email from customer STRAIGHT_JOIN address on customer.address_id=address.address_id;`,
 	`select ID,name from (select address from customer_list where SID=1 order by phone limit 50,10) a join customer_list l on (a.address=l.address) join city c on (c.city=l.city) order by phone desc;`,
+	`SELECT a.table_name 表名, a.table_comment 表说明, b.COLUMN_NAME 字段名, b.column_comment 字段说明, b.column_type 字段类型, b.column_key 约束 FROM information_schema.TABLES a LEFT JOIN information_schema. COLUMNS b ON a.table_name = b.TABLE_NAME WHERE a.table_schema IN ('a') AND b.column_comment LIKE '%一%' ORDER BY a.table_name`,
 }
 
 var exp = []string{
@@ -2450,5 +2451,13 @@ func TestSupportExplainWrite(t *testing.T) {
 	_, err := connTest.supportExplainWrite()
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestExplainAbleSQL(t *testing.T) {
+	for _, sql := range sqls {
+		if _, err := connTest.explainAbleSQL(sql); err != nil {
+			t.Errorf("SQL: %s, not explain able", sql)
+		}
 	}
 }

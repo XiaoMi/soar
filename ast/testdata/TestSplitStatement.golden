@@ -1,0 +1,27 @@
+0 select * from test;
+1 select 'asd;fas', col from test;
+2 -- select * from test;hello
+3 #select * from test;hello
+4 select * /*comment*/from test;
+5 select * /*comment;*/from test;
+6 select * /*comment
+		;*/
+		from test;
+7 select * from test
+8 /*comment*/
+9 /*comment*/;
+10 --
+11 -- comment
+12 # comment
+13 select
+*
+-- comment
+0 select * from test\Ghello
+1 select 'hello\Gworld', col from test\Ghello
+2 -- select * from test\Ghello
+3 #select * from test\Ghello
+4 select * /*comment*/from test\Ghello
+5 select * /*comment;*/from test\Ghello
+6 select * /*comment
+        \\G*/
+        from test\\Ghello

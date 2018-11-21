@@ -1,0 +1,166 @@
+SELECT * FROM film WHERE length = 86;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 86; 0}]
+SELECT * FROM film WHERE length IS NULL;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {1 IS  0} {1 NULL; 0}]
+SELECT * FROM film HAVING title = 'abc';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 HAVING  0} {1 title  0} {7 = 0} {0   0} {2 'abc' 0} {7 ; 0}]
+SELECT * FROM sakila.film WHERE length >= 60;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 sakila. 0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {7 = 0} {0   0} {10 60; 0}]
+SELECT * FROM sakila.film WHERE length >= '60';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 sakila. 0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {7 = 0} {0   0} {2 '60' 0} {7 ; 0}]
+SELECT * FROM film WHERE length BETWEEN 60 AND 84;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {1 BETWEEN  0} {10 60  0} {6 AND  0} {10 84; 0}]
+SELECT * FROM film WHERE title LIKE 'AIR%';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 title  0} {1 LIKE  0} {2 'AIR%' 0} {7 ; 0}]
+SELECT * FROM film WHERE title IS NOT NULL;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 title  0} {1 IS  0} {1 NOT  0} {1 NULL; 0}]
+SELECT * FROM film WHERE length = 114 and title = 'ALABAMA DEVIL';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 114  0} {6 AND  0} {1 title  0} {7 = 0} {0   0} {2 'ALABAMA DEVIL' 0} {7 ; 0}]
+SELECT * FROM film WHERE length > 100 and title = 'ALABAMA DEVIL';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100  0} {6 AND  0} {1 title  0} {7 = 0} {0   0} {2 'ALABAMA DEVIL' 0} {7 ; 0}]
+SELECT * FROM film WHERE length > 100 and language_id < 10 and title = 'xyz';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100  0} {6 AND  0} {1 language_id  0} {7 < 0} {0   0} {10 10  0} {6 AND  0} {1 title  0} {7 = 0} {0   0} {2 'xyz' 0} {7 ; 0}]
+SELECT * FROM film WHERE length > 100 and language_id < 10;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100  0} {6 AND  0} {1 language_id  0} {7 < 0} {0   0} {10 10; 0}]
+SELECT release_year, sum(length) FROM film WHERE length = 123 AND language_id = 1 GROUP BY release_year;
+[{5 SELECT  0} {1 release_year, 0} {0   0} {4 SUM( 0} {4 LENGTH) 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {6 AND  0} {1 language_id  0} {7 = 0} {0   0} {10 1  0} {5 GROUP BY  0} {1 release_year; 0}]
+SELECT release_year, sum(length) FROM film WHERE length >= 123 GROUP BY release_year;
+[{5 SELECT  0} {1 release_year, 0} {0   0} {4 SUM( 0} {4 LENGTH) 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {7 = 0} {0   0} {10 123  0} {5 GROUP BY  0} {1 release_year; 0}]
+SELECT release_year, language_id, sum(length) FROM film GROUP BY release_year, language_id;
+[{5 SELECT  0} {1 release_year, 0} {0   0} {1 language_id, 0} {0   0} {4 SUM( 0} {4 LENGTH) 0} {0   0} {5 FROM  0} {1 film  0} {5 GROUP BY  0} {1 release_year, 0} {0   0} {1 language_id; 0}]
+SELECT release_year, sum(length) FROM film WHERE length = 123 GROUP BY release_year,(length+language_id);
+[{5 SELECT  0} {1 release_year, 0} {0   0} {4 SUM( 0} {4 LENGTH) 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {5 GROUP BY  0} {1 release_year, 0} {7 ( 0} {4 LENGTH+ 0} {1 language_id) 0} {7 ; 0}]
+SELECT release_year, sum(film_id) FROM film GROUP BY release_year;
+[{5 SELECT  0} {1 release_year, 0} {0   0} {4 SUM( 0} {1 film_id) 0} {0   0} {5 FROM  0} {1 film  0} {5 GROUP BY  0} {1 release_year; 0}]
+SELECT * FROM address GROUP BY address,district;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 address  0} {5 GROUP BY  0} {1 address, 0} {1 district; 0}]
+SELECT title FROM film WHERE ABS(language_id) = 3 GROUP BY title;
+[{5 SELECT  0} {1 title  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 ABS( 0} {1 language_id) 0} {0   0} {7 = 0} {0   0} {10 3  0} {5 GROUP BY  0} {1 title; 0}]
+SELECT language_id FROM film WHERE length = 123 GROUP BY release_year ORDER BY language_id;
+[{5 SELECT  0} {1 language_id  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {5 GROUP BY  0} {1 release_year  0} {5 ORDER BY  0} {1 language_id; 0}]
+SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year;
+[{5 SELECT  0} {1 release_year  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {5 GROUP BY  0} {1 release_year  0} {5 ORDER BY  0} {1 release_year; 0}]
+SELECT * FROM film WHERE length = 123 ORDER BY release_year ASC, language_id DESC;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {5 ORDER BY  0} {1 release_year  0} {1 ASC, 0} {0   0} {1 language_id  0} {1 DESC; 0}]
+SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year LIMIT 10;
+[{5 SELECT  0} {1 release_year  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {5 GROUP BY  0} {1 release_year  0} {5 ORDER BY  0} {1 release_year  0} {5 LIMIT  0} {10 10; 0}]
+SELECT * FROM film WHERE length = 123 ORDER BY release_year LIMIT 10;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 123  0} {5 ORDER BY  0} {1 release_year  0} {5 LIMIT  0} {10 10; 0}]
+SELECT * FROM film ORDER BY release_year LIMIT 10;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 ORDER BY  0} {1 release_year  0} {5 LIMIT  0} {10 10; 0}]
+SELECT film_id FROM film ORDER BY release_year LIMIT 10;
+[{5 SELECT  0} {1 film_id  0} {5 FROM  0} {1 film  0} {5 ORDER BY  0} {1 release_year  0} {5 LIMIT  0} {10 10; 0}]
+SELECT * FROM film WHERE length > 100 ORDER BY length LIMIT 10;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100  0} {5 ORDER BY  0} {4 LENGTH  0} {5 LIMIT  0} {10 10; 0}]
+SELECT * FROM film WHERE length < 100 ORDER BY length LIMIT 10;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 < 0} {0   0} {10 100  0} {5 ORDER BY  0} {4 LENGTH  0} {5 LIMIT  0} {10 10; 0}]
+SELECT * FROM customer WHERE address_id in (224,510) ORDER BY last_name;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 customer  0} {5 WHERE  0} {1 address_id  0} {1 in  0} {7 ( 0} {10 224, 0} {10 510) 0} {0   0} {5 ORDER BY  0} {1 last_name; 0}]
+SELECT * FROM film WHERE release_year = 2016 AND length != 1 ORDER BY title;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 release_year  0} {7 = 0} {0   0} {10 2016  0} {6 AND  0} {4 LENGTH  0} {7 ! 0} {7 = 0} {0   0} {10 1  0} {5 ORDER BY  0} {1 title; 0}]
+SELECT title FROM film WHERE release_year = 1995;
+[{5 SELECT  0} {1 title  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 release_year  0} {7 = 0} {0   0} {10 1995; 0}]
+SELECT title, replacement_cost FROM film WHERE language_id = 5 AND length = 70;
+[{5 SELECT  0} {1 title, 0} {0   0} {1 replacement_cost  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 language_id  0} {7 = 0} {0   0} {10 5  0} {6 AND  0} {4 LENGTH  0} {7 = 0} {0   0} {10 70; 0}]
+SELECT title FROM film WHERE language_id > 5 AND length > 70;
+[{5 SELECT  0} {1 title  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 language_id  0} {7 > 0} {0   0} {10 5  0} {6 AND  0} {4 LENGTH  0} {7 > 0} {0   0} {10 70; 0}]
+SELECT * FROM film WHERE length = 100 and title = 'xyz' ORDER BY release_year;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 = 0} {0   0} {10 100  0} {6 AND  0} {1 title  0} {7 = 0} {0   0} {2 'xyz' 0} {0   0} {5 ORDER BY  0} {1 release_year; 0}]
+SELECT * FROM film WHERE length > 100 and title = 'xyz' ORDER BY release_year;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100  0} {6 AND  0} {1 title  0} {7 = 0} {0   0} {2 'xyz' 0} {0   0} {5 ORDER BY  0} {1 release_year; 0}]
+SELECT * FROM film WHERE length > 100 ORDER BY release_year;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100  0} {5 ORDER BY  0} {1 release_year; 0}]
+SELECT * FROM city a INNER JOIN country b ON a.country_id=b.country_id;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 INNER JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id; 0}]
+SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 LEFT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id; 0}]
+SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 RIGHT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id; 0}]
+SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id WHERE b.last_update IS NULL;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 LEFT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id  0} {5 WHERE  0} {1 b. 0} {1 last_update  0} {1 IS  0} {1 NULL; 0}]
+SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id WHERE a.last_update IS NULL;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 RIGHT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id  0} {5 WHERE  0} {1 a. 0} {1 last_update  0} {1 IS  0} {1 NULL; 0}]
+SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id UNION SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 LEFT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id  0} {5 UNION  0} {5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 RIGHT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id; 0}]
+SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id WHERE a.last_update IS NULL UNION SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id WHERE b.last_update IS NULL;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 RIGHT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id  0} {5 WHERE  0} {1 a. 0} {1 last_update  0} {1 IS  0} {1 NULL  0} {5 UNION  0} {5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 a  0} {6 LEFT JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id  0} {5 WHERE  0} {1 b. 0} {1 last_update  0} {1 IS  0} {1 NULL; 0}]
+SELECT country_id, last_update FROM city NATURAL JOIN country;
+[{5 SELECT  0} {1 country_id, 0} {0   0} {1 last_update  0} {5 FROM  0} {1 city  0} {1 NATURAL  0} {6 JOIN  0} {1 country; 0}]
+SELECT country_id, last_update FROM city NATURAL LEFT JOIN country;
+[{5 SELECT  0} {1 country_id, 0} {0   0} {1 last_update  0} {5 FROM  0} {1 city  0} {1 NATURAL  0} {6 LEFT JOIN  0} {1 country; 0}]
+SELECT country_id, last_update FROM city NATURAL RIGHT JOIN country;
+[{5 SELECT  0} {1 country_id, 0} {0   0} {1 last_update  0} {5 FROM  0} {1 city  0} {1 NATURAL  0} {6 RIGHT JOIN  0} {1 country; 0}]
+SELECT a.country_id, a.last_update FROM city a STRAIGHT_JOIN country b ON a.country_id=b.country_id;
+[{5 SELECT  0} {1 a. 0} {1 country_id, 0} {0   0} {1 a. 0} {1 last_update  0} {5 FROM  0} {1 city  0} {1 a  0} {1 STRAIGHT_JOIN  0} {1 country  0} {1 b  0} {1 ON  0} {1 a. 0} {1 country_id= 0} {1 b. 0} {1 country_id; 0}]
+SELECT d.deptno,d.dname,d.loc FROM scott.dept d WHERE d.deptno IN  (SELECT e.deptno FROM scott.emp e);
+[{5 SELECT  0} {1 d. 0} {1 deptno, 0} {1 d. 0} {1 dname, 0} {1 d. 0} {1 loc  0} {5 FROM  0} {1 scott. 0} {1 dept  0} {1 d  0} {5 WHERE  0} {1 d. 0} {1 deptno  0} {1 IN  0} {0   0} {7 ( 0} {5 SELECT  0} {1 e. 0} {1 deptno  0} {5 FROM  0} {1 scott. 0} {1 emp  0} {1 e) 0} {7 ; 0}]
+SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by ts desc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
+[{5 SELECT  0} {1 visitor_id, 0} {0   0} {1 url  0} {5 FROM  0} {7 ( 0} {5 SELECT  0} {1 id  0} {5 FROM  0} {4 LOG  0} {5 WHERE  0} {1 ip= 0} {2 "123.45.67.89" 0} {0   0} {5 ORDER BY  0} {1 ts  0} {1 desc  0} {5 LIMIT  0} {10 50, 0} {0   0} {10 10) 0} {0   0} {1 I  0} {6 JOIN  0} {4 LOG  0} {1 ON  0} {7 ( 0} {1 I. 0} {1 id= 0} {4 LOG. 0} {1 id) 0} {0   0} {6 JOIN  0} {1 url  0} {1 ON  0} {7 ( 0} {1 url. 0} {1 id= 0} {4 LOG. 0} {1 url_id) 0} {0   0} {5 ORDER BY  0} {1 TS  0} {1 desc; 0}]
+DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;
+[{1 DELETE  0} {1 city, 0} {0   0} {1 country  0} {5 FROM  0} {1 city  0} {6 INNER JOIN  0} {1 country  0} {1 using  0} {7 ( 0} {1 country_id) 0} {0   0} {5 WHERE  0} {1 city. 0} {1 city_id  0} {7 = 0} {0   0} {10 1; 0}]
+DELETE city FROM city LEFT JOIN country ON city.country_id = country.country_id WHERE country.country IS NULL;
+[{1 DELETE  0} {1 city  0} {5 FROM  0} {1 city  0} {6 LEFT JOIN  0} {1 country  0} {1 ON  0} {1 city. 0} {1 country_id  0} {7 = 0} {0   0} {1 country. 0} {1 country_id  0} {5 WHERE  0} {1 country. 0} {1 country  0} {1 IS  0} {1 NULL; 0}]
+DELETE a1, a2 FROM city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;
+[{1 DELETE  0} {1 a1, 0} {0   0} {1 a2  0} {5 FROM  0} {1 city  0} {1 AS  0} {1 a1  0} {6 INNER JOIN  0} {1 country  0} {1 AS  0} {1 a2  0} {5 WHERE  0} {1 a1. 0} {1 country_id= 0} {1 a2. 0} {1 country_id; 0}]
+DELETE FROM a1, a2 USING city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;
+[{5 DELETE FROM  0} {1 a1, 0} {0   0} {1 a2  0} {1 USING  0} {1 city  0} {1 AS  0} {1 a1  0} {6 INNER JOIN  0} {1 country  0} {1 AS  0} {1 a2  0} {5 WHERE  0} {1 a1. 0} {1 country_id= 0} {1 a2. 0} {1 country_id; 0}]
+DELETE FROM film WHERE length > 100;
+[{5 DELETE FROM  0} {1 film  0} {5 WHERE  0} {4 LENGTH  0} {7 > 0} {0   0} {10 100; 0}]
+UPDATE city INNER JOIN country USING(country_id) SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
+[{5 UPDATE  0} {1 city  0} {6 INNER JOIN  0} {1 country  0} {1 USING( 0} {1 country_id) 0} {0   0} {5 SET  0} {1 city. 0} {1 city  0} {7 = 0} {0   0} {2 'Abha' 0} {7 , 0} {0   0} {1 city. 0} {1 last_update  0} {7 = 0} {0   0} {2 '2006-02-15 04:45:25' 0} {7 , 0} {0   0} {1 country. 0} {1 country  0} {7 = 0} {0   0} {2 'Afghanistan' 0} {0   0} {5 WHERE  0} {1 city. 0} {1 city_id= 0} {10 10; 0}]
+UPDATE city INNER JOIN country ON city.country_id = country.country_id INNER JOIN address ON city.city_id = address.city_id SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
+[{5 UPDATE  0} {1 city  0} {6 INNER JOIN  0} {1 country  0} {1 ON  0} {1 city. 0} {1 country_id  0} {7 = 0} {0   0} {1 country. 0} {1 country_id  0} {6 INNER JOIN  0} {1 address  0} {1 ON  0} {1 city. 0} {1 city_id  0} {7 = 0} {0   0} {1 address. 0} {1 city_id  0} {5 SET  0} {1 city. 0} {1 city  0} {7 = 0} {0   0} {2 'Abha' 0} {7 , 0} {0   0} {1 city. 0} {1 last_update  0} {7 = 0} {0   0} {2 '2006-02-15 04:45:25' 0} {7 , 0} {0   0} {1 country. 0} {1 country  0} {7 = 0} {0   0} {2 'Afghanistan' 0} {0   0} {5 WHERE  0} {1 city. 0} {1 city_id= 0} {10 10; 0}]
+UPDATE city, country SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.country_id = country.country_id AND city.city_id=10;
+[{5 UPDATE  0} {1 city, 0} {0   0} {1 country  0} {5 SET  0} {1 city. 0} {1 city  0} {7 = 0} {0   0} {2 'Abha' 0} {7 , 0} {0   0} {1 city. 0} {1 last_update  0} {7 = 0} {0   0} {2 '2006-02-15 04:45:25' 0} {7 , 0} {0   0} {1 country. 0} {1 country  0} {7 = 0} {0   0} {2 'Afghanistan' 0} {0   0} {5 WHERE  0} {1 city. 0} {1 country_id  0} {7 = 0} {0   0} {1 country. 0} {1 country_id  0} {6 AND  0} {1 city. 0} {1 city_id= 0} {10 10; 0}]
+UPDATE film SET length = 10 WHERE language_id = 20;
+[{5 UPDATE  0} {1 film  0} {5 SET  0} {4 LENGTH  0} {7 = 0} {0   0} {10 10  0} {5 WHERE  0} {1 language_id  0} {7 = 0} {0   0} {10 20; 0}]
+INSERT INTO city (country_id) SELECT country_id FROM country;
+[{4 INSERT  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 SELECT  0} {1 country_id  0} {5 FROM  0} {1 country; 0}]
+INSERT INTO city (country_id) VALUES (1),(2),(3);
+[{4 INSERT  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 VALUES  0} {7 ( 0} {10 1) 0} {7 , 0} {7 ( 0} {10 2) 0} {7 , 0} {7 ( 0} {10 3) 0} {7 ; 0}]
+INSERT INTO city (country_id) VALUES (10);
+[{4 INSERT  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 VALUES  0} {7 ( 0} {10 10) 0} {7 ; 0}]
+INSERT INTO city (country_id) SELECT 10 FROM DUAL;
+[{4 INSERT  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 SELECT  0} {10 10  0} {5 FROM  0} {1 DUAL; 0}]
+REPLACE INTO city (country_id) SELECT country_id FROM country;
+[{4 REPLACE  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 SELECT  0} {1 country_id  0} {5 FROM  0} {1 country; 0}]
+REPLACE INTO city (country_id) VALUES (1),(2),(3);
+[{4 REPLACE  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 VALUES  0} {7 ( 0} {10 1) 0} {7 , 0} {7 ( 0} {10 2) 0} {7 , 0} {7 ( 0} {10 3) 0} {7 ; 0}]
+REPLACE INTO city (country_id) VALUES (10);
+[{4 REPLACE  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 VALUES  0} {7 ( 0} {10 10) 0} {7 ; 0}]
+REPLACE INTO city (country_id) SELECT 10 FROM DUAL;
+[{4 REPLACE  0} {1 INTO  0} {1 city  0} {7 ( 0} {1 country_id) 0} {0   0} {5 SELECT  0} {10 10  0} {5 FROM  0} {1 DUAL; 0}]
+SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM ( SELECT film_id FROM  film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film;
+[{5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {7 ( 0} {0   0} {5 SELECT  0} {1 film_id  0} {5 FROM  0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film  0} {7 ) 0} {0   0} {1 film; 0}]
+SELECT * FROM film WHERE language_id = (SELECT language_id FROM language LIMIT 1);
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 language_id  0} {7 = 0} {0   0} {7 ( 0} {5 SELECT  0} {1 language_id  0} {5 FROM  0} {1 language  0} {5 LIMIT  0} {10 1) 0} {7 ; 0}]
+SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 i  0} {6 LEFT JOIN  0} {1 country  0} {1 o  0} {1 ON  0} {1 i. 0} {1 city_id= 0} {1 o. 0} {1 country_id  0} {5 UNION  0} {5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 i  0} {6 RIGHT JOIN  0} {1 country  0} {1 o  0} {1 ON  0} {1 i. 0} {1 city_id= 0} {1 o. 0} {1 country_id; 0}]
+SELECT * FROM (SELECT * FROM actor WHERE last_update='2006-02-15 04:34:33' and last_name='CHASE') t WHERE last_update='2006-02-15 04:34:33' and last_name='CHASE' GROUP BY first_name;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {7 ( 0} {5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 actor  0} {5 WHERE  0} {1 last_update= 0} {2 '2006-02-15 04:34:33' 0} {0   0} {6 AND  0} {1 last_name= 0} {2 'CHASE' 0} {7 ) 0} {0   0} {1 t  0} {5 WHERE  0} {1 last_update= 0} {2 '2006-02-15 04:34:33' 0} {0   0} {6 AND  0} {1 last_name= 0} {2 'CHASE' 0} {0   0} {5 GROUP BY  0} {1 first_name; 0}]
+SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 i  0} {6 LEFT JOIN  0} {1 country  0} {1 o  0} {1 ON  0} {1 i. 0} {1 city_id= 0} {1 o. 0} {1 country_id  0} {5 UNION  0} {5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 i  0} {6 RIGHT JOIN  0} {1 country  0} {1 o  0} {1 ON  0} {1 i. 0} {1 city_id= 0} {1 o. 0} {1 country_id; 0}]
+SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id WHERE o.country_id is null union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id WHERE i.city_id is null;
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 i  0} {6 LEFT JOIN  0} {1 country  0} {1 o  0} {1 ON  0} {1 i. 0} {1 city_id= 0} {1 o. 0} {1 country_id  0} {5 WHERE  0} {1 o. 0} {1 country_id  0} {1 is  0} {1 null  0} {5 UNION  0} {5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 city  0} {1 i  0} {6 RIGHT JOIN  0} {1 country  0} {1 o  0} {1 ON  0} {1 i. 0} {1 city_id= 0} {1 o. 0} {1 country_id  0} {5 WHERE  0} {1 i. 0} {1 city_id  0} {1 is  0} {1 null; 0}]
+SELECT first_name,last_name,email FROM customer STRAIGHT_JOIN address ON customer.address_id=address.address_id;
+[{5 SELECT  0} {1 first_name, 0} {1 last_name, 0} {1 email  0} {5 FROM  0} {1 customer  0} {1 STRAIGHT_JOIN  0} {1 address  0} {1 ON  0} {1 customer. 0} {1 address_id= 0} {1 address. 0} {1 address_id; 0}]
+SELECT ID,name FROM (SELECT address FROM customer_list WHERE SID=1 order by phone limit 50,10) a JOIN customer_list l ON (a.address=l.address) JOIN city c ON (c.city=l.city) order by phone desc;
+[{5 SELECT  0} {1 ID, 0} {1 name  0} {5 FROM  0} {7 ( 0} {5 SELECT  0} {1 address  0} {5 FROM  0} {1 customer_list  0} {5 WHERE  0} {1 SID= 0} {10 1  0} {5 ORDER BY  0} {1 phone  0} {5 LIMIT  0} {10 50, 0} {10 10) 0} {0   0} {1 a  0} {6 JOIN  0} {1 customer_list  0} {1 l  0} {1 ON  0} {7 ( 0} {1 a. 0} {1 address= 0} {1 l. 0} {1 address) 0} {0   0} {6 JOIN  0} {1 city  0} {1 c  0} {1 ON  0} {7 ( 0} {1 c. 0} {1 city= 0} {1 l. 0} {1 city) 0} {0   0} {5 ORDER BY  0} {1 phone  0} {1 desc; 0}]
+SELECT * FROM film WHERE date(last_update)='2006-02-15';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 film  0} {5 WHERE  0} {4 DATE( 0} {1 last_update) 0} {7 = 0} {2 '2006-02-15' 0} {7 ; 0}]
+SELECT last_update FROM film GROUP BY date(last_update);
+[{5 SELECT  0} {1 last_update  0} {5 FROM  0} {1 film  0} {5 GROUP BY  0} {4 DATE( 0} {1 last_update) 0} {7 ; 0}]
+SELECT last_update FROM film order by date(last_update);
+[{5 SELECT  0} {1 last_update  0} {5 FROM  0} {1 film  0} {5 ORDER BY  0} {4 DATE( 0} {1 last_update) 0} {7 ; 0}]
+SELECT description FROM film WHERE description IN('NEWS','asd') GROUP BY description;
+[{5 SELECT  0} {1 description  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 description  0} {1 IN( 0} {2 'NEWS' 0} {7 , 0} {2 'asd' 0} {7 ) 0} {0   0} {5 GROUP BY  0} {1 description; 0}]
+alter table address add index idx_city_id(city_id);
+[{5 ALTER TABLE  0} {1 address  0} {5 ADD  0} {1 index  0} {1 idx_city_id( 0} {1 city_id) 0} {7 ; 0}]
+alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
+[{5 ALTER TABLE  0} {1 inventory  0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 ; 0}]
+alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
+[{5 ALTER TABLE  0} {1 inventory  0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 , 0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 , 0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 ; 0}]
+SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')
+[{5 SELECT	 0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {7 , 0} {0   0} {4 COUNT( 0} {1 DISTINCT  0} {7 ( 0} {1 t. 0} {1 usr) 0} {7 ) 0} {0   0} {5 FROM  0} {1 usr_terminal  0} {1 t  0} {5 WHERE  0} {1 t. 0} {1 atm  0} {7 > 0} {0   0} {2 '2018-10-22 00:00:00' 0} {0   0} {6 AND  0} {1 t. 0} {1 agent  0} {1 LIKE  0} {2 '%Chrome%' 0} {0   0} {6 AND  0} {1 t. 0} {1 system  0} {7 = 0} {0   0} {2 'eip' 0} {0   0} {5 GROUP BY  0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {0   0} {5 ORDER BY  0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0}]
+create table hello.t (id int unsigned);
+[{1 create  0} {1 table  0} {1 hello. 0} {1 t  0} {7 ( 0} {1 id  0} {1 int  0} {1 unsigned) 0} {7 ; 0}]

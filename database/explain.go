@@ -28,6 +28,7 @@ import (
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
 
+	tidb "github.com/pingcap/tidb/ast"
 	"github.com/tidwall/gjson"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
@@ -502,8 +503,32 @@ func (db *Connector) supportExplainWrite() (bool, error) {
 func (db *Connector) explainAbleSQL(sql string) (string, error) {
 	stmt, err := sqlparser.Parse(sql)
 	if err != nil {
+		// TODO: charset, collation
+		tiStmt, tiErr := ast.TiParse(sql, "", "")
+		if tiErr != nil {
+			common.Log.Error("explainAbleSQL ast.TiParse Error: %v", tiErr)
+			return "", tiErr
+		}
+
+		var isSelect bool
+		for _, st := range tiStmt {
+			switch st.(type) {
+			case *tidb.SelectStmt, *tidb.UnionStmt:
+				isSelect = true
+			default:
+				isSelect = false
+			}
+			if !isSelect {
+				break
+			}
+		}
+
+		if isSelect {
+			return sql, nil
+		}
+
 		common.Log.Error("explainAbleSQL sqlparser.Parse Error: %v", err)
-		return sql, err
+		return "", err
 	}
 
 	switch stmt.(type) {
