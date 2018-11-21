@@ -894,7 +894,8 @@ func Compress(sql string) string {
 }
 
 // SplitStatement SQL切分
-func SplitStatement(buf []byte, delimiter []byte) (string, []byte) {
+// return original sql, remove comment sql, left over buf
+func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 	var singleLineComment bool
 	var multiLineComment bool
 	var quoted bool
@@ -988,8 +989,9 @@ func SplitStatement(buf []byte, delimiter []byte) (string, []byte) {
 			sql = string(buf)
 		}
 	}
+	orgSQL := string(buf[:len(sql)])
 	buf = buf[len(sql):]
-	return strings.TrimSuffix(sql, string(delimiter)), buf
+	return orgSQL, strings.TrimSuffix(sql, string(delimiter)), buf
 }
 
 // LeftNewLines cal left new lines in space

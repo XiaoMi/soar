@@ -170,7 +170,7 @@ func (db *Connector) Source(file string) ([]*QueryResult, error) {
 		}
 
 		// 查询请求切分
-		sql, bufBytes := ast.SplitStatement([]byte(buf), []byte(common.Config.Delimiter))
+		_, sql, bufBytes := ast.SplitStatement([]byte(buf), []byte(common.Config.Delimiter))
 		buf = string(bufBytes)
 		sql = strings.TrimSpace(sql)
 		common.Log.Debug("Source Query SQL: %s", sql)

@@ -111,11 +111,11 @@ func main() {
 			break
 		}
 		// 查询请求切分
-		sql, bufBytes := ast.SplitStatement([]byte(buf), []byte(common.Config.Delimiter))
+		orgSQL, sql, bufBytes := ast.SplitStatement([]byte(buf), []byte(common.Config.Delimiter))
 		// lineCounter
-		lc := ast.NewLines([]byte(sql))
+		lc := ast.NewLines([]byte(orgSQL))
 		// leftLineCounter
-		llc := ast.LeftNewLines([]byte(sql))
+		llc := ast.LeftNewLines([]byte(orgSQL))
 		lineCounter += llc
 		buf = string(bufBytes)
 
