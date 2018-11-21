@@ -928,7 +928,12 @@ func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 		if singleLineComment {
 			if b == '\r' || b == '\n' {
 				sql = string(buf[:i])
-				break
+				if strings.HasPrefix(sql, "--") || strings.HasPrefix(sql, "#") {
+					// just comment, query start with '--', '#'
+					break
+				}
+				// comment in multi-line sql
+				continue
 			}
 		}
 

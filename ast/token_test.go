@@ -132,6 +132,19 @@ func TestSplitStatement(t *testing.T) {
 -- comment
 from tb
 where col = 1`),
+		[]byte(`select
+* --
+from tb
+where col = 1`),
+		[]byte(`select
+* #
+from tb
+where col = 1`),
+		[]byte(`select
+*
+--
+from tb
+where col = 1`),
 	}
 	buf2s := [][]byte{
 		[]byte("select * from test\\Ghello"),

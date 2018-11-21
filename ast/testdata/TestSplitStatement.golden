@@ -16,6 +16,21 @@
 13 select
 *
 -- comment
+from tb
+where col = 1
+14 select
+* --
+from tb
+where col = 1
+15 select
+* #
+from tb
+where col = 1
+16 select
+*
+--
+from tb
+where col = 1
 0 select * from test\Ghello
 1 select 'hello\Gworld', col from test\Ghello
 2 -- select * from test\Ghello
