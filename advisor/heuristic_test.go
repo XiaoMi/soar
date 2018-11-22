@@ -1035,6 +1035,44 @@ func TestRulePluralWord(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// KWR.004
+func TestRuleMultiBytesWord(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			"select col as 列 from tb",
+			"select col as `列` from tb",
+		},
+		{
+			"select col as c from tb",
+			"select '列'",
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiBytesWord()
+			if rule.Item != "KWR.004" {
+				t.Error("Rule not match:", rule.Item, "Expect : KWR.004")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiBytesWord()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // LCK.001
 func TestRuleInsertSelect(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())

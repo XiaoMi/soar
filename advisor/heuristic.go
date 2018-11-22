@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
@@ -1389,6 +1390,22 @@ func (q *Query4Audit) RulePluralWord() Rule {
 
 		}
 
+	}
+	return rule
+}
+
+// RuleMultiBytesWord KWR.004
+func (q *Query4Audit) RuleMultiBytesWord() Rule {
+	// TODO: 目前使用 utf8 字符集检查，其他字符集输入可能会有问题
+	var rule = q.RuleOK()
+	for _, tk := range ast.Tokenize(q.Query) {
+		switch tk.Type {
+		case ast.TokenTypeBacktickQuote, ast.TokenTypeWord:
+			if utf8.RuneCountInString(tk.Val) != len(tk.Val) {
+				rule = HeuristicRules["KWR.004"]
+			}
+		default:
+		}
 	}
 	return rule
 }
@@ -3177,7 +3194,7 @@ func (q *Query4Audit) RuleStandardName() Rule {
 				rule = HeuristicRules["STA.004"]
 			}
 		case ast.TokenTypeWord:
-			// TOKEN_TYPE_WORD中处理连续下划线的情况，其他情况容易误伤
+			// TOKEN_TYPE_WORD 中处理连续下划线的情况，其他情况容易误伤
 			if strings.Contains(tk.Val, "__") {
 				rule = HeuristicRules["STA.004"]
 			}

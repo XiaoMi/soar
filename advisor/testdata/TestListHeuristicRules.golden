@@ -812,6 +812,16 @@ CREATE TABLE tbl ( `select` int )
 ```sql
 CREATE TABLE tbl ( `books` int )
 ```
+## 不建议使用使用多字节编码字符(中文)命名
+
+* **Item**:KWR.004
+* **Severity**:L1
+* **Content**:为库、表、列、别名命名时建议使用英文，数字，下划线等字符，不建议使用中文或其他多字节编码字符。
+* **Case**:
+
+```sql
+select col as 列 from tb
+```
 ## INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item**:LCK.001

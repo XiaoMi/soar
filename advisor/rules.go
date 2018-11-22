@@ -797,6 +797,14 @@ func init() {
 			Case:     "CREATE TABLE tbl ( `books` int )",
 			Func:     (*Query4Audit).RulePluralWord,
 		},
+		"KWR.004": {
+			Item:     "KWR.004",
+			Severity: "L1",
+			Summary:  "不建议使用使用多字节编码字符(中文)命名",
+			Content:  `为库、表、列、别名命名时建议使用英文，数字，下划线等字符，不建议使用中文或其他多字节编码字符。`,
+			Case:     "select col as 列 from tb",
+			Func:     (*Query4Audit).RuleMultiBytesWord,
+		},
 		"LCK.001": {
 			Item:     "LCK.001",
 			Severity: "L3",
