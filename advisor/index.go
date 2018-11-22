@@ -135,7 +135,7 @@ func NewAdvisor(env *env.VirtualEnv, rEnv database.Connector, q Query4Audit) (*I
 		whereINEQ: ast.FindWhereINEQ(q.Stmt),
 		groupBy:   ast.FindGroupByCols(q.Stmt),
 		orderBy:   ast.FindOrderByCols(q.Stmt),
-		where:     ast.FindAllCols(q.Stmt, "where"),
+		where:     ast.FindAllCols(q.Stmt, ast.WhereExpression),
 		IndexMeta: make(map[string]map[string]*database.TableIndexInfo),
 	}, nil
 }

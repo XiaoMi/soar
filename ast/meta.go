@@ -450,15 +450,15 @@ func FindJoinTable(node sqlparser.SQLNode, meta common.Meta) common.Meta {
 		switch expr := node.(type) {
 		case *sqlparser.JoinTableExpr:
 			switch expr.Join {
-			case "join", "natural join":
+			case sqlparser.JoinStr, sqlparser.NaturalJoinStr:
 				// 两边表都需要
 				findJoinTable(expr.LeftExpr, meta)
 				findJoinTable(expr.RightExpr, meta)
-			case "left join", "natural left join", "straight_join":
+			case sqlparser.LeftJoinStr, sqlparser.NaturalLeftJoinStr, sqlparser.StraightJoinStr:
 				// 只需要右表
 				findJoinTable(expr.RightExpr, meta)
 
-			case "right join", "natural right join":
+			case sqlparser.RightJoinStr, sqlparser.NaturalRightJoinStr:
 				// 只需要左表
 				findJoinTable(expr.LeftExpr, meta)
 			}
@@ -673,8 +673,22 @@ func FindAllCondition(node sqlparser.SQLNode) []interface{} {
 	return conditions
 }
 
+// Expression describe sql expression type
+type Expression string
+
+const (
+	// WhereExpression 用于标记 where
+	WhereExpression Expression = "where"
+	// JoinExpression 用于标记 join
+	JoinExpression Expression = "join"
+	// GroupByExpression 用于标记 group by
+	GroupByExpression Expression = "group by"
+	// OrderByExpression 用于标记 order by
+	OrderByExpression Expression = "order by"
+)
+
 // FindAllCols 获取 AST 中某个节点下所有的 columns
-func FindAllCols(node sqlparser.SQLNode, targets ...string) []*common.Column {
+func FindAllCols(node sqlparser.SQLNode, targets ...Expression) []*common.Column {
 	var result []*common.Column
 	// 获取节点内所有的列
 	f := func(node sqlparser.SQLNode) {
@@ -699,25 +713,24 @@ func FindAllCols(node sqlparser.SQLNode, targets ...string) []*common.Column {
 	} else {
 		// 根据target获取所有的节点
 		for _, target := range targets {
-			target = strings.Replace(strings.ToLower(target), " ", "", -1)
 			err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 				switch node := node.(type) {
 				case *sqlparser.Subquery:
 					// 忽略子查询
 				case *sqlparser.JoinTableExpr:
-					if target == "join" {
+					if target == JoinExpression {
 						f(node)
 					}
 				case *sqlparser.Where:
-					if target == "where" {
+					if target == WhereExpression {
 						f(node)
 					}
-				case *sqlparser.GroupBy:
-					if target == "groupby" {
+				case sqlparser.GroupBy:
+					if target == GroupByExpression {
 						f(node)
 					}
 				case sqlparser.OrderBy:
-					if target == "orderby" {
+					if target == OrderByExpression {
 						f(node)
 					}
 				}
