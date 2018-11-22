@@ -182,22 +182,12 @@ func main() {
 		q, syntaxErr := advisor.NewQuery4Audit(sql)
 		stmt := q.Stmt
 
-		switch stmt.(type) {
-		case *sqlparser.DDL:
-			// 因为 vitess 的 parser 对于 DDL 语法支持不好，通过在测试环境执行辅助进行语法检查
-			if common.Config.OnlySyntaxCheck && vEnv.BuildVirtualEnv(rEnv, sql) {
-				syntaxErr = vEnv.Error
-			}
-		}
-
 		// 如果语法检查出错则不需要给优化建议
 		if syntaxErr != nil {
 			errContent := fmt.Sprintf("At SQL %d : %v", sqlCounter, syntaxErr)
 			common.Log.Warning(errContent)
 			if common.Config.OnlySyntaxCheck {
-				if !strings.Contains(errContent, `doesn't exist`) {
-					fmt.Println(errContent)
-				}
+				fmt.Println(errContent)
 			}
 			if !common.Config.DryRun {
 				os.Exit(1)
