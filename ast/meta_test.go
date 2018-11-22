@@ -270,29 +270,31 @@ func TestFindColumn(t *testing.T) {
 
 func TestFindAllCols(t *testing.T) {
 	sqlList := []string{
-		"SELECT * FROM t1 LEFT JOIN (t2 CROSS JOIN t3 CROSS JOIN t4) ON (t2.a = t1.a AND t3.b = t1.b AND t4.c = t1.c)",
-		"select t from a LEFT JOIN b USING (c1, c2, c3)",
-		"select ID,name from (select address from customer_list where SID=1 order by phone limit 50,10) a join customer_list l on (a.address=l.address) join city c on (c.city=l.city) order by phone desc;",
-		"SELECT * FROM t1 LEFT JOIN (t2, t3, t4) ON (t2.a = t1.a AND t3.b = t1.b AND t4.c = t1.c)",
-		"SELECT * FROM t1 RIGHT JOIN (t2, t3, t4) ON (t2.a = t1.a AND t3.b = t1.b AND t4.c = t1.c)",
-		"SELECT left_tbl.* FROM left_tbl LEFT JOIN right_tbl ON left_tbl.id = right_tbl.id WHERE right_tbl.id IS NULL;",
-		"SELECT left_tbl.* FROM left_tbl RIGHT JOIN right_tbl ON left_tbl.id = right_tbl.id WHERE right_tbl.id IS NULL;",
-		"SELECT * FROM t1 where a in ('a','b')",
-		"SELECT * FROM t1 where a BETWEEN 'bar' AND 'foo'",
-		"SELECT * FROM t1 where a = sum(a,b)",
-		"SELECT distinct a FROM t1 where a = '2001-01-01 01:01:01'",
+		"select * from tb where a = '1' order by c",
+		"select * from tb where a = '1' group by c",
+		"select * from tb where c = '1' group by a",
+		"select * from tb join tb2 on c = c where c = '1' group by a",
 	}
 
-	for _, sql := range sqlList {
-		fmt.Println(sql)
+	targets := []Expression{
+		OrderByExpression,
+		GroupByExpression,
+		WhereExpression,
+		JoinExpression,
+	}
+
+	for i, sql := range sqlList {
 		stmt, err := sqlparser.Parse(sql)
-		// pretty.Println(stmt)
 		if err != nil {
-			panic(err)
+			t.Error(err)
+			return
 		}
 
-		columns := FindAllCols(stmt, "order by")
-		pretty.Println(columns)
+		columns := FindAllCols(stmt, targets[i])
+		if columns[0].Name != "c" {
+			fmt.Println(sql)
+			t.Error(fmt.Errorf("want 'c' got %v", columns))
+		}
 	}
 }
 
