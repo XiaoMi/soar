@@ -146,6 +146,10 @@ where col = 1`),
 --
 from tb
 where col = 1`),
+		[]byte(`select * from
+-- comment
+tb;
+select col from tb where col = 1;`),
 		// https://github.com/XiaoMi/soar/issues/120
 		[]byte(`
 -- comment

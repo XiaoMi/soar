@@ -31,7 +31,10 @@ where col = 1
 --
 from tb
 where col = 1
-17 
+17 select * from
+-- comment
+tb;
+18 
 -- comment
 0 select * from test\Ghello
 1 select 'hello\Gworld', col from test\Ghello
