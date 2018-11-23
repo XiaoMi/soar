@@ -936,7 +936,7 @@ update tbl set col = 1 and cl = 2 where col=3;
 
 * **Item**:RES.006
 * **Severity**:L4
-* **Content**:查询条件永远非真，这将导致查询无匹配到的结果。
+* **Content**:查询条件永远非真，如果该条件出现在 where 中可能导致查询无匹配到的结果。
 * **Case**:
 
 ```sql

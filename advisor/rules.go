@@ -897,7 +897,7 @@ func init() {
 			Item:     "RES.006",
 			Severity: "L4",
 			Summary:  "永远不真的比较条件",
-			Content:  "查询条件永远非真，这将导致查询无匹配到的结果。",
+			Content:  "查询条件永远非真，如果该条件出现在 where 中可能导致查询无匹配到的结果。",
 			Case:     "select * from tbl where 1 != 1;",
 			Func:     (*Query4Audit).RuleImpossibleWhere,
 		},
@@ -1335,7 +1335,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 
 	default:
-		common.Log.Debug("unknown report-type %s", format)
+		common.Log.Debug("report-type: %s", format)
 		buf = append(buf, fmt.Sprintln("Query: ", sql))
 		for _, rule := range suggest {
 			buf = append(buf, pretty.Sprint(rule))
