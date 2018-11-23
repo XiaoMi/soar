@@ -925,16 +925,18 @@ func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 		}
 
 		// new line end single line comment
-		if singleLineComment {
-			if b == '\r' || b == '\n' {
+		if b == '\r' || b == '\n' {
+			if singleLineComment {
 				sql = string(buf[:i])
-				if strings.HasPrefix(sql, "--") || strings.HasPrefix(sql, "#") {
+				if strings.HasPrefix(strings.TrimSpace(sql), "--") ||
+					strings.HasPrefix(strings.TrimSpace(sql), "#") {
 					// just comment, query start with '--', '#'
 					break
 				}
 				// comment in multi-line sql
 				continue
 			}
+			continue
 		}
 
 		// multi line comment

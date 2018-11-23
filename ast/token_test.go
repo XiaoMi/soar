@@ -127,6 +127,7 @@ func TestSplitStatement(t *testing.T) {
 		[]byte(`--`),
 		[]byte(`-- comment`),
 		[]byte(`# comment`),
+		// https://github.com/XiaoMi/soar/issues/116
 		[]byte(`select
 *
 -- comment
@@ -145,6 +146,12 @@ where col = 1`),
 --
 from tb
 where col = 1`),
+		// https://github.com/XiaoMi/soar/issues/120
+		[]byte(`
+-- comment
+select col from tb;
+select col from tb;
+`),
 	}
 	buf2s := [][]byte{
 		[]byte("select * from test\\Ghello"),
