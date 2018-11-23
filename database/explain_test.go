@@ -2366,7 +2366,7 @@ func TestExplain(t *testing.T) {
 
 func TestParseExplainText(t *testing.T) {
 	for _, content := range exp {
-		pretty.Println(string(RemoveSQLComments([]byte(content))))
+		pretty.Println(RemoveSQLComments(content))
 		pretty.Println(ParseExplainText(content))
 	}
 	/*

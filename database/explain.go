@@ -384,7 +384,7 @@ var ExplainExtra = map[string]string{
 func findTablesInJSON(explainJSON string, depth int) {
 	common.Log.Debug("findTablesInJSON Enter: depth(%d), json(%s)", depth, explainJSON)
 	// 去除注释，语法检查
-	explainJSON = string(RemoveSQLComments([]byte(explainJSON)))
+	explainJSON = RemoveSQLComments(explainJSON)
 	if !gjson.Valid(explainJSON) {
 		return
 	}
@@ -923,7 +923,7 @@ func parseVerticalExplainText(content string) (explainRows []*ExplainRow, err er
 // 解析文本形式JSON Explain信息
 func parseJSONExplainText(content string) (*ExplainJSON, error) {
 	explainJSON := new(ExplainJSON)
-	err := json.Unmarshal(RemoveSQLComments([]byte(content)), explainJSON)
+	err := json.Unmarshal([]byte(RemoveSQLComments(content)), explainJSON)
 	return explainJSON, err
 }
 

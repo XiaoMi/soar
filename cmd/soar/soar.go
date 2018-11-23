@@ -120,8 +120,7 @@ func main() {
 		buf = string(bufBytes)
 
 		// 去除无用的备注和空格
-		sql = strings.TrimSpace(sql)
-		sql = string(database.RemoveSQLComments([]byte(sql)))
+		sql = database.RemoveSQLComments(sql)
 		if sql == "" {
 			common.Log.Debug("empty query or comment, buf: %s", buf)
 			continue

@@ -88,3 +88,24 @@ func TestSource(t *testing.T) {
 		t.Error("Source result not match, expect 1, 1")
 	}
 }
+
+func TestRemoveSQLComments(t *testing.T) {
+	SQLs := []string{
+		`-- comment`,
+		`--`,
+		`# comment`,
+		`/* multi-line
+comment*/`,
+		`--
+-- comment`,
+	}
+
+	err := common.GoldenDiff(func() {
+		for _, sql := range SQLs {
+			fmt.Println(RemoveSQLComments(sql))
+		}
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+}

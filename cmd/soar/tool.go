@@ -175,7 +175,7 @@ func reportTool(sql string, bom []byte) (isContinue bool, exitCode int) {
 		fmt.Println(charset)
 		return false, 0
 	case "remove-comment":
-		fmt.Println(string(database.RemoveSQLComments([]byte(sql))))
+		fmt.Println(database.RemoveSQLComments(sql))
 		return false, 0
 	default:
 		return true, 0

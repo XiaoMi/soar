@@ -259,10 +259,11 @@ func (db *Connector) IsView(tbName string) bool {
 }
 
 // RemoveSQLComments 去除SQL中的注释
-func RemoveSQLComments(sql []byte) []byte {
+func RemoveSQLComments(sql string) string {
+	buf := []byte(sql)
 	cmtReg := regexp.MustCompile(`("(""|[^"])*")|('(''|[^'])*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
 
-	return cmtReg.ReplaceAllFunc(sql, func(s []byte) []byte {
+	res := cmtReg.ReplaceAllFunc(buf, func(s []byte) []byte {
 		if (s[0] == '"' && s[len(s)-1] == '"') ||
 			(s[0] == '\'' && s[len(s)-1] == '\'') ||
 			(string(s[:3]) == "/*!") {
@@ -270,6 +271,7 @@ func RemoveSQLComments(sql []byte) []byte {
 		}
 		return []byte("")
 	})
+	return strings.TrimSpace(string(res))
 }
 
 // 为了防止在 Online 环境进行误操作，通过 dangerousQuery 来判断能否在 Online 执行

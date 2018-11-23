@@ -1275,7 +1275,7 @@ func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 func (q *Query4Audit) RuleLoadFile() Rule {
 	var rule = q.RuleOK()
 	// 去除注释
-	sql := string(database.RemoveSQLComments([]byte(q.Query)))
+	sql := database.RemoveSQLComments(q.Query)
 	// 去除多余的空格和回车
 	sql = strings.Join(strings.Fields(sql), " ")
 	tks := ast.Tokenize(sql)
