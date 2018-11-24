@@ -19,24 +19,12 @@ package common
 import (
 	"flag"
 	"os"
-	"runtime"
 	"testing"
 
 	"github.com/kr/pretty"
 )
 
 var update = flag.Bool("update", false, "update .golden files")
-
-func TestGetDefaultLogOutput(t *testing.T) {
-	output := getDefaultLogOutput()
-	if runtime.GOOS == "windows" && output != "nul" {
-		t.Error("windows default -log-output not nul")
-	}
-
-	if runtime.GOOS != "windows" && output != "/dev/stderr" {
-		t.Error("default -log-output not /dev/stderr")
-	}
-}
 
 func TestParseConfig(t *testing.T) {
 	err := ParseConfig("")

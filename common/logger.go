@@ -39,17 +39,10 @@ func init() {
 // LoggerInit Log配置初始化
 func LoggerInit() {
 	Log.SetLevel(Config.LogLevel)
-	if Config.LogOutput == logs.AdapterConsole {
-		err := Log.SetLogger(logs.AdapterConsole)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	} else {
-		func() { _ = Log.DelLogger(logs.AdapterFile) }()
-		err := Log.SetLogger(logs.AdapterFile, fmt.Sprintf(`{"filename":"%s","level":7,"maxlines":0,"maxsize":0,"daily":false,"maxdays":0}`, Config.LogOutput))
-		if err != nil {
-			fmt.Println(err.Error())
-		}
+	func() { _ = Log.DelLogger(logs.AdapterFile) }()
+	err := Log.SetLogger(logs.AdapterFile, fmt.Sprintf(`{"filename":"%s","level":7,"maxlines":0,"maxsize":0,"daily":false,"maxdays":0}`, Config.LogOutput))
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 }
 

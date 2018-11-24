@@ -131,14 +131,6 @@ type Configuration struct {
 	MaxPrettySQLLength int    `yaml:"max-pretty-sql-length"` // 超出该长度的SQL会转换成指纹输出
 }
 
-// getDefaultLogOutput get default log-output by runtime.GOOS
-func getDefaultLogOutput() string {
-	if runtime.GOOS == "windows" {
-		return "nul"
-	}
-	return os.Stderr.Name()
-}
-
 // Config 默认设置
 var Config = &Configuration{
 	OnlineDSN: &dsn{
@@ -178,7 +170,7 @@ var Config = &Configuration{
 	SpaghettiQueryLength: 2048,
 	AllowDropIndex:       false,
 	LogLevel:             3,
-	LogOutput:            getDefaultLogOutput(),
+	LogOutput:            "soar.log",
 	ReportType:           "markdown",
 	ReportCSS:            "",
 	ReportJavascript:     "",
