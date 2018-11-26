@@ -692,11 +692,11 @@ select bp1.p_id, b1.d_d as l, b1.b_id from b1 join bp1 on (b1.b_id = bp1.b_id) l
 ```sql
 SELECT s,p,d FROM tbl WHERE p.p_id = (SELECT s.p_id FROM tbl WHERE s.c_id = 100996 AND s.q = 1 )
 ```
-## 不建议使用联表更新
+## 不建议使用联表删除或更新
 
 * **Item**:JOI.007
 * **Severity**:L4
-* **Content**:当需要同时更新多张表时建议使用简单 SQL，一条 SQL 只更新一张表，尽量不要将多张表的更新在同一条 SQL 中完成。
+* **Content**:当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 * **Case**:
 
 ```sql
