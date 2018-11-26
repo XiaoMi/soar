@@ -86,6 +86,11 @@ func checkConfig() int {
 			fmt.Println("test-dsn", common.Config.TestDSN)
 		}
 	}
+
+	if !testConn.HasAllPrivilege() {
+		fmt.Printf("test-dsn: %s, need all privileges", common.FormatDSN(common.Config.TestDSN))
+		return 1
+	}
 	// OnlineDSN connection check
 	onlineConn := &database.Connector{
 		Addr:     common.Config.OnlineDSN.Addr,
@@ -105,6 +110,11 @@ func checkConfig() int {
 		} else {
 			fmt.Println("online-dsn", common.Config.OnlineDSN)
 		}
+	}
+
+	if !onlineConn.HasSelectPrivilege() {
+		fmt.Printf("online-dsn: %s, need all privileges", common.FormatDSN(common.Config.OnlineDSN))
+		return 1
 	}
 	return 0
 }
