@@ -596,31 +596,31 @@ SELECT SUM(COL) FROM tbl;
 
 * **Item**:FUN.007
 * **Severity**:L1
-* **Content**:
+* **Content**:触发器的执行没有反馈和日志，隐藏了实际的执行步骤，当数据库出现问题是，不能通过慢日志分析触发器的具体执行情况，不易发现问题。在MySQL中，触发器不能临时关闭或打开，在数据迁移或数据恢复等场景下，需要临时drop触发器，可能影响到生产环境。
 * **Case**:
 
 ```sql
-
+CREATE TRIGGER t1 AFTER INSERT ON work FOR EACH ROW INSERT INTO time VALUES(NOW());
 ```
 ## 不建议使用存储过程
 
 * **Item**:FUN.008
 * **Severity**:L1
-* **Content**:
+* **Content**:存储过程无版本控制，配合业务的存储过程升级很难做到业务无感知。存储过程在拓展和移植上也存在问题。
 * **Case**:
 
 ```sql
-
+CREATE PROCEDURE simpleproc (OUT param1 INT);
 ```
 ## 不建议使用自定义函数
 
 * **Item**:FUN.009
 * **Severity**:L1
-* **Content**:
+* **Content**:不建议使用自定义函数
 * **Case**:
 
 ```sql
-
+CREATE FUNCTION hello (s CHAR(20));
 ```
 ## 不建议对等值查询列使用 GROUP BY
 
@@ -1166,19 +1166,19 @@ CREATE TABLE tbl (a int) DEFAULT CHARSET = latin1;
 
 * **Item**:TBL.006
 * **Severity**:L1
-* **Content**:
+* **Content**:不建议使用视图
 * **Case**:
 
 ```sql
-
+create view v_today (today) AS SELECT CURRENT_DATE;
 ```
 ## 不建议使用临时表
 
 * **Item**:TBL.007
 * **Severity**:L1
-* **Content**:
+* **Content**:不建议使用临时表
 * **Case**:
 
 ```sql
-
+CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;
 ```
