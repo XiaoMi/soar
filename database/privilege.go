@@ -74,7 +74,7 @@ func (db *Connector) HasAllPrivilege() bool {
 	}
 
 	// concat privilege columns
-	res, err := db.Query("SELECT GROUP_CONCAT(COLUMN_NAME) from information_schema.COLUMNS where TABLE_SCHEMA='mysql' and TABLE_NAME='user' and COLUMN_NAME like '%_priv'")
+	res, err := db.Query("SELECT GROUP_CONCAT(COLUMN_NAME) from information_schema.COLUMNS where TABLE_SCHEMA='mysql' and TABLE_NAME='user' and COLUMN_NAME like '%%_priv'")
 	if err != nil {
 		common.Log.Error("HasAllPrivilege, DSN: %s, Error: %s", db.Addr, err.Error())
 		return false
