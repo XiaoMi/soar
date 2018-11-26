@@ -101,6 +101,7 @@ type Configuration struct {
 	TableAllowEngines    []string `yaml:"table-allow-engines"`       // Table 允许使用的 Engine
 	MaxIdxCount          int      `yaml:"max-index-count"`           // 单张表允许最多索引数
 	MaxColCount          int      `yaml:"max-column-count"`          // 单张表允许最大列数
+	MaxValueCount        int      `yaml:"max-value-count"`           // INSERT/REPLACE 单次允许批量写入的行数
 	IdxPrefix            string   `yaml:"index-prefix"`              // 普通索引建议使用的前缀
 	UkPrefix             string   `yaml:"unique-key-prefix"`         // 唯一键建议使用的前缀
 	MaxSubqueryDepth     int      `yaml:"max-subquery-depth"`        // 子查询最大尝试
@@ -180,6 +181,7 @@ var Config = &Configuration{
 	TableAllowEngines:    []string{"innodb"},
 	MaxIdxCount:          10,
 	MaxColCount:          40,
+	MaxValueCount:        100,
 	MaxInCount:           10,
 	IdxPrefix:            "idx_",
 	UkPrefix:             "uk_",
@@ -532,6 +534,7 @@ func readCmdFlags() error {
 	tableAllowEngines := flag.String("table-allow-engines", strings.ToLower(strings.Join(Config.TableAllowEngines, ",")), "TableAllowEngines")
 	maxIdxCount := flag.Int("max-index-count", Config.MaxIdxCount, "MaxIdxCount, 单表最大索引个数")
 	maxColCount := flag.Int("max-column-count", Config.MaxColCount, "MaxColCount, 单表允许的最大列数")
+	maxValueCount := flag.Int("max-value-count", Config.MaxValueCount, "MaxValueCount, INSERT/REPLACE 单次批量写入允许的行数")
 	idxPrefix := flag.String("index-prefix", Config.IdxPrefix, "IdxPrefix")
 	ukPrefix := flag.String("unique-key-prefix", Config.UkPrefix, "UkPrefix")
 	maxSubqueryDepth := flag.Int("max-subquery-depth", Config.MaxSubqueryDepth, "MaxSubqueryDepth")
@@ -628,6 +631,7 @@ func readCmdFlags() error {
 	Config.TableAllowEngines = strings.Split(strings.ToLower(*tableAllowEngines), ",")
 	Config.MaxIdxCount = *maxIdxCount
 	Config.MaxColCount = *maxColCount
+	Config.MaxValueCount = *maxValueCount
 	Config.IdxPrefix = *idxPrefix
 	Config.UkPrefix = *ukPrefix
 	Config.MaxSubqueryDepth = *maxSubqueryDepth
