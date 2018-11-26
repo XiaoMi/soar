@@ -1637,20 +1637,86 @@ func TestRuleHavingClause(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
-// CLA.017
-func TestRuleForbiddenSyntax(t *testing.T) {
+// FUN.007
+func TestRuleForbiddenTrigger(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
-		`create view v_today (today) AS SELECT CURRENT_DATE;`,
-		`CREATE VIEW v (col) AS SELECT 'abc';`,
-		`CREATE FUNCTION hello (s CHAR(20));`,
+		`CREATE TRIGGER t1 AFTER INSERT ON work FOR EACH ROW INSERT INTO time VALUES(NOW());`,
+	}
+	for _, sql := range sqls {
+		q, _ := NewQuery4Audit(sql)
+		rule := q.RuleForbiddenTrigger()
+		if rule.Item != "FUN.007" {
+			t.Error("Rule not match:", rule.Item, "Expect : FUN.007")
+		}
+
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// FUN.008
+func TestRuleForbiddenProcedure(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
 		`CREATE PROCEDURE simpleproc (OUT param1 INT)`,
 	}
 	for _, sql := range sqls {
 		q, _ := NewQuery4Audit(sql)
-		rule := q.RuleForbiddenSyntax()
-		if rule.Item != "CLA.017" {
-			t.Error("Rule not match:", rule.Item, "Expect : CLA.017")
+		rule := q.RuleForbiddenProcedure()
+		if rule.Item != "FUN.008" {
+			t.Error("Rule not match:", rule.Item, "Expect : FUN.008")
+		}
+
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// FUN.009
+func TestRuleForbiddenFunction(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		`CREATE FUNCTION hello (s CHAR(20));`,
+	}
+	for _, sql := range sqls {
+		q, _ := NewQuery4Audit(sql)
+		rule := q.RuleForbiddenFunction()
+		if rule.Item != "FUN.009" {
+			t.Error("Rule not match:", rule.Item, "Expect : FUN.009")
+		}
+
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// TBL.006
+func TestRuleForbiddenView(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		`create view v_today (today) AS SELECT CURRENT_DATE;`,
+		`CREATE VIEW v (col) AS SELECT 'abc';`,
+	}
+	for _, sql := range sqls {
+		q, _ := NewQuery4Audit(sql)
+		rule := q.RuleForbiddenView()
+		if rule.Item != "TBL.006" {
+			t.Error("Rule not match:", rule.Item, "Expect : TBL.006")
+		}
+
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// TBL.007
+func TestRuleForbiddenTempTable(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		"CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;",
+	}
+	for _, sql := range sqls {
+		q, _ := NewQuery4Audit(sql)
+		rule := q.RuleForbiddenTempTable()
+		if rule.Item != "TBL.007" {
+			t.Error("Rule not match:", rule.Item, "Expect : TBL.007")
 		}
 
 	}

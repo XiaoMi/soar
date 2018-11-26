@@ -352,16 +352,6 @@ update tbl set col=1
 ```sql
 update tbl set col=1
 ```
-## 不建议使用存储过程、视图、触发器、临时表等
-
-* **Item**:CLA.017
-* **Severity**:L2
-* **Content**:这些功能的使用在一定程度上会使得程序难以调试和拓展，更没有移植性，且会极大的增加出现 BUG 的概率。
-* **Case**:
-
-```sql
-CREATE VIEW v_today (today) AS SELECT CURRENT_DATE;
-```
 ## 不建议使用 SELECT \* 类型查询
 
 * **Item**:COL.001
@@ -611,6 +601,36 @@ SELECT COUNT(1) FROM tbl;
 
 ```sql
 SELECT SUM(COL) FROM tbl;
+```
+## 不建议使用触发器
+
+* **Item**:FUN.007
+* **Severity**:L1
+* **Content**:触发器的执行没有反馈和日志，隐藏了实际的执行步骤，当数据库出现问题是，不能通过慢日志分析触发器的具体执行情况，不易发现问题。在MySQL中，触发器不能临时关闭或打开，在数据迁移或数据恢复等场景下，需要临时drop触发器，可能影响到生产环境。
+* **Case**:
+
+```sql
+CREATE TRIGGER t1 AFTER INSERT ON work FOR EACH ROW INSERT INTO time VALUES(NOW());
+```
+## 不建议使用存储过程
+
+* **Item**:FUN.008
+* **Severity**:L1
+* **Content**:存储过程无版本控制，配合业务的存储过程升级很难做到业务无感知。存储过程在拓展和移植上也存在问题。
+* **Case**:
+
+```sql
+CREATE PROCEDURE simpleproc (OUT param1 INT);
+```
+## 不建议使用自定义函数
+
+* **Item**:FUN.009
+* **Severity**:L1
+* **Content**:不建议使用自定义函数
+* **Case**:
+
+```sql
+CREATE FUNCTION hello (s CHAR(20));
 ```
 ## 不建议对等值查询列使用 GROUP BY
 
@@ -1151,4 +1171,24 @@ CREATE TABLE tbl (a int) AUTO_INCREMENT = 10;
 
 ```sql
 CREATE TABLE tbl (a int) DEFAULT CHARSET = latin1;
+```
+## 不建议使用视图
+
+* **Item**:TBL.006
+* **Severity**:L1
+* **Content**:不建议使用视图
+* **Case**:
+
+```sql
+create view v_today (today) AS SELECT CURRENT_DATE;
+```
+## 不建议使用临时表
+
+* **Item**:TBL.007
+* **Severity**:L1
+* **Content**:不建议使用临时表
+* **Case**:
+
+```sql
+CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;
 ```
