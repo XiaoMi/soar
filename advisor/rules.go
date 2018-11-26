@@ -264,6 +264,14 @@ func init() {
 			Case:     "select id from t where num not in(1,2,3);",
 			Func:     (*Query4Audit).RuleNot,
 		},
+		"ARG.012": {
+			Item:     "ARG.012",
+			Severity: "L2",
+			Summary:  "一次性 INSERT/REPLACE 的数据过多",
+			Content:  "单条 INSERT/REPLACE 语句批量插入大量数据性能较差，甚至可能导致从库同步延迟。为了提升性能，减少批量写入数据对从库同步延时的影响，建议采用分批次插入的方法。",
+			Case:     "INSERT INTO tb (a) VALUES (1), (2)",
+			Func:     (*Query4Audit).RuleInsertValues,
+		},
 		"CLA.001": {
 			Item:     "CLA.001",
 			Severity: "L4",
@@ -280,7 +288,6 @@ func init() {
 			Case:     "select name from tbl where id < 1000 order by rand(number)",
 			Func:     (*Query4Audit).RuleOrderByRand,
 		},
-
 		"CLA.003": {
 			Item:     "CLA.003",
 			Severity: "L2",

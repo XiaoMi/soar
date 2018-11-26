@@ -2135,6 +2135,21 @@ func (q *Query4Audit) RuleNot() Rule {
 	return rule
 }
 
+// RuleInsertValues ARG.012
+func (q *Query4Audit) RuleInsertValues() Rule {
+	var rule = q.RuleOK()
+	switch s := q.Stmt.(type) {
+	case *sqlparser.Insert:
+		switch val := s.Rows.(type) {
+		case sqlparser.Values:
+			if len(val) > common.Config.MaxValueCount {
+				rule = HeuristicRules["ARG.012"]
+			}
+		}
+	}
+	return rule
+}
+
 // RuleUNIONUsage SUB.002
 func (q *Query4Audit) RuleUNIONUsage() Rule {
 	var rule = q.RuleOK()

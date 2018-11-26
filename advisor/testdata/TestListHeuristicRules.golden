@@ -182,6 +182,16 @@ SELECT * FROM t1 USE INDEX (i1) ORDER BY a;
 ```sql
 select id from t where num not in(1,2,3);
 ```
+## 一次性 INSERT/REPLACE 的数据过多
+
+* **Item**:ARG.012
+* **Severity**:L2
+* **Content**:单条 INSERT/REPLACE 语句批量插入大量数据性能较差，甚至可能导致从库同步延迟。为了提升性能，减少批量写入数据对从库同步延时的影响，建议采用分批次插入的方法。
+* **Case**:
+
+```sql
+INSERT INTO tb (a) VALUES (1), (2)
+```
 ## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item**:CLA.001

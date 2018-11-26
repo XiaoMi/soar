@@ -1888,7 +1888,7 @@ func TestRuleHint(t *testing.T) {
 }
 
 // ARG.011
-func TestNot(t *testing.T) {
+func TestRuleNot(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
@@ -1922,6 +1922,46 @@ func TestNot(t *testing.T) {
 			t.Error("sqlparser.Parse Error:", err)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// ARG.012
+func TestRuleInsertValues(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`INSERT INTO tb VALUES (1), (2)`,
+			`REPLACE INTO tb VALUES (1), (2)`,
+		},
+		{
+			`INSERT INTO tb VALUES (1)`,
+		},
+	}
+	oldMaxValueCount := common.Config.MaxValueCount
+	common.Config.MaxValueCount = 1
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleInsertValues()
+			if rule.Item != "ARG.012" {
+				t.Error("Rule not match:", rule.Item, "Expect : ARG.012")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleInsertValues()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Config.MaxValueCount = oldMaxValueCount
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
