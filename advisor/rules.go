@@ -416,14 +416,6 @@ func init() {
 			Case:     "update tbl set col=1",
 			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给
 		},
-		"CLA.017": {
-			Item:     "CLA.017",
-			Severity: "L2",
-			Summary:  "不建议使用存储过程、视图、触发器、临时表等",
-			Content:  `这些功能的使用在一定程度上会使得程序难以调试和拓展，更没有移植性，且会极大的增加出现 BUG 的概率。`,
-			Case:     "CREATE VIEW v_today (today) AS SELECT CURRENT_DATE;",
-			Func:     (*Query4Audit).RuleForbiddenSyntax,
-		},
 		"COL.001": {
 			Item:     "COL.001",
 			Severity: "L1",
@@ -626,6 +618,30 @@ func init() {
 			Content:  `当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl`,
 			Case:     "SELECT SUM(COL) FROM tbl;",
 			Func:     (*Query4Audit).RuleSumNPE,
+		},
+		"FUN.007": {
+			Item:     "FUN.007",
+			Severity: "L1",
+			Summary:  "不建议使用触发器",
+			Content:  ``,
+			Case:     "",
+			Func:     (*Query4Audit).RuleForbiddenTrigger,
+		},
+		"FUN.008": {
+			Item:     "FUN.008",
+			Severity: "L1",
+			Summary:  "不建议使用存储过程",
+			Content:  ``,
+			Case:     "",
+			Func:     (*Query4Audit).RuleForbiddenProcedure,
+		},
+		"FUN.009": {
+			Item:     "FUN.009",
+			Severity: "L1",
+			Summary:  "不建议使用自定义函数",
+			Content:  ``,
+			Case:     "",
+			Func:     (*Query4Audit).RuleForbiddenFunction,
 		},
 		"GRP.001": {
 			Item:     "GRP.001",
@@ -1064,6 +1080,22 @@ func init() {
 			Content:  `表字符集只允许设置为` + strings.Join(common.Config.TableAllowCharsets, ","),
 			Case:     "CREATE TABLE tbl (a int) DEFAULT CHARSET = latin1;",
 			Func:     (*Query4Audit).RuleTableCharsetCheck,
+		},
+		"TBL.006": {
+			Item:     "TBL.006",
+			Severity: "L1",
+			Summary:  "不建议使用视图",
+			Content:  ``,
+			Case:     "",
+			Func:     (*Query4Audit).RuleForbiddenView,
+		},
+		"TBL.007": {
+			Item:     "TBL.007",
+			Severity: "L1",
+			Summary:  "不建议使用临时表",
+			Content:  ``,
+			Case:     "",
+			Func:     (*Query4Audit).RuleForbiddenTempTable,
 		},
 	}
 }

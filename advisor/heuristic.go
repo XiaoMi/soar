@@ -1768,6 +1768,81 @@ func (q *Query4Audit) RuleSumNPE() Rule {
 	return rule
 }
 
+// RuleForbiddenTrigger FUN.007
+func (q *Query4Audit) RuleForbiddenTrigger() Rule {
+	var rule = q.RuleOK()
+
+	// 由于vitess对某些语法的支持不完善，使得如创建临时表等语句无法通过语法检查
+	// 所以这里使用正则对触发器、临时表、存储过程等进行匹配
+	// 但是目前支持的也不是非常全面，有待完善匹配规则
+	// TODO TiDB 目前还不支持触发器、存储过程、自定义函数、外键
+
+	forbidden := []*regexp.Regexp{
+		regexp.MustCompile(`(?i)CREATE\s+TRIGGER\s+`),
+	}
+
+	for _, reg := range forbidden {
+		if reg.MatchString(q.Query) {
+			rule = HeuristicRules["FUN.007"]
+			if position := reg.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
+			break
+		}
+	}
+	return rule
+}
+
+// RuleForbiddenProcedure FUN.008
+func (q *Query4Audit) RuleForbiddenProcedure() Rule {
+	var rule = q.RuleOK()
+
+	// 由于vitess对某些语法的支持不完善，使得如创建临时表等语句无法通过语法检查
+	// 所以这里使用正则对触发器、临时表、存储过程等进行匹配
+	// 但是目前支持的也不是非常全面，有待完善匹配规则
+	// TODO TiDB 目前还不支持触发器、存储过程、自定义函数、外键
+
+	forbidden := []*regexp.Regexp{
+		regexp.MustCompile(`(?i)CREATE\s+PROCEDURE\s+`),
+	}
+
+	for _, reg := range forbidden {
+		if reg.MatchString(q.Query) {
+			rule = HeuristicRules["FUN.008"]
+			if position := reg.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
+			break
+		}
+	}
+	return rule
+}
+
+// RuleForbiddenFunction FUN.009
+func (q *Query4Audit) RuleForbiddenFunction() Rule {
+	var rule = q.RuleOK()
+
+	// 由于vitess对某些语法的支持不完善，使得如创建临时表等语句无法通过语法检查
+	// 所以这里使用正则对触发器、临时表、存储过程等进行匹配
+	// 但是目前支持的也不是非常全面，有待完善匹配规则
+	// TODO TiDB 目前还不支持触发器、存储过程、自定义函数、外键
+
+	forbidden := []*regexp.Regexp{
+		regexp.MustCompile(`(?i)CREATE\s+FUNCTION\s+`),
+	}
+
+	for _, reg := range forbidden {
+		if reg.MatchString(q.Query) {
+			rule = HeuristicRules["FUN.009"]
+			if position := reg.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
+			break
+		}
+	}
+	return rule
+}
+
 // RulePatternMatchingUsage ARG.007
 func (q *Query4Audit) RulePatternMatchingUsage() Rule {
 	var rule = q.RuleOK()
@@ -1929,39 +2004,6 @@ func (idxAdv *IndexAdvisor) RuleUpdatePrimaryKey() Rule {
 		}
 	}
 
-	return rule
-}
-
-// RuleForbiddenSyntax CLA.017
-func (q *Query4Audit) RuleForbiddenSyntax() Rule {
-	var rule = q.RuleOK()
-
-	// 由于vitess对某些语法的支持不完善，使得如创建临时表等语句无法通过语法检查
-	// 所以这里使用正则对触发器、临时表、存储过程等进行匹配
-	// 但是目前支持的也不是非常全面，有待完善匹配规则
-	// TODO TiDB 目前还不支持触发器、存储过程、自定义函数、外键
-
-	forbidden := []*regexp.Regexp{
-		regexp.MustCompile(`(?i)CREATE\s+TRIGGER\s+`),
-
-		regexp.MustCompile(`(?i)CREATE\s+TEMPORARY\s+TABLE\s+`),
-
-		regexp.MustCompile(`(?i)CREATE\s+VIEW\s+`),
-		regexp.MustCompile(`(?i)REPLACE\s+VIEW\s+`),
-
-		regexp.MustCompile(`(?i)CREATE\s+PROCEDURE\s+`),
-		regexp.MustCompile(`(?i)CREATE\s+FUNCTION\s+`),
-	}
-
-	for _, reg := range forbidden {
-		if reg.MatchString(q.Query) {
-			rule = HeuristicRules["CLA.017"]
-			if position := reg.FindIndex([]byte(q.Query)); len(position) > 0 {
-				rule.Position = position[0]
-			}
-			break
-		}
-	}
 	return rule
 }
 
@@ -2806,6 +2848,57 @@ func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 					}
 				}
 			}
+		}
+	}
+	return rule
+}
+
+// RuleForbiddenView TBL.006
+func (q *Query4Audit) RuleForbiddenView() Rule {
+	var rule = q.RuleOK()
+
+	// 由于vitess对某些语法的支持不完善，使得如创建临时表等语句无法通过语法检查
+	// 所以这里使用正则对触发器、临时表、存储过程等进行匹配
+	// 但是目前支持的也不是非常全面，有待完善匹配规则
+	// TODO TiDB 目前还不支持触发器、存储过程、自定义函数、外键
+
+	forbidden := []*regexp.Regexp{
+		regexp.MustCompile(`(?i)CREATE\s+VIEW\s+`),
+		regexp.MustCompile(`(?i)REPLACE\s+VIEW\s+`),
+	}
+
+	for _, reg := range forbidden {
+		if reg.MatchString(q.Query) {
+			rule = HeuristicRules["TBL.006"]
+			if position := reg.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
+			break
+		}
+	}
+	return rule
+}
+
+// RuleForbiddenTempTable TBL.007
+func (q *Query4Audit) RuleForbiddenTempTable() Rule {
+	var rule = q.RuleOK()
+
+	// 由于vitess对某些语法的支持不完善，使得如创建临时表等语句无法通过语法检查
+	// 所以这里使用正则对触发器、临时表、存储过程等进行匹配
+	// 但是目前支持的也不是非常全面，有待完善匹配规则
+	// TODO TiDB 目前还不支持触发器、存储过程、自定义函数、外键
+
+	forbidden := []*regexp.Regexp{
+		regexp.MustCompile(`(?i)CREATE\s+TEMPORARY\s+TABLE\s+`),
+	}
+
+	for _, reg := range forbidden {
+		if reg.MatchString(q.Query) {
+			rule = HeuristicRules["TBL.007"]
+			if position := reg.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
+			break
 		}
 	}
 	return rule

@@ -342,16 +342,6 @@ update tbl set col=1
 ```sql
 update tbl set col=1
 ```
-## 不建议使用存储过程、视图、触发器、临时表等
-
-* **Item**:CLA.017
-* **Severity**:L2
-* **Content**:这些功能的使用在一定程度上会使得程序难以调试和拓展，更没有移植性，且会极大的增加出现 BUG 的概率。
-* **Case**:
-
-```sql
-CREATE VIEW v_today (today) AS SELECT CURRENT_DATE;
-```
 ## 不建议使用 SELECT \* 类型查询
 
 * **Item**:COL.001
@@ -601,6 +591,36 @@ SELECT COUNT(1) FROM tbl;
 
 ```sql
 SELECT SUM(COL) FROM tbl;
+```
+## 不建议使用触发器
+
+* **Item**:FUN.007
+* **Severity**:L1
+* **Content**:
+* **Case**:
+
+```sql
+
+```
+## 不建议使用存储过程
+
+* **Item**:FUN.008
+* **Severity**:L1
+* **Content**:
+* **Case**:
+
+```sql
+
+```
+## 不建议使用自定义函数
+
+* **Item**:FUN.009
+* **Severity**:L1
+* **Content**:
+* **Case**:
+
+```sql
+
 ```
 ## 不建议对等值查询列使用 GROUP BY
 
@@ -1141,4 +1161,24 @@ CREATE TABLE tbl (a int) AUTO_INCREMENT = 10;
 
 ```sql
 CREATE TABLE tbl (a int) DEFAULT CHARSET = latin1;
+```
+## 不建议使用视图
+
+* **Item**:TBL.006
+* **Severity**:L1
+* **Content**:
+* **Case**:
+
+```sql
+
+```
+## 不建议使用临时表
+
+* **Item**:TBL.007
+* **Severity**:L1
+* **Content**:
+* **Case**:
+
+```sql
+
 ```
