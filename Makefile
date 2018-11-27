@@ -81,19 +81,9 @@ cover: test
 			{print "\033[93m"$$0"%\033[0m"}}'
 
 # Builds the project
-build: fmt tidb-parser
+build: fmt
 	@echo "\033[92mBuilding ...\033[0m"
 	@mkdir -p bin
-	@bash ./genver.sh
-	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
-		b=$$(basename $${d}) ; \
-		go build ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
-	done ; exit $$ret
-	@echo "build Success!"
-
-.PHONY: fast
-fast: fmt
-	@echo "\033[92mBuilding ...\033[0m"
 	@bash ./genver.sh
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
@@ -109,7 +99,7 @@ install: build
 
 # Generate doc use -list* command
 .PHONY: doc
-doc: fast
+doc: build
 	@echo "\033[92mAuto generate doc ...\033[0m"
 	./bin/soar -list-heuristic-rules > doc/heuristic.md
 	./bin/soar -list-rewrite-rules > doc/rewrite.md
@@ -133,27 +123,22 @@ vitess:
 .PHONY: tidb
 tidb:
 	@echo "\033[92mUpdate tidb deps ...\033[0m"
-	@echo -n "Current TiDB commit hash: "
-	@(cd ${GOPATH}/src/github.com/pingcap/tidb/ 2>/dev/null && git checkout master && git rev-parse HEAD) || echo "(init)"
-	@(go get -v -d github.com/pingcap/tidb/... || echo "go get tidb")
-	@echo -n "TiDB update to: "
-	@cd ${GOPATH}/src/github.com/pingcap/tidb/ && git pull && git rev-parse HEAD
+	govendor fetch -v github.com/pingcap/tidb/...
+
+# make pingcap parser
+.PHONY: pingcap-parser
+pingcap-parser: tidb
+	@echo "\033[92mUpdate pingcap parser deps ...\033[0m"
+	govendor fetch -v github.com/pingcap/parser/...
 
 # Update all vendor
 .PHONY: vendor
-vendor: vitess tidb
-
-# make tidb parser
-.PHONY: tidb-parser
-tidb-parser: tidb
-	@echo "\033[92mimporting tidb sql parser ...\033[0m"
-	@cd ${GOPATH}/src/github.com/pingcap/tidb && git checkout --quiet ec9672cea6612481b1da845dbab620b7a5581ca4  && make parser
-
+vendor: vitess pingcap-parser
 # gometalinter
 # 如果有不想改的lint问题可以使用metalinter.sh加黑名单
 #@bash doc/example/metalinter.sh
 .PHONY: lint
-lint: fast
+lint: build
 	@echo "\033[92mRun linter check ...\033[0m"
 	CGO_ENABLED=0 retool do gometalinter.v2 -j 1 --config doc/example/metalinter.json ./...
 	retool do revive -formatter friendly --exclude vendor/... -config doc/example/revive.toml ./...
@@ -206,10 +191,10 @@ main_test: install
 	@echo "main_test Success!"
 
 .PHONY: daily
-daily: | deps fmt vendor tidb-parser docker cover doc lint release install main_test clean logo
+daily: | deps fmt vendor docker cover doc lint release install main_test clean logo
 	@echo "\033[92mdaily build finished\033[0m"
 
-# vendor, tidb-parser, docker will cost long time, if all those are ready, daily-quick will much more fast.
+# vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
 daily-quick: | deps fmt cover doc lint logo
 	@echo "\033[92mdaily-quick build finished\033[0m"

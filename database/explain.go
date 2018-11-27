@@ -28,7 +28,7 @@ import (
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
 
-	tidb "github.com/pingcap/tidb/ast"
+	tidb "github.com/pingcap/parser/ast"
 	"github.com/tidwall/gjson"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
