@@ -29,7 +29,7 @@ import (
 
 	"github.com/kr/pretty"
 	"github.com/percona/go-mysql/query"
-	tidb "github.com/pingcap/tidb/ast"
+	tidb "github.com/pingcap/parser/ast"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 

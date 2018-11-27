@@ -27,12 +27,10 @@ import (
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
 	"github.com/XiaoMi/soar/database"
-
 	"github.com/gedex/inflector"
 	"github.com/percona/go-mysql/query"
-	tidb "github.com/pingcap/tidb/ast"
-	"github.com/pingcap/tidb/mysql"
-	"github.com/pingcap/tidb/types"
+	tidb "github.com/pingcap/parser/ast"
+	"github.com/pingcap/parser/mysql"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
@@ -1608,8 +1606,8 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 				// Insert statement
 				for _, values := range node.Lists {
 					for _, value := range values {
-						switch value.GetDatum().Kind() {
-						case types.KindFloat32, types.KindFloat64, types.KindMysqlDecimal:
+						switch value.GetType().Tp {
+						case mysql.TypeNewDecimal, mysql.TypeFloat:
 							rule = HeuristicRules["COL.009"]
 						}
 					}
@@ -1619,8 +1617,8 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 				// Select statement
 				switch where := node.Where.(type) {
 				case *tidb.BinaryOperationExpr:
-					switch where.R.GetDatum().Kind() {
-					case types.KindFloat32, types.KindFloat64, types.KindMysqlDecimal:
+					switch where.R.GetType().Tp {
+					case mysql.TypeNewDecimal, mysql.TypeFloat:
 						rule = HeuristicRules["COL.009"]
 					}
 				}

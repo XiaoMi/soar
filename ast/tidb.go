@@ -20,8 +20,9 @@ import (
 	"github.com/XiaoMi/soar/common"
 
 	"github.com/kr/pretty"
-	"github.com/pingcap/tidb/ast"
-	"github.com/pingcap/tidb/parser"
+	"github.com/pingcap/parser"
+	"github.com/pingcap/parser/ast"
+	_ "github.com/pingcap/tidb/types/parser_driver"
 )
 
 // TiParse TiDB 语法解析
