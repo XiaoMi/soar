@@ -2704,6 +2704,38 @@ func (q *Query4Audit) RuleUniqueKeyDup() Rule {
 	return rule
 }
 
+// RuleFulltextIndex KEY.010
+func (q *Query4Audit) RuleFulltextIndex() Rule {
+	var rule = q.RuleOK()
+
+	/* // TiDB parser
+	for _, tiStmt := range q.TiStmt {
+		switch tiStmt.(type) {
+		case *tidb.CreateTableStmt, *tidb.AlterTableStmt:
+		default:
+			return rule
+		}
+	}
+	*/
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+	default:
+		return rule
+	}
+
+	tks := ast.Tokenize(q.Query)
+	for _, tk := range tks {
+		switch tk.Type {
+		case ast.TokenTypeWord:
+			if strings.TrimSpace(strings.ToUpper(tk.Val)) == "FULLTEXT" {
+				rule = HeuristicRules["KEY.010"]
+			}
+		default:
+		}
+	}
+	return rule
+}
+
 // RuleTimestampDefault COL.013
 func (q *Query4Audit) RuleTimestampDefault() Rule {
 	var rule = q.RuleOK()

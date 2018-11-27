@@ -796,6 +796,14 @@ func init() {
 			Case:     "CREATE UNIQUE INDEX part_of_name ON customer (name(10));",
 			Func:     (*Query4Audit).RuleUniqueKeyDup,
 		},
+		"KEY.010": {
+			Item:     "KEY.010",
+			Severity: "L0",
+			Summary:  "全文索引不是银弹",
+			Content:  `全文索引主要用于解决模糊查询的性能问题，但需要控制好查询的频率和并发度。同时注意调整 ft_min_word_len, ft_max_word_len, ngram_token_size 等参数。`,
+			Case:     "CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `ip` varchar(255) NOT NULL DEFAULT '', PRIMARY KEY (`id`), FULLTEXT KEY `ip` (`ip`) ) ENGINE=InnoDB;",
+			Func:     (*Query4Audit).RuleFulltextIndex,
+		},
 		"KWR.001": {
 			Item:     "KWR.001",
 			Severity: "L2",
