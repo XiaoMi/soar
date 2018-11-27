@@ -22,6 +22,7 @@ import (
 	"github.com/kr/pretty"
 	"github.com/pingcap/parser"
 	"github.com/pingcap/parser/ast"
+	// for pincap parser
 	_ "github.com/pingcap/tidb/types/parser_driver"
 )
 

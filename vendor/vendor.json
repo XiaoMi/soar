@@ -9,48 +9,6 @@
 			"revisionTime": "2018-07-25T03:58:23Z"
 		},
 		{
-			"checksumSHA1": "bfIrhd+IsH6lmvRWzhSWWTwmmpw=",
-			"path": "github.com/XiaoMi/soar",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
-			"checksumSHA1": "Ygylqjfz7kg06wX9OajY/1dQGPw=",
-			"path": "github.com/XiaoMi/soar/advisor",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
-			"checksumSHA1": "fWjgVdgalpgU7pOudJ6l+HcUo+A=",
-			"path": "github.com/XiaoMi/soar/ast",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
-			"checksumSHA1": "tJ9961Sn8qPjyroAvVHGrGoaeIY=",
-			"path": "github.com/XiaoMi/soar/cmd/soar",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
-			"checksumSHA1": "oemy8Awsr7GYl+w/I1N0LZJTUVA=",
-			"path": "github.com/XiaoMi/soar/common",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
-			"checksumSHA1": "CLW1yvXeT/gZLxIeSjHaGn95Ifw=",
-			"path": "github.com/XiaoMi/soar/database",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
-			"checksumSHA1": "Z2P7fVYLlPq5fqwl1E+5wwbRKQY=",
-			"path": "github.com/XiaoMi/soar/env",
-			"revision": "bbf012d54a56327a43efd7ab576e841462662c7d",
-			"revisionTime": "2018-11-27T01:12:27Z"
-		},
-		{
 			"checksumSHA1": "OksAzF6VvpfTlte99lpVNV+iSnY=",
 			"path": "github.com/astaxie/beego/logs",
 			"revision": "053a075344c118a5cc41981b29ef612bb53d20ca",
