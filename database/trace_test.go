@@ -17,7 +17,6 @@
 package database
 
 import (
-	"flag"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -25,34 +24,30 @@ import (
 	"github.com/kr/pretty"
 )
 
-var update = flag.Bool("update", false, "update .golden files")
-
 func TestTrace(t *testing.T) {
-	common.Config.QueryTimeOut = 1
 	res, err := connTest.Trace("select 1")
-	if err == nil {
-		common.GoldenDiff(func() {
-			pretty.Println(res)
-		}, t.Name(), update)
-	} else {
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = common.GoldenDiff(func() {
+		pretty.Println(res)
+	}, t.Name(), update)
+	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestFormatTrace(t *testing.T) {
 	res, err := connTest.Trace("select 1")
-	if err == nil {
-		pretty.Println(FormatTrace(res))
-	} else {
+	if err != nil {
 		t.Error(err)
 	}
-}
 
-func TestGetTrace(t *testing.T) {
-	res, err := connTest.Trace("select 1")
-	if err == nil {
-		pretty.Println(getTrace(res))
-	} else {
+	err = common.GoldenDiff(func() {
+		pretty.Println(FormatTrace(res))
+	}, t.Name(), update)
+	if err != nil {
 		t.Error(err)
 	}
 }

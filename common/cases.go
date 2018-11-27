@@ -67,7 +67,7 @@ func init() {
 		"SELECT * FROM customer WHERE address_id in (224,510) ORDER BY last_name;",                               //  INDEX(address_id)
 		"SELECT * FROM film WHERE release_year = 2016 AND length != 1 ORDER BY title;",                           //  INDEX(`release_year`, `length`, `title`)
 
-		// "Covering" IdxRows
+		// "Covering" Rows
 		"SELECT title FROM film WHERE release_year = 1995;",                               //  INDEX(release_year, title)",
 		"SELECT title, replacement_cost FROM film WHERE language_id = 5 AND length = 70;", //  INDEX(language_id, length, title, replacement_cos film ), title, replacement_cost顺序无关，language_id, length顺序视散粒度情况.
 		"SELECT title FROM film WHERE language_id > 5 AND length > 70;",                   //  INDEX(language_id, length, title) language_id or length first (that's as far as the Algorithm goes), then the other two fields afterwards.

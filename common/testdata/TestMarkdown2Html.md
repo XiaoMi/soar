@@ -186,9 +186,9 @@ Input `***` or `---` on a blank line and press `return` will draw a horizontal l
 
 Typora support [YAML Front Matter](http://jekyllrb.com/docs/frontmatter/) now. Input `---` at the top of the article and then press `Enter` will introduce one. Or insert one metadata block from the menu.
 
-### Table of Contents (TOC)
+### TableName of Contents (TOC)
 
-Input `[toc]` then press `Return` key will create a section for “Table of Contents” extracting all headers from one’s writing, its contents will be updated automatically. 
+Input `[toc]` then press `Return` key will create a section for “TableName of Contents” extracting all headers from one’s writing, its contents will be updated automatically. 
 
 ### Diagrams (Sequence, Flowchart and Mermaid)
 

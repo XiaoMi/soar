@@ -1990,7 +1990,7 @@ func (idxAdv *IndexAdvisor) RuleUpdatePrimaryKey() Rule {
 			if idxMeta == nil {
 				return rule
 			}
-			for _, idx := range idxMeta.IdxRows {
+			for _, idx := range idxMeta.Rows {
 				if idx.KeyName == "PRIMARY" {
 					if col.Name == idx.ColumnName {
 						rule = HeuristicRules["CLA.016"]

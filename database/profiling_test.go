@@ -19,35 +19,21 @@ package database
 import (
 	"testing"
 
-	"github.com/XiaoMi/soar/common"
-
 	"github.com/kr/pretty"
 )
 
 func TestProfiling(t *testing.T) {
-	common.Config.QueryTimeOut = 1
-	res, err := connTest.Profiling("select 1")
-	if err == nil {
-		pretty.Println(res)
-	} else {
+	rows, err := connTest.Profiling("select 1")
+	if err != nil {
 		t.Error(err)
 	}
+	pretty.Println(rows)
 }
 
 func TestFormatProfiling(t *testing.T) {
 	res, err := connTest.Profiling("select 1")
-	if err == nil {
-		pretty.Println(FormatProfiling(res))
-	} else {
+	if err != nil {
 		t.Error(err)
 	}
-}
-
-func TestGetProfiling(t *testing.T) {
-	res, err := connTest.Profiling("select 1")
-	if err == nil {
-		pretty.Println(getProfiling(res))
-	} else {
-		t.Error(err)
-	}
+	pretty.Println(FormatProfiling(res))
 }

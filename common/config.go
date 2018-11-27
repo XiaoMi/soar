@@ -59,8 +59,6 @@ type Configuration struct {
 	Profiling               bool   `yaml:"profiling"`                 // 在开启数据采样的情况下，在测试环境执行进行profile
 	Trace                   bool   `yaml:"trace"`                     // 在开启数据采样的情况下，在测试环境执行进行Trace
 	Explain                 bool   `yaml:"explain"`                   // Explain开关
-	ConnTimeOut             int    `yaml:"conn-time-out"`             // 数据库连接超时时间，单位秒
-	QueryTimeOut            int    `yaml:"query-time-out"`            // 数据库SQL执行超时时间，单位秒
 	Delimiter               string `yaml:"delimiter"`                 // SQL分隔符
 
 	// +++++++++++++++日志相关+++++++++++++++++
@@ -97,8 +95,8 @@ type Configuration struct {
 	MaxInCount           int      `yaml:"max-in-count"`              // IN()最大数量
 	MaxIdxBytesPerColumn int      `yaml:"max-index-bytes-percolumn"` // 索引中单列最大字节数，默认767
 	MaxIdxBytes          int      `yaml:"max-index-bytes"`           // 索引总长度限制，默认3072
-	TableAllowCharsets   []string `yaml:"table-allow-charsets"`      // Table 允许使用的 DEFAULT CHARSET
-	TableAllowEngines    []string `yaml:"table-allow-engines"`       // Table 允许使用的 Engine
+	TableAllowCharsets   []string `yaml:"table-allow-charsets"`      // TableName 允许使用的 DEFAULT CHARSET
+	TableAllowEngines    []string `yaml:"table-allow-engines"`       // TableName 允许使用的 Engine
 	MaxIdxCount          int      `yaml:"max-index-count"`           // 单张表允许最多索引数
 	MaxColCount          int      `yaml:"max-column-count"`          // 单张表允许最大列数
 	MaxValueCount        int      `yaml:"max-value-count"`           // INSERT/REPLACE 单次允许批量写入的行数
@@ -135,12 +133,14 @@ type Configuration struct {
 // Config 默认设置
 var Config = &Configuration{
 	OnlineDSN: &dsn{
+		Net:     "tcp",
 		Schema:  "information_schema",
 		Charset: "utf8mb4",
 		Disable: true,
 		Version: 99999,
 	},
 	TestDSN: &dsn{
+		Net:     "tcp",
 		Schema:  "information_schema",
 		Charset: "utf8mb4",
 		Disable: true,
@@ -156,8 +156,6 @@ var Config = &Configuration{
 	Profiling:               false,
 	Trace:                   false,
 	Explain:                 true,
-	ConnTimeOut:             3,
-	QueryTimeOut:            30,
 	Delimiter:               ";",
 
 	MaxJoinTableCount:    5,
@@ -227,6 +225,7 @@ var Config = &Configuration{
 }
 
 type dsn struct {
+	Net    string `yaml:"net"`
 	Addr   string `yaml:"addr"`
 	Schema string `yaml:"schema"`
 
@@ -235,6 +234,10 @@ type dsn struct {
 	Password string `yaml:"password"`
 	Charset  string `yaml:"charset"`
 	Disable  bool   `yaml:"disable"`
+
+	Timeout      int `yaml:"timeout"`
+	ReadTimeout  int `yaml:"read-timeout"`
+	WriteTimeout int `yaml:"write-timeout"`
 
 	Version int `yaml:"-"` // 版本自动检查，不可配置
 }
@@ -502,8 +505,6 @@ func readCmdFlags() error {
 	explain := flag.Bool("explain", Config.Explain, "Explain, 是否开启Explain执行计划分析")
 	sampling := flag.Bool("sampling", Config.Sampling, "Sampling, 数据采样开关")
 	samplingStatisticTarget := flag.Int("sampling-statistic-target", Config.SamplingStatisticTarget, "SamplingStatisticTarget, 数据采样因子，对应 PostgreSQL 的 default_statistics_target")
-	connTimeOut := flag.Int("conn-time-out", Config.ConnTimeOut, "ConnTimeOut, 数据库连接超时时间，单位秒")
-	queryTimeOut := flag.Int("query-time-out", Config.QueryTimeOut, "QueryTimeOut, 数据库SQL执行超时时间，单位秒")
 	delimiter := flag.String("delimiter", Config.Delimiter, "Delimiter, SQL分隔符")
 	// +++++++++++++++日志相关+++++++++++++++++
 	logLevel := flag.Int("log-level", Config.LogLevel, "LogLevel, 日志级别, [0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]")
@@ -583,8 +584,6 @@ func readCmdFlags() error {
 	Config.Explain = *explain
 	Config.Sampling = *sampling
 	Config.SamplingStatisticTarget = *samplingStatisticTarget
-	Config.ConnTimeOut = *connTimeOut
-	Config.QueryTimeOut = *queryTimeOut
 
 	Config.LogLevel = *logLevel
 	if strings.HasPrefix(*logOutput, "/") {

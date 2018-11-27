@@ -20,75 +20,144 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/XiaoMi/soar/common"
+
 	"github.com/kr/pretty"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 func TestShowTableStatus(t *testing.T) {
-	connTest.Database = "information_schema"
-	ts, err := connTest.ShowTableStatus("TABLES")
+	orgDatabase := connTest.Database
+	connTest.Database = "sakila"
+	ts, err := connTest.ShowTableStatus("film")
 	if err != nil {
 		t.Error("ShowTableStatus Error: ", err)
 	}
+	if string(ts.Rows[0].Engine) != "InnoDB" {
+		t.Error("film table should be InnoDB engine")
+	}
 	pretty.Println(ts)
+
+	connTest.Database = "sakila"
+	ts, err = connTest.ShowTableStatus("actor_info")
+	if err != nil {
+		t.Error("ShowTableStatus Error: ", err)
+	}
+	if string(ts.Rows[0].Comment) != "VIEW" {
+		t.Error("actor_info should be VIEW")
+	}
+	pretty.Println(ts)
+	connTest.Database = orgDatabase
 }
 
 func TestShowTables(t *testing.T) {
-	connTest.Database = "information_schema"
+	orgDatabase := connTest.Database
+	connTest.Database = "sakila"
 	ts, err := connTest.ShowTables()
 	if err != nil {
 		t.Error("ShowTableStatus Error: ", err)
 	}
-	pretty.Println(ts)
+
+	err = common.GoldenDiff(func() {
+		for _, table := range ts {
+			fmt.Println(table)
+		}
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+	connTest.Database = orgDatabase
 }
 
 func TestShowCreateTable(t *testing.T) {
-	connTest.Database = "information_schema"
-	ts, err := connTest.ShowCreateTable("TABLES")
+	orgDatabase := connTest.Database
+	connTest.Database = "sakila"
+	ts, err := connTest.ShowCreateTable("film")
 	if err != nil {
 		t.Error("ShowCreateTable Error: ", err)
 	}
-	fmt.Println(ts)
-	stmt, err := sqlparser.Parse(ts)
-	pretty.Println(stmt, err)
+
+	err = common.GoldenDiff(func() {
+		fmt.Println(ts)
+		stmt, err := sqlparser.Parse(ts)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		pretty.Println(stmt, err)
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+
+	connTest.Database = orgDatabase
 }
 
 func TestShowIndex(t *testing.T) {
-	connTest.Database = "information_schema"
-	ti, err := connTest.ShowIndex("TABLES")
+	orgDatabase := connTest.Database
+	connTest.Database = "sakila"
+	ti, err := connTest.ShowIndex("film")
 	if err != nil {
 		t.Error("ShowIndex Error: ", err)
 	}
-	pretty.Println(ti.FindIndex(IndexKeyName, "idx_store_id_film_id"))
+
+	err = common.GoldenDiff(func() {
+		pretty.Println(ti)
+		pretty.Println(ti.FindIndex(IndexKeyName, "idx_title"))
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+
+	connTest.Database = orgDatabase
 }
 
 func TestShowColumns(t *testing.T) {
-	connTest.Database = "information_schema"
-	ti, err := connTest.ShowColumns("TABLES")
+	orgDatabase := connTest.Database
+	connTest.Database = "sakila"
+	ti, err := connTest.ShowColumns("film")
 	if err != nil {
 		t.Error("ShowColumns Error: ", err)
 	}
-	pretty.Println(ti)
+
+	err = common.GoldenDiff(func() {
+		pretty.Println(ti)
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+
+	connTest.Database = orgDatabase
 }
 
 func TestFindColumn(t *testing.T) {
-	ti, err := connTest.FindColumn("id", "")
+	ti, err := connTest.FindColumn("film_id", "sakila", "film")
 	if err != nil {
 		t.Error("FindColumn Error: ", err)
 	}
-	pretty.Println(ti)
-}
-
-func TestShowReference(t *testing.T) {
-	rv, err := connTest.ShowReference("test2", "homeImg")
+	err = common.GoldenDiff(func() {
+		pretty.Println(ti)
+	}, t.Name(), update)
 	if err != nil {
-		t.Error("ShowReference Error: ", err)
+		t.Error(err)
 	}
-	pretty.Println(rv)
 }
 
 func TestIsFKey(t *testing.T) {
-	if !connTest.IsFKey("sakila", "film", "language_id") {
+	if !connTest.IsForeignKey("sakila", "film", "language_id") {
 		t.Error("want True. got false")
+	}
+}
+
+func TestShowReference(t *testing.T) {
+	rv, err := connTest.ShowReference("sakila", "film")
+	if err != nil {
+		t.Error("ShowReference Error: ", err)
+	}
+
+	err = common.GoldenDiff(func() {
+		pretty.Println(rv)
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
 	}
 }

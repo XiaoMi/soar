@@ -176,9 +176,9 @@ $$
 
 <p>Typora support <a href="http://jekyllrb.com/docs/frontmatter/">YAML Front Matter</a> now. Input <code>---</code> at the top of the article and then press <code>Enter</code> will introduce one. Or insert one metadata block from the menu.</p>
 
-<h3>Table of Contents (TOC)</h3>
+<h3>TableName of Contents (TOC)</h3>
 
-<p>Input <code>[toc]</code> then press <code>Return</code> key will create a section for “Table of Contents” extracting all headers from one’s writing, its contents will be updated automatically.</p>
+<p>Input <code>[toc]</code> then press <code>Return</code> key will create a section for “TableName of Contents” extracting all headers from one’s writing, its contents will be updated automatically.</p>
 
 <h3>Diagrams (Sequence, Flowchart and Mermaid)</h3>
 

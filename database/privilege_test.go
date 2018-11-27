@@ -18,6 +18,16 @@ package database
 
 import "testing"
 
+func TestCurrentUser(t *testing.T) {
+	user, host, err := connTest.CurrentUser()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if user != "root" || host != "%" {
+		t.Errorf("Want user: root, host: %%. Get user: %s, host: %s", user, host)
+	}
+}
+
 func TestHasSelectPrivilege(t *testing.T) {
 	if !connTest.HasSelectPrivilege() {
 		t.Errorf("DSN: %s, User: %s, should has select privilege", connTest.Addr, connTest.User)

@@ -102,7 +102,7 @@ type Rule struct {
 * SEC   Security
 * STA   Standard
 * SUB   Subquery
-* TBL   Table
+* TBL   TableName
 * TRA   Trace, 由trace模块给
 
 */

@@ -914,7 +914,7 @@ func (idxAdv *IndexAdvisor) calcCardinality(cols []*common.Column) []*common.Col
 
 		// 检查对应列是否为主键或单列唯一索引，如果满足直接返回1，不再重复计算，提高效率
 		// 多列复合唯一索引不能跳过计算，单列普通索引不能跳过计算
-		for _, index := range idxAdv.IndexMeta[realDB][col.Table].IdxRows {
+		for _, index := range idxAdv.IndexMeta[realDB][col.Table].Rows {
 			// 根据索引的名称判断该索引包含的列数，列数大于1即为复合索引
 			columnCount := len(idxAdv.IndexMeta[realDB][col.Table].FindIndex(database.IndexKeyName, index.KeyName))
 			if col.Name == index.ColumnName {
@@ -1079,7 +1079,7 @@ func DuplicateKeyChecker(conn *database.Connector, databases ...string) map[stri
 			}
 
 			// 枚举所有的索引信息，提取用到的列
-			for _, idx := range idxInfo.IdxRows {
+			for _, idx := range idxInfo.Rows {
 				if _, ok := idxMap[idx.KeyName]; !ok {
 					idxMap[idx.KeyName] = make([]*common.Column, 0)
 					for _, col := range idxInfo.FindIndex(database.IndexKeyName, idx.KeyName) {

@@ -17,26 +17,70 @@
 package database
 
 import (
+	"flag"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
+
 	"github.com/kr/pretty"
 )
 
-// TODO: go test -race不通过待解决
-func TestQuery(t *testing.T) {
-	common.Config.QueryTimeOut = 1
-	_, err := connTest.Query("select sleep(2)")
-	if err == nil {
-		t.Error("connTest.Query not timeout")
+var connTest *Connector
+
+var update = flag.Bool("update", false, "update .golden files")
+
+func init() {
+	common.BaseDir = common.DevPath
+	common.ParseConfig("")
+	connTest = &Connector{
+		Addr:     common.Config.OnlineDSN.Addr,
+		User:     common.Config.OnlineDSN.User,
+		Pass:     common.Config.OnlineDSN.Password,
+		Database: common.Config.OnlineDSN.Schema,
+		Charset:  common.Config.OnlineDSN.Charset,
+	}
+	if _, err := connTest.Version(); err != nil {
+		common.Log.Critical("Test env Error: %v", err)
+		os.Exit(0)
 	}
 }
 
-func TestColumnCardinality(_ *testing.T) {
-	connTest.Database = "information_schema"
-	a := connTest.ColumnCardinality("TABLES", "TABLE_SCHEMA")
-	fmt.Println("TABLES.TABLE_SCHEMA:", a)
+func TestNewConnection(t *testing.T) {
+	_, err := connTest.NewConnection()
+	if err != nil {
+		t.Errorf("TestNewConnection, Error: %s", err.Error())
+	}
+}
+
+// TODO: go test -race不通过待解决
+func TestQuery(t *testing.T) {
+	res, err := connTest.Query("select 0")
+	if err != nil {
+		t.Error(err.Error())
+	}
+	for res.Rows.Next() {
+		var val int
+		err = res.Rows.Scan(&val)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		if val != 0 {
+			t.Error("should return 0")
+		}
+	}
+	// TODO: timeout test
+}
+
+func TestColumnCardinality(t *testing.T) {
+	orgDatabase := connTest.Database
+	connTest.Database = "sakila"
+	a := connTest.ColumnCardinality("actor", "first_name")
+	if a >= 1 || a <= 0 {
+		t.Error("sakila.actor.first_name cardinality should in (0, 1), now it's", a)
+	}
+	connTest.Database = orgDatabase
 }
 
 func TestDangerousSQL(t *testing.T) {
@@ -63,11 +107,15 @@ func TestWarningsAndQueryCost(t *testing.T) {
 	if err != nil {
 		t.Error("Query Error: ", err)
 	} else {
-		for _, w := range res.Warning {
-			pretty.Println(w.Str(2))
+		for res.Warning.Next() {
+			var str string
+			err = res.Warning.Scan(str)
+			if err != nil {
+				t.Error(err.Error())
+			}
+			pretty.Println(str)
 		}
-		fmt.Println(res.QueryCost)
-		pretty.Println(err)
+		fmt.Println(res.QueryCost, err)
 	}
 }
 
@@ -77,16 +125,6 @@ func TestVersion(t *testing.T) {
 		t.Error(err.Error())
 	}
 	fmt.Println(version)
-}
-
-func TestSource(t *testing.T) {
-	res, err := connTest.Source("testdata/" + t.Name() + ".sql")
-	if err != nil {
-		t.Error("Query Error: ", err)
-	}
-	if res[0].Rows[0].Int(0) != 1 || res[1].Rows[0].Int(0) != 1 {
-		t.Error("Source result not match, expect 1, 1")
-	}
 }
 
 func TestRemoveSQLComments(t *testing.T) {
@@ -108,4 +146,23 @@ comment*/`,
 	if err != nil {
 		t.Error(err)
 	}
+}
+
+func TestSingleIntValue(t *testing.T) {
+	val, err := connTest.SingleIntValue("read_only")
+	if err != nil {
+		t.Error(err)
+	}
+	if val < 0 {
+		t.Error("SingleIntValue, return should large than zero")
+	}
+}
+
+func TestIsView(t *testing.T) {
+	originalDatabase := connTest.Database
+	connTest.Database = "sakila"
+	if !connTest.IsView("actor_info") {
+		t.Error("actor_info should be a VIEW")
+	}
+	connTest.Database = originalDatabase
 }

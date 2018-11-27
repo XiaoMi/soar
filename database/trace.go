@@ -19,12 +19,9 @@ package database
 import (
 	"errors"
 	"fmt"
-	"io"
+	"github.com/XiaoMi/soar/common"
 	"regexp"
 	"strings"
-	"time"
-
-	"github.com/XiaoMi/soar/common"
 
 	"vitess.io/vitess/go/vt/sqlparser"
 )
@@ -43,10 +40,11 @@ type TraceRow struct {
 }
 
 // Trace 执行SQL，并对其Trace
-func (db *Connector) Trace(sql string, params ...interface{}) (*QueryResult, error) {
+func (db *Connector) Trace(sql string, params ...interface{}) ([]TraceRow, error) {
 	common.Log.Debug("Trace SQL: %s", sql)
+	var rows []TraceRow
 	if common.Config.TestDSN.Version < 50600 {
-		return nil, errors.New("version < 5.6, not support trace")
+		return rows, errors.New("version < 5.6, not support trace")
 	}
 
 	// 过滤不需要 Trace 的 SQL
@@ -55,98 +53,71 @@ func (db *Connector) Trace(sql string, params ...interface{}) (*QueryResult, err
 		sql = "explain " + sql
 	case sqlparser.EXPLAIN:
 	default:
-		return nil, errors.New("no need trace")
+		return rows, errors.New("no need trace")
 	}
 
 	// 测试环境如果检查是关闭的，则SQL不会被执行
 	if common.Config.TestDSN.Disable {
-		return nil, errors.New("Dsn Disable")
+		return rows, errors.New("dsn is disable")
 	}
 
 	// 数据库安全性检查：如果 Connector 的 IP 端口与 TEST 环境不一致，则启用SQL白名单
 	// 不在白名单中的SQL不允许执行
 	// 执行环境与test环境不相同
 	if db.Addr != common.Config.TestDSN.Addr && db.dangerousQuery(sql) {
-		return nil, fmt.Errorf("query Execution Deny: Execute SQL with DSN(%s/%s) '%s'",
+		return rows, fmt.Errorf("query Execution Deny: Execute SQL with DSN(%s/%s) '%s'",
 			db.Addr, db.Database, fmt.Sprintf(sql, params...))
 	}
 
 	common.Log.Debug("Execute SQL with DSN(%s/%s) : %s", db.Addr, db.Database, sql)
-	conn := db.NewConnection()
-
-	// 设置SQL连接超时时间
-	conn.SetTimeout(time.Duration(common.Config.ConnTimeOut) * time.Second)
-	defer conn.Close()
-	err := conn.Connect()
+	conn, err := db.NewConnection()
 	if err != nil {
-		return nil, err
+		return rows, err
+	}
+	defer conn.Close()
+
+	// 开启Trace
+	common.Log.Debug("SET SESSION OPTIMIZER_TRACE='enabled=on'")
+	trx, err := conn.Begin()
+	if err != nil {
+		return rows, err
+	}
+	defer trx.Rollback()
+	_, err = trx.Query("SET SESSION OPTIMIZER_TRACE='enabled=on'")
+	common.LogIfError(err, "")
+
+	// 执行SQL，抛弃返回结果
+	tmpRes, err := trx.Query(sql, params...)
+	if err != nil {
+		return rows, err
+	}
+	for tmpRes.Next() {
+		continue
 	}
 
-	// 添加SQL执行超时限制
-	ch := make(chan QueryResult, 1)
-	go func() {
-		// 开启Trace
-		common.Log.Debug("SET SESSION OPTIMIZER_TRACE='enabled=on'")
-		_, _, err = conn.Query("SET SESSION OPTIMIZER_TRACE='enabled=on'")
-		common.LogIfError(err, "")
-
-		// 执行SQL，抛弃返回结果
-		result, err := conn.Start(sql, params...)
+	// 返回Trace结果
+	res, err := trx.Query("SELECT * FROM information_schema.OPTIMIZER_TRACE")
+	for res.Next() {
+		var traceRow TraceRow
+		err = res.Scan(&traceRow.Query, &traceRow.Trace, &traceRow.MissingBytesBeyondMaxMemSize, &traceRow.InsufficientPrivileges)
 		if err != nil {
-			ch <- QueryResult{
-				Error: err,
-			}
-			return
+			common.LogIfError(err, "")
 		}
-		row := result.MakeRow()
-		for {
-			err = result.ScanRow(row)
-			if err == io.EOF {
-				break
-			}
-		}
-
-		// 返回Trace结果
-		res := QueryResult{}
-		res.Rows, res.Result, res.Error = conn.Query("SELECT * FROM information_schema.OPTIMIZER_TRACE")
-
-		// 关闭Trace
-		common.Log.Debug("SET SESSION OPTIMIZER_TRACE='enabled=off'")
-		_, _, err = conn.Query("SET SESSION OPTIMIZER_TRACE='enabled=off'")
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		ch <- res
-	}()
-
-	select {
-	case res := <-ch:
-		return &res, res.Error
-	case <-time.After(time.Duration(common.Config.QueryTimeOut) * time.Second):
-		return nil, errors.New("query execution timeout")
+		rows = append(rows, traceRow)
 	}
-}
 
-// getTrace 获取trace信息
-func getTrace(res *QueryResult) Trace {
-	var rows []TraceRow
-	for _, row := range res.Rows {
-		rows = append(rows, TraceRow{
-			Query: row.Str(0),
-			Trace: row.Str(1),
-			MissingBytesBeyondMaxMemSize: row.Int(2),
-			InsufficientPrivileges:       row.Int(3),
-		})
-	}
-	return Trace{Rows: rows}
+	// 关闭Trace
+	common.Log.Debug("SET SESSION OPTIMIZER_TRACE='enabled=off'")
+	_, err = trx.Query("SET SESSION OPTIMIZER_TRACE='enabled=off'")
+	common.LogIfError(err, "")
+	return rows, err
 }
 
 // FormatTrace 格式化输出Trace信息
-func FormatTrace(res *QueryResult) string {
+func FormatTrace(rows []TraceRow) string {
 	explainReg := regexp.MustCompile(`(?i)^explain\s+`)
-	trace := getTrace(res)
 	str := []string{""}
-	for _, row := range trace.Rows {
+	for _, row := range rows {
 		str = append(str, "```sql")
 		sql := explainReg.ReplaceAllString(row.Query, "")
 		str = append(str, sql)

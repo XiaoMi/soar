@@ -17,31 +17,12 @@
 package database
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 
 	"github.com/kr/pretty"
 )
-
-var connTest *Connector
-
-func init() {
-	common.BaseDir = common.DevPath
-	common.ParseConfig("")
-	connTest = &Connector{
-		Addr:     common.Config.OnlineDSN.Addr,
-		User:     common.Config.OnlineDSN.User,
-		Pass:     common.Config.OnlineDSN.Password,
-		Database: common.Config.OnlineDSN.Schema,
-	}
-	if _, err := connTest.Version(); err != nil {
-		common.Log.Critical("Test env Error: %v", err)
-		os.Exit(0)
-	}
-}
 
 var sqls = []string{
 	`select * from city where country_id = 44;`,
@@ -54,10 +35,10 @@ var sqls = []string{
 	`select * from city where country_id > 31 and city = 'Aden';`,
 	`select * from address where address_id > 8 and city_id < 400 and district = 'Nantou';`,
 	`select * from address where address_id > 8 and city_id < 400;`,
-	`select * from actor where last_update='2006-02-15 04:34:33' and last_name='CHASE' group by first_name;`,
-	`select * from address where last_update >='2014-09-25 22:33:47' group by district;`,
-	`select * from address group by address,district;`,
-	`select * from address where last_update='2014-09-25 22:30:27' group by district,(address_id+city_id);`,
+	`select first_name from actor where last_update='2006-02-15 04:34:33' and last_name='CHASE' group by first_name;`,
+	`select district from address where last_update >='2014-09-25 22:33:47' group by district;`,
+	`select address from address group by address,district;`,
+	`select district from address where last_update='2014-09-25 22:30:27' group by district,(address_id+city_id);`,
 	`select * from customer where active=1 order by last_name limit 10;`,
 	`select * from customer order by last_name limit 10;`,
 	`select * from customer where address_id > 224 order by address_id limit 10;`,
@@ -2351,16 +2332,23 @@ possible_keys: idx_fk_country_id,idx_country_id_city,idx_all,idx_other
 }
 
 func TestExplain(t *testing.T) {
-	for _, sql := range sqls {
+	// TraditionalFormatExplain
+	for idx, sql := range sqls {
 		exp, err := connTest.Explain(sql, TraditionalExplainType, TraditionalFormatExplain)
-		//exp, err := conn.Explain(sql, TraditionalExplainType, JSONFormatExplain)
-		fmt.Println("Old: ", sql)
-		fmt.Println("New: ", exp.SQL)
 		if err != nil {
-			fmt.Println(err)
+			t.Error(err)
 		}
+		pretty.Println("No.:", idx, "\nOld: ", sql, "\nNew: ", exp.SQL)
 		pretty.Println(exp)
-		fmt.Println()
+	}
+	// JSONFormatExplain
+	for idx, sql := range sqls {
+		exp, err := connTest.Explain(sql, TraditionalExplainType, JSONFormatExplain)
+		if err != nil {
+			t.Error(err)
+		}
+		pretty.Println("No.:", idx, "\nOld: ", sql, "\nNew: ", exp.SQL)
+		pretty.Println(exp)
 	}
 }
 
@@ -2400,6 +2388,7 @@ func TestPrintMarkdownExplainTable(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	err = common.GoldenDiff(func() {
 		PrintMarkdownExplainTable(expInfo)
 	}, t.Name(), update)

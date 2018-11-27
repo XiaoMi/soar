@@ -161,8 +161,9 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 
 	// TODO: 1 hour should be config-able
 	minHour := 1
-	for _, row := range dbs.Rows {
-		testDatabase := row.Str(0)
+	for dbs.Rows.Next() {
+		var testDatabase string
+		dbs.Rows.Scan(&testDatabase)
 		// test temporary database format `optimizer_YYMMDDHHmmss_randomString(16)`
 		if len(testDatabase) != 39 {
 			common.Log.Debug("CleanupTestDatabase by pass %s", testDatabase)
@@ -218,7 +219,7 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 	meta := make(map[string]*common.DB)
 	for _, sql := range SQLs {
 
-		common.Log.Debug("BuildVirtualEnv Database&Table Mapping, SQL: %s", sql)
+		common.Log.Debug("BuildVirtualEnv Database&TableName Mapping, SQL: %s", sql)
 
 		stmt, err = sqlparser.Parse(sql)
 		if err != nil {
@@ -320,7 +321,7 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 				}
 
 				// 如果是视图，解析语句
-				if len(tbStatus.Rows) > 0 && tbStatus.Rows[0].Comment == "VIEW" {
+				if len(tbStatus.Rows) > 0 && string(tbStatus.Rows[0].Comment) == "VIEW" {
 					tmpEnv.Database = db
 					var viewDDL string
 					viewDDL, err = tmpEnv.ShowCreateTable(tb.TableName)
@@ -418,7 +419,7 @@ func (ve VirtualEnv) createTable(rEnv database.Connector, dbName, tbName string)
 		return nil
 	}
 
-	common.Log.Debug("createTable, Database: %s, Table: %s", dbName, tbName)
+	common.Log.Debug("createTable, Database: %s, TableName: %s", dbName, tbName)
 
 	//  TODO：查看是否有外键关联（done），对外键的支持 (未解决循环依赖的问题)
 
@@ -506,9 +507,9 @@ func (ve *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
 						DB:         dbName,
 						Table:      tb.TableName,
 						DataType:   colInfo.Type,
-						Character:  colInfo.Collation,
+						Character:  string(colInfo.Collation),
 						Key:        colInfo.Key,
-						Default:    colInfo.Default,
+						Default:    string(colInfo.Default),
 						Extra:      colInfo.Extra,
 						Comment:    colInfo.Comment,
 						Privileges: colInfo.Privileges,
@@ -525,9 +526,9 @@ func (ve *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
 							col.DB = dbName
 							col.Table = tb.TableName
 							col.DataType = colInfo.Type
-							col.Character = colInfo.Collation
+							col.Character = string(colInfo.Collation)
 							col.Key = colInfo.Key
-							col.Default = colInfo.Default
+							col.Default = string(colInfo.Default)
 							col.Extra = colInfo.Extra
 							col.Comment = colInfo.Comment
 							col.Privileges = colInfo.Privileges

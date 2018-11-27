@@ -32,6 +32,8 @@ func TestSamplingData(t *testing.T) {
 		User:     common.Config.OnlineDSN.User,
 		Pass:     common.Config.OnlineDSN.Password,
 		Database: common.Config.OnlineDSN.Schema,
+		Charset:  common.Config.OnlineDSN.Charset,
+		Net:      common.Config.OnlineDSN.Net,
 	}
 
 	offline := &Connector{
@@ -39,6 +41,8 @@ func TestSamplingData(t *testing.T) {
 		User:     common.Config.TestDSN.User,
 		Pass:     common.Config.TestDSN.Password,
 		Database: common.Config.TestDSN.Schema,
+		Charset:  common.Config.TestDSN.Charset,
+		Net:      common.Config.TestDSN.Net,
 	}
 
 	offline.Database = "test"

@@ -27,7 +27,7 @@ type Meta map[string]*DB
 // DB 数据库相关的结构体
 type DB struct {
 	Name  string
-	Table map[string]*Table // ['table_name']*Table
+	Table map[string]*Table // ['table_name']*TableName
 }
 
 // NewDB 用于初始化*DB
@@ -38,14 +38,14 @@ func NewDB(db string) *DB {
 	}
 }
 
-// Table 含有表的属性
+// TableName 含有表的属性
 type Table struct {
 	TableName    string
 	TableAliases []string
 	Column       map[string]*Column
 }
 
-// NewTable 初始化*Table
+// NewTable 初始化*TableName
 func NewTable(tb string) *Table {
 	return &Table{
 		TableName:    tb,

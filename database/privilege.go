@@ -18,6 +18,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/XiaoMi/soar/common"
@@ -29,8 +30,13 @@ func (db *Connector) CurrentUser() (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	if len(res.Rows) > 0 {
-		cols := strings.Split(res.Rows[0].Str(0), "@")
+	if res.Rows.Next() {
+		var currentUser string
+		err = res.Rows.Scan(&currentUser)
+		if err != nil {
+			return "", "", err
+		}
+		cols := strings.Split(currentUser, "@")
 		if len(cols) == 2 {
 			user := strings.Trim(cols[0], "'")
 			host := strings.Trim(cols[1], "'")
@@ -51,14 +57,20 @@ func (db *Connector) HasSelectPrivilege() bool {
 		common.Log.Error("User: %s, HasSelectPrivilege: %s", db.User, err.Error())
 		return false
 	}
-	res, err := db.Query("select Select_priv from mysql.user where user='%s' and host='%s'", user, host)
+	res, err := db.Query(fmt.Sprintf("select Select_priv from mysql.user where user='%s' and host='%s'", user, host))
 	if err != nil {
 		common.Log.Error("HasSelectPrivilege, DSN: %s, Error: %s", db.Addr, err.Error())
 		return false
 	}
 	// Select_priv
-	if len(res.Rows) > 0 {
-		if res.Rows[0].Str(0) == "Y" {
+	if res.Rows.Next() {
+		var selectPrivilege string
+		err = res.Rows.Scan(&selectPrivilege)
+		if err != nil {
+			common.Log.Error("HasSelectPrivilege, Scan Error: %s", err.Error())
+			return false
+		}
+		if selectPrivilege == "Y" {
 			return true
 		}
 	}
@@ -79,24 +91,31 @@ func (db *Connector) HasAllPrivilege() bool {
 		common.Log.Error("HasAllPrivilege, DSN: %s, Error: %s", db.Addr, err.Error())
 		return false
 	}
+
 	var priv string
-	if len(res.Rows) > 0 {
-		priv = res.Rows[0].Str(0)
-	} else {
-		common.Log.Error("HasAllPrivilege, DSN: %s, get privilege string error", db.Addr)
-		return false
+	if res.Rows.Next() {
+		err = res.Rows.Scan(&priv)
+		if err != nil {
+			common.Log.Error("HasAllPrivilege, DSN: %s, Scan error", db.Addr)
+			return false
+		}
 	}
 
 	// get all privilege status
-	res, err = db.Query("select concat("+priv+") from mysql.user where user='%s' and host='%s'", user, host)
+	res, err = db.Query(fmt.Sprintf("select concat("+priv+") from mysql.user where user='%s' and host='%s'", user, host))
 	if err != nil {
 		common.Log.Error("HasAllPrivilege, DSN: %s, Error: %s", db.Addr, err.Error())
 		return false
 	}
 
 	// %_priv
-	if len(res.Rows) > 0 {
-		if strings.Replace(res.Rows[0].Str(0), "Y", "", -1) == "" {
+	if res.Rows.Next() {
+		err = res.Rows.Scan(&priv)
+		if err != nil {
+			common.Log.Error("HasAllPrivilege, DSN: %s, Scan error", db.Addr)
+			return false
+		}
+		if strings.Replace(priv, "Y", "", -1) == "" {
 			return true
 		}
 	}
