@@ -812,6 +812,16 @@ SELECT * FROM tbl ORDER BY a DESC, b ASC;
 ```sql
 CREATE UNIQUE INDEX part_of_name ON customer (name(10));
 ```
+## 全文索引不是银弹
+
+* **Item**:KEY.010
+* **Severity**:L0
+* **Content**:全文索引主要用于解决模糊查询的性能问题，但需要控制好查询的频率和并发度。同时注意调整 ft\_min\_word\_len, ft\_max\_word\_len, ngram\_token\_size 等参数。
+* **Case**:
+
+```sql
+CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `ip` varchar(255) NOT NULL DEFAULT '', PRIMARY KEY (`id`), FULLTEXT KEY `ip` (`ip`) ) ENGINE=InnoDB;
+```
 ## SQL\_CALC\_FOUND\_ROWS 效率低下
 
 * **Item**:KWR.001

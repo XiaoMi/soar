@@ -2130,6 +2130,7 @@ func TestCompareWithFunction(t *testing.T) {
 		{
 			`select id from t where substring(name,1,3)='abc';`,
 			`SELECT * FROM tbl WHERE UNIX_TIMESTAMP(loginTime) BETWEEN UNIX_TIMESTAMP('2018-11-16 09:46:00 +0800 CST') AND UNIX_TIMESTAMP('2018-11-22 00:00:00 +0800 CST')`,
+			`select id from t where num/2 = 100`,
 		},
 		// TODO: 右侧使用函数比较
 		{
@@ -2585,6 +2586,47 @@ func TestRuleUniqueKeyDup(t *testing.T) {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleUniqueKeyDup()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// KEY.010
+func TestRuleFulltextIndex(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`ALTER TABLE tb ADD FULLTEXT INDEX ip (ip);`,
+			// `CREATE FULLTEXT INDEX ft_ip ON tb (ip);`, // TODO: tidb not support yet
+			`CREATE TABLE tb ( id int(10) unsigned NOT NULL AUTO_INCREMENT, ip varchar(255) NOT NULL DEFAULT '', PRIMARY KEY (id), FULLTEXT KEY ip (ip) ) ENGINE=InnoDB;`,
+		},
+		{
+			`ALTER TABLE tbl add INDEX idx_col (col);`,
+			`CREATE INDEX part_of_name ON customer (name(10));`,
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleFulltextIndex()
+			if rule.Item != "KEY.010" {
+				t.Error("Rule not match:", rule.Item, "Expect : KEY.010")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleFulltextIndex()
 			if rule.Item != "OK" {
 				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}
