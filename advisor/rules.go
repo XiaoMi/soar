@@ -709,8 +709,8 @@ func init() {
 		"JOI.007": {
 			Item:     "JOI.007",
 			Severity: "L4",
-			Summary:  "不建议使用联表更新",
-			Content:  `当需要同时更新多张表时建议使用简单 SQL，一条 SQL 只更新一张表，尽量不要将多张表的更新在同一条 SQL 中完成。`,
+			Summary:  "不建议使用联表删除或更新",
+			Content:  `当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。`,
 			Case:     "UPDATE users u LEFT JOIN hobby h ON u.id = h.uid SET u.name = 'pianoboy' WHERE h.hobby = 'piano';",
 			Func:     (*Query4Audit).RuleMultiDeleteUpdate,
 		},
