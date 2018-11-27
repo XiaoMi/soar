@@ -1,0 +1,8 @@
+
+Copyright 2018 Xiaomi, Inc.  All Rights Reserved.
+This product includes software developed by Xiaomi, Inc.
+(http://www.mi.com/).
+This product is licensed to you under the Apache License, Version 2.0
+(the "License").  You may not use this product except in compliance with
+the License.
+
