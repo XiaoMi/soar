@@ -122,6 +122,7 @@ func (ve VirtualEnv) RealDB(hash string) string {
 	if _, ok := ve.hash2Db[hash]; ok {
 		return ve.hash2Db[hash]
 	}
+	common.Log.Error("RealDB, missing hash map: %s", hash)
 	return hash
 }
 
@@ -355,7 +356,9 @@ func (ve VirtualEnv) createDatabase(rEnv database.Connector, dbName string) erro
 	}
 
 	// optimizer_YYMMDDHHmmss_xxxx
-	dbHash := fmt.Sprintf("optimizer_%s_%s", time.Now().Format("060102150405"), uniuri.New())
+	dbHash := fmt.Sprintf("optimizer_%s_%s", // Total 39 bytes
+		time.Now().Format("060102150405"), // 12 Bytes 20180102030405
+		strings.ToLower(uniuri.New()))     // 16 Bytes random string
 	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", dbName, dbName, dbHash)
 	ddl, err := rEnv.ShowCreateDatabase(dbName)
 	if err != nil {
