@@ -288,7 +288,6 @@ func main() {
 						// EXPLAIN 阶段给出的 ERROR 是 ERR.002
 						mysqlSuggest["ERR.002"] = advisor.RuleMySQLError("ERR.002", err)
 						common.Log.Error("vEnv.Explain Error: %v", err)
-						continue
 					}
 				}
 				// 分析 EXPLAIN 结果
