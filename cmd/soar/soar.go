@@ -192,9 +192,7 @@ func main() {
 				os.Exit(1)
 			}
 			// tidb parser 语法检查给出的建议 ERR.000
-			if common.Config.TestDSN.Disable {
-				mysqlSuggest["ERR.000"] = advisor.RuleMySQLError("ERR.000", syntaxErr)
-			}
+			mysqlSuggest["ERR.000"] = advisor.RuleMySQLError("ERR.000", syntaxErr)
 		}
 		// 如果只想检查语法直接跳过后面的步骤
 		if common.Config.OnlySyntaxCheck {
@@ -255,6 +253,9 @@ func main() {
 							}
 						default:
 							// vEnv.VEnvBuild 阶段给出的 ERROR 是 ERR.001
+							if _, ok := mysqlSuggest["ERR.000"]; ok {
+								delete(mysqlSuggest, "ERR.000")
+							}
 							mysqlSuggest["ERR.001"] = advisor.RuleMySQLError("ERR.001", vEnv.Error)
 							common.Log.Error("BuildVirtualEnv DDL Execute Error : %v", vEnv.Error)
 						}
@@ -277,7 +278,7 @@ func main() {
 				explainInfo, err := rEnv.Explain(q.Query,
 					database.ExplainType[common.Config.ExplainType],
 					database.ExplainFormatType[common.Config.ExplainFormat])
-				if err != nil && strings.HasPrefix(vEnv.Database, "optimizer_") {
+				if err != nil {
 					// 线上环境执行失败才到测试环境 EXPLAIN，比如在用户提供建表语句及查询语句的场景
 					common.Log.Warn("rEnv.Explain Warn: %v", err)
 					explainInfo, err = vEnv.Explain(q.Query,
