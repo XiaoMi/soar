@@ -199,5 +199,8 @@ func init() {
 		`SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')`,
 		// https://github.com/XiaoMi/soar/issues/17
 		"create table hello.t (id int unsigned);",
+
+		// https://github.com/XiaoMi/soar/issues/146
+		"select * from tb where data >= ''",
 	}
 }
