@@ -55,10 +55,11 @@ allow-drop-index: false
 max-in-count: 10
 max-index-bytes-percolumn: 767
 max-index-bytes: 3072
-table-allow-charsets:
+allow-charsets:
 - utf8
 - utf8mb4
-table-allow-engines:
+allow-collates: []
+allow-engines:
 - innodb
 max-index-count: 10
 max-column-count: 40

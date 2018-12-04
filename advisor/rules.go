@@ -1069,7 +1069,7 @@ func init() {
 			Item:     "TBL.002",
 			Severity: "L4",
 			Summary:  "请为表选择合适的存储引擎",
-			Content:  `建表或修改表的存储引擎时建议使用推荐的存储引擎，如：` + strings.Join(common.Config.TableAllowEngines, ","),
+			Content:  `建表或修改表的存储引擎时建议使用推荐的存储引擎，如：` + strings.Join(common.Config.AllowEngines, ","),
 			Case:     "create table test(`id` int(11) NOT NULL AUTO_INCREMENT)",
 			Func:     (*Query4Audit).RuleAllowEngine,
 		},
@@ -1093,7 +1093,7 @@ func init() {
 			Item:     "TBL.005",
 			Severity: "L4",
 			Summary:  "请使用推荐的字符集",
-			Content:  `表字符集只允许设置为` + strings.Join(common.Config.TableAllowCharsets, ","),
+			Content:  `表字符集只允许设置为` + strings.Join(common.Config.AllowCharsets, ","),
 			Case:     "CREATE TABLE tbl (a int) DEFAULT CHARSET = latin1;",
 			Func:     (*Query4Audit).RuleTableCharsetCheck,
 		},
@@ -1112,6 +1112,14 @@ func init() {
 			Content:  `不建议使用临时表`,
 			Case:     "CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;",
 			Func:     (*Query4Audit).RuleForbiddenTempTable,
+		},
+		"TBL.008": {
+			Item:     "TBL.008",
+			Severity: "L4",
+			Summary:  "请使用推荐的COLLATE",
+			Content:  `COLLATE 只允许设置为` + strings.Join(common.Config.AllowCollates, ","),
+			Case:     "CREATE TABLE tbl (a int) DEFAULT COLLATE = latin1_bin;",
+			Func:     (*Query4Audit).RuleTableCharsetCheck,
 		},
 	}
 }

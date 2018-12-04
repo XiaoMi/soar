@@ -1767,9 +1767,12 @@ func (q *Query4Audit) RuleCountConst() Rule {
 func (q *Query4Audit) RuleSumNPE() Rule {
 	var rule = q.RuleOK()
 	fingerprint := query.Fingerprint(q.Query)
+	// TODO: https://github.com/XiaoMi/soar/issues/143
+	// https://dev.mysql.com/doc/refman/8.0/en/group-by-functions.html
 	sumReg := regexp.MustCompile(`(?i)sum\(\s*[0-9a-z?]*\s*\)`)
 	isnullReg := regexp.MustCompile(`(?i)isnull\(sum\(\s*[0-9a-z?]*\s*\)\)`)
 	if sumReg.MatchString(fingerprint) && !isnullReg.MatchString(fingerprint) {
+		// TODO: check wether column define with not null flag
 		rule = HeuristicRules["FUN.006"]
 		if position := isnullReg.FindIndex([]byte(q.Query)); len(position) > 0 {
 			rule.Position = position[0]
@@ -2857,7 +2860,6 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 							}
 						}
 					}
-
 				}
 			}
 		}
@@ -2868,18 +2870,18 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 // RuleTableCharsetCheck TBL.005
 func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 	var rule = q.RuleOK()
+	var allow bool
+	var hasCharset bool
 
 	switch q.Stmt.(type) {
-	case *sqlparser.DDL:
+	case *sqlparser.DDL, *sqlparser.DBDDL:
 		for _, tiStmt := range q.TiStmt {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
-				var allow bool
-				var hasCharset bool
 				for _, opt := range node.Options {
 					if opt.Tp == tidb.TableOptionCharset {
 						hasCharset = true
-						for _, ch := range common.Config.TableAllowCharsets {
+						for _, ch := range common.Config.AllowCharsets {
 							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
 								allow = true
 								break
@@ -2888,22 +2890,27 @@ func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 					}
 				}
 
-				// 未指定字符集使用MySQL默认配置字符集，我们认为MySQL的配置是被优化过的。
-				if hasCharset && !allow {
-					rule = HeuristicRules["TBL.005"]
-					break
+			case *tidb.CreateDatabaseStmt:
+				for _, opt := range node.Options {
+					if opt.Tp == tidb.DatabaseOptionCharset {
+						hasCharset = true
+						for _, ch := range common.Config.AllowCharsets {
+							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.Value)) {
+								allow = true
+								break
+							}
+						}
+					}
 				}
 
 			case *tidb.AlterTableStmt:
 				for _, spec := range node.Specs {
-					var allow bool
-					var hasCharset bool
 					switch spec.Tp {
 					case tidb.AlterTableOption:
 						for _, opt := range spec.Options {
 							if opt.Tp == tidb.TableOptionCharset {
 								hasCharset = true
-								for _, ch := range common.Config.TableAllowCharsets {
+								for _, ch := range common.Config.AllowCharsets {
 									if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
 										allow = true
 										break
@@ -2911,15 +2918,15 @@ func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 								}
 							}
 						}
-						// 未指定字符集使用MySQL默认配置字符集，我们认为MySQL的配置是被优化过的。
-						if hasCharset && !allow {
-							rule = HeuristicRules["TBL.005"]
-							break
-						}
 					}
 				}
 			}
 		}
+	}
+
+	// 未指定字符集使用MySQL默认配置字符集，我们认为MySQL的配置是被优化过的。
+	if hasCharset && !allow {
+		rule = HeuristicRules["TBL.005"]
 	}
 	return rule
 }
@@ -2971,6 +2978,70 @@ func (q *Query4Audit) RuleForbiddenTempTable() Rule {
 			}
 			break
 		}
+	}
+	return rule
+}
+
+// RuleTableCollateCheck TBL.008
+func (q *Query4Audit) RuleTableCollateCheck() Rule {
+	var rule = q.RuleOK()
+	var allow bool
+	var hasCollate bool
+
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL, *sqlparser.DBDDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, opt := range node.Options {
+					if opt.Tp == tidb.TableOptionCollate {
+						hasCollate = true
+						for _, ch := range common.Config.AllowCollates {
+							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
+								allow = true
+								break
+							}
+						}
+					}
+				}
+
+			case *tidb.CreateDatabaseStmt:
+				for _, opt := range node.Options {
+					if opt.Tp == tidb.DatabaseOptionCollate {
+						hasCollate = true
+						for _, ch := range common.Config.AllowCollates {
+							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.Value)) {
+								allow = true
+								break
+							}
+						}
+					}
+				}
+
+			case *tidb.AlterTableStmt:
+				for _, spec := range node.Specs {
+					switch spec.Tp {
+					case tidb.AlterTableOption:
+						for _, opt := range spec.Options {
+							if opt.Tp == tidb.TableOptionCollate {
+								hasCollate = true
+								for _, ch := range common.Config.AllowCollates {
+									if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
+										allow = true
+										break
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 未指定字符集使用MySQL默认配置COLLATE，我们认为MySQL的配置是被优化过的。
+	if hasCollate && !allow {
+		rule = HeuristicRules["TBL.008"]
 	}
 	return rule
 }
@@ -3157,13 +3228,13 @@ func (q *Query4Audit) RuleAllowEngine() Rule {
 					if opt.Tp == tidb.TableOptionEngine {
 						hasDefaultEngine = true
 						// 使用了非推荐的存储引擎
-						for _, engine := range common.Config.TableAllowEngines {
+						for _, engine := range common.Config.AllowEngines {
 							if strings.EqualFold(opt.StrValue, engine) {
 								allowedEngine = true
 							}
 						}
-						// common.Config.TableAllowEngines 为空时不给予建议
-						if !allowedEngine && len(common.Config.TableAllowEngines) > 0 {
+						// common.Config.AllowEngines 为空时不给予建议
+						if !allowedEngine && len(common.Config.AllowEngines) > 0 {
 							rule = HeuristicRules["TBL.002"]
 							break
 						}
@@ -3181,13 +3252,13 @@ func (q *Query4Audit) RuleAllowEngine() Rule {
 						for _, opt := range spec.Options {
 							if opt.Tp == tidb.TableOptionEngine {
 								// 使用了非推荐的存储引擎
-								for _, engine := range common.Config.TableAllowEngines {
+								for _, engine := range common.Config.AllowEngines {
 									if strings.EqualFold(opt.StrValue, engine) {
 										allowedEngine = true
 									}
 								}
-								// common.Config.TableAllowEngines 为空时不给予建议
-								if !allowedEngine && len(common.Config.TableAllowEngines) > 0 {
+								// common.Config.AllowEngines 为空时不给予建议
+								if !allowedEngine && len(common.Config.AllowEngines) > 0 {
 									rule = HeuristicRules["TBL.002"]
 									break
 								}

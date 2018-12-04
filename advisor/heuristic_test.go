@@ -2781,6 +2781,7 @@ func TestRuleTableCharsetCheck(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
+			"CREATE DATABASE sbtest /*!40100 DEFAULT CHARACTER SET latin1 */;",
 			"create table tbl (a int) DEFAULT CHARSET=latin1;",
 			"ALTER TABLE tbl CONVERT TO CHARACTER SET latin1;",
 		},
@@ -2812,6 +2813,44 @@ func TestRuleTableCharsetCheck(t *testing.T) {
 		}
 	}
 
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// TBL.008
+func TestRuleTableCollateCheck(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			"CREATE DATABASE sbtest /*!40100 DEFAULT COLLATE latin1_bin */;",
+			"create table tbl (a int) DEFAULT COLLATE=latin1_bin;",
+		},
+		{
+			"create table tlb (a int);",
+			"ALTER TABLE `tbl` add column a int, add column b int ;",
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTableCollateCheck()
+			if rule.Item != "TBL.008" {
+				t.Error("Rule not match:", rule.Item, "Expect : TBL.008")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTableCollateCheck()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 

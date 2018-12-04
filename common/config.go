@@ -98,8 +98,9 @@ type Configuration struct {
 	MaxInCount           int      `yaml:"max-in-count"`              // IN()最大数量
 	MaxIdxBytesPerColumn int      `yaml:"max-index-bytes-percolumn"` // 索引中单列最大字节数，默认767
 	MaxIdxBytes          int      `yaml:"max-index-bytes"`           // 索引总长度限制，默认3072
-	TableAllowCharsets   []string `yaml:"table-allow-charsets"`      // Table 允许使用的 DEFAULT CHARSET
-	TableAllowEngines    []string `yaml:"table-allow-engines"`       // Table 允许使用的 Engine
+	AllowCharsets        []string `yaml:"allow-charsets"`            // 允许使用的 DEFAULT CHARSET
+	AllowCollates        []string `yaml:"allow-collates"`            // 允许使用的 COLLATE
+	AllowEngines         []string `yaml:"allow-engines"`             // 允许使用的存储引擎
 	MaxIdxCount          int      `yaml:"max-index-count"`           // 单张表允许最多索引数
 	MaxColCount          int      `yaml:"max-column-count"`          // 单张表允许最大列数
 	MaxValueCount        int      `yaml:"max-value-count"`           // INSERT/REPLACE 单次允许批量写入的行数
@@ -178,8 +179,9 @@ var Config = &Configuration{
 	ReportJavascript:     "",
 	ReportTitle:          "SQL优化分析报告",
 	BlackList:            "",
-	TableAllowCharsets:   []string{"utf8", "utf8mb4"},
-	TableAllowEngines:    []string{"innodb"},
+	AllowCharsets:        []string{"utf8", "utf8mb4"},
+	AllowCollates:        []string{},
+	AllowEngines:         []string{"innodb"},
 	MaxIdxCount:          10,
 	MaxColCount:          40,
 	MaxValueCount:        100,
@@ -531,8 +533,9 @@ func readCmdFlags() error {
 	maxInCount := flag.Int("max-in-count", Config.MaxInCount, "MaxInCount, IN()最大数量")
 	maxIdxBytesPerColumn := flag.Int("max-index-bytes-percolumn", Config.MaxIdxBytesPerColumn, "MaxIdxBytesPerColumn, 索引中单列最大字节数")
 	maxIdxBytes := flag.Int("max-index-bytes", Config.MaxIdxBytes, "MaxIdxBytes, 索引总长度限制")
-	tableAllowCharsets := flag.String("table-allow-charsets", strings.ToLower(strings.Join(Config.TableAllowCharsets, ",")), "TableAllowCharsets")
-	tableAllowEngines := flag.String("table-allow-engines", strings.ToLower(strings.Join(Config.TableAllowEngines, ",")), "TableAllowEngines")
+	allowCharsets := flag.String("allow-charsets", strings.ToLower(strings.Join(Config.AllowCharsets, ",")), "AllowCharsets")
+	allowCollates := flag.String("allow-collates", strings.ToLower(strings.Join(Config.AllowCollates, ",")), "AllowCollates")
+	allowEngines := flag.String("allow-engines", strings.ToLower(strings.Join(Config.AllowEngines, ",")), "AllowEngines")
 	maxIdxCount := flag.Int("max-index-count", Config.MaxIdxCount, "MaxIdxCount, 单表最大索引个数")
 	maxColCount := flag.Int("max-column-count", Config.MaxColCount, "MaxColCount, 单表允许的最大列数")
 	maxValueCount := flag.Int("max-value-count", Config.MaxValueCount, "MaxValueCount, INSERT/REPLACE 单次批量写入允许的行数")
@@ -624,8 +627,15 @@ func readCmdFlags() error {
 
 	Config.MaxIdxBytesPerColumn = *maxIdxBytesPerColumn
 	Config.MaxIdxBytes = *maxIdxBytes
-	Config.TableAllowCharsets = strings.Split(strings.ToLower(*tableAllowCharsets), ",")
-	Config.TableAllowEngines = strings.Split(strings.ToLower(*tableAllowEngines), ",")
+	if *allowCharsets != "" {
+		Config.AllowCharsets = strings.Split(strings.ToLower(*allowCharsets), ",")
+	}
+	if *allowCollates != "" {
+		Config.AllowCollates = strings.Split(strings.ToLower(*allowCollates), ",")
+	}
+	if *allowEngines != "" {
+		Config.AllowEngines = strings.Split(strings.ToLower(*allowEngines), ",")
+	}
 	Config.MaxIdxCount = *maxIdxCount
 	Config.MaxColCount = *maxColCount
 	Config.MaxValueCount = *maxValueCount
