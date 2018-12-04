@@ -452,15 +452,15 @@ create table tab1(status ENUM('new','in progress','fixed'))
 ```sql
 select c1,c2,c3 from tbl where c4 is null or c4 <> 1
 ```
-## BLOB 和 TEXT 类型的字段不可设置为 NULL
+## BLOB 和 TEXT 类型的字段不建议设置为 NOT NULL
 
 * **Item**:COL.012
 * **Severity**:L5
-* **Content**:BLOB 和 TEXT 类型的字段不可设置为 NULL
+* **Content**:BLOB 和 TEXT 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。
 * **Case**:
 
 ```sql
-CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));
+CREATE TABLE `tb`(`c` longblob NOT NULL);
 ```
 ## TIMESTAMP 类型未设置默认值
 
@@ -482,15 +482,15 @@ CREATE TABLE tbl( `id` bigint not null, `create_time` timestamp);
 ```sql
 CREATE TABLE `tb2` ( `id` int(11) DEFAULT NULL, `col` char(10) CHARACTER SET utf8 DEFAULT NULL)
 ```
-## BLOB 类型的字段不可指定默认值
+## TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值
 
 * **Item**:COL.015
 * **Severity**:L4
-* **Content**:BLOB 类型的字段不可指定默认值
+* **Content**:MySQL 数据库中 TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。
 * **Case**:
 
 ```sql
-CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));
+CREATE TABLE `tbl` (`c` blob DEFAULT NULL);
 ```
 ## 整型定义建议采用 INT(10) 或 BIGINT(20)
 

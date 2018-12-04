@@ -471,6 +471,8 @@ func TestRuleAddDefaultValue(t *testing.T) {
 			`ALTER TABLE test modify id varchar(10) DEFAULT '';`,
 			`ALTER TABLE test CHANGE id id varchar(10) DEFAULT '';`,
 			"create table test(id int not null default 0 comment '用户id')",
+			`create table tb (a text)`,
+			`alter table tb add a text`,
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -2413,18 +2415,35 @@ func TestRuleAlterDropKey(t *testing.T) {
 // COL.012
 func TestRuleCantBeNull(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
-		"alter TABLE `tbl` add column `c` longblob;",
-		"alter TABLE `tbl` add column `c` text;",
-		"alter TABLE `tbl` add column `c` blob;",
+	sqls := [][]string{
+		{
+			"CREATE TABLE `tb`(`c` longblob NOT NULL);",
+		},
+		{
+			"CREATE TABLE `tbl` (`c` longblob);",
+			"alter TABLE `tbl` add column `c` longblob;",
+			"alter TABLE `tbl` add column `c` text;",
+			"alter TABLE `tbl` add column `c` blob;",
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
-			rule := q.RuleCantBeNull()
+			rule := q.RuleBLOBNotNull()
 			if rule.Item != "COL.012" {
 				t.Error("Rule not match:", rule.Item, "Expect : COL.012")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleBLOBNotNull()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)
@@ -2806,7 +2825,13 @@ func TestRuleBlobDefaultValue(t *testing.T) {
 		},
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL, PRIMARY KEY (`id`));",
-			"alter table `tb` add column `c` blob NOT NULL DEFAULT NULL;",
+			"CREATE TABLE `tb` (`col` text NOT NULL);",
+			"alter table `tb` add column `c` blob NOT NULL;",
+			"ALTER TABLE tb ADD COLUMN a BLOB DEFAULT NULL",
+			"CREATE TABLE tb ( a BLOB DEFAULT NULL)",
+			"alter TABLE `tbl` add column `c` longblob;",
+			"alter TABLE `tbl` add column `c` text;",
+			"alter TABLE `tbl` add column `c` blob;",
 		},
 	}
 

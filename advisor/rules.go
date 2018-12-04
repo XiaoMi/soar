@@ -507,10 +507,10 @@ func init() {
 		"COL.012": {
 			Item:     "COL.012",
 			Severity: "L5",
-			Summary:  "BLOB 和 TEXT 类型的字段不可设置为 NULL",
-			Content:  `BLOB 和 TEXT 类型的字段不可设置为 NULL`,
-			Case:     "CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
-			Func:     (*Query4Audit).RuleCantBeNull,
+			Summary:  "BLOB 和 TEXT 类型的字段不建议设置为 NOT NULL",
+			Content:  `BLOB 和 TEXT 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。`,
+			Case:     "CREATE TABLE `tb`(`c` longblob NOT NULL);",
+			Func:     (*Query4Audit).RuleBLOBNotNull,
 		},
 		"COL.013": {
 			Item:     "COL.013",
@@ -528,12 +528,13 @@ func init() {
 			Case:     "CREATE TABLE `tb2` ( `id` int(11) DEFAULT NULL, `col` char(10) CHARACTER SET utf8 DEFAULT NULL)",
 			Func:     (*Query4Audit).RuleColumnWithCharset,
 		},
+		// https://stackoverflow.com/questions/3466872/why-cant-a-text-column-have-a-default-value-in-mysql
 		"COL.015": {
 			Item:     "COL.015",
 			Severity: "L4",
-			Summary:  "BLOB 类型的字段不可指定默认值",
-			Content:  `BLOB 类型的字段不可指定默认值`,
-			Case:     "CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
+			Summary:  "TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值",
+			Content:  `MySQL 数据库中 TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。`,
+			Case:     "CREATE TABLE `tbl` (`c` blob DEFAULT NULL);",
 			Func:     (*Query4Audit).RuleBlobDefaultValue,
 		},
 		"COL.016": {

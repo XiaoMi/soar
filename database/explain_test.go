@@ -38,7 +38,7 @@ func init() {
 		Database: common.Config.OnlineDSN.Schema,
 	}
 	if _, err := connTest.Version(); err != nil {
-		common.Log.Critical("Test env Error: %v", err)
+		fmt.Printf("Test env Error: %v", err)
 		os.Exit(0)
 	}
 }

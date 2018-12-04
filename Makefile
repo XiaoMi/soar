@@ -107,11 +107,10 @@ doc: build
 
 # Add or change a heuristic rule
 .PHONY: heuristic
-heuristic: doc docker
+heuristic: doc
 	@echo "\033[92mUpdate Heuristic rule golden files ...\033[0m"
 	go test github.com/XiaoMi/soar/advisor -v -update -run TestListHeuristicRules
 	go test github.com/XiaoMi/soar/advisor -v -update -run TestMergeConflictHeuristicRules
-	docker stop soar-mysql 2>/dev/null || true
 
 # Update vitess vendor
 .PHONY: vitess

@@ -17,6 +17,7 @@
 package common
 
 import (
+	"github.com/kr/pretty"
 	"github.com/saintfish/chardet"
 )
 
@@ -39,6 +40,7 @@ func Chardet(buf []byte) string {
 	if err != nil {
 		return charset
 	}
+	Log.Debug("Chardet DetectAll Result: %s", pretty.Sprint(result))
 
 	// SOAR's main user speak Chinese, GB-18030, UTF-8 are higher suggested
 	for _, r := range result {

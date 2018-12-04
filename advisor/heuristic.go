@@ -818,6 +818,12 @@ func (q *Query4Audit) RuleAddDefaultValue() Rule {
 						colDefault = true
 					}
 				}
+
+				switch c.Tp.Tp {
+				case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+					colDefault = true
+				}
+
 				if !colDefault {
 					rule = HeuristicRules["COL.004"]
 					break
@@ -835,6 +841,12 @@ func (q *Query4Audit) RuleAddDefaultValue() Rule {
 								colDefault = true
 							}
 						}
+
+						switch c.Tp.Tp {
+						case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+							colDefault = true
+						}
+
 						if !colDefault {
 							rule = HeuristicRules["COL.004"]
 							break
@@ -2493,8 +2505,8 @@ func (q *Query4Audit) RuleAlterDropKey() Rule {
 	return rule
 }
 
-// RuleCantBeNull COL.012
-func (q *Query4Audit) RuleCantBeNull() Rule {
+// RuleBLOBNotNull COL.012
+func (q *Query4Audit) RuleBLOBNotNull() Rule {
 	var rule = q.RuleOK()
 	switch q.Stmt.(type) {
 	case *sqlparser.DDL:
@@ -2504,8 +2516,15 @@ func (q *Query4Audit) RuleCantBeNull() Rule {
 				for _, col := range node.Cols {
 					switch col.Tp.Tp {
 					case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
-						if !mysql.HasNotNullFlag(col.Tp.Flag) {
+						for _, opt := range col.Options {
+							if opt.Tp == tidb.ColumnOptionNotNull {
+								rule = HeuristicRules["COL.012"]
+								break
+							}
+						}
+						if mysql.HasNotNullFlag(col.Tp.Flag) {
 							rule = HeuristicRules["COL.012"]
+							break
 						}
 					}
 				}
@@ -2517,8 +2536,15 @@ func (q *Query4Audit) RuleCantBeNull() Rule {
 						for _, col := range spec.NewColumns {
 							switch col.Tp.Tp {
 							case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
-								if !mysql.HasNotNullFlag(col.Tp.Flag) {
+								for _, opt := range col.Options {
+									if opt.Tp == tidb.ColumnOptionNotNull {
+										rule = HeuristicRules["COL.012"]
+										break
+									}
+								}
+								if mysql.HasNotNullFlag(col.Tp.Flag) {
 									rule = HeuristicRules["COL.012"]
+									break
 								}
 							}
 						}
