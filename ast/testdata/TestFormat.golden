@@ -867,3 +867,11 @@ ORDER BY
 )
 create table hello.t (id int unsigned);
 create  table  hello. t  (id  int  unsigned);
+select * from tb where data >= ''
+
+SELECT  
+  * 
+FROM  
+  tb  
+WHERE  
+  data  >= ''

@@ -48,7 +48,12 @@ var cacheHits int
 var cacheMisses int
 var tokenCache map[string]Token
 
-var tokenBoundaries = []string{",", ";", ":", ")", "(", ".", "=", "<", ">", "+", "-", "*", "/", "!", "^", "%", "|", "&", "#"}
+var tokenBoundaries = []string{
+	// multi character
+	"(>=)", "(<=)", "(!=)", "(<>)",
+	// single characters
+	",", ";", ":", "\\)", "\\(", "\\.", "=", "<", ">", "\\+", "-", "\\*", "/", "!", "\\^", "%", "\\|", "&", "#",
+}
 
 var tokenReserved = []string{
 	"ACCESSIBLE", "ACTION", "AGAINST", "AGGREGATE", "ALGORITHM", "ALL", "ALTER", "ANALYSE", "ANALYZE", "AS", "ASC",
@@ -125,7 +130,7 @@ var regFunctionString string
 func init() {
 	var regs []string
 	for _, reg := range tokenBoundaries {
-		regs = append(regs, regexp.QuoteMeta(reg))
+		regs = append(regs, reg)
 	}
 	regBoundariesString = "(" + strings.Join(regs, "|") + ")"
 
