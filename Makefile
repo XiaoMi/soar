@@ -64,6 +64,12 @@ test:
 	go test ./...
 	@echo "test Success!"
 
+# Rule golang test cases with `-update` flag
+test-update:
+	@echo "\033[92mRun all test cases with -update flag ...\033[0m"
+	go test ./... -update
+	@echo "test-update Success!"
+
 # Code Coverage
 # colorful coverage numerical >=90% GREEN, <80% RED, Other YELLOW
 .PHONY: cover

@@ -30,13 +30,10 @@ var update = flag.Bool("update", false, "update .golden files")
 func TestTrace(t *testing.T) {
 	common.Config.QueryTimeOut = 1
 	res, err := connTest.Trace("select 1")
-	if err == nil {
-		common.GoldenDiff(func() {
-			pretty.Println(res)
-		}, t.Name(), update)
-	} else {
+	if err != nil {
 		t.Error(err)
 	}
+	pretty.Println(res)
 }
 
 func TestFormatTrace(t *testing.T) {

@@ -25,6 +25,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -587,17 +588,13 @@ func readCmdFlags() error {
 	Config.QueryTimeOut = *queryTimeOut
 
 	Config.LogLevel = *logLevel
-	if strings.HasPrefix(*logOutput, "/") {
+	if filepath.IsAbs(*logOutput) {
 		Config.LogOutput = *logOutput
 	} else {
 		if BaseDir == "" {
 			Config.LogOutput = *logOutput
 		} else {
-			if runtime.GOOS == "windows" {
-				Config.LogOutput = *logOutput
-			} else {
-				Config.LogOutput = BaseDir + "/" + *logOutput
-			}
+			Config.LogOutput = filepath.Join(BaseDir, *logOutput)
 		}
 	}
 	Config.ReportType = strings.ToLower(*reportType)

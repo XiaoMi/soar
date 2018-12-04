@@ -17,13 +17,17 @@
 package main
 
 import (
+	"flag"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 )
 
+var update = flag.Bool("update", false, "update .golden files")
+
 func init() {
 	common.Config.OnlineDSN.Schema = "sakila"
+	_ = update
 }
 
 func Test_Main(_ *testing.T) {

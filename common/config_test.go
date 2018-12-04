@@ -19,6 +19,7 @@ package common
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/kr/pretty"
@@ -37,7 +38,7 @@ func TestReadConfigFile(t *testing.T) {
 	if Config == nil {
 		Config = new(Configuration)
 	}
-	Config.readConfigFile("../soar.yaml")
+	Config.readConfigFile(filepath.Join(DevPath, "etc/soar.yaml"))
 }
 
 func TestParseDSN(t *testing.T) {
@@ -59,11 +60,14 @@ func TestParseDSN(t *testing.T) {
 		"/database",
 	}
 
-	GoldenDiff(func() {
+	err := GoldenDiff(func() {
 		for _, dsn := range dsns {
 			pretty.Println(parseDSN(dsn, nil))
 		}
 	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
+	}
 }
 
 func TestListReportTypes(t *testing.T) {
@@ -100,7 +104,14 @@ func TestArgConfig(t *testing.T) {
 }
 
 func TestPrintConfiguration(t *testing.T) {
-	Config.Verbose = true
-	PrintConfiguration()
-
+	Config.readConfigFile(filepath.Join(DevPath, "etc/soar.yaml"))
+	oldLogOutput := Config.LogOutput
+	Config.LogOutput = "soar.log"
+	err := GoldenDiff(func() {
+		PrintConfiguration()
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+	Config.LogOutput = oldLogOutput
 }

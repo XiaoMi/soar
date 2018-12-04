@@ -1,31 +1,31 @@
 online-dsn:
-  addr: ""
-  schema: information_schema
-  user: ""
-  password: ""
+  addr: 127.0.0.1:3306
+  schema: sakila
+  user: root
+  password: '********'
   charset: utf8mb4
-  disable: true
+  disable: false
 test-dsn:
-  addr: ""
-  schema: information_schema
-  user: ""
-  password: ""
+  addr: 127.0.0.1:3306
+  schema: sakila
+  user: root
+  password: '********'
   charset: utf8mb4
-  disable: true
-allow-online-as-test: false
+  disable: false
+allow-online-as-test: true
 drop-test-temporary: true
 cleanup-test-database: false
 only-syntax-check: false
 sampling-statistic-target: 100
-sampling: false
+sampling: true
 profiling: false
 trace: false
 explain: true
 conn-time-out: 3
 query-time-out: 30
 delimiter: ;
-log-level: 3
-log-output: /dev/stderr
+log-level: 7
+log-output: soar.log
 report-type: markdown
 report-css: ""
 report-javascript: ""
@@ -62,6 +62,7 @@ table-allow-engines:
 - innodb
 max-index-count: 10
 max-column-count: 40
+max-value-count: 100
 index-prefix: idx_
 unique-key-prefix: uk_
 max-subquery-depth: 5
@@ -89,6 +90,6 @@ list-heuristic-rules: false
 list-rewrite-rules: false
 list-test-sqls: false
 list-report-types: false
-verbose: true
+verbose: false
 dry-run: true
 max-pretty-sql-length: 1024

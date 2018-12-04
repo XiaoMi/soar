@@ -46,7 +46,6 @@ func TestNewVirtualEnv(t *testing.T) {
 	testSQL := []string{
 		"create table t(id int,c1 varchar(20),PRIMARY KEY (id));",
 		"alter table t add index `idx_c1`(c1);",
-		"alter table t add index `idx_c1`(c1);",
 		"select * from city where country_id = 44;",
 		"select * from address where address2 is not null;",
 		"select * from address where address2 is null;",
@@ -92,7 +91,7 @@ func TestNewVirtualEnv(t *testing.T) {
 
 	env := NewVirtualEnv(connTest)
 	defer env.CleanUp()
-	common.GoldenDiff(func() {
+	err := common.GoldenDiff(func() {
 		for _, sql := range testSQL {
 			env.BuildVirtualEnv(rEnv, sql)
 			switch err := env.Error.(type) {
@@ -111,6 +110,9 @@ func TestNewVirtualEnv(t *testing.T) {
 			}
 		}
 	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestCleanupTestDatabase(t *testing.T) {
