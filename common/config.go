@@ -377,10 +377,10 @@ func FormatDSN(env *dsn) string {
 
 // SoarVersion soar version information
 func SoarVersion() {
-	//fmt.Println("Version:", Version)
-	//fmt.Println("Branch:", Branch)
-	//fmt.Println("Compile:", Compile)
-	//fmt.Println("GitDirty:", GitDirty)
+	fmt.Println("Version:", Version)
+	fmt.Println("Branch:", Branch)
+	fmt.Println("Compile:", Compile)
+	fmt.Println("GitDirty:", GitDirty)
 }
 
 // 因为vitess sqlparser 使用了 glog 中也会使用 flag，为了不让用户困扰我们单独写一个 usage
