@@ -49,8 +49,8 @@ func LoggerInit() {
 		"daily": false,
 		"maxdays": 0,
 	}
-	logConfigStr, _ := json.Marshal(logConfig)
-	err := Log.SetLogger(logs.AdapterFile, fmt.Sprintf(string(logConfigStr)))
+	logConfigJson, _ := json.Marshal(logConfig)
+	err := Log.SetLogger(logs.AdapterFile, fmt.Sprintf(string(logConfigJson)))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
