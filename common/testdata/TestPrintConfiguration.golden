@@ -68,6 +68,8 @@ index-prefix: idx_
 unique-key-prefix: uk_
 max-subquery-depth: 5
 max-varchar-length: 1024
+column-not-allow-type:
+- boolean
 explain-sql-report-type: pretty
 explain-type: extended
 explain-format: traditional

@@ -2988,6 +2988,48 @@ func TestRuleVarcharLength(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// COL.018
+func TestRuleColumnNotAllowType(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+
+	sqls := [][]string{
+		{
+			"CREATE TABLE tab (a BOOLEAN);",
+			"CREATE TABLE tab (a BOOLEAN );",
+			"ALTER TABLE `tb` add column `a` BOOLEAN;",
+		},
+		{
+			"CREATE TABLE `tb` ( `id` varchar(1024));",
+			"ALTER TABLE `tb` add column `id` varchar(35);",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleColumnNotAllowType()
+			if rule.Item != "COL.018" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.018")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleColumnNotAllowType()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // KEY.002
 func TestRuleNoOSCKey(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())

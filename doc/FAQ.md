@@ -48,6 +48,16 @@ bash: ./soar.linux-amd64: cannot execute binary file
 
 请注意您操作系统类型，`soar.linux-amd64` 为 Linux 系统使用的二进制文件，`soar.darwin-amd64` 为苹果系统使用的二进制文件，`soar.windows-amd64` 是微软用户使用的二进制文件。下载文件后 Linux 和苹果用户需要为文件添加可执行权限 `chmod a+x filename`。
 
+## 命令无法找到
+
+```bash
+bash: soar: command not found
+```
+
+直接执行 `soar` 命令提示命令无法找到，请先将 soar 文件添加可执行权限 `chmod a+x soar` 然后将可以将 soar 所在路径加到[PATH](https://linuxconfig.org/linux-path-environment-variable)中，也可以将 soar 移动到已有 PATH 中。
+
+当然在 Linux 环境下，在 soar 二进制文件所在路径运行 `./soar` 也同样可以解决您的问题。
+
 ## 提示语法错误
 
 * 请检查SQL语句中是否出现了不配对的引号,如 `, ", '
