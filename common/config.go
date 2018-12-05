@@ -108,6 +108,7 @@ type Configuration struct {
 	UkPrefix             string   `yaml:"unique-key-prefix"`         // 唯一键建议使用的前缀
 	MaxSubqueryDepth     int      `yaml:"max-subquery-depth"`        // 子查询最大尝试
 	MaxVarcharLength     int      `yaml:"max-varchar-length"`        // varchar最大长度
+	ColumnNotAllowType   []string `yaml:"column-not-allow-type"`     // 字段不允许使用的数据类型
 
 	// ++++++++++++++EXPLAIN检查项+++++++++++++
 	ExplainSQLReportType   string   `yaml:"explain-sql-report-type"`  // EXPLAIN markdown 格式输出 SQL 样式，支持 sample, fingerprint, pretty 等
@@ -190,6 +191,7 @@ var Config = &Configuration{
 	UkPrefix:             "uk_",
 	MaxSubqueryDepth:     5,
 	MaxVarcharLength:     1024,
+	ColumnNotAllowType:   []string{"boolean"},
 
 	MarkdownExtensions: 94,
 	MarkdownHTMLFlags:  0,
@@ -543,6 +545,7 @@ func readCmdFlags() error {
 	ukPrefix := flag.String("unique-key-prefix", Config.UkPrefix, "UkPrefix")
 	maxSubqueryDepth := flag.Int("max-subquery-depth", Config.MaxSubqueryDepth, "MaxSubqueryDepth")
 	maxVarcharLength := flag.Int("max-varchar-length", Config.MaxVarcharLength, "MaxVarcharLength")
+	columnNotAllowType := flag.String("column-not-allow-type", strings.Join(Config.ColumnNotAllowType, ","), "ColumnNotAllowType")
 	// ++++++++++++++EXPLAIN检查项+++++++++++++
 	explainSQLReportType := flag.String("explain-sql-report-type", strings.ToLower(Config.ExplainSQLReportType), "ExplainSQLReportType [pretty, sample, fingerprint]")
 	explainType := flag.String("explain-type", strings.ToLower(Config.ExplainType), "ExplainType [extended, partitions, traditional]")
@@ -669,6 +672,9 @@ func readCmdFlags() error {
 	Config.DryRun = *dryrun
 	Config.MaxPrettySQLLength = *maxPrettySQLLength
 	Config.MaxVarcharLength = *maxVarcharLength
+	if *columnNotAllowType != "" {
+		Config.ColumnNotAllowType = strings.Split(strings.ToLower(*columnNotAllowType), ",")
+	}
 
 	PrintVersion = *printVersion
 	PrintConfig = *printConfig

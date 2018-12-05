@@ -3179,6 +3179,38 @@ func (q *Query4Audit) RuleVarcharLength() Rule {
 	return rule
 }
 
+// RuleColumnNotAllowType COL.018
+func (q *Query4Audit) RuleColumnNotAllowType() Rule {
+	var rule = q.RuleOK()
+
+	if len(common.Config.ColumnNotAllowType) == 0 {
+		return rule
+	}
+
+	switch s := q.Stmt.(type) {
+	case *sqlparser.DDL:
+		switch s.Action {
+		case "create", "alter":
+			tks := ast.Tokenize(q.Query)
+			for _, tk := range tks {
+				if tk.Type == ast.TokenTypeWord {
+					for _, tp := range common.Config.ColumnNotAllowType {
+						if len(tk.Val) <= len(tp)+1 &&
+							strings.HasPrefix(strings.ToLower(tk.Val), strings.ToLower(tp)) {
+							rule = HeuristicRules["COL.018"]
+							break
+						}
+					}
+				}
+				if rule.Item != "OK" {
+					break
+				}
+			}
+		}
+	}
+	return rule
+}
+
 // RuleNoOSCKey KEY.002
 func (q *Query4Audit) RuleNoOSCKey() Rule {
 	var rule = q.RuleOK()
