@@ -1,9 +1,26 @@
 # CHANGELOG
 
-## 2018-11
+## 2018-12
 - DOING: english translation
+
+## 2018-11
+- add all third-party lib into vendor
+- support `-report-type chardet`
+- add more heuristic rules: TBL.008, KEY.010, ARG.012, KWR.004
 - add -cleanup-test-database command-line arg
+- add -check-config parameter
+- fix #146 pretty cause syntax error
+- fix #140 COL.012, COL.015 NULL type about TEXT/BLOB
+- fix #141 empty output when query execute failed on mysql
+- fix #89 index advisor give wrong database name, `optimizer_xx`
+- fix #121 RemoveSQLComment trim space
+- fix #120 trimspace before check single line comment
+- fix mac os stdout print buffer truncate
 - fix -config arg load file error
+- fix #116 SplitStatement check if single comment line is in multi-line sql.
+- fix #112 multi-line comment will cause line counter error, when -report-type=lint
+- fix #110 remove bom before auditing
+- fix #104 case insensitive regex @ CLA.009
 - fix #87 RuleImplicitConversion value type mistach check bug
 - fix #38 always true where condition check
 - abandon stdin terminal interactive mod, which may seems like hangup
