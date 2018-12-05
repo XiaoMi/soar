@@ -25,6 +25,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -591,21 +592,14 @@ func readCmdFlags() error {
 	Config.SamplingStatisticTarget = *samplingStatisticTarget
 	Config.ConnTimeOut = *connTimeOut
 	Config.QueryTimeOut = *queryTimeOut
-
 	Config.LogLevel = *logLevel
-	if strings.HasPrefix(*logOutput, "/") {
+
+	if filepath.IsAbs(*logOutput) || *logOutput == "" {
 		Config.LogOutput = *logOutput
 	} else {
-		if BaseDir == "" {
-			Config.LogOutput = *logOutput
-		} else {
-			if runtime.GOOS == "windows" {
-				Config.LogOutput = *logOutput
-			} else {
-				Config.LogOutput = BaseDir + "/" + *logOutput
-			}
-		}
+		Config.LogOutput = filepath.Join(BaseDir, *logOutput)
 	}
+
 	Config.ReportType = strings.ToLower(*reportType)
 	Config.ReportCSS = *reportCSS
 	Config.ReportJavascript = *reportJavascript
@@ -615,12 +609,13 @@ func readCmdFlags() error {
 	Config.IgnoreRules = strings.Split(*ignoreRules, ",")
 	Config.RewriteRules = strings.Split(*rewriteRules, ",")
 	*blackList = strings.TrimSpace(*blackList)
-	if strings.HasPrefix(*blackList, "/") || *blackList == "" {
+
+	if filepath.IsAbs(*blackList) || *blackList == "" {
 		Config.BlackList = *blackList
 	} else {
-		pwd, _ := os.Getwd()
-		Config.BlackList = pwd + "/" + *blackList
+		Config.BlackList = filepath.Join(BaseDir, *blackList)
 	}
+
 	Config.MaxJoinTableCount = *maxJoinTableCount
 	Config.MaxGroupByColsCount = *maxGroupByColsCount
 	Config.MaxDistinctCount = *maxDistinctCount
@@ -697,8 +692,8 @@ func ParseConfig(configFile string) error {
 	if configFile == "" {
 		configs = []string{
 			"/etc/soar.yaml",
-			BaseDir + "/etc/soar.yaml",
-			BaseDir + "/soar.yaml",
+			filepath.Join(BaseDir, "etc", "soar.yaml"),
+			filepath.Join(BaseDir, "soar.yaml"),
 		}
 	} else {
 		configs = []string{
