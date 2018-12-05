@@ -609,11 +609,10 @@ func readCmdFlags() error {
 	Config.IgnoreRules = strings.Split(*ignoreRules, ",")
 	Config.RewriteRules = strings.Split(*rewriteRules, ",")
 	*blackList = strings.TrimSpace(*blackList)
-	if strings.HasPrefix(*blackList, "/") || *blackList == "" {
+	if filepath.IsAbs(*blackList) || *blackList == "" {
 		Config.BlackList = *blackList
 	} else {
-		pwd, _ := os.Getwd()
-		Config.BlackList = pwd + "/" + *blackList
+		Config.BlackList = filepath.Join(BaseDir, *blackList)
 	}
 	Config.MaxJoinTableCount = *maxJoinTableCount
 	Config.MaxGroupByColsCount = *maxGroupByColsCount
@@ -688,8 +687,8 @@ func ParseConfig(configFile string) error {
 	if configFile == "" {
 		configs = []string{
 			"/etc/soar.yaml",
-			BaseDir + "/etc/soar.yaml",
-			BaseDir + "/soar.yaml",
+			filepath.Join(BaseDir, "etc", "soar.yaml"),
+			filepath.Join(BaseDir, "soar.yaml"),
 		}
 	} else {
 		configs = []string{

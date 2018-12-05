@@ -1176,7 +1176,7 @@ CREATE TABLE tbl (a int) AUTO_INCREMENT = 10;
 
 * **Item**:TBL.005
 * **Severity**:L4
-* **Content**:表字符集只允许设置为utf8,utf8mb4
+* **Content**:表字符集只允许设置为'utf8,utf8mb4'
 * **Case**:
 
 ```sql
@@ -1206,7 +1206,7 @@ CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;
 
 * **Item**:TBL.008
 * **Severity**:L4
-* **Content**:COLLATE 只允许设置为
+* **Content**:COLLATE 只允许设置为''
 * **Case**:
 
 ```sql

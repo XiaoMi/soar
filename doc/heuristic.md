@@ -1176,7 +1176,7 @@ CREATE TABLE tbl (a int) AUTO_INCREMENT = 10;
 
 * **Item**:TBL.005
 * **Severity**:L4
-* **Content**:表字符集只允许设置为utf8,utf8mb4
+* **Content**:表字符集只允许设置为'utf8,utf8mb4'
 * **Case**:
 
 ```sql
@@ -1201,4 +1201,14 @@ create view v_today (today) AS SELECT CURRENT_DATE;
 
 ```sql
 CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;
+```
+## 请使用推荐的COLLATE
+
+* **Item**:TBL.008
+* **Severity**:L4
+* **Content**:COLLATE 只允许设置为''
+* **Case**:
+
+```sql
+CREATE TABLE tbl (a int) DEFAULT COLLATE = latin1_bin;
 ```
