@@ -48,6 +48,7 @@ max-join-table-count: 5
 max-group-by-cols-count: 5
 max-distinct-count: 5
 max-index-cols-count: 5
+max-text-cols-count: 2
 max-total-rows: 9999999
 max-query-cost: 9999
 spaghetti-query-length: 2048

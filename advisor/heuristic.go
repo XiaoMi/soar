@@ -328,7 +328,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 						continue
 					}
 
-					c := fmt.Sprintf("%s.%s definition is %s not %s",
+					c := fmt.Sprintf("%s表中列%s的定义是 %s 而不是 %s",
 						colList[0].Table, colList[0].Name, colList[0].DataType, typNameMap[val.Type])
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
