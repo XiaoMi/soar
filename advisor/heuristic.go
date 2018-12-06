@@ -3272,6 +3272,57 @@ func (q *Query4Audit) RuleMaxTextColsCount() Rule {
 	return rule
 }
 
+// RuleMaxTextColsCount COL.007 checking for existed table
+func (idxAdv *IndexAdvisor) RuleMaxTextColsCount() Rule {
+	rule := HeuristicRules["OK"]
+	// 未开启测试环境不进行检查
+	if common.Config.TestDSN.Disable {
+		return rule
+	}
+
+	sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+		switch stmt := node.(type) {
+		case *sqlparser.DDL:
+			if stmt.Action != "alter" {
+				return true, nil
+			}
+
+			tb := stmt.Table
+
+			// 此处的检查需要在测试环境中的临时数据库中进行检查
+			// 需要将测试环境 DSN 的数据库暂时指向临时数据库
+			// 为了防止影响切换数据库环境会影响接下来的测试，需要在检查完后将原配置还原
+			dbTmp := idxAdv.vEnv.Database
+			idxAdv.vEnv.Database = idxAdv.vEnv.DBRef[idxAdv.vEnv.Database]
+			defer func() {
+				idxAdv.vEnv.Database = dbTmp
+			}()
+
+			// 添加字段的语句会在初始化环境的时候被执行
+			// 只需要获取该标的 CREAET 语句，后再对该语句进行检查即可
+			ddl, err := idxAdv.vEnv.ShowCreateTable(tb.Name.String())
+			if err != nil {
+				common.Log.Error("RuleMaxTextColsCount create statement got failed: %s", err.Error())
+				return false, err
+			}
+
+			q, err := NewQuery4Audit(ddl)
+			if err != nil {
+				return false, err
+			}
+
+			r := q.RuleMaxTextColsCount()
+			if r.Item != "OK" {
+				rule = r
+				return false, nil
+			}
+		}
+		return true, nil
+	}, idxAdv.Ast)
+
+	return rule
+}
+
 // RuleAllowEngine TBL.002
 func (q *Query4Audit) RuleAllowEngine() Rule {
 	var rule = q.RuleOK()
