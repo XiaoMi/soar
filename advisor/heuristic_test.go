@@ -3091,6 +3091,28 @@ func TestRuleTooManyFields(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// COL.007
+func TestRuleMaxTextColsCount(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		"create table tbl (a int, b text, c blob, d text);",
+	}
+
+	common.Config.MaxColCount = 0
+	for _, sql := range sqls {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMaxTextColsCount()
+			if rule.Item != "COL.007" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.007")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // TBL.002
 func TestRuleAllowEngine(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())

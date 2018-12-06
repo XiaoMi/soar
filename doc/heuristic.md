@@ -412,6 +412,16 @@ CREATE TABLE tbl (col int) ENGINE=InnoDB;
 ```sql
 CREATE TABLE tbl ( cols ....);
 ```
+## 表中包含有太多的 text/blob 列
+
+* **Item**:COL.007
+* **Severity**:L3
+* **Content**:表中包含超过2个的 text/blob 列
+* **Case**:
+
+```sql
+CREATE TABLE tbl ( cols ....);
+```
 ## 可使用 VARCHAR 代替 CHAR， VARBINARY 代替 BINARY
 
 * **Item**:COL.008

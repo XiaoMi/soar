@@ -3246,6 +3246,32 @@ func (q *Query4Audit) RuleTooManyFields() Rule {
 	return rule
 }
 
+// RuleMaxTextColsCount COL.007
+func (q *Query4Audit) RuleMaxTextColsCount() Rule {
+	var textColsCount int
+	var rule = q.RuleOK()
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, col := range node.Cols {
+					switch col.Tp.Tp {
+					case mysql.TypeBlob, mysql.TypeLongBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob:
+						textColsCount++
+					}
+				}
+			}
+		}
+	}
+
+	if textColsCount > common.Config.MaxTextColsCount {
+		rule = HeuristicRules["COL.007"]
+	}
+
+	return rule
+}
+
 // RuleAllowEngine TBL.002
 func (q *Query4Audit) RuleAllowEngine() Rule {
 	var rule = q.RuleOK()
