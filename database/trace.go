@@ -132,8 +132,8 @@ func getTrace(res *QueryResult) Trace {
 	var rows []TraceRow
 	for _, row := range res.Rows {
 		rows = append(rows, TraceRow{
-			Query: row.Str(0),
-			Trace: row.Str(1),
+			Query:                        row.Str(0),
+			Trace:                        row.Str(1),
 			MissingBytesBeyondMaxMemSize: row.Int(2),
 			InsufficientPrivileges:       row.Int(3),
 		})

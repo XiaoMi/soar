@@ -19,8 +19,8 @@ package advisor
 import (
 	"errors"
 	"sort"
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/XiaoMi/soar/common"
 
