@@ -20,12 +20,12 @@ import (
 	"errors"
 	"sort"
 	"testing"
+	"strings"
 
 	"github.com/XiaoMi/soar/common"
 
 	"github.com/XiaoMi/soar/env"
 	"github.com/kr/pretty"
-	"strings"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
