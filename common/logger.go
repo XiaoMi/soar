@@ -43,14 +43,14 @@ func LoggerInit() {
 	func() { _ = Log.DelLogger(logs.AdapterFile) }()
 	logConfig := map[string]interface{}{
 		"filename": Config.LogOutput,
-		"level": 7,
+		"level":    7,
 		"maxlines": 0,
-		"maxsize": 0,
-		"daily": false,
-		"maxdays": 0,
+		"maxsize":  0,
+		"daily":    false,
+		"maxdays":  0,
 	}
-	logConfigJson, _ := json.Marshal(logConfig)
-	err := Log.SetLogger(logs.AdapterFile, fmt.Sprintf(string(logConfigJson)))
+	logConfigJSON, _ := json.Marshal(logConfig)
+	err := Log.SetLogger(logs.AdapterFile, string(logConfigJSON))
 	if err != nil {
 		fmt.Println(err.Error())
 	}

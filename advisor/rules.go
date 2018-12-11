@@ -471,6 +471,14 @@ func init() {
 			Case:     "CREATE TABLE tbl ( cols ....);",
 			Func:     (*Query4Audit).RuleTooManyFields,
 		},
+		"COL.007": {
+			Item:     "COL.007",
+			Severity: "L3",
+			Summary:  "表中包含有太多的 text/blob 列",
+			Content:  fmt.Sprintf(`表中包含超过%d个的 text/blob 列`, common.Config.MaxTextColsCount),
+			Case:     "CREATE TABLE tbl ( cols ....);",
+			Func:     (*Query4Audit).RuleTooManyFields,
+		},
 		"COL.008": {
 			Item:     "COL.008",
 			Severity: "L1",

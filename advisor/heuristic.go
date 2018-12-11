@@ -328,7 +328,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 						continue
 					}
 
-					c := fmt.Sprintf("%s.%s definition is %s not %s",
+					c := fmt.Sprintf("%s表中列%s的定义是 %s 而不是 %s",
 						colList[0].Table, colList[0].Name, colList[0].DataType, typNameMap[val.Type])
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
@@ -3243,6 +3243,84 @@ func (q *Query4Audit) RuleTooManyFields() Rule {
 			}
 		}
 	}
+	return rule
+}
+
+// RuleMaxTextColsCount COL.007
+func (q *Query4Audit) RuleMaxTextColsCount() Rule {
+	var textColsCount int
+	var rule = q.RuleOK()
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, col := range node.Cols {
+					switch col.Tp.Tp {
+					case mysql.TypeBlob, mysql.TypeLongBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob:
+						textColsCount++
+					}
+				}
+			}
+		}
+	}
+
+	if textColsCount > common.Config.MaxTextColsCount {
+		rule = HeuristicRules["COL.007"]
+	}
+
+	return rule
+}
+
+// RuleMaxTextColsCount COL.007 checking for existed table
+func (idxAdv *IndexAdvisor) RuleMaxTextColsCount() Rule {
+	rule := HeuristicRules["OK"]
+	// 未开启测试环境不进行检查
+	if common.Config.TestDSN.Disable {
+		return rule
+	}
+
+	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+		switch stmt := node.(type) {
+		case *sqlparser.DDL:
+			if stmt.Action != "alter" {
+				return true, nil
+			}
+
+			tb := stmt.Table
+
+			// 此处的检查需要在测试环境中的临时数据库中进行检查
+			// 需要将测试环境 DSN 的数据库暂时指向临时数据库
+			// 为了防止影响切换数据库环境会影响接下来的测试，需要在检查完后将原配置还原
+			dbTmp := idxAdv.vEnv.Database
+			idxAdv.vEnv.Database = idxAdv.vEnv.DBRef[idxAdv.vEnv.Database]
+			defer func() {
+				idxAdv.vEnv.Database = dbTmp
+			}()
+
+			// 添加字段的语句会在初始化环境的时候被执行
+			// 只需要获取该标的 CREAET 语句，后再对该语句进行检查即可
+			ddl, err := idxAdv.vEnv.ShowCreateTable(tb.Name.String())
+			if err != nil {
+				common.Log.Error("RuleMaxTextColsCount create statement got failed: %s", err.Error())
+				return false, err
+			}
+
+			q, err := NewQuery4Audit(ddl)
+			if err != nil {
+				return false, err
+			}
+
+			r := q.RuleMaxTextColsCount()
+			if r.Item != "OK" {
+				rule = r
+				return false, nil
+			}
+		}
+		return true, nil
+	}, idxAdv.Ast)
+	common.LogIfError(err, "")
+
 	return rule
 }
 

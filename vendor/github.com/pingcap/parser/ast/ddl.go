@@ -550,6 +550,7 @@ type DropTableStmt struct {
 
 	IfExists bool
 	Tables   []*TableName
+	IsView   bool
 }
 
 // Restore implements Recoverable interface.
@@ -887,6 +888,7 @@ const (
 	AlterTableAddPartitions
 	AlterTableCoalescePartitions
 	AlterTableDropPartition
+	AlterTableTruncatePartition
 
 	// TODO: Add more actions
 )
