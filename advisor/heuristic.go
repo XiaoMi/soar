@@ -3280,7 +3280,7 @@ func (idxAdv *IndexAdvisor) RuleMaxTextColsCount() Rule {
 		return rule
 	}
 
-	sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch stmt := node.(type) {
 		case *sqlparser.DDL:
 			if stmt.Action != "alter" {
@@ -3319,6 +3319,7 @@ func (idxAdv *IndexAdvisor) RuleMaxTextColsCount() Rule {
 		}
 		return true, nil
 	}, idxAdv.Ast)
+	common.LogIfError(err, "")
 
 	return rule
 }
