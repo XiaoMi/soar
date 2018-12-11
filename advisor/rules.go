@@ -965,6 +965,14 @@ func init() {
 			Case:     "LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;",
 			Func:     (*Query4Audit).RuleLoadFile,
 		},
+		"RES.009": {
+			Item:     "RES.009",
+			Severity: "L2",
+			Summary:  "不建议使用连续判断",
+			Content:  "类似这样的 SELECT * FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。",
+			Case:     "SELECT * FROM tbl WHERE col = col = 'abc'",
+			Func:     (*Query4Audit).RuleMultiCompare,
+		},
 		"SEC.001": {
 			Item:     "SEC.001",
 			Severity: "L0",

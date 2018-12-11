@@ -1308,6 +1308,42 @@ func (q *Query4Audit) RuleLoadFile() Rule {
 	return rule
 }
 
+// RuleMultiCompare RES.009
+func (q *Query4Audit) RuleMultiCompare() Rule {
+	var rule = q.RuleOK()
+	if q.TiStmt != nil {
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.SelectStmt:
+				switch where := node.Where.(type) {
+				case *tidb.BinaryOperationExpr:
+					switch where.L.(type) {
+					case *tidb.BinaryOperationExpr:
+						rule = HeuristicRules["RES.009"]
+					}
+				}
+			case *tidb.UpdateStmt:
+				switch where := node.Where.(type) {
+				case *tidb.BinaryOperationExpr:
+					switch where.L.(type) {
+					case *tidb.BinaryOperationExpr:
+						rule = HeuristicRules["RES.009"]
+					}
+				}
+			case *tidb.DeleteStmt:
+				switch where := node.Where.(type) {
+				case *tidb.BinaryOperationExpr:
+					switch where.L.(type) {
+					case *tidb.BinaryOperationExpr:
+						rule = HeuristicRules["RES.009"]
+					}
+				}
+			}
+		}
+	}
+	return rule
+}
+
 // RuleStandardINEQ STA.001
 func (q *Query4Audit) RuleStandardINEQ() Rule {
 	var rule = q.RuleOK()

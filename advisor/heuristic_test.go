@@ -941,6 +941,46 @@ func TestRuleLoadFile(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// RES.009
+func TestRuleMultiCompare(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			"SELECT * FROM tbl WHERE col = col = 'abc'",
+			"UPDATE tbl set col = 1 WHERE col = col = 'abc'",
+			"DELETE FROM tbl WHERE col = col = 'abc'",
+		},
+		{
+			"SELECT * FROM tbl WHERE col = 'abc'",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiCompare()
+			if rule.Item != "RES.009" {
+				t.Error("Rule not match:", rule.Item, "Expect : RES.009, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiCompare()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // STA.001
 func TestRuleStandardINEQ(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
