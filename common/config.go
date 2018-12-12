@@ -515,7 +515,7 @@ func readCmdFlags() error {
 	// +++++++++++++++日志相关+++++++++++++++++
 	logLevel := flag.Int("log-level", Config.LogLevel, "LogLevel, 日志级别, [0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]")
 	logOutput := flag.String("log-output", Config.LogOutput, "LogOutput, 日志输出位置")
-	reportType := flag.String("report-type", Config.ReportType, "ReportType, 化建议输出格式，目前支持: json, text, markdown, html等")
+	reportType := flag.String("report-type", Config.ReportType, "ReportType, 优化建议输出格式，目前支持: json, text, markdown, html等")
 	reportCSS := flag.String("report-css", Config.ReportCSS, "ReportCSS, 当 ReportType 为 html 格式时使用的 css 风格，如不指定会提供一个默认风格。CSS可以是本地文件，也可以是一个URL")
 	reportJavascript := flag.String("report-javascript", Config.ReportJavascript, "ReportJavascript, 当 ReportType 为 html 格式时使用的javascript脚本，如不指定默认会加载SQL pretty 使用的 javascript。像CSS一样可以是本地文件，也可以是一个URL")
 	reportTitle := flag.String("report-title", Config.ReportTitle, "ReportTitle, 当 ReportType 为 html 格式时，HTML 的 title")

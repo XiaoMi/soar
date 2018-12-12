@@ -59,19 +59,27 @@ func TestRuleImplicitConversion(t *testing.T) {
 		`CREATE TABLE t1 (id int, title varchar(255) CHARSET utf8 COLLATE utf8_general_ci);`,
 		`CREATE TABLE t2 (id int, title varchar(255) CHARSET utf8mb4);`,
 		`CREATE TABLE t3 (id int, title varchar(255) CHARSET utf8 COLLATE utf8_bin);`,
+		`CREATE TABLE t4 (id int, col bit(1));`,
 	}
 	for _, sql := range initSQLs {
 		vEnv.BuildVirtualEnv(rEnv, sql)
 	}
 
-	sqls := []string{
-		"SELECT * FROM t1 WHERE title >= 60;",
-		"SELECT * FROM t1, t2 WHERE t1.title = t2.title;",
-		"SELECT * FROM t1, t3 WHERE t1.title = t3.title;",
-		"SELECT * FROM t1 WHERE title in (60, '60');",
-		"SELECT * FROM t1 WHERE title in (60);",
+	sqls := [][]string{
+		{
+			"SELECT * FROM t1 WHERE title >= 60;",
+			"SELECT * FROM t1, t2 WHERE t1.title = t2.title;",
+			"SELECT * FROM t1, t3 WHERE t1.title = t3.title;",
+			"SELECT * FROM t1 WHERE title in (60, '60');",
+			"SELECT * FROM t1 WHERE title in (60);",
+			"SELECT * FROM t4 WHERE col = '1'",
+		},
+		{
+			// https://github.com/XiaoMi/soar/issues/151
+			"SELECT * FROM t4 WHERE col = 1",
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		stmt, syntaxErr := sqlparser.Parse(sql)
 		if syntaxErr != nil {
 			common.Log.Critical("Syntax Error: %v, SQL: %s", syntaxErr, sql)
@@ -91,6 +99,27 @@ func TestRuleImplicitConversion(t *testing.T) {
 			}
 		}
 	}
+	for _, sql := range sqls[1] {
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			common.Log.Critical("Syntax Error: %v, SQL: %s", syntaxErr, sql)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleImplicitConversion()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule, "Expect : OK, SQL:", sql)
+			}
+		}
+	}
+
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 	common.Config.OnlineDSN = dsn
 }

@@ -293,7 +293,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					"date", "time", "datetime", "timestamp", "year",
 				},
 				sqlparser.IntVal: {
-					"tinyint", "smallint", "mediumint", "int", "integer", "bigint", "timestamp", "year",
+					"tinyint", "smallint", "mediumint", "int", "integer", "bigint", "timestamp", "year", "bit",
 				},
 				sqlparser.FloatVal: {
 					"float", "double", "real", "decimal",
