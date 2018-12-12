@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+GOPATH=$(go env GOPATH)
 PROJECT_PATH=${GOPATH}/src/github.com/XiaoMi/soar/
 
 if [ "$1x" == "-updatex" ]; then

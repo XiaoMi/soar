@@ -46,7 +46,7 @@ deps:
 	@bash ./deps.sh
 	# The retool tools.json is setup from retool-install.sh
 	retool sync
-	retool do gometalinter.v2 intall
+	retool do gometalinter.v2 --install
 
 # Code format
 .PHONY: fmt
@@ -176,7 +176,7 @@ docker:
 	-v `pwd`/doc/example/sakila.sql.gz:/docker-entrypoint-initdb.d/sakila.sql.gz \
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
-	@echo -n "waiting for sakila database initializing "
+	@echo "waiting for sakila database initializing "
 	@while ! mysql -h 127.0.0.1 -u root sakila -p1tIsB1g3rt -NBe "do 1;" 2>/dev/null; do \
 	printf '.' ; \
 	sleep 1 ; \
