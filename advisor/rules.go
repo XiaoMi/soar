@@ -471,6 +471,14 @@ func init() {
 			Case:     "CREATE TABLE tbl ( cols ....);",
 			Func:     (*Query4Audit).RuleTooManyFields,
 		},
+		"COL.007": {
+			Item:     "COL.007",
+			Severity: "L3",
+			Summary:  "表中包含有太多的 text/blob 列",
+			Content:  fmt.Sprintf(`表中包含超过%d个的 text/blob 列`, common.Config.MaxTextColsCount),
+			Case:     "CREATE TABLE tbl ( cols ....);",
+			Func:     (*Query4Audit).RuleTooManyFields,
+		},
 		"COL.008": {
 			Item:     "COL.008",
 			Severity: "L1",
@@ -956,6 +964,14 @@ func init() {
 			Content:  "SELECT INTO OUTFILE 需要授予 FILE 权限，这通过会引入安全问题。LOAD DATA 虽然可以提高数据导入速度，但同时也可能导致从库同步延迟过大。",
 			Case:     "LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;",
 			Func:     (*Query4Audit).RuleLoadFile,
+		},
+		"RES.009": {
+			Item:     "RES.009",
+			Severity: "L2",
+			Summary:  "不建议使用连续判断",
+			Content:  "类似这样的 SELECT * FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。",
+			Case:     "SELECT * FROM tbl WHERE col = col = 'abc'",
+			Func:     (*Query4Audit).RuleMultiCompare,
 		},
 		"SEC.001": {
 			Item:     "SEC.001",

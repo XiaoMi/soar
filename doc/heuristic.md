@@ -412,6 +412,16 @@ CREATE TABLE tbl (col int) ENGINE=InnoDB;
 ```sql
 CREATE TABLE tbl ( cols ....);
 ```
+## 表中包含有太多的 text/blob 列
+
+* **Item**:COL.007
+* **Severity**:L3
+* **Content**:表中包含超过2个的 text/blob 列
+* **Case**:
+
+```sql
+CREATE TABLE tbl ( cols ....);
+```
 ## 可使用 VARCHAR 代替 CHAR， VARBINARY 代替 BINARY
 
 * **Item**:COL.008
@@ -1011,6 +1021,16 @@ select * from tbl where 1 = 1;
 
 ```sql
 LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;
+```
+## 不建议使用连续判断
+
+* **Item**:RES.009
+* **Severity**:L2
+* **Content**:类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
+* **Case**:
+
+```sql
+SELECT * FROM tbl WHERE col = col = 'abc'
 ```
 ## 请谨慎使用TRUNCATE操作
 

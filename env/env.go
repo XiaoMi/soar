@@ -91,11 +91,11 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 	}
 
 	// 检查线上环境可用性版本
-	rEnvVersion, err := vEnv.Version()
+	rEnvVersion, err := conn.Version()
 	common.Config.OnlineDSN.Version = rEnvVersion
 	if err != nil {
 		common.Log.Warn("BuildEnv OnlineDSN: %s:********@%s/%s not available , Error: %s",
-			vEnv.User, vEnv.Addr, vEnv.Database, err.Error())
+			conn.User, conn.Addr, conn.Database, err.Error())
 		common.Config.TestDSN.Disable = true
 	}
 

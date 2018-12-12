@@ -19,11 +19,14 @@ package advisor
 import (
 	"errors"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 
+	"github.com/XiaoMi/soar/env"
 	"github.com/kr/pretty"
+	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 // ALI.001
@@ -933,6 +936,46 @@ func TestRuleLoadFile(t *testing.T) {
 		rule := q.RuleLoadFile()
 		if rule.Item != "OK" {
 			t.Error("Rule not match:", rule.Item, "Expect : OK, SQL: ", sql)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// RES.009
+func TestRuleMultiCompare(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			"SELECT * FROM tbl WHERE col = col = 'abc'",
+			"UPDATE tbl set col = 1 WHERE col = col = 'abc'",
+			"DELETE FROM tbl WHERE col = col = 'abc'",
+		},
+		{
+			"SELECT * FROM tbl WHERE col = 'abc'",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiCompare()
+			if rule.Item != "RES.009" {
+				t.Error("Rule not match:", rule.Item, "Expect : RES.009, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiCompare()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
 		}
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
@@ -3089,6 +3132,71 @@ func TestRuleTooManyFields(t *testing.T) {
 		}
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// COL.007
+func TestRuleMaxTextColsCount(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		"create table tbl (a int, b text, c blob, d text);",
+	}
+
+	common.Config.MaxColCount = 0
+	for _, sql := range sqls {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMaxTextColsCount()
+			if rule.Item != "COL.007" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.007")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// COL.007
+func TestRuleMaxTextColsCountWithEnv(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	dsn := common.Config.OnlineDSN
+	common.Config.OnlineDSN = common.Config.TestDSN
+	vEnv, rEnv := env.BuildEnv()
+	defer vEnv.CleanUp()
+	initSQLs := []string{
+		`CREATE TABLE t1 (id int, title text, content blob);`,
+		"alter table t1 add column other text;",
+	}
+
+	for _, sql := range initSQLs {
+		vEnv.BuildVirtualEnv(rEnv, sql)
+
+		if !strings.HasPrefix(strings.ToLower(sql), "alter") {
+			continue
+		}
+
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			common.Log.Critical("Syntax Error: %v, SQL: %s", syntaxErr, sql)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleMaxTextColsCount()
+			if rule.Item != "COL.007" {
+				t.Error("Rule not match:", rule, "Expect : COL.007, SQL:", sql)
+			}
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+	common.Config.OnlineDSN = dsn
 }
 
 // TBL.002
