@@ -187,8 +187,6 @@ func main() {
 			common.Log.Warning(errContent)
 			if common.Config.OnlySyntaxCheck {
 				fmt.Println(errContent)
-			}
-			if !common.Config.DryRun {
 				os.Exit(1)
 			}
 			// tidb parser 语法检查给出的建议 ERR.000
