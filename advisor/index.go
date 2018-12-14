@@ -628,7 +628,6 @@ func (idxAdv *IndexAdvisor) buildJoinIndex(meta common.Meta) []IndexInfo {
 		indexColsList := make(map[string]map[string][]*common.Column)
 		for _, col := range IndexCols {
 			mergeIndex(indexColsList, col)
-
 		}
 
 		if common.Config.TestDSN.Disable || common.Config.OnlineDSN.Disable {
@@ -723,6 +722,11 @@ func (idxAdv *IndexAdvisor) buildIndexWithNoEnv(indexList map[string]map[string]
 
 // mergeIndex 将索引用到的列去重后合并到一起
 func mergeIndex(idxList map[string]map[string][]*common.Column, column *common.Column) {
+	// 散粒度低于阈值将不会添加索引
+	if common.Config.MinCardinality > column.Cardinality {
+		return
+	}
+
 	db := column.DB
 	tb := column.Table
 	if idxList[db] == nil {
