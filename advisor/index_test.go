@@ -357,7 +357,8 @@ func TestRuleUpdatePrimaryKey(t *testing.T) {
 
 func TestIndexAdvise(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	// common.Config.MinCardinality = 1
+	minCardinalityBak := common.Config.MinCardinality
+	common.Config.MinCardinality = 20
 	vEnv, rEnv := env.BuildEnv()
 	defer vEnv.CleanUp()
 
@@ -384,6 +385,7 @@ func TestIndexAdvise(t *testing.T) {
 		}
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+	common.Config.MinCardinality = minCardinalityBak
 }
 
 func TestIndexAdviseNoEnv(t *testing.T) {
