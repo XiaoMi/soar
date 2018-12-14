@@ -2792,6 +2792,8 @@ func TestRuleColumnWithCharset(t *testing.T) {
 		// 反面的例子
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` char(120) NOT NULL DEFAULT '', PRIMARY KEY (`id`))",
+			// https://github.com/XiaoMi/soar/issues/163
+			"alter table tb alter column id drop default",
 		},
 	}
 	for _, sql := range sqls[0] {

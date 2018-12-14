@@ -1629,6 +1629,9 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 			case *tidb.CreateTableStmt:
 				// Create table statement
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeFloat, mysql.TypeDouble, mysql.TypeDecimal, mysql.TypeNewDecimal:
 						rule = HeuristicRules["COL.009"]
@@ -1641,6 +1644,9 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeFloat, mysql.TypeDouble,
 								mysql.TypeDecimal, mysql.TypeNewDecimal:
@@ -1686,6 +1692,9 @@ func (q *Query4Audit) RuleValuesInDefinition() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeSet, mysql.TypeEnum, mysql.TypeBit:
 						rule = HeuristicRules["COL.010"]
@@ -1696,6 +1705,9 @@ func (q *Query4Audit) RuleValuesInDefinition() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeSet, mysql.TypeEnum, mysql.TypeBit:
 								rule = HeuristicRules["COL.010"]
@@ -2238,6 +2250,9 @@ func (q *Query4Audit) RuleReadablePasswords() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeString, mysql.TypeVarchar, mysql.TypeVarString,
 						mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob:
@@ -2253,6 +2268,9 @@ func (q *Query4Audit) RuleReadablePasswords() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableModifyColumn, tidb.AlterTableChangeColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeString, mysql.TypeVarchar, mysql.TypeVarString,
 								mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob:
@@ -2426,6 +2444,9 @@ func (q *Query4Audit) RuleVarcharVSChar() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					// 在 TiDB 的 AST 中，char 和 binary 的 type 都是 mysql.TypeString
 					// 只是 binary 数据类型的 character 和 collate 是 binary
@@ -2439,6 +2460,9 @@ func (q *Query4Audit) RuleVarcharVSChar() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeString:
 								rule = HeuristicRules["COL.008"]
@@ -2553,6 +2577,9 @@ func (q *Query4Audit) RuleBLOBNotNull() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
 						for _, opt := range col.Options {
@@ -2573,6 +2600,9 @@ func (q *Query4Audit) RuleBLOBNotNull() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableModifyColumn, tidb.AlterTableChangeColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
 								for _, opt := range col.Options {
@@ -2808,6 +2838,9 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					if col.Tp.Tp == mysql.TypeTimestamp {
 						hasDefault := false
 						for _, option := range col.Options {
@@ -2829,6 +2862,9 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 						tidb.AlterTableChangeColumn,
 						tidb.AlterTableAlterColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							if col.Tp.Tp == mysql.TypeTimestamp {
 								hasDefault := false
 								for _, option := range col.Options {
@@ -2879,6 +2915,9 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					if col.Tp.Charset != "" || col.Tp.Collate != "" {
 						rule = HeuristicRules["COL.014"]
 						break
@@ -2890,6 +2929,9 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 					case tidb.AlterTableAlterColumn, tidb.AlterTableChangeColumn,
 						tidb.AlterTableModifyColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							if col.Tp.Charset != "" || col.Tp.Collate != "" {
 								rule = HeuristicRules["COL.014"]
 								break
@@ -3091,6 +3133,9 @@ func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob:
 						for _, opt := range col.Options {
@@ -3107,6 +3152,9 @@ func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 					case tidb.AlterTableModifyColumn, tidb.AlterTableAlterColumn,
 						tidb.AlterTableChangeColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob:
 								for _, opt := range col.Options {
@@ -3134,6 +3182,9 @@ func (q *Query4Audit) RuleIntPrecision() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeLong:
 						if (col.Tp.Flen < 10 || col.Tp.Flen > 11) && col.Tp.Flen > 0 {
@@ -3154,6 +3205,9 @@ func (q *Query4Audit) RuleIntPrecision() Rule {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn,
 						tidb.AlterTableAlterColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeLong:
 								if (col.Tp.Flen < 10 || col.Tp.Flen > 11) && col.Tp.Flen > 0 {
@@ -3185,6 +3239,9 @@ func (q *Query4Audit) RuleVarcharLength() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeVarchar, mysql.TypeVarString:
 						if col.Tp.Flen > common.Config.MaxVarcharLength {
@@ -3199,6 +3256,9 @@ func (q *Query4Audit) RuleVarcharLength() Rule {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn,
 						tidb.AlterTableAlterColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeVarchar, mysql.TypeVarString:
 								if col.Tp.Flen > common.Config.MaxVarcharLength {
@@ -3292,6 +3352,9 @@ func (q *Query4Audit) RuleMaxTextColsCount() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeBlob, mysql.TypeLongBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob:
 						textColsCount++
@@ -3452,6 +3515,9 @@ func (q *Query4Audit) RuleAutoIncUnsigned() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					for _, opt := range col.Options {
 						if opt.Tp == tidb.ColumnOptionAutoIncrement {
 							if !mysql.HasUnsignedFlag(col.Tp.Flag) {
@@ -3471,6 +3537,9 @@ func (q *Query4Audit) RuleAutoIncUnsigned() Rule {
 					case tidb.AlterTableChangeColumn, tidb.AlterTableAlterColumn,
 						tidb.AlterTableModifyColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							for _, opt := range col.Options {
 								if opt.Tp == tidb.ColumnOptionAutoIncrement {
 									if !mysql.HasUnsignedFlag(col.Tp.Flag) {
