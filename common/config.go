@@ -110,6 +110,7 @@ type Configuration struct {
 	MaxSubqueryDepth     int      `yaml:"max-subquery-depth"`        // 子查询最大尝试
 	MaxVarcharLength     int      `yaml:"max-varchar-length"`        // varchar最大长度
 	ColumnNotAllowType   []string `yaml:"column-not-allow-type"`     // 字段不允许使用的数据类型
+	MinCardinality       float64  `yaml:"min-cardinality"`           // 添加索引散粒度阈值，范围 0~100
 
 	// ++++++++++++++EXPLAIN检查项+++++++++++++
 	ExplainSQLReportType   string   `yaml:"explain-sql-report-type"`  // EXPLAIN markdown 格式输出 SQL 样式，支持 sample, fingerprint, pretty 等
@@ -163,6 +164,7 @@ var Config = &Configuration{
 	ConnTimeOut:             3,
 	QueryTimeOut:            30,
 	Delimiter:               ";",
+	MinCardinality:          0,
 
 	MaxJoinTableCount:    5,
 	MaxGroupByColsCount:  5,
@@ -512,6 +514,7 @@ func readCmdFlags() error {
 	connTimeOut := flag.Int("conn-time-out", Config.ConnTimeOut, "ConnTimeOut, 数据库连接超时时间，单位秒")
 	queryTimeOut := flag.Int("query-time-out", Config.QueryTimeOut, "QueryTimeOut, 数据库SQL执行超时时间，单位秒")
 	delimiter := flag.String("delimiter", Config.Delimiter, "Delimiter, SQL分隔符")
+	minCardinality := flag.Float64("min-cardinality", Config.MinCardinality, "MinCardinality，索引列散粒度最低阈值，散粒度低于该值的列不添加索引，建议范围0.0 ~ 100.0")
 	// +++++++++++++++日志相关+++++++++++++++++
 	logLevel := flag.Int("log-level", Config.LogLevel, "LogLevel, 日志级别, [0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]")
 	logOutput := flag.String("log-output", Config.LogOutput, "LogOutput, 日志输出位置")
@@ -612,6 +615,7 @@ func readCmdFlags() error {
 	Config.IgnoreRules = strings.Split(*ignoreRules, ",")
 	Config.RewriteRules = strings.Split(*rewriteRules, ",")
 	*blackList = strings.TrimSpace(*blackList)
+	Config.MinCardinality = *minCardinality
 
 	if filepath.IsAbs(*blackList) || *blackList == "" {
 		Config.BlackList = *blackList
