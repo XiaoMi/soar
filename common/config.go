@@ -257,7 +257,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 
 	if d != nil {
 		// 原来有个判断，后来判断条件被删除了就导致第一次addr无论如何都会被修改。所以这边先注释掉
-		//addr = d.Addr
+		// addr = d.Addr
 		user = d.User
 		password = d.Password
 		schema = d.Schema
@@ -273,27 +273,24 @@ func parseDSN(odbc string, d *dsn) *dsn {
 	var userInfo, hostInfo, query string
 
 	// DSN 格式匹配
-	// userInfo@hostInfo/database
-	if res := regexp.MustCompile( `^(.*)@(.*?)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res)  > 5 {
+	if res := regexp.MustCompile(`^(.*)@(.*?)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 5 {
+		// userInfo@hostInfo/database
 		userInfo = res[1]
 		hostInfo = res[2]
 		schema = res[3]
 		query = res[5]
-
-	// hostInfo/database
 	} else if res := regexp.MustCompile(`^(.*)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 4 {
+		// hostInfo/database
 		hostInfo = res[1]
 		schema = res[2]
 		query = res[4]
-
-	// userInfo@hostInfo
 	} else if res := regexp.MustCompile(`^(.*)@(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 4 {
+		// userInfo@hostInfo
 		userInfo = res[1]
 		hostInfo = res[2]
 		query = res[4]
-		
-	// hostInfo
 	} else {
+		// hostInfo
 		hostInfo = odbc
 	}
 
@@ -301,7 +298,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 	if userInfo != "" {
 		user = strings.Split(userInfo, ":")[0]
 		// 防止密码中含有与用户名相同的字符, 所以用正则替换, 剩下的就是密码
-		password = strings.TrimLeft(regexp.MustCompile("^" + user).ReplaceAllString(userInfo, ""), ":")
+		password = strings.TrimLeft(regexp.MustCompile("^"+user).ReplaceAllString(userInfo, ""), ":")
 	}
 
 	// 解析主机信息
@@ -310,13 +307,13 @@ func parseDSN(odbc string, d *dsn) *dsn {
 	if host == "" {
 		host = "127.0.0.1"
 	}
-	if port == ""{
+	if port == "" {
 		port = "3306"
 	}
 	addr = host + ":" + port
 
 	// 解析查询字符串
-	if (query != "") {
+	if query != "" {
 		params := strings.Split(query, "&")
 		for _, f := range params {
 			attr := strings.Split(f, "=")
