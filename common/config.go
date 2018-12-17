@@ -269,60 +269,55 @@ func parseDSN(odbc string, d *dsn) *dsn {
 		return &dsn{Disable: true}
 	}
 
-	// username:password@ip:port/database
-	l1 := strings.Split(odbc, "@")
-	if len(l1) < 2 {
-		if strings.HasPrefix(l1[0], ":") {
-			// ":port/database"
-			l2 := strings.Split(strings.TrimLeft(l1[0], ":"), "/")
-			if l2[0] == "" {
-				addr = strings.Split(addr, ":")[0] + ":3306"
-				if len(l2) > 1 {
-					schema = strings.Split(l2[1], "?")[0]
-				}
-			} else {
-				addr = strings.Split(addr, ":")[0] + ":" + l2[0]
-				if len(l2) > 1 {
-					schema = strings.Split(l2[1], "?")[0]
-				}
-			}
-		} else if strings.HasPrefix(l1[0], "/") {
-			// "/database"
-			l2 := strings.TrimLeft(l1[0], "/")
-			schema = l2
-		} else {
-			// ip:port/database
-			l2 := strings.Split(l1[0], "/")
-			if len(l2) == 2 {
-				addr = l2[0]
-				schema = strings.Split(l2[1], "?")[0]
-			} else {
-				addr = l2[0]
-			}
-		}
+	// userInfo@hostInfo/database
+	regexStr1 := `^(.*)@(.*?)/(.*?)($|\?)(.*)`
+	// hostInfo/database
+	regexStr2 := `^(.*)/(.*?)($|\?)(.*)`
+	// userInfo@hostInfo
+	regexStr3 := `^(.*)@(.*?)($|\?)(.*)`
+
+	var userInfo, hostInfo, query string
+
+	// DSN 格式匹配
+	if res := regexp.MustCompile(regexStr1).FindStringSubmatch(odbc); len(res)  > 0 {
+		userInfo = res[1]
+		hostInfo = res[2]
+		schema = res[3]
+		query = res[5]
+	} else if res := regexp.MustCompile(regexStr2).FindStringSubmatch(odbc); len(res) > 0 {
+		hostInfo = res[1]
+		schema = res[2]
+		query = res[4]
+	} else if res := regexp.MustCompile(regexStr3).FindStringSubmatch(odbc); len(res) > 0 {
+		userInfo = res[1]
+		hostInfo = res[2]
+		query = res[4]
 	} else {
-		// user:password
-		l2 := strings.Split(l1[0], ":")
-		if len(l2) == 2 {
-			user = l2[0]
-			password = l2[1]
-		} else {
-			user = l2[0]
-		}
-		// ip:port/database
-		l3 := strings.Split(l1[1], "/")
-		if len(l3) == 2 {
-			addr = l3[0]
-			schema = strings.Split(l3[1], "?")[0]
-		} else {
-			addr = l3[0]
-		}
+		hostInfo = odbc
 	}
 
-	// 其他flag参数，目前只支持charset :(
-	if len(strings.Split(odbc, "?")) > 1 {
-		flags := strings.Split(strings.Split(odbc, "?")[1], "&")
-		for _, f := range flags {
+	// 解析用户信息
+	if userInfo != "" {
+		user = strings.Split(userInfo, ":")[0]
+		// 防止密码中含有与用户名相同的字符, 所以用正则替换, 剩下的就是密码
+		password = strings.TrimLeft(regexp.MustCompile("^" + user).ReplaceAllString(userInfo, ""), ":")
+	}
+
+	// 解析主机信息
+	host := strings.Split(hostInfo, ":")[0]
+	port := strings.TrimLeft(strings.Replace(hostInfo, host, "", 1), ":")
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	if port == ""{
+		port = "3306"
+	}
+	addr = host + ":" + port
+
+	// 解析查询字符串
+	if (query != "") {
+		params := strings.Split(query, "&")
+		for _, f := range params {
 			attr := strings.Split(f, "=")
 			if len(attr) > 1 {
 				arg := strings.TrimSpace(attr[0])
@@ -334,20 +329,6 @@ func parseDSN(odbc string, d *dsn) *dsn {
 				}
 			}
 		}
-	}
-
-	// 自动补端口
-	if !strings.Contains(addr, ":") {
-		addr = addr + ":3306"
-	} else {
-		if strings.HasSuffix(addr, ":") {
-			addr = addr + "3306"
-		}
-	}
-
-	// 默认走127.0.0.1
-	if strings.HasPrefix(addr, ":") {
-		addr = "127.0.0.1" + addr
 	}
 
 	// 默认用information_schema库
