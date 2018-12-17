@@ -256,7 +256,8 @@ func parseDSN(odbc string, d *dsn) *dsn {
 	}
 
 	if d != nil {
-		addr = d.Addr
+		// 原来有个判断，后来判断条件被删除了就导致第一次addr无论如何都会被修改。所以这边先注释掉
+		//addr = d.Addr
 		user = d.User
 		password = d.Password
 		schema = d.Schema
@@ -269,29 +270,29 @@ func parseDSN(odbc string, d *dsn) *dsn {
 		return &dsn{Disable: true}
 	}
 
-	// userInfo@hostInfo/database
-	regexStr1 := `^(.*)@(.*?)/(.*?)($|\?)(.*)`
-	// hostInfo/database
-	regexStr2 := `^(.*)/(.*?)($|\?)(.*)`
-	// userInfo@hostInfo
-	regexStr3 := `^(.*)@(.*?)($|\?)(.*)`
-
 	var userInfo, hostInfo, query string
 
 	// DSN 格式匹配
-	if res := regexp.MustCompile(regexStr1).FindStringSubmatch(odbc); len(res)  > 0 {
+	// userInfo@hostInfo/database
+	if res := regexp.MustCompile( `^(.*)@(.*?)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res)  > 5 {
 		userInfo = res[1]
 		hostInfo = res[2]
 		schema = res[3]
 		query = res[5]
-	} else if res := regexp.MustCompile(regexStr2).FindStringSubmatch(odbc); len(res) > 0 {
+
+	// hostInfo/database
+	} else if res := regexp.MustCompile(`^(.*)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 4 {
 		hostInfo = res[1]
 		schema = res[2]
 		query = res[4]
-	} else if res := regexp.MustCompile(regexStr3).FindStringSubmatch(odbc); len(res) > 0 {
+
+	// userInfo@hostInfo
+	} else if res := regexp.MustCompile(`^(.*)@(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 4 {
 		userInfo = res[1]
 		hostInfo = res[2]
 		query = res[4]
+		
+	// hostInfo
 	} else {
 		hostInfo = odbc
 	}
