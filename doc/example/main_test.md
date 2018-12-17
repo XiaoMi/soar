@@ -1,6 +1,6 @@
 # Query: C3FAEDA6AD6D762B
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -12,52 +12,17 @@ WHERE
   LENGTH  = 86
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: E969B9297DA79BA6
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ☆ 90分
 
 ```sql
 
@@ -69,56 +34,21 @@ WHERE
   LENGTH  IS  NULL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  应尽量避免在WHERE子句中对字段进行NULL值判断
+##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
 * **Severity:**  L1
 
-* **Content:**  使用IS NULL或IS NOT NULL将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中num列没有null值，然后这样查询： select id from t where num=0;
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 8A106444D14B9880
 
@@ -134,52 +64,33 @@ HAVING
   title  = 'abc'
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用HAVING子句
+##  不建议使用 HAVING 子句
 
 * **Item:**  CLA.013
 
 * **Severity:**  L3
 
-* **Content:**  将查询的HAVING子句改写为WHERE中的查询条件，可以在查询处理期间使用索引。
+* **Content:**  将查询的 HAVING 子句改写为 WHERE 中的查询条件，可以在查询处理期间使用索引。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: A0C5E62C724A121A
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -191,52 +102,17 @@ WHERE
   LENGTH  >= 60
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 33.33% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 868317D1973FD1B0
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -249,48 +125,13 @@ WHERE
   AND  84
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 11.11% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 707FE669669FA075
 
@@ -306,38 +147,13 @@ WHERE
   title  LIKE  'AIR%'
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | range | idx\_title | idx\_title | 767 |  | 2 | ☠️ **100.00%** | ☠️ **O(n)** | Using index condition |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **range**: 只检索给定范围的行, 使用一个索引来选择行. key列显示使用了哪个索引. key_len包含所使用索引的最长关键元素.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-* **Using index condition**: 在5.6版本后加入的新特性（Index Condition Pushdown）。Using index condition 会先条件过滤索引，过滤完索引后找到所有符合索引条件的数据行，随后用 WHERE 子句中的其他条件去过滤这些数据行。
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: DF916439ABD07664
 
@@ -353,44 +169,21 @@ WHERE
   title  IS  NOT  NULL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL | idx\_title | NULL |  |  | 1000 | 90.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  应尽量避免在WHERE子句中对字段进行NULL值判断
+##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
 * **Severity:**  L1
 
-* **Content:**  使用IS NULL或IS NOT NULL将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中num列没有null值，然后这样查询： select id from t where num=0;
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: B9336971FF3D3792
 
@@ -407,48 +200,21 @@ WHERE
   AND  title  = 'ALABAMA DEVIL'
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 10.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列title添加索引,散粒度为: 100.00%; 为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_title\_length\` (\`title\`,\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: 68E48001ECD53152
 
@@ -465,48 +231,21 @@ WHERE
   AND  title  = 'ALABAMA DEVIL'
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 33.33% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列title添加索引,散粒度为: 100.00%; 为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_title\_length\` (\`title\`,\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: 12FF1DAA3D425FA9
 
@@ -524,48 +263,21 @@ WHERE
   AND  title  = 'xyz'
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title,<br>idx\_fk\_language\_id | idx\_title | 767 | const | 1 | 33.33% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列title添加索引,散粒度为: 100.00%; 为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_title\_length\` (\`title\`,\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: E84CBAAC2E12BDEA
 
@@ -582,52 +294,25 @@ WHERE
   AND  language_id  < 10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL | idx\_fk\_language\_id | NULL |  |  | 1000 | 33.33% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: 6A0F035BD4E01018
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ☆ ☆ 75分
 
 ```sql
 
@@ -642,54 +327,33 @@ GROUP BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL | idx\_fk\_language\_id | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列language\_id添加索引,散粒度为: 0.10%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_language\_id\_release\_year\` (\`length\`,\`language\_id\`,\`release\_year\`) ;
-
-
-
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+##  使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: 23D176AEA2947002
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ☆ 85分
 
 ```sql
 
@@ -703,54 +367,25 @@ GROUP BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 33.33% | ☠️ **O(n)** | Using where; Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_release\_year\` (\`length\`,\`release\_year\`) ;
-
-
-
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+##  使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
 
 # Query: 73DDF6E6D9E40384
 
-★ ★ ★ ☆ ☆ 60分
+★ ★ ★ ☆ ☆ 65分
 
 ```sql
 
@@ -762,60 +397,33 @@ GROUP BY
   release_year, language_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列release\_year添加索引,散粒度为: 0.10%; 为列language\_id添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_release\_year\_language\_id\` (\`release\_year\`,\`language\_id\`) ;
-
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+##  使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
 
 # Query: B3C502B4AA344196
 
-★ ★ ★ ☆ ☆ 70分
+★ ★ ★ ☆ ☆ 75分
 
 ```sql
 
@@ -829,62 +437,33 @@ GROUP BY
   release_year, (LENGTH+ language_id)
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  GROUP BY的条件为表达式
+##  GROUP BY 的条件为表达式
 
 * **Item:**  CLA.010
 
 * **Severity:**  L2
 
-* **Content:**  当GROUP BY条件为表达式或函数时会使用到临时表，如果在未指定WHERE或WHERE条件返回的结果集较大时性能会很差。
+* **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+##  使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
 
 # Query: 47044E1FE1A965A5
 
-★ ★ ★ ☆ ☆ 60分
+★ ★ ★ ☆ ☆ 70分
 
 ```sql
 
@@ -896,60 +475,25 @@ GROUP BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_release\_year\` (\`release\_year\`) ;
-
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
 # Query: 2BA1217F6C8CF0AB
 
-☆ ☆ ☆ ☆ ☆ 0分
+★ ★ ☆ ☆ ☆ 45分
 
 ```sql
 
@@ -961,53 +505,37 @@ GROUP BY
   address, district
 ```
 
-## MySQL返回信息
-
-Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'optimizer_RSq3xBEF0TXgZsHj.address.address_id' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-
-##  为sakila库的address表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列address添加索引,散粒度为: 100.00%; 为列district添加索引,散粒度为: 100.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`address\` add index \`idx\_address\_district\` (\`address\`,\`district\`) ;
-
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  非确定性的GROUP BY
+##  非确定性的 GROUP BY
 
 * **Item:**  RES.001
 
 * **Severity:**  L4
 
-* **Content:**  SQL返回的列既不在聚合函数中也不是GROUP BY表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该SQL返回的结果就是不确定的。
+* **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
 
 # Query: 863A85207E4F410D
 
@@ -1025,48 +553,25 @@ GROUP BY
   title
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | index | idx\_title | idx\_title | 767 |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  避免在WHERE条件中使用函数或其他运算符
+##  避免在 WHERE 条件中使用函数或其他运算符
 
 * **Item:**  FUN.001
 
 * **Severity:**  L2
 
-* **Content:**  虽然在SQL中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。
+* **Content:**  虽然在 SQL 中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。也不建议在查询比较条件两侧书写多余的括号，这会对阅读产生比较大的困扰。
 
 # Query: DF59FD602E4AA368
 
-☆ ☆ ☆ ☆ ☆ 0分
+★ ★ ★ ★ ☆ 80分
 
 ```sql
 
@@ -1082,33 +587,17 @@ ORDER BY
   language_id
 ```
 
-## MySQL返回信息
-
-Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'optimizer_RSq3xBEF0TXgZsHj.film.language_id' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_release\_year\` (\`length\`,\`release\_year\`) ;
-
-
-
-##  非确定性的GROUP BY
+##  非确定性的 GROUP BY
 
 * **Item:**  RES.001
 
 * **Severity:**  L4
 
-* **Content:**  SQL返回的列既不在聚合函数中也不是GROUP BY表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该SQL返回的结果就是不确定的。
+* **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
 
 # Query: F6DBEAA606D800FC
 
-★ ★ ★ ★ ☆ 90分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1124,48 +613,11 @@ ORDER BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using temporary; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_release\_year\` (\`length\`,\`release\_year\`) ;
-
-
+##  OK
 
 # Query: 6E9B96CA3F0E6BDA
 
-★ ★ ☆ ☆ ☆ 55分
+★ ★ ★ ☆ ☆ 65分
 
 ```sql
 
@@ -1179,70 +631,33 @@ ORDER BY
   release_year  ASC, language_id  DESC
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  ORDER BY语句对多个不同条件使用不同方向的排序无法使用索引
+##  ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
 
 * **Item:**  CLA.007
 
 * **Severity:**  L2
 
-* **Content:**  ORDER BY子句中的所有表达式必须按统一的ASC或DESC方向排序，以便利用索引。
+* **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  ORDER BY多个列但排序方向不同时可能无法使用索引
+##  ORDER BY 多个列但排序方向不同时可能无法使用索引
 
 * **Item:**  KEY.008
 
 * **Severity:**  L4
 
-* **Content:**  在MySQL 8.0之前当ORDER BY多个列指定的排序方向不同时将无法使用已经建立的索引。
+* **Content:**  在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
 
 # Query: 2EAACFD7030EA528
 
-★ ★ ★ ★ ☆ 90分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1260,48 +675,11 @@ LIMIT
   10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using temporary; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_release\_year\` (\`length\`,\`release\_year\`) ;
-
-
+##  OK
 
 # Query: 5CE2F187DBF2A710
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1317,54 +695,17 @@ LIMIT
   10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_release\_year\` (\`length\`,\`release\_year\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: E75234155B5E2E14
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ☆ ☆ 75分
 
 ```sql
 
@@ -1378,60 +719,49 @@ LIMIT
   10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_release\_year\` (\`release\_year\`) ;
-
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: AFEEBF10A8D74E32
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  film_id  
+FROM  
+  film  
+ORDER BY  
+  release_year  
+LIMIT  
+  10
+```
+
+##  最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: 965D5AC955824512
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1447,54 +777,17 @@ LIMIT
   10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 33.33% | ☠️ **O(n)** | Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 1E2CF4145EE706A5
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1510,54 +803,17 @@ LIMIT
   10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 33.33% | ☠️ **O(n)** | Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: A314542EEE8571EE
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1571,52 +827,13 @@ ORDER BY
   last_name
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *customer* | NULL | range | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 |  | 2 | ☠️ **100.00%** | ☠️ **O(n)** | Using index condition; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **range**: 只检索给定范围的行, 使用一个索引来选择行. key列显示使用了哪个索引. key_len包含所使用索引的最长关键元素.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-* **Using index condition**: 在5.6版本后加入的新特性（Index Condition Pushdown）。Using index condition 会先条件过滤索引，过滤完索引后找到所有符合索引条件的数据行，随后用 WHERE 子句中的其他条件去过滤这些数据行。
-
-
-##  为sakila库的customer表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列address\_id添加索引,散粒度为: 100.00%; 为列last\_name添加索引,散粒度为: 100.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`customer\` add index \`idx\_address\_id\_last\_name\` (\`address\_id\`,\`last\_name\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 0BE2D79E2F1E7CB0
 
@@ -1635,50 +852,21 @@ ORDER BY
   title
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 9.00% | ☠️ **O(n)** | Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列release\_year添加索引,散粒度为: 0.10%; 为列length添加索引,散粒度为: 14.00%; 为列title添加索引,散粒度为: 100.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_release\_year\_length\_title\` (\`release\_year\`,\`length\`,\`title\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 ##  '!=' 运算符是非标准的
 
@@ -1690,7 +878,7 @@ ORDER BY
 
 # Query: 4E73AA068370E6A8
 
-★ ★ ★ ★ ☆ 90分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1702,40 +890,7 @@ WHERE
   release_year  = 1995
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 10.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_release\_year\` (\`release\_year\`) ;
-
-
+##  OK
 
 # Query: BA7111449E4F1122
 
@@ -1752,40 +907,13 @@ WHERE
   AND  LENGTH  = 70
 ```
 
-##  Explain信息
+##  不建议使用连续判断
 
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | const | 1 | 10.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
+* **Item:**  RES.009
 
 * **Severity:**  L2
 
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列language\_id添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_language\_id\` (\`length\`,\`language\_id\`) ;
-
-
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: B13E0ACEAF8F3119
 
@@ -1802,44 +930,13 @@ WHERE
   AND  LENGTH  > 70
 ```
 
-##  Explain信息
+##  不建议使用连续判断
 
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | range | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 |  | 1 | 33.33% | ☠️ **O(n)** | Using index condition; Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **range**: 只检索给定范围的行, 使用一个索引来选择行. key列显示使用了哪个索引. key_len包含所使用索引的最长关键元素.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-* **Using index condition**: 在5.6版本后加入的新特性（Index Condition Pushdown）。Using index condition 会先条件过滤索引，过滤完索引后找到所有符合索引条件的数据行，随后用 WHERE 子句中的其他条件去过滤这些数据行。
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
+* **Item:**  RES.009
 
 * **Severity:**  L2
 
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: A3FAB6027484B88B
 
@@ -1858,54 +955,21 @@ ORDER BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 10.00% | ☠️ **O(n)** | Using index condition; Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-* **Using index condition**: 在5.6版本后加入的新特性（Index Condition Pushdown）。Using index condition 会先条件过滤索引，过滤完索引后找到所有符合索引条件的数据行，随后用 WHERE 子句中的其他条件去过滤这些数据行。
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列title添加索引,散粒度为: 100.00%; 为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_title\_length\_release\_year\` (\`title\`,\`length\`,\`release\_year\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: CB42080E9F35AB07
 
@@ -1924,58 +988,25 @@ ORDER BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 33.33% | ☠️ **O(n)** | Using index condition; Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-* **Using index condition**: 在5.6版本后加入的新特性（Index Condition Pushdown）。Using index condition 会先条件过滤索引，过滤完索引后找到所有符合索引条件的数据行，随后用 WHERE 子句中的其他条件去过滤这些数据行。
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列title添加索引,散粒度为: 100.00%; 为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_title\_length\_release\_year\` (\`title\`,\`length\`,\`release\_year\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: C4A212A42400411D
 
-★ ★ ★ ★ ☆ 85分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1989,50 +1020,13 @@ ORDER BY
   release_year
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 33.33% | ☠️ **O(n)** | Using where; Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 为列release\_year添加索引,散粒度为: 0.10%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\_release\_year\` (\`length\`,\`release\_year\`) ;
-
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 4ECCA9568BE69E68
 
@@ -2047,51 +1041,29 @@ FROM
   INNER JOIN  country  b  ON  a. country_id= b. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *b* | NULL | ALL | PRIMARY | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 485D56FC88BBBDB9
 
@@ -2106,51 +1078,29 @@ FROM
   LEFT JOIN  country  b  ON  a. country_id= b. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 0D0DABACEDFF5765
 
@@ -2165,55 +1115,33 @@ FROM
   RIGHT JOIN  country  b  ON  a. country_id= b. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *b* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 1E56C6CCEA2131CC
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ☆ 90分
 
 ```sql
 
@@ -2226,73 +1154,33 @@ WHERE
   b. last_update  IS  NULL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的country表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列last\_update添加索引,散粒度为: 0.92%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`country\` add index \`idx\_last\_update\` (\`last\_update\`) ;
-
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  应尽量避免在WHERE子句中对字段进行NULL值判断
+##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
 * **Severity:**  L1
 
-* **Content:**  使用IS NULL或IS NOT NULL将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中num列没有null值，然后这样查询： select id from t where num=0;
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: F5D30BCAC1E206A1
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ☆ 90分
 
 ```sql
 
@@ -2305,69 +1193,29 @@ WHERE
   a. last_update  IS  NULL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *b* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的city表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列last\_update添加索引,散粒度为: 0.17%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`city\` add index \`idx\_last\_update\` (\`last\_update\`) ;
-
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  应尽量避免在WHERE子句中对字段进行NULL值判断
+##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
 * **Severity:**  L1
 
-* **Content:**  使用IS NULL或IS NOT NULL将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中num列没有null值，然后这样查询： select id from t where num=0;
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
 # Query: 17D5BCF21DC2364C
 
@@ -2388,66 +1236,31 @@ FROM
   RIGHT JOIN  country  b  ON  a. country_id= b. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | PRIMARY | *a* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *b* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 0  | UNION RESULT | *<union1,2>* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **PRIMARY**: 最外层的select.
-
-* **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
-
-* **UNION RESULT**: UNION查询的结果集.
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用UNION ALL替代UNION
+##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -2457,7 +1270,7 @@ FROM
 
 # Query: A4911095C201896F
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ★ ☆ 85分
 
 ```sql
 
@@ -2478,86 +1291,23 @@ WHERE
   b. last_update  IS  NULL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | PRIMARY | *b* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *a* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-| 0  | UNION RESULT | *<union1,2>* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **PRIMARY**: 最外层的select.
-
-* **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
-
-* **UNION RESULT**: UNION查询的结果集.
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-
-##  为sakila库的city表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列last\_update添加索引,散粒度为: 0.17%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`city\` add index \`idx\_last\_update\` (\`last\_update\`) ;
-
-
-
-##  为sakila库的country表添加索引
-
-* **Item:**  IDX.002
-
-* **Severity:**  L2
-
-* **Content:**  为列last\_update添加索引,散粒度为: 0.92%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`country\` add index \`idx\_last\_update\` (\`last\_update\`) ;
-
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用UNION ALL替代UNION
+##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -2578,39 +1328,13 @@ FROM
   JOIN  country
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *country* | NULL | ALL | PRIMARY | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: 5C547F08EADBB131
 
@@ -2625,39 +1349,13 @@ FROM
   LEFT JOIN  country
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *city* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: AF0C1EB58B23D2FA
 
@@ -2672,39 +1370,13 @@ FROM
   RIGHT JOIN  country
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *country* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: 626571EAE84E2C8A
 
@@ -2718,51 +1390,25 @@ FROM
   city  a  STRAIGHT_JOIN  country  b  ON  a. country_id= b. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ALL | idx\_fk\_country\_id | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: F76BFFC87914E3D5
 
-☆ ☆ ☆ ☆ ☆ 0分
+★ ★ ★ ☆ ☆ 60分
 
 ```sql
 
@@ -2778,37 +1424,33 @@ FROM
   scott. emp  e)
 ```
 
-## MySQL返回信息
-
-Unknown database 'scott'
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  MySQL对子查询的优化效果不佳
+##  MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
 * **Severity:**  L4
 
-* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为JOIN或LEFT OUTER JOIN。
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
 
-# Query: 18D2299710570E81
+# Query: 7253A3D336F9F3FE
 
-☆ ☆ ☆ ☆ ☆ 10分
+★ ☆ ☆ ☆ ☆ 30分
 
 ```sql
 
@@ -2823,7 +1465,7 @@ FROM
 WHERE  
   ip= "123.45.67.89" 
 ORDER BY  
-  tsdesc  
+  ts  desc  
 LIMIT  
   50, 10) I  
   JOIN  LOG  ON  (I. id= LOG. id) 
@@ -2832,29 +1474,13 @@ ORDER BY
   TS  desc
 ```
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
-
-##  ORDER BY语句对多个不同条件使用不同方向的排序无法使用索引
-
-* **Item:**  CLA.007
-
-* **Severity:**  L2
-
-* **Content:**  ORDER BY子句中的所有表达式必须按统一的ASC或DESC方向排序，以便利用索引。
-
-##  ORDER BY的条件为表达式
-
-* **Item:**  CLA.009
-
-* **Severity:**  L2
-
-* **Content:**  当ORDER BY条件为表达式或函数时会使用到临时表，如果在未指定WHERE或WHERE条件返回的结果集较大时性能会很差。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ##  同一张表被连接两次
 
@@ -2862,7 +1488,7 @@ ORDER BY
 
 * **Severity:**  L4
 
-* **Content:**  相同的表在FROM子句中至少出现两次，可以简化为对该表的单次访问。
+* **Content:**  相同的表在 FROM 子句中至少出现两次，可以简化为对该表的单次访问。
 
 ##  用字符类型存储IP地址
 
@@ -2870,15 +1496,15 @@ ORDER BY
 
 * **Severity:**  L2
 
-* **Content:**  字符串字面上看起来像IP地址，但不是INET\_ATON()的参数，表示数据被存储为字符而不是整数。将IP地址存储为整数更为有效。
+* **Content:**  字符串字面上看起来像IP地址，但不是 INET\_ATON() 的参数，表示数据被存储为字符而不是整数。将IP地址存储为整数更为有效。
 
-##  MySQL对子查询的优化效果不佳
+##  MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
 * **Severity:**  L4
 
-* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为JOIN或LEFT OUTER JOIN。
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
 
 # Query: 7F02E23D44A38A6D
 
@@ -2893,29 +1519,13 @@ WHERE
   city. city_id  = 1
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | DELETE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col =1.
-
-
-##  不建议使用联表更新
+##  不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
 * **Severity:**  L4
 
-* **Content:**  当需要同时更新多张表时建议使用简单SQL，一条SQL只更新一张表，尽量不要将多张表的更新在同一条SQL中完成。
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
 ##  使用DELETE/DROP/TRUNCATE等操作时注意备份
 
@@ -2927,7 +1537,7 @@ WHERE
 
 # Query: F8314ABD1CBF2FF1
 
-★ ★ ★ ☆ ☆ 70分
+★ ★ ★ ★ ☆ 80分
 
 ```sql
 DELETE  city  
@@ -2938,53 +1548,13 @@ WHERE
   country. country  IS  NULL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *city* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的country表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列country添加索引,散粒度为: 100.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`country\` add index \`idx\_country\` (\`country\`) ;
-
-
-
-##  不建议使用联表更新
+##  不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
 * **Severity:**  L4
 
-* **Content:**  当需要同时更新多张表时建议使用简单SQL，一条SQL只更新一张表，尽量不要将多张表的更新在同一条SQL中完成。
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
 ##  使用DELETE/DROP/TRUNCATE等操作时注意备份
 
@@ -3007,31 +1577,13 @@ WHERE
   a1. country_id= a2. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *a2* | NULL | ALL | PRIMARY | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-
-##  不建议使用联表更新
+##  不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
 * **Severity:**  L4
 
-* **Content:**  当需要同时更新多张表时建议使用简单SQL，一条SQL只更新一张表，尽量不要将多张表的更新在同一条SQL中完成。
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
 ##  使用DELETE/DROP/TRUNCATE等操作时注意备份
 
@@ -3054,31 +1606,13 @@ WHERE
   a1. country_id= a2. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *a2* | NULL | ALL | PRIMARY | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-
-##  不建议使用联表更新
+##  不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
 * **Severity:**  L4
 
-* **Content:**  当需要同时更新多张表时建议使用简单SQL，一条SQL只更新一张表，尽量不要将多张表的更新在同一条SQL中完成。
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
 ##  使用DELETE/DROP/TRUNCATE等操作时注意备份
 
@@ -3090,7 +1624,7 @@ WHERE
 
 # Query: F16FD63381EF8299
 
-★ ★ ★ ★ ☆ 90分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -3099,37 +1633,6 @@ DELETE FROM
 WHERE  
   LENGTH  > 100
 ```
-
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列length添加索引,散粒度为: 14.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
-
-
 
 ##  使用DELETE/DROP/TRUNCATE等操作时注意备份
 
@@ -3156,29 +1659,13 @@ WHERE
   city. city_id= 10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col =1.
-
-
-##  不建议使用联表更新
+##  不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
 * **Severity:**  L4
 
-* **Content:**  当需要同时更新多张表时建议使用简单SQL，一条SQL只更新一张表，尽量不要将多张表的更新在同一条SQL中完成。
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
 # Query: C15BDF2C73B5B7ED
 
@@ -3198,44 +1685,17 @@ WHERE
   city. city_id= 10
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *address* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col =1.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  不建议使用联表更新
+##  不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
 * **Severity:**  L4
 
-* **Content:**  当需要同时更新多张表时建议使用简单SQL，一条SQL只更新一张表，尽量不要将多张表的更新在同一条SQL中完成。
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
 # Query: FCD1ABF36F8CDAD7
 
-★ ★ ★ ★ ★ 100分
+★ ★ ★ ★ ☆ 90分
 
 ```sql
 
@@ -3250,21 +1710,13 @@ WHERE
   AND  city. city_id= 10
 ```
 
-##  Explain信息
+##  不建议使用连续判断
 
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+* **Item:**  RES.009
 
+* **Severity:**  L2
 
-
-### Explain信息解读
-
-#### Type信息解读
-
-* **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col =1.
-
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
 
 # Query: FE409EB794EE91CF
 
@@ -3280,24 +1732,7 @@ WHERE
   language_id  = 20
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *film* | NULL | range | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* **range**: 只检索给定范围的行, 使用一个索引来选择行. key列显示使用了哪个索引. key_len包含所使用索引的最长关键元素.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
+##  OK
 
 # Query: 3656B13CC4F888E2
 
@@ -3311,47 +1746,21 @@ FROM
   country
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | INSERT | *city* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *country* | NULL | index |  | PRIMARY | 2 |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  INSERT INTO xx SELECT加锁粒度较大请谨慎
+##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
 * **Severity:**  L3
 
-* **Content:**  INSERT INTO xx SELECT加锁粒度较大请谨慎
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 # Query: 2F7439623B712317
 
@@ -3365,20 +1774,7 @@ VALUES
   (3)
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | INSERT | *city* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
+##  OK
 
 # Query: 11EC7AAACC97DC0F
 
@@ -3392,28 +1788,13 @@ FROM
   DUAL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | INSERT | *city* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-
-##  INSERT INTO xx SELECT加锁粒度较大请谨慎
+##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
 * **Severity:**  L3
 
-* **Content:**  INSERT INTO xx SELECT加锁粒度较大请谨慎
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 # Query: E3DDA1A929236E72
 
@@ -3427,47 +1808,21 @@ FROM
   country
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | REPLACE | *city* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *country* | NULL | index |  | PRIMARY | 2 |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  INSERT INTO xx SELECT加锁粒度较大请谨慎
+##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
 * **Severity:**  L3
 
-* **Content:**  INSERT INTO xx SELECT加锁粒度较大请谨慎
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 # Query: 466F1AC2F5851149
 
@@ -3481,20 +1836,7 @@ VALUES
   (3)
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | REPLACE | *city* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
+##  OK
 
 # Query: A7973BDD268F926E
 
@@ -3508,28 +1850,13 @@ FROM
   DUAL
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | REPLACE | *city* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | NULL |
-
-
-
-### Explain信息解读
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-
-##  INSERT INTO xx SELECT加锁粒度较大请谨慎
+##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
 * **Severity:**  L3
 
-* **Content:**  INSERT INTO xx SELECT加锁粒度较大请谨慎
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 # Query: 105C870D5DFB6710
 
@@ -3623,36 +1950,13 @@ FROM
 ) film
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | index |  | idx\_fk\_language\_id | 1 |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ##  执行计划中嵌套连接深度过深
 
@@ -3682,67 +1986,37 @@ LIMIT
   1)
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | PRIMARY | *film* | NULL | ALL | idx\_fk\_language\_id | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-| 2  | SUBQUERY | *language* | NULL | index |  | PRIMARY | 1 |  | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **PRIMARY**: 最外层的select.
-
-* **SUBQUERY**: 子查询中的第一个SELECT查询, 不依赖于外部查询的结果集.
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  未使用ORDER BY的LIMIT查询
+##  未使用 ORDER BY 的 LIMIT 查询
 
 * **Item:**  RES.002
 
 * **Severity:**  L4
 
-* **Content:**  没有ORDER BY的LIMIT会导致非确定性的结果，这取决于查询执行计划。
+* **Content:**  没有 ORDER BY 的 LIMIT 会导致非确定性的结果，这取决于查询执行计划。
 
-##  MySQL对子查询的优化效果不佳
+##  MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
 * **Severity:**  L4
 
-* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为JOIN或LEFT OUTER JOIN。
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
 
 # Query: 16CB4628D2597D40
 
@@ -3763,64 +2037,31 @@ FROM
   RIGHT JOIN  country  o  ON  i. city_id= o. country_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | PRIMARY | *i* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *o* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 0  | UNION RESULT | *<union1,2>* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **PRIMARY**: 最外层的select.
-
-* **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
-
-* **UNION RESULT**: UNION查询的结果集.
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用UNION ALL替代UNION
+##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -3830,7 +2071,7 @@ FROM
 
 # Query: EA50643B01E139A8
 
-☆ ☆ ☆ ☆ ☆ 0分
+★ ☆ ☆ ☆ ☆ 35分
 
 ```sql
 
@@ -3853,53 +2094,45 @@ GROUP BY
   first_name
 ```
 
-## MySQL返回信息
-
-Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 't.actor_id' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-
-##  为sakila库的actor表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列last\_name添加索引,散粒度为: 60.50%; 为列last\_update添加索引,散粒度为: 0.50%; 为列first\_name添加索引,散粒度为: 64.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`actor\` add index \`idx\_last\_name\_last\_update\_first\_name\` (\`last\_name\`,\`last\_update\`,\`first\_name\`) ;
-
-
-
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  非确定性的GROUP BY
+##  非确定性的 GROUP BY
 
 * **Item:**  RES.001
 
 * **Severity:**  L4
 
-* **Content:**  SQL返回的列既不在聚合函数中也不是GROUP BY表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该SQL返回的结果就是不确定的。
+* **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
 
-##  MySQL对子查询的优化效果不佳
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
+
+##  MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
 * **Severity:**  L4
 
-* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为JOIN或LEFT OUTER JOIN。
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
 
 # Query: 7598A4EDE6CFA6BE
 
@@ -3924,60 +2157,23 @@ WHERE
   i. city_id  is  null
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | PRIMARY | *i* | NULL | ALL |  | NULL |  |  | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *o* | NULL | ALL |  | NULL |  |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
-| 0  | UNION RESULT | *<union1,2>* | NULL | ALL |  | NULL |  |  | 0 | 0.00% | ☠️ **O(n)** | Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **PRIMARY**: 最外层的select.
-
-* **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
-
-* **UNION RESULT**: UNION查询的结果集.
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用UNION ALL替代UNION
+##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -3997,43 +2193,17 @@ FROM
   customer  STRAIGHT_JOIN  address  ON  customer. address_id= address. address_id
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *customer* | NULL | ALL | idx\_fk\_address\_id | NULL |  |  | 599 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *address* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.customer.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: E48A20D0413512DA
 
-★ ☆ ☆ ☆ ☆ 20分
+★ ☆ ☆ ☆ ☆ 30分
 
 ```sql
 
@@ -4057,89 +2227,29 @@ ORDER BY
   phone  desc
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | PRIMARY | *country* | NULL | index | PRIMARY | PRIMARY | 2 |  | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index; Using temporary; Using filesort |
-| 1  | PRIMARY | *city* | NULL | ref | PRIMARY,<br>idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *c* | NULL | ALL |  | NULL |  |  | 600 | 10.00% | ☠️ **O(n)** | Using where; Using join buffer (Block Nested Loop) |
-| 1  | PRIMARY | *a* | NULL | ref | PRIMARY,<br>idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.city.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *cu* | NULL | ref | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *<derived2>* | NULL | ref | <auto\_key0> | <auto\_key0> | 152 | sakila.a.address | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *a* | NULL | ALL | PRIMARY,<br>idx\_fk\_city\_id | NULL |  |  | 603 | ☠️ **100.00%** | ☠️ **O(n)** | Using filesort |
-| 2  | DERIVED | *cu* | NULL | ref | idx\_fk\_store\_id,<br>idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | 54.42% | ☠️ **O(n)** | Using where |
-| 2  | DERIVED | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | sakila.a.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **PRIMARY**: 最外层的select.
-
-* **DERIVED**: 用于from子句里有子查询的情况. MySQL会递归执行这些子查询, 把结果放在临时表里.
-
-#### Type信息解读
-
-* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
-
-* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using join buffer**: 从已有连接中找被读入缓存的数据, 并且通过缓存来完成与当前表的连接.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的city表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列city添加索引,散粒度为: 99.83%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`city\` add index \`idx\_city\` (\`city\`) ;
-
-
-
-##  建议使用AS关键字显示声明一个别名
+##  建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
 * **Severity:**  L0
 
-* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用AS关键字比隐含别名(如"tbl alias")更易懂。
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  ORDER BY语句对多个不同条件使用不同方向的排序无法使用索引
+##  ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
 
 * **Item:**  CLA.007
 
 * **Severity:**  L2
 
-* **Content:**  ORDER BY子句中的所有表达式必须按统一的ASC或DESC方向排序，以便利用索引。
+* **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
 
 ##  同一张表被连接两次
 
@@ -4147,15 +2257,15 @@ ORDER BY
 
 * **Severity:**  L4
 
-* **Content:**  相同的表在FROM子句中至少出现两次，可以简化为对该表的单次访问。
+* **Content:**  相同的表在 FROM 子句中至少出现两次，可以简化为对该表的单次访问。
 
-##  MySQL对子查询的优化效果不佳
+##  MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
 * **Severity:**  L4
 
-* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为JOIN或LEFT OUTER JOIN。
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
 
 # Query: B0BA5A7079EA16B3
 
@@ -4171,48 +2281,25 @@ WHERE
   DATE( last_update) = '2006-02-15'
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  不建议使用SELECT * 类型查询
+##  不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
 * **Severity:**  L1
 
-* **Content:**  当表结构变更时，使用\*通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  避免在WHERE条件中使用函数或其他运算符
+##  避免在 WHERE 条件中使用函数或其他运算符
 
 * **Item:**  FUN.001
 
 * **Severity:**  L2
 
-* **Content:**  虽然在SQL中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。
+* **Content:**  虽然在 SQL 中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。也不建议在查询比较条件两侧书写多余的括号，这会对阅读产生比较大的困扰。
 
 # Query: 18A2AD1395A58EAE
 
-☆ ☆ ☆ ☆ ☆ 0分
+★ ★ ★ ☆ ☆ 60分
 
 ```sql
 
@@ -4224,33 +2311,29 @@ GROUP BY
   DATE( last_update)
 ```
 
-## MySQL返回信息
-
-Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'optimizer_RSq3xBEF0TXgZsHj.film.last_update' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  GROUP BY的条件为表达式
+##  GROUP BY 的条件为表达式
 
 * **Item:**  CLA.010
 
 * **Severity:**  L2
 
-* **Content:**  当GROUP BY条件为表达式或函数时会使用到临时表，如果在未指定WHERE或WHERE条件返回的结果集较大时性能会很差。
+* **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
 
 # Query: 60F234BA33AAC132
 
@@ -4266,48 +2349,25 @@ ORDER BY
   DATE( last_update)
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using filesort |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
-
-
-##  SELECT未指定WHERE条件
+##  最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
 * **Severity:**  L4
 
-* **Content:**  SELECT语句没有WHERE子句，可能检查比预期更多的行(全表扫描)。对于SELECT COUNT(\*)类型的请求如果不要求精度，建议使用SHOW TABLE STATUS或EXPLAIN替代。
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  ORDER BY的条件为表达式
+##  ORDER BY 的条件为表达式
 
 * **Item:**  CLA.009
 
 * **Severity:**  L2
 
-* **Content:**  当ORDER BY条件为表达式或函数时会使用到临时表，如果在未指定WHERE或WHERE条件返回的结果集较大时性能会很差。
+* **Content:**  当 ORDER BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
 
 # Query: 1ED2B7ECBA4215E1
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ☆ 90分
 
 ```sql
 
@@ -4323,50 +2383,13 @@ GROUP BY
   description
 ```
 
-##  Explain信息
-
-| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL |  | NULL |  |  | 1000 | 20.00% | ☠️ **O(n)** | Using where; Using temporary |
-
-
-
-### Explain信息解读
-
-#### SelectType信息解读
-
-* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
-
-#### Type信息解读
-
-* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-
-##  为sakila库的film表添加索引
-
-* **Item:**  IDX.001
-
-* **Severity:**  L2
-
-* **Content:**  为列description添加索引,散粒度为: 100.00%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_description\` (\`description\`(255)) ;
-
-
-
-##  请为GROUP BY显示添加ORDER BY条件
+##  请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
 * **Severity:**  L2
 
-* **Content:**  默认MySQL会对'GROUP BY col1, col2, ...'请求按如下顺序排序'ORDER BY col1, col2, ...'。如果GROUP BY语句不指定ORDER BY条件会导致无谓的排序产生，如果不需要排序建议添加'ORDER BY NULL'。
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
 # Query: 255BAC03F56CDBC7
 
@@ -4380,13 +2403,7 @@ ADD
   index  idx_city_id( city_id)
 ```
 
-##  提醒：请将索引属性顺序与查询对齐
-
-* **Item:**  KEY.004
-
-* **Severity:**  L0
-
-* **Content:**  如果为列创建复合索引，请确保查询属性与索引属性的顺序相同，以便DBMS在处理查询时使用索引。如果查询和索引属性订单没有对齐，那么DBMS可能无法在查询处理期间使用索引。
+##  OK
 
 # Query: C315BC4EE0F4E523
 
@@ -4398,7 +2415,7 @@ ALTER TABLE
   inventory  
 ADD  
   index  `idx_store_film` (
-    `store_id`, `film_id` )
+    `store_id`, `film_id`)
 ```
 
 ##  提醒：请将索引属性顺序与查询对齐
@@ -4419,13 +2436,13 @@ ALTER TABLE
   inventory  
 ADD  
   index  `idx_store_film` (
-    `store_id`, `film_id` ), 
-    ADD  
+    `store_id`, `film_id`), 
+      ADD  
       index  `idx_store_film` (
-        `store_id`, `film_id` ), 
-        ADD  
+        `store_id`, `film_id`), 
+              ADD  
           index  `idx_store_film` (
-            `store_id`, `film_id` )
+            `store_id`, `film_id`)
 ```
 
 ##  提醒：请将索引属性顺序与查询对齐
@@ -4435,4 +2452,161 @@ ADD
 * **Severity:**  L0
 
 * **Content:**  如果为列创建复合索引，请确保查询属性与索引属性的顺序相同，以便DBMS在处理查询时使用索引。如果查询和索引属性订单没有对齐，那么DBMS可能无法在查询处理期间使用索引。
+
+# Query: CE8A69541550D286
+
+★ ☆ ☆ ☆ ☆ 30分
+
+```sql
+
+SELECT  
+  DATE_FORMAT( t. atm, '%Y-%m-%d'
+), 
+COUNT( DISTINCT  (
+  t. usr)) 
+  FROM  
+    usr_terminal  t  
+  WHERE  
+    t. atm  > '2018-10-22 00:00:00' 
+    AND  t. agent  LIKE  '%Chrome%' 
+    AND  t. system  = 'eip' 
+  GROUP BY  
+    DATE_FORMAT( t. atm, '%Y-%m-%d'
+) 
+ORDER BY  
+  DATE_FORMAT( t. atm, '%Y-%m-%d'
+)
+```
+
+##  建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+##  不建议使用前项通配符查找
+
+* **Item:**  ARG.001
+
+* **Severity:**  L4
+
+* **Content:**  例如 "％foo"，查询参数有一个前项通配符的情况无法使用已有索引。
+
+##  ORDER BY 的条件为表达式
+
+* **Item:**  CLA.009
+
+* **Severity:**  L2
+
+* **Content:**  当 ORDER BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+##  GROUP BY 的条件为表达式
+
+* **Item:**  CLA.010
+
+* **Severity:**  L2
+
+* **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+##  ORDER BY 多个列但排序方向不同时可能无法使用索引
+
+* **Item:**  KEY.008
+
+* **Severity:**  L4
+
+* **Content:**  在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
+
+##  不建议使用连续判断
+
+* **Item:**  RES.009
+
+* **Severity:**  L2
+
+* **Content:**  类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
+
+# Query: C11ECE7AE5F80CE5
+
+★ ★ ☆ ☆ ☆ 45分
+
+```sql
+create  table  hello. t  (id  int  unsigned)
+```
+
+##  建议为表添加注释
+
+* **Item:**  CLA.011
+
+* **Severity:**  L1
+
+* **Content:**  为表添加注释能够使得表的意义更明确，从而为日后的维护带来极大的便利。
+
+##  请为列添加默认值
+
+* **Item:**  COL.004
+
+* **Severity:**  L1
+
+* **Content:**  请为列添加默认值，如果是 ALTER 操作，请不要忘记将原字段的默认值写上。字段无默认值，当表较大时无法在线变更表结构。
+
+##  列未添加注释
+
+* **Item:**  COL.005
+
+* **Severity:**  L1
+
+* **Content:**  建议对表中每个列添加注释，来明确每个列在表中的含义及作用。
+
+##  未指定主键或主键非 int 或 bigint
+
+* **Item:**  KEY.007
+
+* **Severity:**  L4
+
+* **Content:**  未指定主键或主键非 int 或 bigint，建议将主键设置为 int unsigned 或 bigint unsigned。
+
+##  请为表选择合适的存储引擎
+
+* **Item:**  TBL.002
+
+* **Severity:**  L4
+
+* **Content:**  建表或修改表的存储引擎时建议使用推荐的存储引擎，如：innodb
+
+# Query: 291F95B7DCB74C21
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  tb  
+WHERE  
+  data  >= ''
+```
+
+##  不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 084DA3E3EE38DD85
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+ALTER TABLE  
+  tb  alter  column  id  
+DROP  
+  DEFAULT
+```
+
+##  OK
 

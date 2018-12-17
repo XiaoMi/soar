@@ -202,7 +202,7 @@ daily: | deps fmt vendor docker cover doc lint release install main_test clean l
 
 # vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
-daily-quick: | deps fmt cover doc lint logo
+daily-quick: | deps fmt cover main_test doc lint logo
 	@echo "\033[92mdaily-quick build finished\033[0m"
 
 .PHONY: logo

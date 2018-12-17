@@ -569,6 +569,14 @@ func init() {
 			Case:     "CREATE TABLE tab (a BOOLEAN);",
 			Func:     (*Query4Audit).RuleColumnNotAllowType,
 		},
+		"COL.019": {
+			Item:     "COL.019",
+			Severity: "L1",
+			Summary:  "不建议使用精度在秒级以下的时间数据类型",
+			Content:  "使用高精度的时间数据类型带来的存储空间消耗相对较大；MySQL 在5.6.4以上才可以支持精确到微秒的时间数据类型，使用时需要考虑版本兼容问题。",
+			Case:     "CREATE TABLE t1 (t TIME(3), dt DATETIME(6));",
+			Func:     (*Query4Audit).RuleTimePrecision,
+		},
 		"DIS.001": {
 			Item:     "DIS.001",
 			Severity: "L1",

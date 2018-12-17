@@ -160,9 +160,11 @@ alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
-SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')
-SELECT DATE_FORMAT(t.atm, '%Y-%m-%d'), COUNT(DISTINCT (t.usr)) FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00' AND t.agent LIKE '%Chrome%' AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')
+SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d');
+SELECT DATE_FORMAT(t.atm, '%Y-%m-%d'), COUNT(DISTINCT (t.usr)) FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00' AND t.agent LIKE '%Chrome%' AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d');
 create table hello.t (id int unsigned);
 create table hello.t (id int unsigned);
-select * from tb where data >= ''
-select * from tb where data >= ''
+select * from tb where data >= '';
+select * from tb where data >= '';
+alter table tb alter column id drop default;
+alter table tb alter column id drop default;

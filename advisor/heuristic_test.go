@@ -2792,8 +2792,6 @@ func TestRuleColumnWithCharset(t *testing.T) {
 		// 反面的例子
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` char(120) NOT NULL DEFAULT '', PRIMARY KEY (`id`))",
-			// https://github.com/XiaoMi/soar/issues/163
-			"alter table tb alter column id drop default",
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -3065,6 +3063,47 @@ func TestRuleColumnNotAllowType(t *testing.T) {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleColumnNotAllowType()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// COL.019
+func TestRuleTimePrecision(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		// 正面的例子
+		{
+			"CREATE TABLE t1 (t TIME(3), dt DATETIME(6));",
+			"ALTER TABLE t1 add t TIME(3);",
+		},
+		// 反面的例子
+		{
+			"CREATE TABLE t1 (t TIME, dt DATETIME);",
+			"ALTER TABLE t1 add t TIME;",
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTimePrecision()
+			if rule.Item != "COL.019" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.019")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTimePrecision()
 			if rule.Item != "OK" {
 				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}

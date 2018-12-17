@@ -160,9 +160,11 @@ alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
 [{5 ALTER TABLE  0} {1 inventory  0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 ; 0}]
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
 [{5 ALTER TABLE  0} {1 inventory  0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 , 0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 , 0} {5 ADD  0} {1 index  0} {3 `idx_store_film` 0} {0   0} {7 ( 0} {3 `store_id` 0} {7 , 0} {3 `film_id` 0} {7 ) 0} {7 ; 0}]
-SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')
-[{5 SELECT	 0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {7 , 0} {0   0} {4 COUNT( 0} {1 DISTINCT  0} {7 ( 0} {1 t. 0} {1 usr) 0} {7 ) 0} {0   0} {5 FROM  0} {1 usr_terminal  0} {1 t  0} {5 WHERE  0} {1 t. 0} {1 atm  0} {7 > 0} {0   0} {2 '2018-10-22 00:00:00' 0} {0   0} {6 AND  0} {1 t. 0} {1 agent  0} {1 LIKE  0} {2 '%Chrome%' 0} {0   0} {6 AND  0} {1 t. 0} {1 system  0} {7 = 0} {0   0} {2 'eip' 0} {0   0} {5 GROUP BY  0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {0   0} {5 ORDER BY  0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0}]
+SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d');
+[{5 SELECT	 0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {7 , 0} {0   0} {4 COUNT( 0} {1 DISTINCT  0} {7 ( 0} {1 t. 0} {1 usr) 0} {7 ) 0} {0   0} {5 FROM  0} {1 usr_terminal  0} {1 t  0} {5 WHERE  0} {1 t. 0} {1 atm  0} {7 > 0} {0   0} {2 '2018-10-22 00:00:00' 0} {0   0} {6 AND  0} {1 t. 0} {1 agent  0} {1 LIKE  0} {2 '%Chrome%' 0} {0   0} {6 AND  0} {1 t. 0} {1 system  0} {7 = 0} {0   0} {2 'eip' 0} {0   0} {5 GROUP BY  0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {0   0} {5 ORDER BY  0} {4 DATE_FORMAT( 0} {1 t. 0} {1 atm, 0} {0   0} {2 '%Y-%m-%d' 0} {7 ) 0} {7 ; 0}]
 create table hello.t (id int unsigned);
 [{1 create  0} {1 table  0} {1 hello. 0} {1 t  0} {7 ( 0} {1 id  0} {1 int  0} {1 unsigned) 0} {7 ; 0}]
-select * from tb where data >= ''
-[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 tb  0} {5 WHERE  0} {1 data  0} {7 >= 0} {0   0} {2 '' 0}]
+select * from tb where data >= '';
+[{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 tb  0} {5 WHERE  0} {1 data  0} {7 >= 0} {0   0} {2 '' 0} {7 ; 0}]
+alter table tb alter column id drop default;
+[{5 ALTER TABLE  0} {1 tb  0} {1 alter  0} {1 column  0} {1 id  0} {5 DROP  0} {4 DEFAULT; 0}]

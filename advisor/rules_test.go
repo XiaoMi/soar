@@ -18,6 +18,7 @@ package advisor
 
 import (
 	"flag"
+	"strings"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -26,6 +27,11 @@ import (
 var update = flag.Bool("update", false, "update .golden files")
 
 func TestListTestSQLs(t *testing.T) {
+	for _, sql := range common.TestSQLs {
+		if !strings.HasSuffix(sql, ";") {
+			t.Errorf("%s should end with ';'", sql)
+		}
+	}
 	err := common.GoldenDiff(func() { ListTestSQLs() }, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)

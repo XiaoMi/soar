@@ -3307,6 +3307,51 @@ func (q *Query4Audit) RuleColumnNotAllowType() Rule {
 	return rule
 }
 
+// RuleTimePrecision COL.019
+func (q *Query4Audit) RuleTimePrecision() Rule {
+	var rule = q.RuleOK()
+
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
+					switch col.Tp.Tp {
+					case mysql.TypeDatetime, mysql.TypeTimestamp, mysql.TypeDuration:
+						if col.Tp.Decimal > 0 {
+							rule = HeuristicRules["COL.019"]
+						}
+					}
+				}
+			case *tidb.AlterTableStmt:
+				for _, spec := range node.Specs {
+					switch spec.Tp {
+					case tidb.AlterTableChangeColumn, tidb.AlterTableAlterColumn,
+						tidb.AlterTableModifyColumn, tidb.AlterTableAddColumns:
+						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
+							switch col.Tp.Tp {
+							case mysql.TypeDatetime, mysql.TypeTimestamp, mysql.TypeDuration:
+								if col.Tp.Decimal > 0 {
+									rule = HeuristicRules["COL.019"]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return rule
+}
+
 // RuleNoOSCKey KEY.002
 func (q *Query4Audit) RuleNoOSCKey() Rule {
 	var rule = q.RuleOK()
