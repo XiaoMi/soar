@@ -10,3 +10,22 @@ for cmd in ${NEEDED_COMMANDS} ; do
         echo "${cmd} found"
     fi
 done
+
+# MySQL client
+## Mac OS: brew install mysql
+## Ubuntu: apt-get install mysql-client
+
+# Docker
+## https://www.docker.com
+
+# Git
+## https://git-scm.com/
+
+# Go
+## https://golang.org/
+
+# Govendor
+## go get github.com/kardianos/govendor
+
+# retool
+## go get github.com/twitchtv/retool

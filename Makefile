@@ -45,8 +45,9 @@ deps:
 	@echo "\033[92mDependency check\033[0m"
 	@bash ./deps.sh
 	# The retool tools.json is setup from retool-install.sh
+	# some packages download need more open internet access
 	retool sync
-	retool do gometalinter.v2 intall
+	#retool do gometalinter.v2 --install
 
 # Code format
 .PHONY: fmt
@@ -151,7 +152,7 @@ lint: build
 	@echo "gometalinter check your code is pretty good"
 
 .PHONY: release
-release: deps build
+release: build
 	@echo "\033[92mCross platform building for release ...\033[0m"
 	@mkdir -p release
 	@for GOOS in darwin linux windows; do \
@@ -176,7 +177,7 @@ docker:
 	-v `pwd`/doc/example/sakila.sql.gz:/docker-entrypoint-initdb.d/sakila.sql.gz \
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
-	@echo -n "waiting for sakila database initializing "
+	@echo "waiting for sakila database initializing "
 	@while ! mysql -h 127.0.0.1 -u root sakila -p1tIsB1g3rt -NBe "do 1;" 2>/dev/null; do \
 	printf '.' ; \
 	sleep 1 ; \
@@ -201,7 +202,7 @@ daily: | deps fmt vendor docker cover doc lint release install main_test clean l
 
 # vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
-daily-quick: | deps fmt cover doc lint logo
+daily-quick: | deps fmt cover main_test doc lint logo
 	@echo "\033[92mdaily-quick build finished\033[0m"
 
 .PHONY: logo
