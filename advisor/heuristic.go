@@ -1319,7 +1319,9 @@ func (q *Query4Audit) RuleMultiCompare() Rule {
 				case *tidb.BinaryOperationExpr:
 					switch where.L.(type) {
 					case *tidb.BinaryOperationExpr:
-						rule = HeuristicRules["RES.009"]
+						if where.Op.String() == "eq" {
+							rule = HeuristicRules["RES.009"]
+						}
 					}
 				}
 			case *tidb.UpdateStmt:
@@ -1327,7 +1329,9 @@ func (q *Query4Audit) RuleMultiCompare() Rule {
 				case *tidb.BinaryOperationExpr:
 					switch where.L.(type) {
 					case *tidb.BinaryOperationExpr:
-						rule = HeuristicRules["RES.009"]
+						if where.Op.String() == "eq" {
+							rule = HeuristicRules["RES.009"]
+						}
 					}
 				}
 			case *tidb.DeleteStmt:
@@ -1335,7 +1339,9 @@ func (q *Query4Audit) RuleMultiCompare() Rule {
 				case *tidb.BinaryOperationExpr:
 					switch where.L.(type) {
 					case *tidb.BinaryOperationExpr:
-						rule = HeuristicRules["RES.009"]
+						if where.Op.String() == "eq" {
+							rule = HeuristicRules["RES.009"]
+						}
 					}
 				}
 			}
