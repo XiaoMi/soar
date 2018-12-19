@@ -77,8 +77,8 @@ func TestColumnCardinality(t *testing.T) {
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	a := connTest.ColumnCardinality("actor", "first_name")
-	if a >= 1 || a <= 0 {
-		t.Error("sakila.actor.first_name cardinality should in (0, 1), now it's", a)
+	if a > 1 || a <= 0 {
+		t.Error("sakila.actor.first_name cardinality should in [0, 1], now it's", a)
 	}
 	connTest.Database = orgDatabase
 }

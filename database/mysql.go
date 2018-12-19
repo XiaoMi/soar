@@ -104,7 +104,7 @@ func (db *Connector) Version() (int, error) {
 	version := 99999
 	// 从数据库中获取版本信息
 	res, err := db.Query("select @@version")
-	if err != nil{
+	if err != nil {
 		common.Log.Warn("(db *Connector) Version() Error: %v", err)
 		return version, err
 	}
@@ -189,6 +189,10 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 		}
 	}
 
+	// 当table status元数据不准确时 rowTotal 可能远小于count(*)，导致散粒度大于1
+	if colNum > float64(rowTotal) {
+		return 1
+	}
 	// 散粒度区间：[0,1]
 	return colNum / float64(rowTotal)
 }

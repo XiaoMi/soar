@@ -114,7 +114,7 @@ func TestShowIndex(t *testing.T) {
 func TestShowColumns(t *testing.T) {
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
-	ti, err := connTest.ShowColumns("film")
+	ti, err := connTest.ShowColumns("actor_info")
 	if err != nil {
 		t.Error("ShowColumns Error: ", err)
 	}

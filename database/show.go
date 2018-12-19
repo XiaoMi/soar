@@ -116,6 +116,7 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 		return tbStatus, err
 	}
 
+	// columns info
 	ts := tableStatusRow{}
 	statusFields := make([]interface{}, 0)
 	fields := map[string]interface{}{
@@ -175,6 +176,7 @@ type TableIndexRow struct {
 	Comment      string
 	IndexComment string
 	Visible      string
+	Expression   []byte
 }
 
 // NewTableIndexInfo 构造 TableIndexInfo
@@ -195,23 +197,34 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 		return nil, err
 	}
 
+	// columns info
+	ti := TableIndexRow{}
+	indexFields := make([]interface{}, 0)
+	fields := map[string]interface{}{
+		"Table":         &ti.Table,
+		"Non_unique":    &ti.NonUnique,
+		"Key_name":      &ti.KeyName,
+		"Seq_in_index":  &ti.SeqInIndex,
+		"Column_name":   &ti.ColumnName,
+		"Collation":     &ti.Collation,
+		"Cardinality":   &ti.Cardinality,
+		"Sub_part":      &ti.SubPart,
+		"Packed":        &ti.Packed,
+		"Null":          &ti.Null,
+		"Index_type":    &ti.IndexType,
+		"Comment":       &ti.Comment,
+		"Index_comment": &ti.IndexComment,
+		"Visible":       &ti.Visible,
+		"Expression":    &ti.Expression,
+	}
+	cols, err := res.Rows.Columns()
+	common.LogIfError(err, "")
+	for _, col := range cols {
+		indexFields = append(indexFields, fields[col])
+	}
 	// 获取值
 	for res.Rows.Next() {
-		var ti TableIndexRow
-		res.Rows.Scan(&ti.Table,
-			&ti.NonUnique,
-			&ti.KeyName,
-			&ti.SeqInIndex,
-			&ti.ColumnName,
-			&ti.Collation,
-			&ti.Cardinality,
-			&ti.SubPart,
-			&ti.Packed,
-			&ti.Null,
-			&ti.IndexType,
-			&ti.Comment,
-			&ti.IndexComment,
-			&ti.Visible)
+		res.Rows.Scan(indexFields...)
 		tbIndex.Rows = append(tbIndex.Rows, ti)
 	}
 	return tbIndex, err
@@ -314,18 +327,29 @@ func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 		return nil, err
 	}
 
+	// columns info
+	tc := TableDescValue{}
+	columnFields := make([]interface{}, 0)
+	fields := map[string]interface{}{
+		"Field":      &tc.Field,
+		"Type":       &tc.Type,
+		"Collation":  &tc.Collation,
+		"Null":       &tc.Null,
+		"Key":        &tc.Key,
+		"Default":    &tc.Default,
+		"Extra":      &tc.Extra,
+		"Privileges": &tc.Privileges,
+		"Comment":    &tc.Comment,
+	}
+	cols, err := res.Rows.Columns()
+	common.LogIfError(err, "")
+	for _, col := range cols {
+		columnFields = append(columnFields, fields[col])
+	}
+
 	// 获取值
 	for res.Rows.Next() {
-		var tc TableDescValue
-		res.Rows.Scan(&tc.Field,
-			&tc.Type,
-			&tc.Collation,
-			&tc.Null,
-			&tc.Key,
-			&tc.Default,
-			&tc.Extra,
-			&tc.Privileges,
-			&tc.Comment)
+		res.Rows.Scan(columnFields...)
 		tbDesc.DescValues = append(tbDesc.DescValues, tc)
 	}
 	return tbDesc, err
