@@ -93,6 +93,9 @@ func (db *Connector) Query(sql string, params ...interface{}) (QueryResult, erro
 		}
 	}
 
+	if res.Error != nil && err == nil {
+		err = res.Error
+	}
 	return res, err
 }
 
@@ -101,8 +104,8 @@ func (db *Connector) Version() (int, error) {
 	version := 99999
 	// 从数据库中获取版本信息
 	res, err := db.Query("select @@version")
-	if err != nil || res.Error != nil {
-		common.Log.Warn("(db *Connector) Version() Error: %v, MySQL Error: %v", err, res.Error)
+	if err != nil{
+		common.Log.Warn("(db *Connector) Version() Error: %v", err)
 		return version, err
 	}
 

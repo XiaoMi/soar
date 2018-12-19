@@ -139,7 +139,7 @@ func (ve VirtualEnv) CleanUp() bool {
 		common.Log.Debug("CleanUp ...")
 		for db := range ve.hash2Db {
 			ve.Database = db
-			_, err := ve.Query("drop database %s", db)
+			_, err := ve.Query(fmt.Sprintf("drop database %s", db))
 			if err != nil {
 				common.Log.Error("CleanUp failed Error: %s", err)
 				return false
@@ -178,7 +178,7 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 
 		subHour := time.Since(pastTime).Hours()
 		if subHour > float64(minHour) {
-			if _, err := ve.Query("drop database %s", testDatabase); err != nil {
+			if _, err := ve.Query(fmt.Sprintf("drop database %s", testDatabase)); err != nil {
 				common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
 				continue
 			}

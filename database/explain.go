@@ -1031,9 +1031,6 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 	if err != nil {
 		return exp, err
 	}
-	if res.Error != nil {
-		return exp, res.Error
-	}
 
 	// 解析mysql结果，输出ExplainInfo
 	exp, err = ParseExplainResult(res, formatType)

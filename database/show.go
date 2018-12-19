@@ -91,9 +91,6 @@ func (db *Connector) ShowTables() ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	if res.Error != nil {
-		return []string{}, res.Error
-	}
 
 	// 获取值
 	var tables []string
@@ -117,9 +114,6 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 	res, err := db.Query(fmt.Sprintf("show table status where name = '%s'", tbStatus.Name))
 	if err != nil {
 		return tbStatus, err
-	}
-	if res.Error != nil {
-		return tbStatus, res.Error
 	}
 
 	ts := tableStatusRow{}
@@ -199,9 +193,6 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 	res, err := db.Query(fmt.Sprintf("show index from `%s`.`%s`", db.Database, tableName))
 	if err != nil {
 		return nil, err
-	}
-	if res.Error != nil {
-		return nil, res.Error
 	}
 
 	// 获取值
@@ -322,9 +313,6 @@ func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 	if err != nil {
 		return nil, err
 	}
-	if res.Error != nil {
-		return nil, res.Error
-	}
 
 	// 获取值
 	for res.Rows.Next() {
@@ -358,9 +346,6 @@ func (db *Connector) showCreate(createType, name string) (string, error) {
 	res, err := db.Query(fmt.Sprintf("show create %s `%s`", createType, name))
 	if err != nil {
 		return "", err
-	}
-	if res.Error != nil {
-		return "", res.Error
 	}
 
 	// 获取 CREATE TABLE 语句
@@ -444,10 +429,6 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 		common.Log.Error("(db *Connector) FindColumn Error : ", err)
 		return columns, err
 	}
-	if res.Error != nil {
-		common.Log.Error("(db *Connector) FindColumn Error : ", res.Error)
-		return columns, res.Error
-	}
 
 	var col common.Column
 	for res.Rows.Next() {
@@ -472,10 +453,6 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 			if err != nil {
 				common.Log.Error("(db *Connector) FindColumn Error : ", err)
 				return columns, err
-			}
-			if res.Error != nil {
-				common.Log.Error("(db *Connector) FindColumn Error : ", res.Error)
-				return columns, res.Error
 			}
 
 			var tbCollation string
@@ -506,10 +483,6 @@ func (db *Connector) IsForeignKey(dbName, tbName, column string) bool {
 		common.Log.Error("IsForeignKey, Error: %s", err.Error())
 		return false
 	}
-	if res.Error != nil {
-		common.Log.Error("IsForeignKey, Error: %s", res.Error.Error())
-		return false
-	}
 	if res.Rows.Next() {
 		return true
 	}
@@ -532,9 +505,7 @@ type ReferenceValue struct {
 // ShowReference 查找所有的外键信息
 func (db *Connector) ShowReference(dbName string, tbName ...string) ([]ReferenceValue, error) {
 	var referenceValues []ReferenceValue
-	sql := `SELECT C.REFERENCED_TABLE_SCHEMA,C.REFERENCED_TABLE_NAME,C.TABLE_SCHEMA,C.TABLE_NAME,C.CONSTRAINT_NAME
-FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C JOIN INFORMATION_SCHEMA. TABLES T ON T.TABLE_NAME = C.TABLE_NAME
-WHERE C.REFERENCED_TABLE_NAME IS NOT NULL`
+	sql := `SELECT DISTINCT C.REFERENCED_TABLE_SCHEMA,C.REFERENCED_TABLE_NAME,C.TABLE_SCHEMA,C.TABLE_NAME,C.CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C JOIN INFORMATION_SCHEMA. TABLES T ON T.TABLE_NAME = C.TABLE_NAME WHERE C.REFERENCED_TABLE_NAME IS NOT NULL`
 	sql = sql + fmt.Sprintf(` AND C.TABLE_SCHEMA = "%s"`, dbName)
 
 	if len(tbName) > 0 {
@@ -547,9 +518,6 @@ WHERE C.REFERENCED_TABLE_NAME IS NOT NULL`
 	res, err := db.Query(sql)
 	if err != nil {
 		return referenceValues, err
-	}
-	if res.Error != nil {
-		return referenceValues, res.Error
 	}
 
 	// 获取值
