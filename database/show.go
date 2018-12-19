@@ -18,10 +18,11 @@ package database
 
 import (
 	"fmt"
-	"github.com/XiaoMi/soar/common"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/XiaoMi/soar/common"
 )
 
 // SHOW TABLE STATUS Syntax
@@ -190,6 +191,10 @@ func NewTableIndexInfo(tableName string) *TableIndexInfo {
 // ShowIndex show Index
 func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 	tbIndex := NewTableIndexInfo(tableName)
+
+	if db.Database == "" || tableName == "" {
+		return nil, fmt.Errorf("database('%s') or table('%s') name should not empty", db.Database, tableName)
+	}
 
 	// 执行 show create table
 	res, err := db.Query(fmt.Sprintf("show index from `%s`.`%s`", db.Database, tableName))
@@ -456,12 +461,14 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 
 	var col common.Column
 	for res.Rows.Next() {
+		var character, collation string
 		res.Rows.Scan(&col.Table,
 			&col.DB,
 			&col.DataType,
-			&col.Character,
-			&col.Collation)
-
+			&character,
+			&collation)
+		col.Character = character
+		col.Collation = collation
 		// 填充字符集和排序规则
 		if col.Character == "" {
 			// 当从`INFORMATION_SCHEMA`.`COLUMNS`表中查询不到相关列的character和collation的信息时
@@ -479,13 +486,13 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 				return columns, err
 			}
 
-			var tbCollation string
+			var tbCollation []byte
 			if newRes.Rows.Next() {
 				newRes.Rows.Scan(&tbCollation)
 			}
-			if tbCollation != "" {
-				col.Character = strings.Split(tbCollation, "_")[0]
-				col.Collation = tbCollation
+			if string(tbCollation) != "" {
+				col.Character = strings.Split(string(tbCollation), "_")[0]
+				col.Collation = string(tbCollation)
 			}
 		}
 		columns = append(columns, &col)

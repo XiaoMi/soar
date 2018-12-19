@@ -785,7 +785,6 @@ func CompleteColumnsInfo(stmt sqlparser.Statement, cols []*common.Column, env *e
 				if find {
 					break
 				}
-
 			}
 
 			// 如果不依赖env环境，利用ast中包含的信息推理列的库表信息
@@ -904,7 +903,7 @@ func (idxAdv *IndexAdvisor) calcCardinality(cols []*common.Column) []*common.Col
 				// 如果是不存在的表就会报错，报错的可能性有三个：
 				// 1.数据库错误  2.表不存在  3.临时表
 				// 而这三种错误都是不需要在这一层关注的，直接跳过
-				common.Log.Debug("calcCardinality error: %v", err)
+				common.Log.Warn("calcCardinality error: %v", err)
 				continue
 			}
 
