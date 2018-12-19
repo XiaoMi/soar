@@ -185,9 +185,14 @@ docker:
 	echo '.'
 	@echo "mysql test enviorment is ready!"
 
-.PHONY: connect
-connect:
+.PHONY: docker-connect
+docker-connect:
 	mysql -h 127.0.0.1 -u root -p1tIsB1g3rt -c
+
+# attach docker container with bash interactive mode
+.PHONY: docker-it
+docker-it:
+	docker exec -it soar-mysql /bin/bash
 
 .PHONY: main_test
 main_test: install
