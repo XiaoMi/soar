@@ -309,7 +309,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 			// 列与值比较
 			for _, val := range values {
 				if colList[0].DataType == "" {
-					common.Log.Debug("Can't get %s data type", colList[0].Name)
+					common.Log.Warn("Can't get %s data type", colList[0].Name)
 					break
 				}
 

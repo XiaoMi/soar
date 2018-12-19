@@ -357,8 +357,9 @@ func TestIndexAdvise(t *testing.T) {
 }
 
 func TestIndexAdviseNoEnv(t *testing.T) {
-	common.Config.OnlineDSN.Disable = true
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	orgOnlineDSNStatus := common.Config.OnlineDSN.Disable
+	common.Config.OnlineDSN.Disable = true
 	vEnv, rEnv := env.BuildEnv()
 	defer vEnv.CleanUp()
 
@@ -384,6 +385,7 @@ func TestIndexAdviseNoEnv(t *testing.T) {
 			}
 		}
 	}
+	common.Config.OnlineDSN.Disable = orgOnlineDSNStatus
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 

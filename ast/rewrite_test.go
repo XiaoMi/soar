@@ -25,6 +25,7 @@ import (
 )
 
 func TestRewrite(t *testing.T) {
+	orgTestDSNStatus := common.Config.TestDSN.Disable
 	common.Config.TestDSN.Disable = false
 	testSQL := []map[string]string{
 		{
@@ -97,9 +98,11 @@ func TestRewrite(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Config.TestDSN.Disable = orgTestDSNStatus
 }
 
 func TestRewriteStar2Columns(t *testing.T) {
+	orgTestDSNStatus := common.Config.TestDSN.Disable
 	common.Config.TestDSN.Disable = false
 	testSQL := []map[string]string{
 		{
@@ -127,6 +130,7 @@ func TestRewriteStar2Columns(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Config.TestDSN.Disable = orgTestDSNStatus
 }
 
 func TestRewriteInsertColumns(t *testing.T) {
@@ -427,6 +431,7 @@ func TestRewriteAlwaysTrue(t *testing.T) {
 
 // TODO:
 func TestRewriteSubQuery2Join(t *testing.T) {
+	orgTestDSNStatus := common.Config.TestDSN.Disable
 	common.Config.TestDSN.Disable = true
 	testSQL := []map[string]string{
 		{
@@ -452,6 +457,7 @@ func TestRewriteSubQuery2Join(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Config.TestDSN.Disable = orgTestDSNStatus
 }
 
 func TestRewriteDML2Select(t *testing.T) {

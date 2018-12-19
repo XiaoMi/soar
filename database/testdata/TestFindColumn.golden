@@ -1,6 +1,6 @@
 []*common.Column{
     &common.Column{
-        Name:        "",
+        Name:        "film_id",
         Alias:       nil,
         Table:       "film",
         DB:          "sakila",

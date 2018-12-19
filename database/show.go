@@ -371,7 +371,8 @@ func (td TableDesc) Columns() []string {
 
 // showCreate show create
 func (db *Connector) showCreate(createType, name string) (string, error) {
-	// 执行 show create table
+	// 执行 show create table|database
+	// createType = [table|database]
 	res, err := db.Query(fmt.Sprintf("show create %s `%s`", createType, name))
 	if err != nil {
 		return "", err
@@ -461,14 +462,17 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 
 	var col common.Column
 	for res.Rows.Next() {
-		var character, collation string
-		res.Rows.Scan(&col.Table,
+		var character, collation []byte
+		res.Rows.Scan(
+			&col.Table,
 			&col.DB,
 			&col.DataType,
 			&character,
-			&collation)
-		col.Character = character
-		col.Collation = collation
+			&collation,
+		)
+		col.Name = name
+		col.Character = string(character)
+		col.Collation = string(collation)
 		// 填充字符集和排序规则
 		if col.Character == "" {
 			// 当从`INFORMATION_SCHEMA`.`COLUMNS`表中查询不到相关列的character和collation的信息时
