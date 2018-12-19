@@ -22,8 +22,6 @@ import (
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
-
-	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 var update = flag.Bool("update", false, "update .golden files")
@@ -153,16 +151,6 @@ func TestIsKeyword(t *testing.T) {
 	for tk, v := range tks {
 		if IsMysqlKeyword(tk) != v {
 			t.Error("isKeyword:", tk)
-		}
-	}
-}
-
-func TestRemoveComments(t *testing.T) {
-	for _, sql := range TestSqlsPretty {
-		stmt, _ := sqlparser.Parse(sql)
-		newSQL := sqlparser.String(stmt)
-		if newSQL != sql {
-			fmt.Print(newSQL)
 		}
 	}
 }
