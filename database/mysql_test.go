@@ -48,13 +48,13 @@ func init() {
 }
 
 func TestNewConnection(t *testing.T) {
-	_, err := connTest.NewConnection()
+	conn, err := connTest.NewConnection()
 	if err != nil {
 		t.Errorf("TestNewConnection, Error: %s", err.Error())
 	}
+	defer conn.Close()
 }
 
-// TODO: go test -race不通过待解决
 func TestQuery(t *testing.T) {
 	res, err := connTest.Query("select 0")
 	if err != nil {

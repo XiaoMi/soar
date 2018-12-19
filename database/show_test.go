@@ -23,7 +23,6 @@ import (
 	"github.com/XiaoMi/soar/common"
 
 	"github.com/kr/pretty"
-	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 func TestShowTableStatus(t *testing.T) {
@@ -72,18 +71,18 @@ func TestShowTables(t *testing.T) {
 func TestShowCreateTable(t *testing.T) {
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
-	ts, err := connTest.ShowCreateTable("film")
-	if err != nil {
-		t.Error("ShowCreateTable Error: ", err)
+	tables := []string{
+		"film",
+		"customer_list",
 	}
-
-	err = common.GoldenDiff(func() {
-		fmt.Println(ts)
-		stmt, err := sqlparser.Parse(ts)
-		if err != nil {
-			t.Error(err.Error())
+	err := common.GoldenDiff(func() {
+		for _, table := range tables {
+			ts, err := connTest.ShowCreateTable(table)
+			if err != nil {
+				t.Error("ShowCreateTable Error: ", err)
+			}
+			fmt.Println(ts)
 		}
-		pretty.Println(stmt, err)
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)

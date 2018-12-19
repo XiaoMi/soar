@@ -61,7 +61,7 @@ fmt: go_version_check
 .PHONY: test
 test:
 	@echo "\033[92mRun all test cases ...\033[0m"
-	go test ./...
+	go test -race ./...
 	@echo "test Success!"
 
 # Code Coverage

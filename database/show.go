@@ -372,19 +372,38 @@ func (td TableDesc) Columns() []string {
 // showCreate show create
 func (db *Connector) showCreate(createType, name string) (string, error) {
 	// 执行 show create table|database
-	// createType = [table|database]
+	// createType = [table|database|view]
 	res, err := db.Query(fmt.Sprintf("show create %s `%s`", createType, name))
 	if err != nil {
 		return "", err
 	}
 
-	// 获取 CREATE TABLE 语句
-	var tableName, createTable string
-	for res.Rows.Next() {
-		res.Rows.Scan(&tableName, &createTable)
+	// columns info
+	var colByPass []byte
+	var create string
+	createFields := make([]interface{}, 0)
+	fields := map[string]interface{}{
+		"Create View":          &create,
+		"Create Table":         &create,
+		"Create Database":      &create,
+		"Table":                &colByPass,
+		"Database":             &colByPass,
+		"View":                 &colByPass,
+		"character_set_client": &colByPass,
+		"collation_connection": &colByPass,
+	}
+	cols, err := res.Rows.Columns()
+	common.LogIfError(err, "")
+	for _, col := range cols {
+		createFields = append(createFields, fields[col])
 	}
 
-	return createTable, err
+	// 获取 CREATE TABLE|VIEW|DATABASE 语句
+	for res.Rows.Next() {
+		res.Rows.Scan(createFields...)
+	}
+
+	return create, err
 }
 
 // ShowCreateDatabase show create database

@@ -331,6 +331,10 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 					}
 
 					startIdx := strings.Index(viewDDL, "AS")
+					if startIdx < 0 || viewDDL == "" {
+						common.Log.Error("BuildVirtualEnv '%s' got '%s', Index: %d", tb.TableName, viewDDL, startIdx)
+						return false
+					}
 					viewDDL = viewDDL[startIdx+2:]
 					if !ve.BuildVirtualEnv(&tmpEnv, viewDDL) {
 						return false
