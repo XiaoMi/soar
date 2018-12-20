@@ -28,9 +28,9 @@ import (
 	"github.com/XiaoMi/soar/database"
 	"github.com/XiaoMi/soar/env"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/kr/pretty"
 	"github.com/percona/go-mysql/query"
-	"github.com/ziutek/mymysql/mysql"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
@@ -244,7 +244,7 @@ func main() {
 						}
 					} else {
 						// 根据错误号输出建议
-						switch vEnv.Error.(*mysql.Error).Code {
+						switch vEnv.Error.(*mysql.MySQLError).Number {
 						case 1061:
 							idxSuggest["IDX.001"] = advisor.Rule{
 								Item:     "IDX.001",

@@ -22,8 +22,8 @@ import (
 
 	"github.com/XiaoMi/soar/common"
 	"github.com/XiaoMi/soar/database"
+	"github.com/go-sql-driver/mysql"
 	"github.com/kr/pretty"
-	"github.com/ziutek/mymysql/mysql"
 )
 
 var connTest *database.Connector
@@ -102,8 +102,8 @@ func TestNewVirtualEnv(t *testing.T) {
 				// unexpected EOF
 				// 测试环境无法访问，或者被Disable的时候会进入这个分支
 				pretty.Println(sql, err)
-			case *mysql.Error:
-				if err.Code != 1061 {
+			case *mysql.MySQLError:
+				if err.Number != 1061 {
 					t.Error(err)
 				}
 			default:
