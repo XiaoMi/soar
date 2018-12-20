@@ -967,8 +967,14 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 	}
 	cols, err := res.Rows.Columns()
 	common.LogIfError(err, "")
+	var colByPass []byte
 	for _, col := range cols {
-		explainFields = append(explainFields, fields[col])
+		if _, ok := fields[col]; ok {
+			explainFields = append(explainFields, fields[col])
+		} else {
+			common.Log.Debug("ParseExplainResult by pass column %s", col)
+			explainFields = append(explainFields, &colByPass)
+		}
 	}
 
 	// 补全 ExplainRows

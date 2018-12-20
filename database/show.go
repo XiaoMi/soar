@@ -142,8 +142,14 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 	}
 	cols, err := res.Rows.Columns()
 	common.LogIfError(err, "")
+	var colByPass []byte
 	for _, col := range cols {
-		statusFields = append(statusFields, fields[col])
+		if _, ok := fields[col]; ok {
+			statusFields = append(statusFields, fields[col])
+		} else {
+			common.Log.Debug("ShowTableStatus by pass column %s", col)
+			statusFields = append(statusFields, &colByPass)
+		}
 	}
 	// 获取值
 	for res.Rows.Next() {
@@ -161,7 +167,7 @@ type TableIndexInfo struct {
 	Rows      []TableIndexRow
 }
 
-// TableIndexRow 用以存放show index之后获取的每一条index信息
+// TableIndexRow 用以存放show index 之后获取的每一条 index 信息
 type TableIndexRow struct {
 	Table        string // 表名
 	NonUnique    int    // 0：unique key，1：not unique
@@ -224,8 +230,14 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 	}
 	cols, err := res.Rows.Columns()
 	common.LogIfError(err, "")
+	var colByPass []byte
 	for _, col := range cols {
-		indexFields = append(indexFields, fields[col])
+		if _, ok := fields[col]; ok {
+			indexFields = append(indexFields, fields[col])
+		} else {
+			common.Log.Debug("ShowIndex by pass column %s", col)
+			indexFields = append(indexFields, &colByPass)
+		}
 	}
 	// 获取值
 	for res.Rows.Next() {
@@ -348,10 +360,15 @@ func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 	}
 	cols, err := res.Rows.Columns()
 	common.LogIfError(err, "")
+	var colByPass []byte
 	for _, col := range cols {
-		columnFields = append(columnFields, fields[col])
+		if _, ok := fields[col]; ok {
+			columnFields = append(columnFields, fields[col])
+		} else {
+			common.Log.Debug("ShowColumns by pass column %s", col)
+			columnFields = append(columnFields, &colByPass)
+		}
 	}
-
 	// 获取值
 	for res.Rows.Next() {
 		res.Rows.Scan(columnFields...)
@@ -371,34 +388,43 @@ func (td TableDesc) Columns() []string {
 
 // showCreate show create
 func (db *Connector) showCreate(createType, name string) (string, error) {
-	// 执行 show create table|database
-	// createType = [table|database|view]
+	// SHOW CREATE DATABASE db_name
+	// SHOW CREATE EVENT event_name
+	// SHOW CREATE FUNCTION func_name
+	// SHOW CREATE PROCEDURE proc_name
+	// SHOW CREATE TABLE tbl_name
+	// SHOW CREATE TRIGGER trigger_name
+	// SHOW CREATE VIEW view_name
 	res, err := db.Query(fmt.Sprintf("show create %s `%s`", createType, name))
 	if err != nil {
 		return "", err
 	}
 
 	// columns info
-	var colByPass []byte
 	var create string
 	createFields := make([]interface{}, 0)
 	fields := map[string]interface{}{
-		"Create View":          &create,
-		"Create Table":         &create,
-		"Create Database":      &create,
-		"Table":                &colByPass,
-		"Database":             &colByPass,
-		"View":                 &colByPass,
-		"character_set_client": &colByPass,
-		"collation_connection": &colByPass,
+		"Create View":      &create,
+		"Create Table":     &create,
+		"Create Database":  &create,
+		"Create Event":     &create,
+		"Statement":        &create, // show create trigger
+		"Create Function":  &create,
+		"Create Procedure": &create,
 	}
 	cols, err := res.Rows.Columns()
 	common.LogIfError(err, "")
+	var colByPass []byte
 	for _, col := range cols {
-		createFields = append(createFields, fields[col])
+		if _, ok := fields[col]; ok {
+			createFields = append(createFields, fields[col])
+		} else {
+			common.Log.Debug("showCreate by pass column %s", col)
+			createFields = append(createFields, &colByPass)
+		}
 	}
 
-	// 获取 CREATE TABLE|VIEW|DATABASE 语句
+	// 获取 CREATE 语句
 	for res.Rows.Next() {
 		res.Rows.Scan(createFields...)
 	}
@@ -494,9 +520,9 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 		col.Collation = string(collation)
 		// 填充字符集和排序规则
 		if col.Character == "" {
-			// 当从`INFORMATION_SCHEMA`.`COLUMNS`表中查询不到相关列的character和collation的信息时
-			// 认为该列使用的character和collation与其所处的表一致
-			// 由于`INFORMATION_SCHEMA`.`TABLES`表中未找到表的character，所以从按照MySQL中collation的规则从中截取character
+			// 当从 `INFORMATION_SCHEMA`.`COLUMNS` 表中查询不到相关列的 character 和 collation 的信息时
+			// 认为该列使用的 character 和 collation 与其所处的表一致
+			// 由于 `INFORMATION_SCHEMA`.`TABLES` 表中未找到表的 character，所以从按照 MySQL 中 collation 的规则从中截取 character
 
 			sql = fmt.Sprintf("SELECT `t`.`TABLE_COLLATION` FROM `INFORMATION_SCHEMA`.`TABLES` AS `t` "+
 				"WHERE `t`.`TABLE_NAME`='%s' AND `t`.`TABLE_SCHEMA` = '%s'", col.Table, col.DB)
