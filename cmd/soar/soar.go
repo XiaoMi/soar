@@ -424,4 +424,9 @@ func main() {
 		}
 		return
 	}
+
+	// syntax check verbose mode, add output for success!
+	if common.Config.OnlySyntaxCheck && common.Config.Verbose {
+		fmt.Println("Syntax check OK!")
+	}
 }
