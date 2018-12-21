@@ -367,11 +367,12 @@ func (ve VirtualEnv) createDatabase(rEnv *database.Connector, dbName string) err
 	if ddl == "" {
 		return fmt.Errorf("dbName: '%s' get create info error", dbName)
 	}
-	_, err = ve.Query(ddl)
+	res, err := ve.Query(ddl)
 	if err != nil {
 		common.Log.Warning("createDatabase, Error : %v", err)
 		return err
 	}
+	res.Rows.Close()
 
 	// 创建成功，添加映射记录
 	ve.DBRef[dbName] = dbHash
@@ -449,12 +450,13 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 
 	// 改变数据环境
 	ve.Database = ve.DBRef[dbName]
-	_, err = ve.Query(ddl)
+	res, err := ve.Query(ddl)
 	if err != nil {
 		// 有可能是用户新建表，因此线上环境查不到
 		common.Log.Error("createTable, %s Error : %v", tbName, err)
 		return err
 	}
+	res.Rows.Close()
 
 	// 泵取数据
 	if common.Config.Sampling {

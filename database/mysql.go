@@ -134,21 +134,17 @@ func (db *Connector) Version() (int, error) {
 	// MySQL https://dev.mysql.com/doc/refman/8.0/en/comments.html
 	var versionStr string
 	var versionSeg []string
-	for res.Rows.Next() {
+	if res.Rows.Next() {
 		err = res.Rows.Scan(&versionStr)
-		if err != nil {
-			break
-		}
-		versionStr = strings.Split(versionStr, "-")[0]
-		versionSeg = strings.Split(versionStr, ".")
-		if len(versionSeg) == 3 {
-			versionStr = fmt.Sprintf("%s%02s%02s", versionSeg[0], versionSeg[1], versionSeg[2])
-			version, err = strconv.Atoi(versionStr)
-		}
-		break
 	}
 	if err := res.Rows.Close(); err != nil {
 		common.Log.Error(err.Error())
+	}
+	versionStr = strings.Split(versionStr, "-")[0]
+	versionSeg = strings.Split(versionStr, ".")
+	if len(versionSeg) == 3 {
+		versionStr = fmt.Sprintf("%s%02s%02s", versionSeg[0], versionSeg[1], versionSeg[2])
+		version, err = strconv.Atoi(versionStr)
 	}
 	return version, err
 }
