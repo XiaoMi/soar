@@ -19,9 +19,10 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/XiaoMi/soar/common"
 	"regexp"
 	"strings"
+
+	"github.com/XiaoMi/soar/common"
 
 	"vitess.io/vitess/go/vt/sqlparser"
 )
@@ -70,15 +71,9 @@ func (db *Connector) Trace(sql string, params ...interface{}) ([]TraceRow, error
 	}
 
 	common.Log.Debug("Execute SQL with DSN(%s/%s) : %s", db.Addr, db.Database, sql)
-	conn, err := db.NewConnection()
-	if err != nil {
-		return rows, err
-	}
-	defer conn.Close()
-
 	// 开启Trace
 	common.Log.Debug("SET SESSION OPTIMIZER_TRACE='enabled=on'")
-	trx, err := conn.Begin()
+	trx, err := db.Conn.Begin()
 	if err != nil {
 		return rows, err
 	}
@@ -97,14 +92,20 @@ func (db *Connector) Trace(sql string, params ...interface{}) ([]TraceRow, error
 
 	// 返回Trace结果
 	res, err := trx.Query("SELECT * FROM information_schema.OPTIMIZER_TRACE")
+	if err != nil {
+		trx.Rollback()
+		return rows, err
+	}
 	for res.Next() {
 		var traceRow TraceRow
 		err = res.Scan(&traceRow.Query, &traceRow.Trace, &traceRow.MissingBytesBeyondMaxMemSize, &traceRow.InsufficientPrivileges)
 		if err != nil {
 			common.LogIfError(err, "")
+			break
 		}
 		rows = append(rows, traceRow)
 	}
+	res.Close()
 
 	// 关闭Trace
 	common.Log.Debug("SET SESSION OPTIMIZER_TRACE='enabled=off'")

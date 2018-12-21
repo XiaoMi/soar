@@ -67,52 +67,48 @@ func initConfig() {
 // if error found return non-zero, no error return zero
 func checkConfig() int {
 	// TestDSN connection check
-	testConn := &database.Connector{
-		Addr:     common.Config.TestDSN.Addr,
-		User:     common.Config.TestDSN.User,
-		Pass:     common.Config.TestDSN.Password,
-		Database: common.Config.TestDSN.Schema,
-		Charset:  common.Config.TestDSN.Charset,
+	connTest, err := database.NewConnector(common.Config.TestDSN)
+	if err != nil {
+		fmt.Println("test-dsn:", common.Config.TestDSN.Addr, err.Error())
+		return 1
 	}
-	testVersion, err := testConn.Version()
+	testVersion, err := connTest.Version()
 	if err != nil && !common.Config.TestDSN.Disable {
-		fmt.Println("test-dsn:", testConn, err.Error())
+		fmt.Println("test-dsn:", connTest, err.Error())
 		return 1
 	}
 	if common.Config.Verbose {
 		if err == nil {
-			fmt.Println("test-dsn", testConn, "Version:", testVersion)
+			fmt.Println("test-dsn", connTest, "Version:", testVersion)
 		} else {
 			fmt.Println("test-dsn", common.Config.TestDSN)
 		}
 	}
 
-	if !testConn.HasAllPrivilege() {
+	if !connTest.HasAllPrivilege() {
 		fmt.Printf("test-dsn: %s, need all privileges", common.FormatDSN(common.Config.TestDSN))
 		return 1
 	}
 	// OnlineDSN connection check
-	onlineConn := &database.Connector{
-		Addr:     common.Config.OnlineDSN.Addr,
-		User:     common.Config.OnlineDSN.User,
-		Pass:     common.Config.OnlineDSN.Password,
-		Database: common.Config.OnlineDSN.Schema,
-		Charset:  common.Config.OnlineDSN.Charset,
+	connOnline, err := database.NewConnector(common.Config.OnlineDSN)
+	if err != nil {
+		fmt.Println("test-dsn:", common.Config.OnlineDSN.Addr, err.Error())
+		return 1
 	}
-	onlineVersion, err := onlineConn.Version()
+	onlineVersion, err := connOnline.Version()
 	if err != nil && !common.Config.OnlineDSN.Disable {
-		fmt.Println("online-dsn:", onlineConn, err.Error())
+		fmt.Println("online-dsn:", connOnline, err.Error())
 		return 1
 	}
 	if common.Config.Verbose {
 		if err == nil {
-			fmt.Println("online-dsn", onlineConn, "Version:", onlineVersion)
+			fmt.Println("online-dsn", connOnline, "Version:", onlineVersion)
 		} else {
 			fmt.Println("online-dsn", common.Config.OnlineDSN)
 		}
 	}
 
-	if !onlineConn.HasSelectPrivilege() {
+	if !connOnline.HasSelectPrivilege() {
 		fmt.Printf("online-dsn: %s, need all privileges", common.FormatDSN(common.Config.OnlineDSN))
 		return 1
 	}
@@ -229,9 +225,11 @@ func initQuery(query string) string {
 	return query
 }
 
-func shutdown(vEnv *env.VirtualEnv) {
+func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {
 	if common.Config.DropTestTemporary {
 		vEnv.CleanUp()
 	}
+	vEnv.Conn.Close()
+	rEnv.Conn.Close()
 	os.Exit(0)
 }

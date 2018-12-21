@@ -62,15 +62,9 @@ func (db *Connector) Profiling(sql string, params ...interface{}) ([]ProfilingRo
 	}
 
 	common.Log.Debug("Execute SQL with DSN(%s/%s) : %s", db.Addr, db.Database, sql)
-	conn, err := db.NewConnection()
-	if err != nil {
-		return rows, err
-	}
-	defer conn.Close()
-
 	// Keep connection
 	// https://github.com/go-sql-driver/mysql/issues/208
-	trx, err := conn.Begin()
+	trx, err := db.Conn.Begin()
 	if err != nil {
 		return rows, err
 	}
@@ -91,14 +85,20 @@ func (db *Connector) Profiling(sql string, params ...interface{}) ([]ProfilingRo
 
 	// 返回 Profiling 结果
 	res, err := trx.Query("show profile")
+	if err != nil {
+		trx.Rollback()
+		return rows, err
+	}
+	var profileRow ProfilingRow
 	for res.Next() {
-		var profileRow ProfilingRow
-		err := res.Scan(&profileRow.Status, &profileRow.Duration)
+		err = res.Scan(&profileRow.Status, &profileRow.Duration)
 		if err != nil {
 			common.LogIfError(err, "")
+			break
 		}
 		rows = append(rows, profileRow)
 	}
+	res.Close()
 
 	// 关闭 Profiling
 	_, err = trx.Query("set @@profiling=0")

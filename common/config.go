@@ -48,8 +48,8 @@ var (
 // Configuration 配置文件定义结构体
 type Configuration struct {
 	// +++++++++++++++测试环境+++++++++++++++++
-	OnlineDSN               *dsn   `yaml:"online-dsn"`                // 线上环境数据库配置
-	TestDSN                 *dsn   `yaml:"test-dsn"`                  // 测试环境数据库配置
+	OnlineDSN               *Dsn   `yaml:"online-dsn"`                // 线上环境数据库配置
+	TestDSN                 *Dsn   `yaml:"test-dsn"`                  // 测试环境数据库配置
 	AllowOnlineAsTest       bool   `yaml:"allow-online-as-test"`      // 允许 Online 环境也可以当作 Test 环境
 	DropTestTemporary       bool   `yaml:"drop-test-temporary"`       // 是否清理Test环境产生的临时库表
 	CleanupTestDatabase     bool   `yaml:"cleanup-test-database"`     // 清理残余的测试数据库（程序异常退出或未开启drop-test-temporary）  issue #48
@@ -132,14 +132,14 @@ type Configuration struct {
 
 // Config 默认设置
 var Config = &Configuration{
-	OnlineDSN: &dsn{
+	OnlineDSN: &Dsn{
 		Net:     "tcp",
 		Schema:  "information_schema",
 		Charset: "utf8mb4",
 		Disable: true,
 		Version: 99999,
 	},
-	TestDSN: &dsn{
+	TestDSN: &Dsn{
 		Net:     "tcp",
 		Schema:  "information_schema",
 		Charset: "utf8mb4",
@@ -224,7 +224,8 @@ var Config = &Configuration{
 	MaxPrettySQLLength: 1024,
 }
 
-type dsn struct {
+// Dsn Data source name
+type Dsn struct {
 	Net    string `yaml:"net"`
 	Addr   string `yaml:"addr"`
 	Schema string `yaml:"schema"`
@@ -243,7 +244,7 @@ type dsn struct {
 }
 
 // 解析命令行DSN输入
-func parseDSN(odbc string, d *dsn) *dsn {
+func parseDSN(odbc string, d *Dsn) *Dsn {
 	var addr, user, password, schema, charset string
 	if odbc == FormatDSN(d) {
 		return d
@@ -260,7 +261,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 	// 设置为空表示禁用环境
 	odbc = strings.TrimSpace(odbc)
 	if odbc == "" {
-		return &dsn{Disable: true}
+		return &Dsn{Disable: true}
 	}
 
 	// username:password@ip:port/database
@@ -354,7 +355,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 		charset = "utf8mb4"
 	}
 
-	dsn := &dsn{
+	dsn := &Dsn{
 		Addr:     addr,
 		User:     user,
 		Password: password,
@@ -367,7 +368,7 @@ func parseDSN(odbc string, d *dsn) *dsn {
 }
 
 // FormatDSN 格式化打印DSN
-func FormatDSN(env *dsn) string {
+func FormatDSN(env *Dsn) string {
 	if env == nil || env.Disable {
 		return ""
 	}

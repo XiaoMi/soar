@@ -17,13 +17,10 @@
 package advisor
 
 import (
-	"flag"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 )
-
-var update = flag.Bool("update", false, "update .golden files")
 
 func TestListTestSQLs(t *testing.T) {
 	err := common.GoldenDiff(func() { ListTestSQLs() }, t.Name(), update)

@@ -68,6 +68,15 @@ func TestShowTables(t *testing.T) {
 	connTest.Database = orgDatabase
 }
 
+func TestShowCreateDatabase(t *testing.T) {
+	err := common.GoldenDiff(func() {
+		fmt.Println(connTest.ShowCreateDatabase("sakila"))
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestShowCreateTable(t *testing.T) {
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
@@ -87,7 +96,6 @@ func TestShowCreateTable(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 	connTest.Database = orgDatabase
 }
 

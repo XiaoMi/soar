@@ -556,14 +556,12 @@ func (db *Connector) explainAbleSQL(sql string) (string, error) {
 	return "", nil
 }
 
-// 执行explain请求，返回mysql.Result执行结果
-func (db *Connector) executeExplain(sql string, explainType int, formatType int) (QueryResult, error) {
-	var res QueryResult
+// explainQuery 生成可执行的 explain 查询请求
+func (db *Connector) explainQuery(sql string, explainType int, formatType int) string {
 	var err error
-	var explainQuery string
 	sql, err = db.explainAbleSQL(sql)
-	if sql == "" {
-		return res, err
+	if sql == "" || err != nil {
+		return sql
 	}
 
 	// 5.6以上支持 FORMAT=JSON
@@ -580,18 +578,17 @@ func (db *Connector) executeExplain(sql string, explainType int, formatType int)
 	case ExtendedExplainType:
 		// 5.6以上extended关键字已经不推荐使用，8.0废弃了这个关键字
 		if common.Config.TestDSN.Version >= 50600 {
-			explainQuery = fmt.Sprintf("explain %s", sql)
+			sql = fmt.Sprintf("explain %s", sql)
 		} else {
-			explainQuery = fmt.Sprintf("explain extended %s", sql)
+			sql = fmt.Sprintf("explain extended %s", sql)
 		}
 	case PartitionsExplainType:
-		explainQuery = fmt.Sprintf("explain partitions %s", sql)
+		sql = fmt.Sprintf("explain partitions %s", sql)
 
 	default:
-		explainQuery = fmt.Sprintf("explain %s %s", explainFormat, sql)
+		sql = fmt.Sprintf("explain %s %s", explainFormat, sql)
 	}
-	res, err = db.Query(explainQuery)
-	return res, err
+	return sql
 }
 
 // MySQLExplainWarnings WARNINGS信息中包含的优化器信息
@@ -944,6 +941,7 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 			err = res.Rows.Scan(&explainString)
 			exp.ExplainJSON, err = parseJSONExplainText(explainString)
 		}
+		res.Rows.Close()
 		return exp, err
 	}
 
@@ -992,23 +990,24 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 		expRow.Scalability = ExplainScalability[expRow.AccessType]
 		explainRows = append(explainRows, expRow)
 	}
+	res.Rows.Close()
 	exp.ExplainRows = explainRows
 
 	// check explain warning info
 	if common.Config.ShowWarnings {
 		for res.Warning.Next() {
 			var expWarning *ExplainWarning
-			res.Warning.Scan(
-				expWarning.Level,
-				expWarning.Code,
-				expWarning.Message,
-			)
+			err = res.Warning.Scan(expWarning.Level, expWarning.Code, expWarning.Message)
+			if err != nil {
+				break
+			}
 
 			// 'EXTENDED' is deprecated and will be removed in a future release.
 			if expWarning.Code != 1681 {
 				exp.Warnings = append(exp.Warnings, expWarning)
 			}
 		}
+		res.Warning.Close()
 	}
 
 	// 添加 last_query_cost
@@ -1022,6 +1021,7 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 	if explainType != TraditionalExplainType {
 		formatType = TraditionalFormatExplain
 	}
+
 	defer func() {
 		if e := recover(); e != nil {
 			const size = 4096
@@ -1033,10 +1033,8 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 	}()
 
 	// 执行EXPLAIN请求
-	res, err := db.executeExplain(sql, explainType, formatType)
-	if err != nil {
-		return exp, err
-	}
+	sql = db.explainQuery(sql, explainType, formatType)
+	res, err := db.Query(sql)
 
 	// 解析mysql结果，输出ExplainInfo
 	exp, err = ParseExplainResult(res, formatType)

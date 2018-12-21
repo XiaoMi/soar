@@ -68,7 +68,7 @@ func main() {
 
 	// 当程序卡死的时候，或者由于某些原因程序没有退出，可以通过捕获信号量的形式让程序优雅退出并且清理测试环境
 	common.HandleSignal(func() {
-		shutdown(vEnv)
+		shutdown(vEnv, rEnv)
 	})
 
 	// 对指定的库表进行索引重复检查

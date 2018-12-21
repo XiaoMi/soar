@@ -28,31 +28,23 @@ import (
 )
 
 var connTest *Connector
-
 var update = flag.Bool("update", false, "update .golden files")
 
 func init() {
 	common.BaseDir = common.DevPath
-	common.ParseConfig("")
-	connTest = &Connector{
-		Addr:     common.Config.OnlineDSN.Addr,
-		User:     common.Config.OnlineDSN.User,
-		Pass:     common.Config.OnlineDSN.Password,
-		Database: common.Config.OnlineDSN.Schema,
-		Charset:  common.Config.OnlineDSN.Charset,
+	err := common.ParseConfig("")
+	common.LogIfError(err, "init ParseConfig")
+	common.Log.Debug("mysql_test init")
+	connTest, err = NewConnector(common.Config.TestDSN)
+	if err != nil {
+		common.Log.Critical("Test env Error: %v", err)
+		os.Exit(0)
 	}
+
 	if _, err := connTest.Version(); err != nil {
 		common.Log.Critical("Test env Error: %v", err)
 		os.Exit(0)
 	}
-}
-
-func TestNewConnection(t *testing.T) {
-	conn, err := connTest.NewConnection()
-	if err != nil {
-		t.Errorf("TestNewConnection, Error: %s", err.Error())
-	}
-	defer conn.Close()
 }
 
 func TestQuery(t *testing.T) {
@@ -70,6 +62,7 @@ func TestQuery(t *testing.T) {
 			t.Error("should return 0")
 		}
 	}
+	res.Rows.Close()
 	// TODO: timeout test
 }
 
@@ -115,6 +108,7 @@ func TestWarningsAndQueryCost(t *testing.T) {
 			}
 			pretty.Println(str)
 		}
+		res.Warning.Close()
 		fmt.Println(res.QueryCost, err)
 	}
 }

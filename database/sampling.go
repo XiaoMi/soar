@@ -19,6 +19,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/XiaoMi/soar/common"
 )
 
@@ -43,26 +44,13 @@ import (
  */
 
 // SamplingData 将数据从Remote拉取到 db 中
-func (db *Connector) SamplingData(remote Connector, tables ...string) error {
+func (db *Connector) SamplingData(remote *Connector, tables ...string) error {
 	// 计算需要泵取的数据量
 	wantRowsCount := 300 * common.Config.SamplingStatisticTarget
 
 	// 设置数据采样单条 SQL 中 value 的数量
 	// 该数值越大，在内存中缓存的data就越多，但相对的，插入时速度就越快
 	maxValCount := 200
-
-	// 获取数据库连接对象
-	conn, err := remote.NewConnection()
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	localConn, err := db.NewConnection()
-	if err != nil {
-		return err
-	}
-	defer localConn.Close()
 
 	for _, table := range tables {
 		// 表类型检查
@@ -89,7 +77,7 @@ func (db *Connector) SamplingData(remote Connector, tables ...string) error {
 		factor := float64(wantRowsCount) / float64(tableRows)
 		common.Log.Debug("SamplingData, tableRows: %d, wantRowsCount: %d, factor: %f", tableRows, wantRowsCount, factor)
 
-		err = startSampling(conn, localConn, db.Database, table, factor, wantRowsCount, maxValCount)
+		err = startSampling(remote.Conn, db.Conn, db.Database, table, factor, wantRowsCount, maxValCount)
 		if err != nil {
 			common.Log.Error("(db *Connector) SamplingData Error : %v", err)
 		}

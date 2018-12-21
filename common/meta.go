@@ -38,7 +38,7 @@ func NewDB(db string) *DB {
 	}
 }
 
-// TableName 含有表的属性
+// Table 含有表的属性
 type Table struct {
 	TableName    string
 	TableAliases []string

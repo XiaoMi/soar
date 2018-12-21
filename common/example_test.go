@@ -19,7 +19,7 @@ package common
 import "fmt"
 
 func ExampleFormatDSN() {
-	dsxExp := &dsn{
+	dsxExp := &Dsn{
 		Addr:     "127.0.0.1:3306",
 		Schema:   "mysql",
 		User:     "root",

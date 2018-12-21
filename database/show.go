@@ -99,10 +99,11 @@ func (db *Connector) ShowTables() ([]string, error) {
 		var table string
 		err = res.Rows.Scan(&table)
 		if err != nil {
-			return []string{}, err
+			break
 		}
 		tables = append(tables, table)
 	}
+	res.Rows.Close()
 	return tables, err
 }
 
@@ -156,6 +157,7 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 		res.Rows.Scan(statusFields...)
 		tbStatus.Rows = append(tbStatus.Rows, ts)
 	}
+	res.Rows.Close()
 	return tbStatus, err
 }
 
@@ -244,6 +246,7 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 		res.Rows.Scan(indexFields...)
 		tbIndex.Rows = append(tbIndex.Rows, ti)
 	}
+	res.Rows.Close()
 	return tbIndex, err
 }
 
@@ -374,6 +377,7 @@ func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 		res.Rows.Scan(columnFields...)
 		tbDesc.DescValues = append(tbDesc.DescValues, tc)
 	}
+	res.Rows.Close()
 	return tbDesc, err
 }
 
@@ -428,7 +432,7 @@ func (db *Connector) showCreate(createType, name string) (string, error) {
 	for res.Rows.Next() {
 		res.Rows.Scan(createFields...)
 	}
-
+	res.Rows.Close()
 	return create, err
 }
 
@@ -508,13 +512,10 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 	var col common.Column
 	for res.Rows.Next() {
 		var character, collation []byte
-		res.Rows.Scan(
-			&col.Table,
-			&col.DB,
-			&col.DataType,
-			&character,
-			&collation,
-		)
+		err = res.Rows.Scan(&col.Table, &col.DB, &col.DataType, &character, &collation)
+		if err != nil {
+			break
+		}
 		col.Name = name
 		col.Character = string(character)
 		col.Collation = string(collation)
@@ -537,8 +538,12 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 
 			var tbCollation []byte
 			if newRes.Rows.Next() {
-				newRes.Rows.Scan(&tbCollation)
+				err = newRes.Rows.Scan(&tbCollation)
+				if err != nil {
+					break
+				}
 			}
+			newRes.Rows.Close()
 			if string(tbCollation) != "" {
 				col.Character = strings.Split(string(tbCollation), "_")[0]
 				col.Collation = string(tbCollation)
@@ -546,6 +551,7 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 		}
 		columns = append(columns, &col)
 	}
+	res.Rows.Close()
 	return columns, err
 }
 
@@ -603,13 +609,12 @@ func (db *Connector) ShowReference(dbName string, tbName ...string) ([]Reference
 	// 获取值
 	for res.Rows.Next() {
 		var rv ReferenceValue
-		res.Rows.Scan(&rv.ReferencedTableSchema,
-			&rv.ReferencedTableName,
-			&rv.TableSchema,
-			&rv.TableName,
-			&rv.ConstraintName)
+		err = res.Rows.Scan(&rv.ReferencedTableSchema, &rv.ReferencedTableName, &rv.TableSchema, &rv.TableName, &rv.ConstraintName)
+		if err != nil {
+			break
+		}
 		referenceValues = append(referenceValues, rv)
 	}
-
+	res.Rows.Close()
 	return referenceValues, err
 }

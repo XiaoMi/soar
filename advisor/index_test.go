@@ -17,25 +17,30 @@
 package advisor
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
+	"github.com/XiaoMi/soar/database"
 	"github.com/XiaoMi/soar/env"
 
 	"github.com/kr/pretty"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
+var update = flag.Bool("update", false, "update .golden files")
+var vEnv *env.VirtualEnv
+var rEnv *database.Connector
+
 func init() {
 	common.BaseDir = common.DevPath
 	err := common.ParseConfig("")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	vEnv, rEnv := env.BuildEnv()
+	common.LogIfError(err, "init ParseConfig")
+	common.Log.Debug("advisor_test init")
+	vEnv, rEnv = env.BuildEnv()
 	if _, err = vEnv.Version(); err != nil {
 		fmt.Println(err.Error(), ", By pass all advisor test cases")
 		os.Exit(0)
@@ -45,6 +50,7 @@ func init() {
 		fmt.Println(err.Error(), ", By pass all advisor test cases")
 		os.Exit(0)
 	}
+	defer vEnv.CleanUp()
 }
 
 // ARG.003
@@ -52,8 +58,6 @@ func TestRuleImplicitConversion(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	dsn := common.Config.OnlineDSN
 	common.Config.OnlineDSN = common.Config.TestDSN
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
 
 	initSQLs := []string{
 		`CREATE TABLE t1 (id int, title varchar(255) CHARSET utf8 COLLATE utf8_general_ci);`,
@@ -104,9 +108,6 @@ func TestRuleImpossibleOuterJoin(t *testing.T) {
 		`select city_id, city, country from city left outer join country on city.country_id=country.country_id WHERE city.city_id IS NULL`,
 	}
 
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
-
 	for _, sql := range sqls {
 		stmt, syntaxErr := sqlparser.Parse(sql)
 		if syntaxErr != nil {
@@ -145,9 +146,6 @@ func TestIndexAdvisorRuleGroupByConst(t *testing.T) {
 			`select film_id, title from film where release_year in ('2006', '2007') group by release_year`,
 		},
 	}
-
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
 
 	for _, sql := range sqls[0] {
 		stmt, syntaxErr := sqlparser.Parse(sql)
@@ -211,9 +209,6 @@ func TestIndexAdvisorRuleOrderByConst(t *testing.T) {
 		},
 	}
 
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
-
 	for _, sql := range sqls[0] {
 		stmt, syntaxErr := sqlparser.Parse(sql)
 		if syntaxErr != nil {
@@ -275,9 +270,6 @@ func TestRuleUpdatePrimaryKey(t *testing.T) {
 		},
 	}
 
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
-
 	for _, sql := range sqls[0] {
 		stmt, syntaxErr := sqlparser.Parse(sql)
 		if syntaxErr != nil {
@@ -328,8 +320,6 @@ func TestRuleUpdatePrimaryKey(t *testing.T) {
 
 func TestIndexAdvise(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
 
 	for _, sql := range common.TestSQLs {
 		stmt, syntaxErr := sqlparser.Parse(sql)
@@ -360,8 +350,6 @@ func TestIndexAdviseNoEnv(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgOnlineDSNStatus := common.Config.OnlineDSN.Disable
 	common.Config.OnlineDSN.Disable = true
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
 
 	for _, sql := range common.TestSQLs {
 		stmt, syntaxErr := sqlparser.Parse(sql)
@@ -391,7 +379,6 @@ func TestIndexAdviseNoEnv(t *testing.T) {
 
 func TestDuplicateKeyChecker(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	_, rEnv := env.BuildEnv()
 	rule := DuplicateKeyChecker(rEnv, "sakila")
 	if len(rule) != 0 {
 		t.Errorf("got rules: %s", pretty.Sprint(rule))
@@ -425,9 +412,6 @@ func TestIdxColsTypeCheck(t *testing.T) {
 	sqls := []string{
 		`select city_id, city, country from city left outer join country using(country_id) WHERE city.city_id=59 and country.country='Algeria'`,
 	}
-
-	vEnv, rEnv := env.BuildEnv()
-	defer vEnv.CleanUp()
 
 	for _, sql := range sqls {
 		stmt, syntaxErr := sqlparser.Parse(sql)

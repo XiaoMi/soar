@@ -27,27 +27,12 @@ func init() {
 }
 
 func TestSamplingData(t *testing.T) {
-	online := &Connector{
-		Addr:     common.Config.OnlineDSN.Addr,
-		User:     common.Config.OnlineDSN.User,
-		Pass:     common.Config.OnlineDSN.Password,
-		Database: common.Config.OnlineDSN.Schema,
-		Charset:  common.Config.OnlineDSN.Charset,
-		Net:      common.Config.OnlineDSN.Net,
+	connOnline, err := NewConnector(common.Config.OnlineDSN)
+	if err != nil {
+		t.Error(err)
 	}
 
-	offline := &Connector{
-		Addr:     common.Config.TestDSN.Addr,
-		User:     common.Config.TestDSN.User,
-		Pass:     common.Config.TestDSN.Password,
-		Database: common.Config.TestDSN.Schema,
-		Charset:  common.Config.TestDSN.Charset,
-		Net:      common.Config.TestDSN.Net,
-	}
-
-	offline.Database = "test"
-
-	err := connTest.SamplingData(*online, "film")
+	err = connTest.SamplingData(connOnline, "film")
 	if err != nil {
 		t.Error(err)
 	}

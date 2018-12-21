@@ -39,6 +39,7 @@ type Connector struct {
 	Database string
 	Charset  string
 	Net      string
+	Conn     *sql.DB
 }
 
 // QueryResult 数据库查询返回值
@@ -49,20 +50,38 @@ type QueryResult struct {
 	QueryCost float64
 }
 
-// NewConnection 创建新连接
-func (db *Connector) NewConnection() (*sql.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@%s(%s)/%s?parseTime=true&charset=%s", db.User, db.Pass, db.Net, db.Addr, db.Database, db.Charset)
-	return sql.Open("mysql", dsn)
+// NewConnector 创建新连接
+func NewConnector(dsn *common.Dsn) (*Connector, error) {
+	conn, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s)/%s?parseTime=true&charset=%s",
+		dsn.User,
+		dsn.Password,
+		dsn.Net,
+		dsn.Addr,
+		dsn.Schema,
+		dsn.Charset,
+	))
+	if err != nil {
+		return nil, err
+	}
+	connector := &Connector{
+		Addr:     dsn.Addr,
+		User:     dsn.User,
+		Pass:     dsn.Password,
+		Database: dsn.Schema,
+		Charset:  dsn.Charset,
+		Conn:     conn,
+	}
+	return connector, err
 }
 
 // Query 执行SQL
 func (db *Connector) Query(sql string, params ...interface{}) (QueryResult, error) {
 	var res QueryResult
+	var err error
 	// 测试环境如果检查是关闭的，则SQL不会被执行
 	if common.Config.TestDSN.Disable {
 		return res, errors.New("dsn is disable")
 	}
-
 	// 数据库安全性检查：如果 Connector 的 IP 端口与 TEST 环境不一致，则启用SQL白名单
 	// 不在白名单中的SQL不允许执行
 	// 执行环境与test环境不相同
@@ -72,23 +91,25 @@ func (db *Connector) Query(sql string, params ...interface{}) (QueryResult, erro
 	}
 
 	common.Log.Debug("Execute SQL with DSN(%s/%s) : %s", db.Addr, db.Database, fmt.Sprintf(sql, params...))
-	conn, err := db.NewConnection()
-	defer conn.Close()
-	if err != nil {
-		return res, err
-	}
-	res.Rows, res.Error = conn.Query(sql, params...)
+	_, err = db.Conn.Exec("USE " + db.Database)
+	common.LogIfError(err, "")
+	res.Rows, res.Error = db.Conn.Query(sql, params...)
 
 	if common.Config.ShowWarnings {
-		res.Warning, err = conn.Query("SHOW WARNINGS")
+		res.Warning, err = db.Conn.Query("SHOW WARNINGS")
+		common.LogIfError(err, "")
 	}
 
 	// SHOW WARNINGS 并不会影响 last_query_cost
 	if common.Config.ShowLastQueryCost {
-		cost, err := conn.Query("SHOW SESSION STATUS LIKE 'last_query_cost'")
+		cost, err := db.Conn.Query("SHOW SESSION STATUS LIKE 'last_query_cost'")
 		if err == nil {
 			if cost.Next() {
 				err = cost.Scan(res.QueryCost)
+				common.LogIfError(err, "")
+			}
+			if err := cost.Close(); err != nil {
+				common.Log.Error(err.Error())
 			}
 		}
 	}
@@ -115,6 +136,9 @@ func (db *Connector) Version() (int, error) {
 	var versionSeg []string
 	for res.Rows.Next() {
 		err = res.Rows.Scan(&versionStr)
+		if err != nil {
+			break
+		}
 		versionStr = strings.Split(versionStr, "-")[0]
 		versionSeg = strings.Split(versionStr, ".")
 		if len(versionSeg) == 3 {
@@ -123,7 +147,9 @@ func (db *Connector) Version() (int, error) {
 		}
 		break
 	}
-
+	if err := res.Rows.Close(); err != nil {
+		common.Log.Error(err.Error())
+	}
 	return version, err
 }
 
@@ -139,6 +165,9 @@ func (db *Connector) SingleIntValue(option string) (int, error) {
 	var intVal int
 	if res.Rows.Next() {
 		err = res.Rows.Scan(&intVal)
+	}
+	if err := res.Rows.Close(); err != nil {
+		common.Log.Error(err.Error())
 	}
 	return intVal, err
 }
@@ -188,6 +217,7 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 			return 0
 		}
 	}
+	res.Rows.Close()
 
 	// 当table status元数据不准确时 rowTotal 可能远小于count(*)，导致散粒度大于1
 	if colNum > float64(rowTotal) {

@@ -18,10 +18,12 @@ package env
 
 import (
 	"flag"
+	"os"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 	"github.com/XiaoMi/soar/database"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/kr/pretty"
 )
@@ -33,12 +35,16 @@ func init() {
 	common.BaseDir = common.DevPath
 	err := common.ParseConfig("")
 	common.LogIfError(err, "init ParseConfig")
-	connTest = &database.Connector{
-		Addr:     common.Config.TestDSN.Addr,
-		User:     common.Config.TestDSN.User,
-		Pass:     common.Config.TestDSN.Password,
-		Database: common.Config.TestDSN.Schema,
-		Charset:  common.Config.TestDSN.Charset,
+	common.Log.Debug("env_test init")
+	connTest, err = database.NewConnector(common.Config.TestDSN)
+	if err != nil {
+		common.Log.Critical("Test env Error: %v", err)
+		os.Exit(0)
+	}
+
+	if _, err := connTest.Version(); err != nil {
+		common.Log.Critical("Test env Error: %v", err)
+		os.Exit(0)
 	}
 }
 
