@@ -169,6 +169,7 @@ release: build
 docker:
 	@echo "\033[92mBuild mysql test enviorment\033[0m"
 	@docker stop soar-mysql 2>/dev/null || true
+	@docker wait soar-mysql 2>/dev/null || true
 	@echo "docker run --name soar-mysql $(MYSQL_RELEASE):$(MYSQL_VERSION)"
 	@docker run --name soar-mysql --rm -d \
 	-e MYSQL_ROOT_PASSWORD=1tIsB1g3rt \

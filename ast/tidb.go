@@ -32,7 +32,12 @@ import (
 // TiParse TiDB 语法解析
 func TiParse(sql, charset, collation string) ([]ast.StmtNode, error) {
 	p := parser.New()
-	return p.Parse(sql, charset, collation)
+	stmt, warn, err := p.Parse(sql, charset, collation)
+	// TODO: bypass warning info
+	for _, w := range warn {
+		common.Log.Warn(w.Error())
+	}
+	return stmt, err
 }
 
 // PrintPrettyStmtNode 打印TiParse语法树

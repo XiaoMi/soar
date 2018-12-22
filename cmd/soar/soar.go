@@ -185,7 +185,7 @@ func main() {
 		if syntaxErr != nil {
 			errContent := fmt.Sprintf("At SQL %d : %v", sqlCounter, syntaxErr)
 			common.Log.Warning(errContent)
-			if common.Config.OnlySyntaxCheck {
+			if common.Config.OnlySyntaxCheck || common.Config.ReportType == "rewrite" {
 				fmt.Println(errContent)
 				os.Exit(1)
 			}

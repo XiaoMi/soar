@@ -2926,6 +2926,8 @@ IndexOptionList:
 				opt1.Comment = opt2.Comment
 			} else if opt2.Tp != 0 {
 				opt1.Tp = opt2.Tp
+			} else if opt2.KeyBlockSize > 0 {
+			    opt1.KeyBlockSize = opt2.KeyBlockSize
 			}
 			$$ = opt1
 		}
@@ -2936,8 +2938,7 @@ IndexOption:
 	"KEY_BLOCK_SIZE" EqOpt LengthNum
 	{
 		$$ = &ast.IndexOption{
-			// TODO bug should be fix here!
-			// KeyBlockSize: $1.(uint64),
+			KeyBlockSize: $3.(uint64),
 		}
 	}
 |	IndexType
@@ -5189,6 +5190,11 @@ TableOptimizerHints:
 |	hintBegin TableOptimizerHintList hintEnd
 	{
 		$$ = $2
+	}
+|	hintBegin error hintEnd
+	{
+		yyerrok()
+		parser.lastErrorAsWarn()
 	}
 
 HintTableList:
