@@ -22,22 +22,12 @@ import (
 	"github.com/XiaoMi/soar/common"
 
 	"github.com/kr/pretty"
-	"github.com/pingcap/parser"
-	"github.com/pingcap/parser/ast"
-
-	// for pincap parser
-	_ "github.com/pingcap/tidb/types/parser_driver"
+	"vitess.io/vitess/go/vt/sqlparser"
 )
 
-// TiParse TiDB 语法解析
-func TiParse(sql, charset, collation string) ([]ast.StmtNode, error) {
-	p := parser.New()
-	return p.Parse(sql, charset, collation)
-}
-
-// PrintPrettyStmtNode 打印TiParse语法树
-func PrintPrettyStmtNode(sql, charset, collation string) {
-	tree, err := TiParse(sql, charset, collation)
+// PrintPrettyVitessStmtNode print vitess AST struct data
+func PrintPrettyVitessStmtNode(sql string) {
+	tree, err := sqlparser.Parse(sql)
 	if err != nil {
 		common.Log.Warning(err.Error())
 	} else {
@@ -46,10 +36,10 @@ func PrintPrettyStmtNode(sql, charset, collation string) {
 	}
 }
 
-// StmtNode2JSON TiParse AST tree into json format
-func StmtNode2JSON(sql, charset, collation string) string {
+// VitessStmtNode2JSON vitess AST tree into json format
+func VitessStmtNode2JSON(sql string) string {
 	var str string
-	tree, err := TiParse(sql, charset, collation)
+	tree, err := sqlparser.Parse(sql)
 	if err != nil {
 		common.Log.Warning(err.Error())
 	} else {
