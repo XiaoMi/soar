@@ -18,6 +18,7 @@ BUILD_TIME=`date +%Y%m%d%H%M`
 COMMIT_VERSION=`git rev-parse HEAD`
 
 # Add mysql version for testing `MYSQL_RELEASE=percona MYSQL_VERSION=5.7 make docker`
+# MySQL 5.1 `MYSQL_RELEASE=vsamov/mysql-5.1.73 make docker`
 # MYSQL_RELEASE: mysql, percona, mariadb ...
 # MYSQL_VERSION: latest, 8.0, 5.7, 5.6, 5.5 ...
 # use mysql:latest as default
@@ -179,7 +180,7 @@ docker:
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
 	@echo "waiting for sakila database initializing "
-	@while ! mysql -h 127.0.0.1 -u root sakila -p1tIsB1g3rt -NBe "do 1;" 2>/dev/null; do \
+	@while ! docker exec soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" --silent -NBe "do 1" >/dev/null 2>&1 ; do \
 	printf '.' ; \
 	sleep 1 ; \
 	done ; \
@@ -188,7 +189,7 @@ docker:
 
 .PHONY: docker-connect
 docker-connect:
-	mysql -h 127.0.0.1 -u root -p1tIsB1g3rt -c
+	docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1"
 
 # attach docker container with bash interactive mode
 .PHONY: docker-it

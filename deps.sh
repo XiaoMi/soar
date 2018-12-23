@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NEEDED_COMMANDS="mysql docker git go govendor retool"
+NEEDED_COMMANDS="docker git go govendor retool"
 
 for cmd in ${NEEDED_COMMANDS} ; do
     if ! command -v "${cmd}" &> /dev/null ; then
@@ -10,10 +10,6 @@ for cmd in ${NEEDED_COMMANDS} ; do
         echo "${cmd} found"
     fi
 done
-
-# MySQL client
-## Mac OS: brew install mysql
-## Ubuntu: apt-get install mysql-client
 
 # Docker
 ## https://www.docker.com
