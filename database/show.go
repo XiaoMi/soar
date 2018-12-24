@@ -459,27 +459,27 @@ func (db *Connector) ShowCreateTable(tableName string) (string, error) {
 	ddl, err := db.showCreate("table", tableName)
 
 	// 去除外键关联条件
-	var noConstraint []string
-	relationReg, _ := regexp.Compile("CONSTRAINT")
-	for _, line := range strings.Split(ddl, "\n") {
-
-		if relationReg.Match([]byte(line)) {
-			continue
+	lines := strings.Split(ddl, "\n")
+	// CREATE VIEW ONLY 1 LINE
+	if len(lines) > 2 {
+		var noConstraint []string
+		relationReg, _ := regexp.Compile("CONSTRAINT")
+		for _, line := range lines[1 : len(lines)-1] {
+			if relationReg.Match([]byte(line)) {
+				continue
+			}
+			line = strings.TrimSuffix(line, ",")
+			noConstraint = append(noConstraint, line)
 		}
 
 		// 去除外键语句会使DDL中多一个','导致语法错误，要把多余的逗号去除
-		if strings.Index(line, ")") == 0 {
-			lineWrongSyntax := noConstraint[len(noConstraint)-1]
-			// 如果')'前一句的末尾是',' 删除 ',' 保证语法正确性
-			if strings.Index(lineWrongSyntax, ",") == len(lineWrongSyntax)-1 {
-				noConstraint[len(noConstraint)-1] = lineWrongSyntax[:len(lineWrongSyntax)-1]
-			}
-		}
-
-		noConstraint = append(noConstraint, line)
+		ddl = fmt.Sprint(
+			lines[0], "\n",
+			strings.Join(noConstraint, ",\n"), "\n",
+			lines[len(lines)-1],
+		)
 	}
-
-	return strings.Join(noConstraint, "\n"), err
+	return ddl, err
 }
 
 // FindColumn find column

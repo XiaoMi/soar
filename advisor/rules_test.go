@@ -23,29 +23,37 @@ import (
 )
 
 func TestListTestSQLs(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() { ListTestSQLs() }, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestListHeuristicRules(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() { ListHeuristicRules(HeuristicRules) }, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestInBlackList(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	common.BlackList = []string{"select"}
 	if !InBlackList("select 1") {
 		t.Error("should be true")
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestIsIgnoreRule(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	common.Config.IgnoreRules = []string{"test"}
 	if !IsIgnoreRule("test") {
 		t.Error("should be true")
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

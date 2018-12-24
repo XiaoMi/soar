@@ -25,6 +25,7 @@ import (
 )
 
 func TestTrace(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	res, err := connTest.Trace("select 1")
 	if err != nil {
 		t.Error(err)
@@ -36,9 +37,11 @@ func TestTrace(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestFormatTrace(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	res, err := connTest.Trace("select 1")
 	if err != nil {
 		t.Error(err)
@@ -50,4 +53,5 @@ func TestFormatTrace(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

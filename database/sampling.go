@@ -17,11 +17,15 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
+	"time"
+
+	"strings"
+
+	"database/sql"
 
 	"github.com/XiaoMi/soar/common"
-	"strings"
+	"github.com/ziutek/mymysql/mysql"
 )
 
 /*--------------------
@@ -44,99 +48,125 @@ import (
 *--------------------
  */
 
-// SamplingData 将数据从Remote拉取到 db 中
-func (db *Connector) SamplingData(remote *Connector, tables ...string) error {
+// SamplingData 将数据从 onlineConn 拉取到 db 中
+func (db *Connector) SamplingData(onlineConn *Connector, database string, tables ...string) error {
+	var err error
+	if database == db.Database {
+		return fmt.Errorf("SamplingData the same database, From: %s/%s, To: %s/%s", onlineConn.Addr, database, db.Addr, db.Database)
+	}
+
 	// 计算需要泵取的数据量
 	wantRowsCount := 300 * common.Config.SamplingStatisticTarget
 
-	// 设置数据采样单条 SQL 中 value 的数量
-	// 该数值越大，在内存中缓存的data就越多，但相对的，插入时速度就越快
-	maxValCount := 200
-
 	for _, table := range tables {
 		// 表类型检查
-		if remote.IsView(table) {
+		if onlineConn.IsView(table) {
 			return nil
 		}
 
-		tableStatus, err := remote.ShowTableStatus(table)
-		if err != nil {
-			return err
+		// generate where condition
+		var where string
+		if common.Config.SamplingCondition == "" {
+			tableStatus, err := onlineConn.ShowTableStatus(table)
+			if err != nil {
+				return err
+			}
+
+			if len(tableStatus.Rows) == 0 {
+				common.Log.Info("SamplingData, Table %s with no data, stop sampling", table)
+				return nil
+			}
+
+			tableRows := tableStatus.Rows[0].Rows
+			if tableRows == 0 {
+				common.Log.Info("SamplingData, Table %s with no data, stop sampling", table)
+				return nil
+			}
+
+			factor := float64(wantRowsCount) / float64(tableRows)
+			common.Log.Debug("SamplingData, tableRows: %d, wantRowsCount: %d, factor: %f", tableRows, wantRowsCount, factor)
+			where = fmt.Sprintf("WHERE RAND() <= %f LIMIT %d", factor, wantRowsCount)
+			if factor >= 1 {
+				where = ""
+			}
+		} else {
+			where = common.Config.SamplingCondition
 		}
 
-		if len(tableStatus.Rows) == 0 {
-			common.Log.Info("SamplingData, Table %s with no data, stop sampling", table)
-			return nil
-		}
-
-		tableRows := tableStatus.Rows[0].Rows
-		if tableRows == 0 {
-			common.Log.Info("SamplingData, Table %s with no data, stop sampling", table)
-			return nil
-		}
-
-		factor := float64(wantRowsCount) / float64(tableRows)
-		common.Log.Debug("SamplingData, tableRows: %d, wantRowsCount: %d, factor: %f", tableRows, wantRowsCount, factor)
-
-		err = startSampling(remote.Conn, db.Conn, db.Database, table, factor, wantRowsCount, maxValCount)
-		if err != nil {
-			common.Log.Error("(db *Connector) SamplingData Error : %v", err)
-		}
+		err = db.startSampling(onlineConn.Conn, database, table, where)
 	}
-	return nil
+	return err
 }
 
 // startSampling sampling data from OnlineDSN to TestDSN
-// 因为涉及到的数据量问题，所以泵取与插入时同时进行的
-// TODO: 加 ref link
-func startSampling(conn, localConn *sql.DB, database, table string, factor float64, wants, maxValCount int) error {
-	// generate where condition
-	where := fmt.Sprintf("WHERE RAND() <= %f", factor)
-	if factor >= 1 {
-		where = ""
-	}
-
-	res, err := conn.Query(fmt.Sprintf("SELECT * FROM `%s`.`%s` %s LIMIT %d;", database, table, where, wants))
+func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, where string) error {
+	samplingQuery := fmt.Sprintf("SELECT * FROM `%s`.`%s` %s", database, table, where)
+	common.Log.Debug("startSampling with Query: %s", samplingQuery)
+	res, err := onlineConn.Query(samplingQuery)
 	if err != nil {
 		return err
 	}
 
-	// column info
+	// columns list
 	columns, err := res.Columns()
 	if err != nil {
 		return err
 	}
-	row := make(map[string][]byte, len(columns))
+	row := make([][]byte, len(columns))
 	tableFields := make([]interface{}, 0)
-	for _, col := range columns {
-		if _, ok := row[col]; ok {
-			tableFields = append(tableFields, row[col])
-		}
+	for i := range columns {
+		tableFields = append(tableFields, &row[i])
+	}
+	columnTypes, err := res.ColumnTypes()
+	if err != nil {
+		return err
 	}
 
 	// sampling data
-	var valuesStr string
-	var values []string
+	var valuesCount int
+	var valuesStr []string
+	maxValuesCount := 200 // one time insert values count, TODO: config able
 	columnsStr := "`" + strings.Join(columns, "`,`") + "`"
 	for res.Next() {
+		var values []string
 		res.Scan(tableFields...)
-		for _, val := range row {
-			values = append(values, fmt.Sprintf(`unhex("%s")`, fmt.Sprintf("%x", val)))
+		for i, val := range row {
+			if val == nil {
+				values = append(values, "NULL")
+			} else {
+				switch columnTypes[i].DatabaseTypeName() {
+				case "TIMESTAMP", "DATETIME":
+					t, err := time.Parse(time.RFC3339, string(val))
+					common.LogIfWarn(err, "")
+					values = append(values, fmt.Sprintf(`"%s"`, mysql.TimeString(t)))
+				default:
+					values = append(values, fmt.Sprintf(`unhex("%s")`, fmt.Sprintf("%x", val)))
+				}
+			}
 		}
-		valuesStr = fmt.Sprintf(`(%s)`, strings.Join(values, `,`))
-		doSampling(localConn, database, table, columnsStr, valuesStr)
+		valuesStr = append(valuesStr, "("+strings.Join(values, `,`)+")")
+		valuesCount++
+		if maxValuesCount <= valuesCount {
+			err = db.doSampling(table, columnsStr, strings.Join(valuesStr, `,`))
+			if err != nil {
+				break
+			}
+			values = make([]string, 0)
+			valuesStr = make([]string, 0)
+			valuesCount = 0
+		}
 	}
 	res.Close()
-	return nil
+	return err
 }
 
-// 将泵取的数据转换成Insert语句并在数据库中执行
-func doSampling(conn *sql.DB, dbName, table, colDef, values string) {
-	query := fmt.Sprintf("INSERT INTO `%s`.`%s` (%s) VALUES %s;", dbName, table,
-		colDef, values)
-
-	_, err := conn.Exec(query)
-	if err != nil {
-		common.Log.Error("doSampling Error from %s.%s: %v", dbName, table, err)
+// 将泵取的数据转换成 insert 语句并在 testConn 数据库中执行
+func (db *Connector) doSampling(table, colDef, values string) error {
+	// db.Database is hashed database name
+	query := fmt.Sprintf("INSERT INTO `%s`.`%s` (%s) VALUES %s;", db.Database, table, colDef, values)
+	res, err := db.Query(query)
+	if res.Rows != nil {
+		res.Rows.Close()
 	}
+	return err
 }

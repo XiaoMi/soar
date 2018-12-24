@@ -26,6 +26,10 @@ import (
 
 var update = flag.Bool("update", false, "update .golden files")
 
+func init() {
+	BaseDir = DevPath
+}
+
 func TestParseConfig(t *testing.T) {
 	err := ParseConfig("")
 	if err != nil {
@@ -37,7 +41,7 @@ func TestReadConfigFile(t *testing.T) {
 	if Config == nil {
 		Config = new(Configuration)
 	}
-	Config.readConfigFile("../soar.yaml")
+	Config.readConfigFile(DevPath + "/soar.yaml")
 }
 
 func TestParseDSN(t *testing.T) {

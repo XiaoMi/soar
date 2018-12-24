@@ -26,6 +26,7 @@ import (
 )
 
 func TestShowTableStatus(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	ts, err := connTest.ShowTableStatus("film")
@@ -47,9 +48,11 @@ func TestShowTableStatus(t *testing.T) {
 	}
 	pretty.Println(ts)
 	connTest.Database = orgDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestShowTables(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	ts, err := connTest.ShowTables()
@@ -66,23 +69,29 @@ func TestShowTables(t *testing.T) {
 		t.Error(err)
 	}
 	connTest.Database = orgDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestShowCreateDatabase(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		fmt.Println(connTest.ShowCreateDatabase("sakila"))
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestShowCreateTable(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	tables := []string{
 		"film",
+		"category",
 		"customer_list",
+		"inventory",
 	}
 	err := common.GoldenDiff(func() {
 		for _, table := range tables {
@@ -97,9 +106,11 @@ func TestShowCreateTable(t *testing.T) {
 		t.Error(err)
 	}
 	connTest.Database = orgDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestShowIndex(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	ti, err := connTest.ShowIndex("film")
@@ -114,11 +125,12 @@ func TestShowIndex(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 	connTest.Database = orgDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestShowColumns(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	ti, err := connTest.ShowColumns("actor_info")
@@ -134,9 +146,11 @@ func TestShowColumns(t *testing.T) {
 	}
 
 	connTest.Database = orgDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestFindColumn(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	ti, err := connTest.FindColumn("film_id", "sakila", "film")
 	if err != nil {
 		t.Error("FindColumn Error: ", err)
@@ -147,15 +161,19 @@ func TestFindColumn(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestIsFKey(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	if !connTest.IsForeignKey("sakila", "film", "language_id") {
 		t.Error("want True. got false")
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestShowReference(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	rv, err := connTest.ShowReference("sakila", "film")
 	if err != nil {
 		t.Error("ShowReference Error: ", err)
@@ -167,4 +185,5 @@ func TestShowReference(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

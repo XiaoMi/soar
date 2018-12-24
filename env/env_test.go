@@ -49,6 +49,7 @@ func init() {
 }
 
 func TestNewVirtualEnv(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []string{
 		"create table t(id int,c1 varchar(20),PRIMARY KEY (id));",
 		"alter table t add index `idx_c1`(c1);",
@@ -117,9 +118,11 @@ func TestNewVirtualEnv(t *testing.T) {
 			}
 		}
 	}, t.Name(), update)
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestCleanupTestDatabase(t *testing.T) {
+	common.Log.Debug("Enter function: %s", common.GetFunctionName())
 	vEnv, _ := BuildEnv()
 	if common.Config.TestDSN.Disable {
 		common.Log.Warn("common.Config.TestDSN.Disable=true, by pass TestCleanupTestDatabase")
@@ -146,9 +149,11 @@ func TestCleanupTestDatabase(t *testing.T) {
 	if err != nil {
 		t.Error("optimizer_060102150405 not exist, should not be dropped")
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestGenTableColumns(t *testing.T) {
+	common.Log.Debug("Enter function: %s", common.GetFunctionName())
 	vEnv, rEnv := BuildEnv()
 	defer vEnv.CleanUp()
 
@@ -214,4 +219,66 @@ func TestGenTableColumns(t *testing.T) {
 			}
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+func TestCreateTable(t *testing.T) {
+	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	orgSamplingCondition := common.Config.SamplingCondition
+	common.Config.SamplingCondition = "LIMIT 1"
+
+	vEnv, rEnv := BuildEnv()
+	defer vEnv.CleanUp()
+	// TODO: support VIEW,
+	tables := []string{
+		"actor",
+		// "actor_info", // VIEW
+		"address",
+		"category",
+		"city",
+		"country",
+		"customer",
+		"customer_list",
+		"film",
+		"film_actor",
+		"film_category",
+		"film_list",
+		"film_text",
+		"inventory",
+		"language",
+		"nicer_but_slower_film_list",
+		"payment",
+		"rental",
+		// "sales_by_film_category", // VIEW
+		// "sales_by_store", // VIEW
+		"staff",
+		"staff_list",
+		"store",
+	}
+	for _, table := range tables {
+		err := vEnv.createTable(rEnv, "sakila", table)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+	common.Config.SamplingCondition = orgSamplingCondition
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+func TestCreateDatabase(t *testing.T) {
+	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	vEnv, rEnv := BuildEnv()
+	defer vEnv.CleanUp()
+	err := vEnv.createDatabase(rEnv, "sakila")
+	if err != nil {
+		t.Error(err)
+	}
+	if vEnv.DBHash("sakila") == "sakila" {
+		t.Errorf("database: sakila rehashed failed!")
+	}
+
+	if vEnv.DBHash("not_exist_db") != "not_exist_db" {
+		t.Errorf("database: not_exist_db rehashed!")
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

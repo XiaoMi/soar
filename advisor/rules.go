@@ -58,7 +58,7 @@ func NewQuery4Audit(sql string, options ...string) (*Query4Audit, error) {
 	// vitess 语法解析不上报，以 tidb parser 为主
 	q.Stmt, vErr = sqlparser.Parse(sql)
 	if vErr != nil {
-		common.Log.Warn("NewQuery4Audit vitess parse Error: %s", vErr.Error())
+		common.Log.Warn("NewQuery4Audit vitess parse Error: %s, Query: %s", vErr.Error(), sql)
 	}
 
 	// TODO: charset, collation

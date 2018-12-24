@@ -19,21 +19,26 @@ package database
 import (
 	"testing"
 
+	"github.com/XiaoMi/soar/common"
 	"github.com/kr/pretty"
 )
 
 func TestProfiling(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	rows, err := connTest.Profiling("select 1")
 	if err != nil {
 		t.Error(err)
 	}
 	pretty.Println(rows)
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestFormatProfiling(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	res, err := connTest.Profiling("select 1")
 	if err != nil {
 		t.Error(err)
 	}
 	pretty.Println(FormatProfiling(res))
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

@@ -104,8 +104,9 @@ func (db *Connector) Query(sql string, params ...interface{}) (QueryResult, erro
 	if common.Config.ShowLastQueryCost {
 		cost, err := db.Conn.Query("SHOW SESSION STATUS LIKE 'last_query_cost'")
 		if err == nil {
+			var varName string
 			if cost.Next() {
-				err = cost.Scan(res.QueryCost)
+				err = cost.Scan(&varName, &res.QueryCost)
 				common.LogIfError(err, "")
 			}
 			if err := cost.Close(); err != nil {

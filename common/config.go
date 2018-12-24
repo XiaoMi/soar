@@ -56,6 +56,7 @@ type Configuration struct {
 	OnlySyntaxCheck         bool   `yaml:"only-syntax-check"`         // 只做语法检查不输出优化建议
 	SamplingStatisticTarget int    `yaml:"sampling-statistic-target"` // 数据采样因子，对应 PostgreSQL 的 default_statistics_target
 	Sampling                bool   `yaml:"sampling"`                  // 数据采样开关
+	SamplingCondition       string `yaml:"sampling-condition"`        // 指定采样条件，如：WHERE xxx LIMIT xxx;
 	Profiling               bool   `yaml:"profiling"`                 // 在开启数据采样的情况下，在测试环境执行进行profile
 	Trace                   bool   `yaml:"trace"`                     // 在开启数据采样的情况下，在测试环境执行进行Trace
 	Explain                 bool   `yaml:"explain"`                   // Explain开关
@@ -506,6 +507,7 @@ func readCmdFlags() error {
 	explain := flag.Bool("explain", Config.Explain, "Explain, 是否开启Explain执行计划分析")
 	sampling := flag.Bool("sampling", Config.Sampling, "Sampling, 数据采样开关")
 	samplingStatisticTarget := flag.Int("sampling-statistic-target", Config.SamplingStatisticTarget, "SamplingStatisticTarget, 数据采样因子，对应 PostgreSQL 的 default_statistics_target")
+	samplingCondition := flag.String("sampling-condition", Config.SamplingCondition, "SamplingCondition, 数据采样条件，如： WHERE xxx LIMIT xxx")
 	delimiter := flag.String("delimiter", Config.Delimiter, "Delimiter, SQL分隔符")
 	// +++++++++++++++日志相关+++++++++++++++++
 	logLevel := flag.Int("log-level", Config.LogLevel, "LogLevel, 日志级别, [0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]")
@@ -585,6 +587,7 @@ func readCmdFlags() error {
 	Config.Explain = *explain
 	Config.Sampling = *sampling
 	Config.SamplingStatisticTarget = *samplingStatisticTarget
+	Config.SamplingCondition = *samplingCondition
 
 	Config.LogLevel = *logLevel
 	if strings.HasPrefix(*logOutput, "/") {

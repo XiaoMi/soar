@@ -25,6 +25,7 @@ import (
 )
 
 func TestRewrite(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgTestDSNStatus := common.Config.TestDSN.Disable
 	common.Config.TestDSN.Disable = false
 	testSQL := []map[string]string{
@@ -99,9 +100,11 @@ func TestRewrite(t *testing.T) {
 		}
 	}
 	common.Config.TestDSN.Disable = orgTestDSNStatus
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteStar2Columns(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgTestDSNStatus := common.Config.TestDSN.Disable
 	common.Config.TestDSN.Disable = false
 	testSQL := []map[string]string{
@@ -131,9 +134,11 @@ func TestRewriteStar2Columns(t *testing.T) {
 		}
 	}
 	common.Config.TestDSN.Disable = orgTestDSNStatus
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteInsertColumns(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `insert into film values(1,2,3,4,5)`,
@@ -173,9 +178,11 @@ func TestRewriteInsertColumns(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteHaving(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `SELECT state, COUNT(*) FROM Drivers GROUP BY state HAVING state IN ('GA', 'TX') ORDER BY state`,
@@ -196,9 +203,11 @@ func TestRewriteHaving(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteAddOrderByNull(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "SELECT sum(col1) FROM tbl GROUP BY col",
@@ -211,9 +220,11 @@ func TestRewriteAddOrderByNull(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteRemoveDMLOrderBy(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "DELETE FROM tbl WHERE col1=1 ORDER BY col",
@@ -230,9 +241,11 @@ func TestRewriteRemoveDMLOrderBy(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteGroupByConst(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "select 1;",
@@ -259,9 +272,11 @@ func TestRewriteGroupByConst(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteStandard(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "SELECT sum(col1) FROM tbl GROUP BY 1;",
@@ -274,9 +289,11 @@ func TestRewriteStandard(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteCountStar(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "SELECT count(col) FROM tbl GROUP BY 1;",
@@ -293,9 +310,11 @@ func TestRewriteCountStar(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteInnoDB(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT);",
@@ -312,9 +331,11 @@ func TestRewriteInnoDB(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteAutoIncrement(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB AUTO_INCREMENT=123802;",
@@ -331,9 +352,11 @@ func TestRewriteAutoIncrement(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteIntWidth(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "CREATE TABLE t1(id bigint(10) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB AUTO_INCREMENT=123802;",
@@ -358,9 +381,11 @@ func TestRewriteIntWidth(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteAlwaysTrue(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "SELECT count(col) FROM tbl where 1=1;",
@@ -427,10 +452,12 @@ func TestRewriteAlwaysTrue(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 // TODO:
 func TestRewriteSubQuery2Join(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgTestDSNStatus := common.Config.TestDSN.Disable
 	common.Config.TestDSN.Disable = true
 	testSQL := []map[string]string{
@@ -458,9 +485,11 @@ func TestRewriteSubQuery2Join(t *testing.T) {
 		}
 	}
 	common.Config.TestDSN.Disable = orgTestDSNStatus
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteDML2Select(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  "DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;",
@@ -513,9 +542,11 @@ func TestRewriteDML2Select(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteDistinctStar(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `SELECT DISTINCT * FROM film;`,
@@ -549,9 +580,11 @@ func TestRewriteDistinctStar(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestMergeAlterTables(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		// ADD|DROP INDEX
 		// TODO: PRIMARY KEY, [UNIQUE|FULLTEXT|SPATIAL] INDEX
@@ -602,9 +635,11 @@ func TestMergeAlterTables(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteUnionAll(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `select country_id from city union select country_id from country;`,
@@ -617,8 +652,10 @@ func TestRewriteUnionAll(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 func TestRewriteTruncate(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `delete from tbl;`,
@@ -631,9 +668,11 @@ func TestRewriteTruncate(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRewriteOr2In(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `select country_id from city where country_id = 1 or country_id = 2 or country_id = 3;`,
@@ -672,9 +711,11 @@ func TestRewriteOr2In(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRmParenthesis(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
 		{
 			"input":  `select country_id from city where (country_id = 1);`,
@@ -699,13 +740,16 @@ func TestRmParenthesis(t *testing.T) {
 			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestListRewriteRules(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		ListRewriteRules(RewriteRules)
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

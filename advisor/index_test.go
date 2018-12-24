@@ -95,8 +95,8 @@ func TestRuleImplicitConversion(t *testing.T) {
 			}
 		}
 	}
-	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 	common.Config.OnlineDSN = dsn
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 // JOI.003 & JOI.004
@@ -383,9 +383,11 @@ func TestDuplicateKeyChecker(t *testing.T) {
 	if len(rule) != 0 {
 		t.Errorf("got rules: %s", pretty.Sprint(rule))
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestMergeAdvices(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	dst := []IndexInfo{
 		{
 			Name:     "test",
@@ -405,6 +407,7 @@ func TestMergeAdvices(t *testing.T) {
 	if len(advise) != 1 {
 		t.Error(pretty.Sprint(advise))
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestIdxColsTypeCheck(t *testing.T) {
@@ -450,13 +453,16 @@ func TestIdxColsTypeCheck(t *testing.T) {
 			}
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestGetRandomIndexSuffix(t *testing.T) {
+	common.Log.Debug("Enter function: %s", common.GetFunctionName())
 	for i := 0; i < 5; i++ {
 		r := getRandomIndexSuffix()
 		if !(strings.HasPrefix(r, "_") && len(r) == 5) {
 			t.Errorf("getRandomIndexSuffix should return a string with prefix `_` and 5 length, but got:%s", r)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

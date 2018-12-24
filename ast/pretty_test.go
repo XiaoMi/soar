@@ -128,6 +128,7 @@ var TestSqlsPretty = []string{
 }
 
 func TestPretty(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		for _, sql := range append(TestSqlsPretty, common.TestSQLs...) {
 			fmt.Println(sql)
@@ -137,9 +138,11 @@ func TestPretty(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestIsKeyword(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	tks := map[string]bool{
 		"AGAINST":        true,
 		"AUTO_INCREMENT": true,
@@ -155,9 +158,11 @@ func TestIsKeyword(t *testing.T) {
 			t.Error("isKeyword:", tk)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRemoveComments(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	for _, sql := range TestSqlsPretty {
 		stmt, _ := sqlparser.Parse(sql)
 		newSQL := sqlparser.String(stmt)
@@ -165,9 +170,11 @@ func TestRemoveComments(t *testing.T) {
 			fmt.Print(newSQL)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestMysqlEscapeString(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	var strs = []map[string]string{
 		{
 			"input":  "abc",
@@ -198,4 +205,5 @@ abc`,
 			}
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

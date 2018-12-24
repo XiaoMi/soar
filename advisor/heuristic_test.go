@@ -35,7 +35,7 @@ func TestRuleImplicitAlias(t *testing.T) {
 			"select col from tbl tb where id < 1000",
 		},
 		{
-			"do 1",
+			"select 1",
 		},
 	}
 	for _, sql := range sqls[0] {

@@ -82,7 +82,7 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 	common.LogIfError(err, "")
 
 	// 检查线上环境可用性版本
-	rEnvVersion, err := vEnv.Version()
+	rEnvVersion, err := connOnline.Version()
 	common.Config.OnlineDSN.Version = rEnvVersion
 	if err != nil {
 		common.Log.Warn("BuildEnv OnlineDSN: %s:********@%s/%s not available , Error: %s",
@@ -245,20 +245,20 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 			// 为了支持并发，需要将DB进行映射，但db.table这种形式无法保证DB的映射是正确的
 			// TODO：暂不支持 create db.tableName (id int) 形式的建表语句
 			if stmt.Table.Qualifier.String() != "" {
-				common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+				common.Log.Error("BuildVirtualEnv DDL Not support db.tb format")
 				return false
 			}
 
 			for _, tb := range stmt.FromTables {
 				if tb.Qualifier.String() != "" {
-					common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+					common.Log.Error("BuildVirtualEnv DDL Not support db.tb format")
 					return false
 				}
 			}
 
 			for _, tb := range stmt.ToTables {
 				if tb.Qualifier.String() != "" {
-					common.Log.Error("BuildVirtualEnv DDL Not support '.'")
+					common.Log.Error("BuildVirtualEnv DDL Not support db.tb format")
 					return false
 				}
 			}
@@ -338,7 +338,7 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 
 				err = ve.createTable(tmpEnv, db, tb.TableName)
 				if err != nil {
-					common.Log.Error("BuildVirtualEnv Error : %v", err)
+					common.Log.Error("BuildVirtualEnv %s.%s Error : %v", db, tb.TableName, err)
 					return false
 				}
 			}
@@ -453,7 +453,7 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 	res, err := ve.Query(ddl)
 	if err != nil {
 		// 有可能是用户新建表，因此线上环境查不到
-		common.Log.Error("createTable, %s Error : %v", tbName, err)
+		common.Log.Error("createTable: %s Error : %v", tbName, err)
 		return err
 	}
 	res.Rows.Close()
@@ -461,13 +461,9 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 	// 泵取数据
 	if common.Config.Sampling {
 		common.Log.Debug("createTable, Start Sampling data from %s.%s to %s.%s ...", dbName, tbName, ve.DBRef[dbName], tbName)
-		err := ve.SamplingData(rEnv, tbName)
-		if err != nil {
-			common.Log.Error(" (ve VirtualEnv) createTable SamplingData Error: %v", err)
-			return err
-		}
+		err = ve.SamplingData(rEnv, dbName, tbName)
 	}
-	return nil
+	return err
 }
 
 // GenTableColumns 为 Rewrite 提供的结构体初始化

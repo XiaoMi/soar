@@ -48,6 +48,7 @@ func init() {
 }
 
 func TestQuery(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	res, err := connTest.Query("select 0")
 	if err != nil {
 		t.Error(err.Error())
@@ -64,9 +65,11 @@ func TestQuery(t *testing.T) {
 	}
 	res.Rows.Close()
 	// TODO: timeout test
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestColumnCardinality(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	orgDatabase := connTest.Database
 	connTest.Database = "sakila"
 	a := connTest.ColumnCardinality("actor", "first_name")
@@ -74,9 +77,11 @@ func TestColumnCardinality(t *testing.T) {
 		t.Error("sakila.actor.first_name cardinality should in [0, 1], now it's", a)
 	}
 	connTest.Database = orgDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestDangerousSQL(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testCase := map[string]bool{
 		"select * from tb;delete from tb;": true,
 		"show database;":                   false,
@@ -91,9 +96,11 @@ func TestDangerousSQL(t *testing.T) {
 			t.Errorf("SQL:%s got:%v want:%v", sql, got, want)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestWarningsAndQueryCost(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	common.Config.ShowWarnings = true
 	common.Config.ShowLastQueryCost = true
 	res, err := connTest.Query("explain select * from sakila.film")
@@ -111,17 +118,21 @@ func TestWarningsAndQueryCost(t *testing.T) {
 		res.Warning.Close()
 		fmt.Println(res.QueryCost, err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestVersion(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	version, err := connTest.Version()
 	if err != nil {
 		t.Error(err.Error())
 	}
 	fmt.Println(version)
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestRemoveSQLComments(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	SQLs := []string{
 		`-- comment`,
 		`--`,
@@ -140,9 +151,11 @@ comment*/`,
 	if err != nil {
 		t.Error(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestSingleIntValue(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	val, err := connTest.SingleIntValue("read_only")
 	if err != nil {
 		t.Error(err)
@@ -150,13 +163,16 @@ func TestSingleIntValue(t *testing.T) {
 	if val < 0 {
 		t.Error("SingleIntValue, return should large than zero")
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestIsView(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	originalDatabase := connTest.Database
 	connTest.Database = "sakila"
 	if !connTest.IsView("actor_info") {
 		t.Error("actor_info should be a VIEW")
 	}
 	connTest.Database = originalDatabase
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

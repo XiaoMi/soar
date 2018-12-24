@@ -21,15 +21,11 @@ import (
 	"testing"
 )
 
-func init() {
-	BaseDir = DevPath
-}
-
 func TestLogger(t *testing.T) {
-	Log.Info("info")
-	Log.Debug("debug")
-	Log.Warning("warning")
-	Log.Error("error")
+	Log.Info("TestLogger_Info")
+	Log.Debug("TestLogger_Debug")
+	Log.Warning("TestLogger_Warning")
+	Log.Error("Warning_Error")
 }
 
 func TestCaller(t *testing.T) {
@@ -47,7 +43,7 @@ func TestGetFunctionName(t *testing.T) {
 }
 
 func TestIfError(t *testing.T) {
-	err := errors.New("test")
+	err := errors.New("TestIfError")
 	LogIfError(err, "")
 	LogIfError(err, "func %s", "func_test")
 }

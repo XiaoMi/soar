@@ -26,6 +26,7 @@ import (
 )
 
 func TestTokenize(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		for _, sql := range common.TestSQLs {
 			fmt.Println(sql)
@@ -35,9 +36,11 @@ func TestTokenize(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestTokenizer(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		"select c1,c2,c3 from t1,t2 join t3 on t1.c1=t2.c1 and t1.c3=t3.c1 where id>1000",
 		"select sourcetable, if(f.lastcontent = ?, f.lastupdate, f.lastcontent) as lastactivity, f.totalcount as activity, type.class as type, (f.nodeoptions & ?) as nounsubscribe from node as f inner join contenttype as type on type.contenttypeid = f.contenttypeid inner join subscribed as sd on sd.did = f.nodeid and sd.userid = ? union all select f.name as title, f.userid as keyval, ? as sourcetable, ifnull(f.lastpost, f.joindate) as lastactivity, f.posts as activity, ? as type, ? as nounsubscribe from user as f inner join userlist as ul on ul.relationid = f.userid and ul.userid = ? where ul.type = ? and ul.aq = ? order by title limit ?",
@@ -57,9 +60,11 @@ func TestTokenizer(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestGetQuotedString(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	var str = []string{
 		`"hello world"`,
 		"`hello world`",
@@ -82,9 +87,11 @@ func TestGetQuotedString(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestCompress(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		for _, sql := range common.TestSQLs {
 			fmt.Println(sql)
@@ -94,10 +101,11 @@ func TestCompress(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
-
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestFormat(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		for _, sql := range common.TestSQLs {
 			fmt.Println(sql)
@@ -107,9 +115,11 @@ func TestFormat(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestSplitStatement(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	bufs := [][]byte{
 		[]byte("select * from test;hello"),
 		[]byte("select 'asd;fas', col from test;hello"),
@@ -181,9 +191,11 @@ select col from tb;
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestLeftNewLines(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	bufs := [][]byte{
 		[]byte(`
 		select * from test;hello`),
@@ -200,9 +212,11 @@ func TestLeftNewLines(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func TestNewLines(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	bufs := [][]byte{
 		[]byte(`
 		select * from test;hello`),
@@ -219,4 +233,5 @@ func TestNewLines(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
