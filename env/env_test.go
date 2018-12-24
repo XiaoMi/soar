@@ -282,3 +282,60 @@ func TestCreateDatabase(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestCreateTable(t *testing.T) {
+	orgSamplingCondition := common.Config.SamplingCondition
+	common.Config.SamplingCondition = "LIMIT 1"
+
+	vEnv, rEnv := BuildEnv()
+	defer vEnv.CleanUp()
+	// TODO: support VIEW,
+	tables := []string{
+		"actor",
+		// "actor_info", // VIEW
+		"address",
+		"category",
+		"city",
+		"country",
+		"customer",
+		"customer_list",
+		"film",
+		"film_actor",
+		"film_category",
+		"film_list",
+		"film_text",
+		"inventory",
+		"language",
+		"nicer_but_slower_film_list",
+		"payment",
+		"rental",
+		// "sales_by_film_category", // VIEW
+		// "sales_by_store", // VIEW
+		"staff",
+		"staff_list",
+		"store",
+	}
+	for _, table := range tables {
+		err := vEnv.createTable(rEnv, "sakila", table)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+	common.Config.SamplingCondition = orgSamplingCondition
+}
+
+func TestCreateDatabase(t *testing.T) {
+	vEnv, rEnv := BuildEnv()
+	defer vEnv.CleanUp()
+	err := vEnv.createDatabase(rEnv, "sakila")
+	if err != nil {
+		t.Error(err)
+	}
+	if vEnv.DBHash("sakila") == "sakila" {
+		t.Errorf("database: sakila rehashed failed!")
+	}
+
+	if vEnv.DBHash("not_exist_db") != "not_exist_db" {
+		t.Errorf("database: not_exist_db rehashed!")
+	}
+}

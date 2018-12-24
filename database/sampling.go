@@ -17,12 +17,10 @@
 package database
 
 import (
-	"fmt"
-	"time"
-
-	"strings"
-
 	"database/sql"
+	"fmt"
+	"strings"
+	"time"
 
 	"github.com/XiaoMi/soar/common"
 	"github.com/ziutek/mymysql/mysql"
@@ -92,7 +90,6 @@ func (db *Connector) SamplingData(onlineConn *Connector, database string, tables
 		} else {
 			where = common.Config.SamplingCondition
 		}
-
 		err = db.startSampling(onlineConn.Conn, database, table, where)
 	}
 	return err
@@ -143,17 +140,17 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 					values = append(values, fmt.Sprintf(`unhex("%s")`, fmt.Sprintf("%x", val)))
 				}
 			}
-		}
-		valuesStr = append(valuesStr, "("+strings.Join(values, `,`)+")")
-		valuesCount++
-		if maxValuesCount <= valuesCount {
-			err = db.doSampling(table, columnsStr, strings.Join(valuesStr, `,`))
-			if err != nil {
-				break
+			valuesStr = append(valuesStr, "("+strings.Join(values, `,`)+")")
+			valuesCount++
+			if maxValuesCount <= valuesCount {
+				err = db.doSampling(table, columnsStr, strings.Join(valuesStr, `,`))
+				if err != nil {
+					break
+				}
+				values = make([]string, 0)
+				valuesStr = make([]string, 0)
+				valuesCount = 0
 			}
-			values = make([]string, 0)
-			valuesStr = make([]string, 0)
-			valuesCount = 0
 		}
 	}
 	res.Close()
