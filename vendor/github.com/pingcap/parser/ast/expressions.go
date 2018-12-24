@@ -79,9 +79,24 @@ type BetweenExpr struct {
 	Not bool
 }
 
-// Restore implements Recoverable interface.
-func (n *BetweenExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *BetweenExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore BetweenExpr.Expr")
+	}
+	if n.Not {
+		ctx.WriteKeyWord(" NOT BETWEEN ")
+	} else {
+		ctx.WriteKeyWord(" BETWEEN ")
+	}
+	if err := n.Left.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore BetweenExpr.Left")
+	}
+	ctx.WriteKeyWord(" AND ")
+	if err := n.Right.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore BetweenExpr.Right ")
+	}
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -137,9 +152,19 @@ type BinaryOperationExpr struct {
 	R ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *BinaryOperationExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *BinaryOperationExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.L.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred when restore BinaryOperationExpr.L")
+	}
+	if err := n.Op.Restore(ctx.In); err != nil {
+		return errors.Annotate(err, "An error occurred when restore BinaryOperationExpr.Op")
+	}
+	if err := n.R.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred when restore BinaryOperationExpr.R")
+	}
+
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -183,9 +208,17 @@ type WhenClause struct {
 	Result ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *WhenClause) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *WhenClause) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("WHEN ")
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore WhenClauses.Expr")
+	}
+	ctx.WriteKeyWord(" THEN ")
+	if err := n.Result.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore WhenClauses.Result")
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -221,9 +254,30 @@ type CaseExpr struct {
 	ElseClause ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *CaseExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *CaseExpr) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("CASE")
+	if n.Value != nil {
+		ctx.WritePlain(" ")
+		if err := n.Value.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore CaseExpr.Value")
+		}
+	}
+	for _, clause := range n.WhenClauses {
+		ctx.WritePlain(" ")
+		if err := clause.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore CaseExpr.WhenClauses")
+		}
+	}
+	if n.ElseClause != nil {
+		ctx.WriteKeyWord(" ELSE ")
+		if err := n.ElseClause.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore CaseExpr.ElseClause")
+		}
+	}
+	ctx.WriteKeyWord(" END")
+
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -290,8 +344,8 @@ type SubqueryExpr struct {
 	Exists     bool
 }
 
-// Restore implements Recoverable interface.
-func (n *SubqueryExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *SubqueryExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -331,8 +385,8 @@ type CompareSubqueryExpr struct {
 	All bool
 }
 
-// Restore implements Recoverable interface.
-func (n *CompareSubqueryExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *CompareSubqueryExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -369,17 +423,17 @@ type ColumnName struct {
 	Name   model.CIStr
 }
 
-// Restore implements Recoverable interface.
-func (n *ColumnName) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *ColumnName) Restore(ctx *RestoreCtx) error {
 	if n.Schema.O != "" {
-		WriteName(sb, n.Schema.O)
-		sb.WriteString(".")
+		ctx.WriteName(n.Schema.O)
+		ctx.WritePlain(".")
 	}
 	if n.Table.O != "" {
-		WriteName(sb, n.Table.O)
-		sb.WriteString(".")
+		ctx.WriteName(n.Table.O)
+		ctx.WritePlain(".")
 	}
-	WriteName(sb, n.Name.O)
+	ctx.WriteName(n.Name.O)
 	return nil
 }
 
@@ -431,10 +485,9 @@ type ColumnNameExpr struct {
 	Refer *ResultField
 }
 
-// Restore implements Recoverable interface.
-func (n *ColumnNameExpr) Restore(sb *strings.Builder) error {
-	err := n.Name.Restore(sb)
-	if err != nil {
+// Restore implements Node interface.
+func (n *ColumnNameExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Name.Restore(ctx); err != nil {
 		return errors.Trace(err)
 	}
 	return nil
@@ -468,9 +521,17 @@ type DefaultExpr struct {
 	Name *ColumnName
 }
 
-// Restore implements Recoverable interface.
-func (n *DefaultExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *DefaultExpr) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("DEFAULT")
+	if n.Name != nil {
+		ctx.WritePlain("(")
+		if err := n.Name.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore DefaultExpr.Name")
+		}
+		ctx.WritePlain(")")
+	}
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -505,8 +566,8 @@ type ExistsSubqueryExpr struct {
 	Not bool
 }
 
-// Restore implements Recoverable interface.
-func (n *ExistsSubqueryExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *ExistsSubqueryExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -543,8 +604,8 @@ type PatternInExpr struct {
 	Sel ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *PatternInExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *PatternInExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -603,9 +664,16 @@ type IsNullExpr struct {
 	Not bool
 }
 
-// Restore implements Recoverable interface.
-func (n *IsNullExpr) Restore(sb *strings.Builder) error {
-	n.Format(sb)
+// Restore implements Node interface.
+func (n *IsNullExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Trace(err)
+	}
+	if n.Not {
+		ctx.WriteKeyWord(" IS NOT NULL")
+	} else {
+		ctx.WriteKeyWord(" IS NULL")
+	}
 	return nil
 }
 
@@ -645,9 +713,22 @@ type IsTruthExpr struct {
 	True int64
 }
 
-// Restore implements Recoverable interface.
-func (n *IsTruthExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *IsTruthExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Trace(err)
+	}
+	if n.Not {
+		ctx.WriteKeyWord(" IS NOT")
+	} else {
+		ctx.WriteKeyWord(" IS")
+	}
+	if n.True > 0 {
+		ctx.WriteKeyWord(" TRUE")
+	} else {
+		ctx.WriteKeyWord(" FALSE")
+	}
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -696,9 +777,23 @@ type PatternLikeExpr struct {
 	PatTypes []byte
 }
 
-// Restore implements Recoverable interface.
-func (n *PatternLikeExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *PatternLikeExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore PatternLikeExpr.Expr")
+	}
+
+	if n.Not {
+		ctx.WriteKeyWord(" NOT LIKE ")
+	} else {
+		ctx.WriteKeyWord(" LIKE ")
+	}
+
+	if err := n.Pattern.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore PatternLikeExpr.Pattern")
+	}
+
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -754,9 +849,14 @@ type ParenthesesExpr struct {
 	Expr ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *ParenthesesExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *ParenthesesExpr) Restore(ctx *RestoreCtx) error {
+	ctx.WritePlain("(")
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred when restore ParenthesesExpr.Expr")
+	}
+	ctx.WritePlain(")")
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -796,8 +896,8 @@ type PositionExpr struct {
 	Refer *ResultField
 }
 
-// Restore implements Recoverable interface.
-func (n *PositionExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *PositionExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -839,9 +939,23 @@ type PatternRegexpExpr struct {
 	Sexpr *string
 }
 
-// Restore implements Recoverable interface.
-func (n *PatternRegexpExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *PatternRegexpExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore PatternRegexpExpr.Expr")
+	}
+
+	if n.Not {
+		ctx.WriteKeyWord(" NOT REGEXP ")
+	} else {
+		ctx.WriteKeyWord(" REGEXP ")
+	}
+
+	if err := n.Pattern.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore PatternRegexpExpr.Pattern")
+	}
+
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -883,8 +997,8 @@ type RowExpr struct {
 	Values []ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *RowExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *RowExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -919,9 +1033,14 @@ type UnaryOperationExpr struct {
 	V ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *UnaryOperationExpr) Restore(sb *strings.Builder) error {
-	n.Format(sb)
+// Restore implements Node interface.
+func (n *UnaryOperationExpr) Restore(ctx *RestoreCtx) error {
+	if err := n.Op.Restore(ctx.In); err != nil {
+		return errors.Trace(err)
+	}
+	if err := n.V.Restore(ctx); err != nil {
+		return errors.Trace(err)
+	}
 	return nil
 }
 
@@ -953,9 +1072,16 @@ type ValuesExpr struct {
 	Column *ColumnNameExpr
 }
 
-// Restore implements Recoverable interface.
-func (n *ValuesExpr) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *ValuesExpr) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("VALUES")
+	ctx.WritePlain("(")
+	if err := n.Column.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore ValuesExpr.Column")
+	}
+	ctx.WritePlain(")")
+
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -995,8 +1121,8 @@ type VariableExpr struct {
 	Value ExprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *VariableExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *VariableExpr) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -1029,8 +1155,8 @@ type MaxValueExpr struct {
 	exprNode
 }
 
-// Restore implements Recoverable interface.
-func (n *MaxValueExpr) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *MaxValueExpr) Restore(ctx *RestoreCtx) error {
 	panic("Not implemented")
 }
 

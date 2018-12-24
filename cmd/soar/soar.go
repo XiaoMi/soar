@@ -31,7 +31,6 @@ import (
 	"github.com/kr/pretty"
 	"github.com/percona/go-mysql/query"
 	"github.com/ziutek/mymysql/mysql"
-	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 func main() {
@@ -143,19 +142,20 @@ func main() {
 			fmt.Println(ast.Compress(sql) + common.Config.Delimiter)
 			continue
 		case "ast":
-			// SQL 抽象语法树
-			var tree sqlparser.Statement
-			tree, err = sqlparser.Parse(sql)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				_, err = pretty.Println(tree)
-				common.LogIfWarn(err, "")
-			}
+			// print vitess AST data struct
+			ast.PrintPrettyVitessStmtNode(sql)
+			continue
+		case "ast-json":
+			// print vitess SQL AST into json format
+			fmt.Println(ast.VitessStmtNode2JSON(sql))
 			continue
 		case "tiast":
-			// TiDB SQL 抽象语法树
+			// print TiDB AST data struct
 			ast.PrintPrettyStmtNode(sql, "", "")
+			continue
+		case "tiast-json":
+			// print TiDB SQL AST into json format
+			fmt.Println(ast.StmtNode2JSON(sql, "", ""))
 			continue
 		case "tokenize":
 			// SQL 切词
@@ -185,7 +185,7 @@ func main() {
 		if syntaxErr != nil {
 			errContent := fmt.Sprintf("At SQL %d : %v", sqlCounter, syntaxErr)
 			common.Log.Warning(errContent)
-			if common.Config.OnlySyntaxCheck {
+			if common.Config.OnlySyntaxCheck || common.Config.ReportType == "rewrite" {
 				fmt.Println(errContent)
 				os.Exit(1)
 			}
@@ -423,5 +423,10 @@ func main() {
 			common.Log.Error("FormatSuggest json.Marshal Error: %v", err)
 		}
 		return
+	}
+
+	// syntax check verbose mode, add output for success!
+	if common.Config.OnlySyntaxCheck && common.Config.Verbose {
+		fmt.Println("Syntax check OK!")
 	}
 }

@@ -222,24 +222,22 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 	null := res.Result.Map("Null")
 	idxType := res.Result.Map("Index_type")
 	comment := res.Result.Map("Comment")
-	idxComment := res.Result.Map("Index_comment")
 
 	// 获取值
 	for _, row := range res.Rows {
 		value := TableIndexRow{
-			Table:        row.Str(table),
-			NonUnique:    row.Int(unique),
-			KeyName:      row.Str(keyName),
-			SeqInIndex:   row.Int(seq),
-			ColumnName:   row.Str(cName),
-			Collation:    row.Str(collation),
-			Cardinality:  row.Int(cardinality),
-			SubPart:      row.Int(subPart),
-			Packed:       row.Int(packed),
-			Null:         row.Str(null),
-			IndexType:    row.Str(idxType),
-			Comment:      row.Str(comment),
-			IndexComment: row.Str(idxComment),
+			Table:       row.Str(table),
+			NonUnique:   row.Int(unique),
+			KeyName:     row.Str(keyName),
+			SeqInIndex:  row.Int(seq),
+			ColumnName:  row.Str(cName),
+			Collation:   row.Str(collation),
+			Cardinality: row.Int(cardinality),
+			SubPart:     row.Int(subPart),
+			Packed:      row.Int(packed),
+			Null:        row.Str(null),
+			IndexType:   row.Str(idxType),
+			Comment:     row.Str(comment),
 		}
 		tbIndex.IdxRows = append(tbIndex.IdxRows, value)
 	}

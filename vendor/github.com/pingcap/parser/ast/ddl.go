@@ -14,8 +14,6 @@
 package ast
 
 import (
-	"strings"
-
 	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/auth"
 	"github.com/pingcap/parser/model"
@@ -65,15 +63,17 @@ type DatabaseOption struct {
 	Value string
 }
 
-// Restore implements Recoverable interface.
-func (n *DatabaseOption) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *DatabaseOption) Restore(ctx *RestoreCtx) error {
 	switch n.Tp {
 	case DatabaseOptionCharset:
-		sb.WriteString("CHARACTER SET = ")
-		sb.WriteString(n.Value)
+		ctx.WriteKeyWord("CHARACTER SET")
+		ctx.WritePlain(" = ")
+		ctx.WritePlain(n.Value)
 	case DatabaseOptionCollate:
-		sb.WriteString("COLLATE = ")
-		sb.WriteString(n.Value)
+		ctx.WriteKeyWord("COLLATE")
+		ctx.WritePlain(" = ")
+		ctx.WritePlain(n.Value)
 	default:
 		return errors.Errorf("invalid DatabaseOptionType: %d", n.Tp)
 	}
@@ -90,16 +90,16 @@ type CreateDatabaseStmt struct {
 	Options     []*DatabaseOption
 }
 
-// Restore implements Recoverable interface.
-func (n *CreateDatabaseStmt) Restore(sb *strings.Builder) error {
-	sb.WriteString("CREATE DATABASE ")
+// Restore implements Node interface.
+func (n *CreateDatabaseStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("CREATE DATABASE ")
 	if n.IfNotExists {
-		sb.WriteString("IF NOT EXISTS ")
+		ctx.WriteKeyWord("IF NOT EXISTS ")
 	}
-	WriteName(sb, n.Name)
+	ctx.WriteName(n.Name)
 	for _, option := range n.Options {
-		sb.WriteString(" ")
-		err := option.Restore(sb)
+		ctx.WritePlain(" ")
+		err := option.Restore(ctx)
 		if err != nil {
 			return errors.Trace(err)
 		}
@@ -126,13 +126,13 @@ type DropDatabaseStmt struct {
 	Name     string
 }
 
-// Restore implements Recoverable interface.
-func (n *DropDatabaseStmt) Restore(sb *strings.Builder) error {
-	sb.WriteString("DROP DATABASE ")
+// Restore implements Node interface.
+func (n *DropDatabaseStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("DROP DATABASE ")
 	if n.IfExists {
-		sb.WriteString("IF EXISTS ")
+		ctx.WriteKeyWord("IF EXISTS ")
 	}
-	WriteName(sb, n.Name)
+	ctx.WriteName(n.Name)
 	return nil
 }
 
@@ -154,8 +154,8 @@ type IndexColName struct {
 	Length int
 }
 
-// Restore implements Recoverable interface.
-func (n *IndexColName) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *IndexColName) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -185,8 +185,8 @@ type ReferenceDef struct {
 	OnUpdate      *OnUpdateOpt
 }
 
-// Restore implements Recoverable interface.
-func (n *ReferenceDef) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *ReferenceDef) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -255,8 +255,8 @@ type OnDeleteOpt struct {
 	ReferOpt ReferOptionType
 }
 
-// Restore implements Recoverable interface.
-func (n *OnDeleteOpt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *OnDeleteOpt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -276,8 +276,8 @@ type OnUpdateOpt struct {
 	ReferOpt ReferOptionType
 }
 
-// Restore implements Recoverable interface.
-func (n *OnUpdateOpt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *OnUpdateOpt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -325,8 +325,8 @@ type ColumnOption struct {
 	Refer *ReferenceDef
 }
 
-// Restore implements Recoverable interface.
-func (n *ColumnOption) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *ColumnOption) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -361,9 +361,32 @@ type IndexOption struct {
 	Comment      string
 }
 
-// Restore implements Recoverable interface.
-func (n *IndexOption) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *IndexOption) Restore(ctx *RestoreCtx) error {
+	hasPrevOption := false
+	if n.KeyBlockSize > 0 {
+		ctx.WriteKeyWord("KEY_BLOCK_SIZE")
+		ctx.WritePlainf("=%d", n.KeyBlockSize)
+		hasPrevOption = true
+	}
+
+	if n.Tp != model.IndexTypeInvalid {
+		if hasPrevOption {
+			ctx.WritePlain(" ")
+		}
+		ctx.WriteKeyWord("USING ")
+		ctx.WritePlain(n.Tp.String())
+		hasPrevOption = true
+	}
+
+	if n.Comment != "" {
+		if hasPrevOption {
+			ctx.WritePlain(" ")
+		}
+		ctx.WriteKeyWord("COMMENT ")
+		ctx.WriteString(n.Comment)
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -406,8 +429,8 @@ type Constraint struct {
 	Option *IndexOption // Index Options
 }
 
-// Restore implements Recoverable interface.
-func (n *Constraint) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *Constraint) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -451,8 +474,8 @@ type ColumnDef struct {
 	Options []*ColumnOption
 }
 
-// Restore implements Recoverable interface.
-func (n *ColumnDef) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *ColumnDef) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -494,8 +517,8 @@ type CreateTableStmt struct {
 	Select      ResultSetNode
 }
 
-// Restore implements Recoverable interface.
-func (n *CreateTableStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *CreateTableStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -553,8 +576,8 @@ type DropTableStmt struct {
 	IsView   bool
 }
 
-// Restore implements Recoverable interface.
-func (n *DropTableStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *DropTableStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -588,8 +611,8 @@ type RenameTableStmt struct {
 	TableToTables []*TableToTable
 }
 
-// Restore implements Recoverable interface.
-func (n *RenameTableStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *RenameTableStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -629,8 +652,8 @@ type TableToTable struct {
 	NewTable *TableName
 }
 
-// Restore implements Recoverable interface.
-func (n *TableToTable) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *TableToTable) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -669,8 +692,8 @@ type CreateViewStmt struct {
 	CheckOption model.ViewCheckOption
 }
 
-// Restore implements Recoverable interface.
-func (n *CreateViewStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *CreateViewStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -706,8 +729,8 @@ type CreateIndexStmt struct {
 	IndexOption   *IndexOption
 }
 
-// Restore implements Recoverable interface.
-func (n *CreateIndexStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *CreateIndexStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -750,9 +773,20 @@ type DropIndexStmt struct {
 	Table     *TableName
 }
 
-// Restore implements Recoverable interface.
-func (n *DropIndexStmt) Restore(sb *strings.Builder) error {
-	return errors.New("Not implemented")
+// Restore implements Node interface.
+func (n *DropIndexStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("DROP INDEX ")
+	if n.IfExists {
+		ctx.WriteKeyWord("IF EXISTS ")
+	}
+	ctx.WriteName(n.IndexName)
+	ctx.WriteKeyWord(" ON ")
+
+	if err := n.Table.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while add index")
+	}
+
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -843,8 +877,8 @@ type ColumnPosition struct {
 	RelativeColumn *ColumnName
 }
 
-// Restore implements Recoverable interface.
-func (n *ColumnPosition) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *ColumnPosition) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -925,8 +959,8 @@ type AlterTableSpec struct {
 	Num             uint64
 }
 
-// Restore implements Recoverable interface.
-func (n *AlterTableSpec) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -984,8 +1018,8 @@ type AlterTableStmt struct {
 	Specs []*AlterTableSpec
 }
 
-// Restore implements Recoverable interface.
-func (n *AlterTableStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *AlterTableStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 
@@ -1019,8 +1053,8 @@ type TruncateTableStmt struct {
 	Table *TableName
 }
 
-// Restore implements Recoverable interface.
-func (n *TruncateTableStmt) Restore(sb *strings.Builder) error {
+// Restore implements Node interface.
+func (n *TruncateTableStmt) Restore(ctx *RestoreCtx) error {
 	return errors.New("Not implemented")
 }
 

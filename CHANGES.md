@@ -1,9 +1,11 @@
 # CHANGELOG
 
 ## 2018-12
+
 - DOING: english translation
 
 ## 2018-11
+
 - add all third-party lib into vendor
 - support `-report-type chardet`
 - add more heuristic rules: TBL.008, KEY.010, ARG.012, KWR.004
@@ -21,33 +23,36 @@
 - fix #112 multi-line comment will cause line counter error, when -report-type=lint
 - fix #110 remove bom before auditing
 - fix #104 case insensitive regex @ CLA.009
-- fix #87 RuleImplicitConversion value type mistach check bug
+- fix #87 RuleImplicitConversion value type mismatch check bug
 - fix #38 always true where condition check
 - abandon stdin terminal interactive mod, which may seems like hangup
 
 ## 2018-10
-- Fix SplitStatement mulitstatement eof bug #66
+
+- Fix SplitStatement multistatement eof bug #66
 - Fix pretty func hangup issue #47
 - Fix some foolish code spell error
 - Use travis for CI
-- Fix Go 1.8 defapth GOPATH compatible issue BUG #5
+- Fix Go 1.8 default GOPATH compatible issue BUG #5
 - 2018-10-20 开源先锋日(OSCAR)对外正式开源发布代码
 
 ## 2018-09
+
 - 修复多个启发式建议不准确BUG，优化部分建议文案使得建议更清晰
-- 基于TiDB Parser完善多个DDL类型语句的建议
+- 基于 TiDB Parser 完善多个 DDL 类型语句的建议
 - 新增lint report-type类型，支持Vim Plugin优化建议输出
 - 更新整理项目文档，开源准备
 - 2018-09-21 Gdevops SOAR首次对外进行技术分享宣传
 
 ## 2018-08
-- 利用docker临时容器进行daily测试
+
+- 利用 docker 临时容器进行 daily 测试
 - 添加main_test全功能回归测试
 - 修复在测试中发现的问题
-- mymysql合并MySQL8.0相关PR，修改vendor依赖
+- mymysql 合并 MySQL8.0 相关PR，修改vendor依赖
 - 改善HeuristicRule中的文案
 - 持续集成Vitess Parser的改进
-- NewQuery4Audit结构体中引入TiDB Parser
+- NewQuery4Audit 结构体中引入 TiDB Parser
 - 通过TiAST完成大量与 DDL 相关的TODO
 - 修改heuristic rules检查的返回值，提升拓展性
 - 建议中引入Position，用于表示建议产生于SQL的位置
@@ -58,22 +63,25 @@
 - 优化 doc 文档
 
 ## 2018-07
+
 - 补充文档，添加项目LOGO
 - 改善代码质量提升测试覆盖度
 - mymysql升级，支持MySQL 8.0
 - 提供remove-comment小工具
 - 提供索引重复检查小工具
-- HeuristicRule新增RuleSpaceAfterDot
+- HeuristicRule 新增 RuleSpaceAfterDot
 - 支持字符集和Collation不相同时的隐式数据类型转换的检查
 
 ## 2018-06
+
 - 支持更多的SQL Rewrite规则
 - 添加SQL执行超时限制
 - 索引优化建议支持对约束的检查
-- 修复数据采样中null值处理不正确的问题
-- Explain支持last_query_cost
+- 修复数据采样中 NULL 值处理不正确的问题
+- Explain 支持 last_query_cost
 
 ## 2018-05
+
 - 添加数据采样功能
 - 添加语句执行安全检查
 - 支持DDL语法检查
@@ -84,6 +92,7 @@
 - 支持SQL Pretty输出
 
 ## 2018-04
+
 - 支持语法检查
 - 支持测试环境
 - 支持MySQL原数据的获取
@@ -93,7 +102,8 @@
 - 引入配置文件
 
 ## 2018-03
+
 - 基本架构设计
 - 添加大量底层函数用于处理AST
-- 添加Insert、Delete、Update转写成Select的基本函数
+- 添加Insert、Delete、Update 转写成 Select 的基本函数
 - 支持MySQL Explain信息输出
