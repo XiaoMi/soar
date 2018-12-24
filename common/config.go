@@ -289,9 +289,10 @@ func parseDSN(odbc string, d *dsn) *dsn {
 		userInfo = res[1]
 		hostInfo = res[2]
 		query = res[4]
-	} else {
+	}  else if res := regexp.MustCompile(`^(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 3 {
 		// hostInfo
-		hostInfo = odbc
+		hostInfo = res[1]
+		query = res[3]
 	}
 
 	// 解析用户信息
