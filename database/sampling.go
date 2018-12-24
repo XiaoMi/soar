@@ -140,17 +140,17 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 					values = append(values, fmt.Sprintf(`unhex("%s")`, fmt.Sprintf("%x", val)))
 				}
 			}
-			valuesStr = append(valuesStr, "("+strings.Join(values, `,`)+")")
-			valuesCount++
-			if maxValuesCount <= valuesCount {
-				err = db.doSampling(table, columnsStr, strings.Join(valuesStr, `,`))
-				if err != nil {
-					break
-				}
-				values = make([]string, 0)
-				valuesStr = make([]string, 0)
-				valuesCount = 0
+		}
+		valuesStr = append(valuesStr, "("+strings.Join(values, `,`)+")")
+		valuesCount++
+		if maxValuesCount <= valuesCount {
+			err = db.doSampling(table, columnsStr, strings.Join(valuesStr, `,`))
+			if err != nil {
+				break
 			}
+			values = make([]string, 0)
+			valuesStr = make([]string, 0)
+			valuesCount = 0
 		}
 	}
 	res.Close()
