@@ -82,7 +82,9 @@ func TestShowCreateTable(t *testing.T) {
 	connTest.Database = "sakila"
 	tables := []string{
 		"film",
+		"category",
 		"customer_list",
+		"inventory",
 	}
 	err := common.GoldenDiff(func() {
 		for _, table := range tables {

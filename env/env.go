@@ -453,7 +453,7 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 	res, err := ve.Query(ddl)
 	if err != nil {
 		// 有可能是用户新建表，因此线上环境查不到
-		common.Log.Error("createTable, %s Error : %v", tbName, err)
+		common.Log.Error("createTable: %s Error : %v", tbName, err)
 		return err
 	}
 	res.Rows.Close()
@@ -461,13 +461,9 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 	// 泵取数据
 	if common.Config.Sampling {
 		common.Log.Debug("createTable, Start Sampling data from %s.%s to %s.%s ...", dbName, tbName, ve.DBRef[dbName], tbName)
-		err := ve.SamplingData(rEnv, tbName)
-		if err != nil {
-			common.Log.Error(" (ve VirtualEnv) createTable SamplingData Error: %v", err)
-			return err
-		}
+		err = ve.SamplingData(rEnv, dbName, tbName)
 	}
-	return nil
+	return err
 }
 
 // GenTableColumns 为 Rewrite 提供的结构体初始化
