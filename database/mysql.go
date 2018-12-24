@@ -23,6 +23,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/XiaoMi/soar/common"
 
@@ -286,4 +287,18 @@ func (db *Connector) dangerousQuery(query string) bool {
 	}
 
 	return false
+}
+
+// Sandard MySQL datetime format
+const TimeFormat = "2006-01-02 15:04:05.000000000"
+
+// TimeString returns t as string in MySQL format Converts time.Time zero to MySQL zero.
+func TimeString(t time.Time) string {
+	if t.IsZero() {
+		return "0000-00-00 00:00:00"
+	}
+	if t.Nanosecond() == 0 {
+		return t.Format(TimeFormat[:19])
+	}
+	return t.Format(TimeFormat)
 }

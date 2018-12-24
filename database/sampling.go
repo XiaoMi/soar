@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/XiaoMi/soar/common"
-	"github.com/ziutek/mymysql/mysql"
 )
 
 /*--------------------
@@ -135,7 +134,7 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 				case "TIMESTAMP", "DATETIME":
 					t, err := time.Parse(time.RFC3339, string(val))
 					common.LogIfWarn(err, "")
-					values = append(values, fmt.Sprintf(`"%s"`, mysql.TimeString(t)))
+					values = append(values, fmt.Sprintf(`"%s"`, TimeString(t)))
 				default:
 					values = append(values, fmt.Sprintf(`unhex("%s")`, fmt.Sprintf("%x", val)))
 				}
