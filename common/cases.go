@@ -141,7 +141,7 @@ func init() {
 
 		// Delayed Join
 		// https://www.percona.com/blog/2007/04/06/using-delayed-join-to-optimize-count-and-limit-queries/
-		`SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by ts desc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;`,
+		`SELECT city FROM( SELECT city_id FROM city WHERE city = "A Corua (La Corua)" ORDER BY last_update DESC LIMIT 50, 10) I JOIN city ON (I.city_id = city.city_id) JOIN country ON (country.country_id = city.country_id) ORDER BY city DESC;`,
 
 		// DELETE
 		"DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;",
@@ -196,7 +196,7 @@ func init() {
 		"alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);",
 
 		// https://github.com/XiaoMi/soar/issues/47
-		`SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d');`,
+		`SELECT	DATE_FORMAT(t.last_update, '%Y-%m-%d'),	COUNT(DISTINCT (t.city))	FROM city t WHERE t.last_update > '2018-10-22 00:00:00'	AND t.city LIKE '%Chrome%'	AND t.city = 'eip' GROUP BY DATE_FORMAT(t.last_update, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.last_update, '%Y-%m-%d');`,
 		// https://github.com/XiaoMi/soar/issues/17
 		"create table hello.t (id int unsigned);",
 
