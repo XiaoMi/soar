@@ -14,5 +14,8 @@ jobs:
             make parser
             diff -u parser.go.committed parser.go
       - run:
+          name: "Check code format"
+          command: make fmt
+      - run:
           name: "Build & Test"
           command: make test
