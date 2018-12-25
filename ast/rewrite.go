@@ -40,180 +40,184 @@ type Rule struct {
 }
 
 // RewriteRules SQL重写规则，注意这个规则是有序的，先后顺序不能乱
-var RewriteRules = []Rule{
-	{
-		Name:        "dml2select",
-		Description: "将数据库更新请求转换为只读查询请求，便于执行EXPLAIN",
-		Original:    "DELETE FROM film WHERE length > 100",
-		Suggest:     "select * from film where length > 100",
-		Func:        (*Rewrite).RewriteDML2Select,
-	},
-	{
-		Name:        "star2columns",
-		Description: "为SELECT *补全表的列信息",
-		Original:    "SELECT * FROM film",
-		Suggest:     "select film.film_id, film.title from film",
-		Func:        (*Rewrite).RewriteStar2Columns,
-	},
-	{
-		Name:        "insertcolumns",
-		Description: "为INSERT补全表的列信息",
-		Original:    "insert into film values(1,2,3,4,5)",
-		Suggest:     "insert into film(film_id, title, description, release_year, language_id) values (1, 2, 3, 4, 5)",
-		Func:        (*Rewrite).RewriteInsertColumns,
-	},
-	{
-		Name:        "having",
-		Description: "将查询的 HAVING 子句改写为 WHERE 中的查询条件",
-		Original:    "SELECT state, COUNT(*) FROM Drivers GROUP BY state HAVING state IN ('GA', 'TX') ORDER BY state",
-		Suggest:     "select state, COUNT(*) from Drivers where state in ('GA', 'TX') group by state order by state asc",
-		Func:        (*Rewrite).RewriteHaving,
-	},
-	{
-		Name:        "orderbynull",
-		Description: "如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 ORDER BY NULL",
-		Original:    "SELECT sum(col1) FROM tbl GROUP BY col",
-		Suggest:     "select sum(col1) from tbl group by col order by null",
-		Func:        (*Rewrite).RewriteAddOrderByNull,
-	},
-	{
-		Name:        "unionall",
-		Description: "可以接受重复的时间，使用 UNION ALL 替代 UNION 以提高查询效率",
-		Original:    "select country_id from city union select country_id from country",
-		Suggest:     "select country_id from city union all select country_id from country",
-		Func:        (*Rewrite).RewriteUnionAll,
-	},
-	{
-		Name:        "or2in",
-		Description: "将同一列不同条件的 OR 查询转写为 IN 查询",
-		Original:    "select country_id from city where col1 = 1 or (col2 = 1 or col2 = 2 ) or col1 = 3;",
-		Suggest:     "select country_id from city where (col2 in (1, 2)) or col1 in (1, 3);",
-		Func:        (*Rewrite).RewriteOr2In,
-	},
-	{
-		Name:        "innull",
-		Description: "如果 IN 条件中可能有 NULL 值而又想匹配 NULL 值时，建议添加OR col IS NULL",
-		Original:    "暂不支持",
-		Suggest:     "暂不支持",
-		Func:        (*Rewrite).RewriteInNull,
-	},
-	// 把所有跟 or 相关的重写完之后才进行 or 转 union 的重写
-	{
-		Name:        "or2union",
-		Description: "将不同列的 OR 查询转为 UNION 查询，建议结合 unionall 重写策略一起使用",
-		Original:    "暂不支持",
-		Suggest:     "暂不支持",
-		Func:        (*Rewrite).RewriteOr2Union,
-	},
-	{
-		Name:        "dmlorderby",
-		Description: "删除 DML 更新操作中无意义的 ORDER BY",
-		Original:    "DELETE FROM tbl WHERE col1=1 ORDER BY col",
-		Suggest:     "delete from tbl where col1 = 1",
-		Func:        (*Rewrite).RewriteRemoveDMLOrderBy,
-	},
-	/*
+var RewriteRules []Rule
+
+func init() {
+	RewriteRules = []Rule{
 		{
-			Name:        "groupbyconst",
-			Description: "删除无意义的GROUP BY常量",
-			Original:    "SELECT sum(col1) FROM tbl GROUP BY 1;",
-			Suggest:     "select sum(col1) from tbl",
-			Func:        (*Rewrite).RewriteGroupByConst,
+			Name:        "dml2select",
+			Description: "将数据库更新请求转换为只读查询请求，便于执行EXPLAIN",
+			Original:    "DELETE FROM film WHERE length > 100",
+			Suggest:     "select * from film where length > 100",
+			Func:        (*Rewrite).RewriteDML2Select,
 		},
-	*/
-	{
-		Name:        "sub2join",
-		Description: "将子查询转换为JOIN查询",
-		Original:    "暂不支持",
-		Suggest:     "暂不支持",
-		Func:        (*Rewrite).RewriteSubQuery2Join,
-	},
-	{
-		Name:        "join2sub",
-		Description: "将JOIN查询转换为子查询",
-		Original:    "暂不支持",
-		Suggest:     "暂不支持",
-		Func:        (*Rewrite).RewriteJoin2SubQuery,
-	},
-	{
-		Name:        "distinctstar",
-		Description: "DISTINCT *对有主键的表没有意义，可以将DISTINCT删掉",
-		Original:    "SELECT DISTINCT * FROM film;",
-		Suggest:     "SELECT * FROM film",
-		Func:        (*Rewrite).RewriteDistinctStar,
-	},
-	{
-		Name:        "standard",
-		Description: "SQL标准化，如：关键字转换为小写",
-		Original:    "SELECT sum(col1) FROM tbl GROUP BY 1;",
-		Suggest:     "select sum(col1) from tbl group by 1",
-		Func:        (*Rewrite).RewriteStandard,
-	},
-	{
-		Name:        "mergealter",
-		Description: "合并同一张表的多条ALTER语句",
-		Original:    "ALTER TABLE t2 DROP COLUMN c;ALTER TABLE t2 DROP COLUMN d;",
-		Suggest:     "ALTER TABLE t2 DROP COLUMN c, DROP COLUMN d;",
-	},
-	{
-		Name:        "alwaystrue",
-		Description: "删除无用的恒真判断条件",
-		Original:    "SELECT count(col) FROM tbl where 'a'= 'a' or ('b' = 'b' and a = 'b');",
-		Suggest:     "select count(col) from tbl where (a = 'b');",
-		Func:        (*Rewrite).RewriteAlwaysTrue,
-	},
-	{
-		Name:        "countstar",
-		Description: "不建议使用COUNT(col)或COUNT(常量)，建议改写为COUNT(*)",
-		Original:    "SELECT count(col) FROM tbl GROUP BY 1;",
-		Suggest:     "SELECT count(*) FROM tbl GROUP BY 1;",
-		Func:        (*Rewrite).RewriteCountStar,
-	},
-	{
-		Name:        "innodb",
-		Description: "建表时建议使用InnoDB引擎，非 InnoDB 引擎表自动转 InnoDB",
-		Original:    "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT);",
-		Suggest:     "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB;",
-		Func:        (*Rewrite).RewriteInnoDB,
-	},
-	{
-		Name:        "autoincrement",
-		Description: "将autoincrement初始化为1",
-		Original:    "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB AUTO_INCREMENT=123802;",
-		Suggest:     "create table t1(id bigint(20) not null auto_increment) ENGINE=InnoDB auto_increment=1;",
-		Func:        (*Rewrite).RewriteAutoIncrement,
-	},
-	{
-		Name:        "intwidth",
-		Description: "整型数据类型修改默认显示宽度",
-		Original:    "create table t1 (id int(20) not null auto_increment) ENGINE=InnoDB;",
-		Suggest:     "create table t1 (id int(10) not null auto_increment) ENGINE=InnoDB;",
-		Func:        (*Rewrite).RewriteIntWidth,
-	},
-	{
-		Name:        "truncate",
-		Description: "不带 WHERE 条件的 DELETE 操作建议修改为 TRUNCATE",
-		Original:    "DELETE FROM tbl",
-		Suggest:     "truncate table tbl",
-		Func:        (*Rewrite).RewriteTruncate,
-	},
-	{
-		Name:        "rmparenthesis",
-		Description: "去除没有意义的括号",
-		Original:    "select col from table where (col = 1);",
-		Suggest:     "select col from table where col = 1;",
-		Func:        (*Rewrite).RewriteRmParenthesis,
-	},
-	// delimiter要放在最后，不然补不上
-	{
-		Name:        "delimiter",
-		Description: "补全DELIMITER",
-		Original:    "use sakila",
-		Suggest:     "use sakila;",
-		Func:        (*Rewrite).RewriteDelimiter,
-	},
-	// TODO in to exists
-	// TODO exists to in
+		{
+			Name:        "star2columns",
+			Description: "为SELECT *补全表的列信息",
+			Original:    "SELECT * FROM film",
+			Suggest:     "select film.film_id, film.title from film",
+			Func:        (*Rewrite).RewriteStar2Columns,
+		},
+		{
+			Name:        "insertcolumns",
+			Description: "为INSERT补全表的列信息",
+			Original:    "insert into film values(1,2,3,4,5)",
+			Suggest:     "insert into film(film_id, title, description, release_year, language_id) values (1, 2, 3, 4, 5)",
+			Func:        (*Rewrite).RewriteInsertColumns,
+		},
+		{
+			Name:        "having",
+			Description: "将查询的 HAVING 子句改写为 WHERE 中的查询条件",
+			Original:    "SELECT state, COUNT(*) FROM Drivers GROUP BY state HAVING state IN ('GA', 'TX') ORDER BY state",
+			Suggest:     "select state, COUNT(*) from Drivers where state in ('GA', 'TX') group by state order by state asc",
+			Func:        (*Rewrite).RewriteHaving,
+		},
+		{
+			Name:        "orderbynull",
+			Description: "如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 ORDER BY NULL",
+			Original:    "SELECT sum(col1) FROM tbl GROUP BY col",
+			Suggest:     "select sum(col1) from tbl group by col order by null",
+			Func:        (*Rewrite).RewriteAddOrderByNull,
+		},
+		{
+			Name:        "unionall",
+			Description: "可以接受重复的时间，使用 UNION ALL 替代 UNION 以提高查询效率",
+			Original:    "select country_id from city union select country_id from country",
+			Suggest:     "select country_id from city union all select country_id from country",
+			Func:        (*Rewrite).RewriteUnionAll,
+		},
+		{
+			Name:        "or2in",
+			Description: "将同一列不同条件的 OR 查询转写为 IN 查询",
+			Original:    "select country_id from city where col1 = 1 or (col2 = 1 or col2 = 2 ) or col1 = 3;",
+			Suggest:     "select country_id from city where (col2 in (1, 2)) or col1 in (1, 3);",
+			Func:        (*Rewrite).RewriteOr2In,
+		},
+		{
+			Name:        "innull",
+			Description: "如果 IN 条件中可能有 NULL 值而又想匹配 NULL 值时，建议添加OR col IS NULL",
+			Original:    "暂不支持",
+			Suggest:     "暂不支持",
+			Func:        (*Rewrite).RewriteInNull,
+		},
+		// 把所有跟 or 相关的重写完之后才进行 or 转 union 的重写
+		{
+			Name:        "or2union",
+			Description: "将不同列的 OR 查询转为 UNION 查询，建议结合 unionall 重写策略一起使用",
+			Original:    "暂不支持",
+			Suggest:     "暂不支持",
+			Func:        (*Rewrite).RewriteOr2Union,
+		},
+		{
+			Name:        "dmlorderby",
+			Description: "删除 DML 更新操作中无意义的 ORDER BY",
+			Original:    "DELETE FROM tbl WHERE col1=1 ORDER BY col",
+			Suggest:     "delete from tbl where col1 = 1",
+			Func:        (*Rewrite).RewriteRemoveDMLOrderBy,
+		},
+		/*
+			{
+				Name:        "groupbyconst",
+				Description: "删除无意义的GROUP BY常量",
+				Original:    "SELECT sum(col1) FROM tbl GROUP BY 1;",
+				Suggest:     "select sum(col1) from tbl",
+				Func:        (*Rewrite).RewriteGroupByConst,
+			},
+		*/
+		{
+			Name:        "sub2join",
+			Description: "将子查询转换为JOIN查询",
+			Original:    "暂不支持",
+			Suggest:     "暂不支持",
+			Func:        (*Rewrite).RewriteSubQuery2Join,
+		},
+		{
+			Name:        "join2sub",
+			Description: "将JOIN查询转换为子查询",
+			Original:    "暂不支持",
+			Suggest:     "暂不支持",
+			Func:        (*Rewrite).RewriteJoin2SubQuery,
+		},
+		{
+			Name:        "distinctstar",
+			Description: "DISTINCT *对有主键的表没有意义，可以将DISTINCT删掉",
+			Original:    "SELECT DISTINCT * FROM film;",
+			Suggest:     "SELECT * FROM film",
+			Func:        (*Rewrite).RewriteDistinctStar,
+		},
+		{
+			Name:        "standard",
+			Description: "SQL标准化，如：关键字转换为小写",
+			Original:    "SELECT sum(col1) FROM tbl GROUP BY 1;",
+			Suggest:     "select sum(col1) from tbl group by 1",
+			Func:        (*Rewrite).RewriteStandard,
+		},
+		{
+			Name:        "mergealter",
+			Description: "合并同一张表的多条ALTER语句",
+			Original:    "ALTER TABLE t2 DROP COLUMN c;ALTER TABLE t2 DROP COLUMN d;",
+			Suggest:     "ALTER TABLE t2 DROP COLUMN c, DROP COLUMN d;",
+		},
+		{
+			Name:        "alwaystrue",
+			Description: "删除无用的恒真判断条件",
+			Original:    "SELECT count(col) FROM tbl where 'a'= 'a' or ('b' = 'b' and a = 'b');",
+			Suggest:     "select count(col) from tbl where (a = 'b');",
+			Func:        (*Rewrite).RewriteAlwaysTrue,
+		},
+		{
+			Name:        "countstar",
+			Description: "不建议使用COUNT(col)或COUNT(常量)，建议改写为COUNT(*)",
+			Original:    "SELECT count(col) FROM tbl GROUP BY 1;",
+			Suggest:     "SELECT count(*) FROM tbl GROUP BY 1;",
+			Func:        (*Rewrite).RewriteCountStar,
+		},
+		{
+			Name:        "innodb",
+			Description: "建表时建议使用InnoDB引擎，非 InnoDB 引擎表自动转 InnoDB",
+			Original:    "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT);",
+			Suggest:     "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB;",
+			Func:        (*Rewrite).RewriteInnoDB,
+		},
+		{
+			Name:        "autoincrement",
+			Description: "将autoincrement初始化为1",
+			Original:    "CREATE TABLE t1(id bigint(20) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB AUTO_INCREMENT=123802;",
+			Suggest:     "create table t1(id bigint(20) not null auto_increment) ENGINE=InnoDB auto_increment=1;",
+			Func:        (*Rewrite).RewriteAutoIncrement,
+		},
+		{
+			Name:        "intwidth",
+			Description: "整型数据类型修改默认显示宽度",
+			Original:    "create table t1 (id int(20) not null auto_increment) ENGINE=InnoDB;",
+			Suggest:     "create table t1 (id int(10) not null auto_increment) ENGINE=InnoDB;",
+			Func:        (*Rewrite).RewriteIntWidth,
+		},
+		{
+			Name:        "truncate",
+			Description: "不带 WHERE 条件的 DELETE 操作建议修改为 TRUNCATE",
+			Original:    "DELETE FROM tbl",
+			Suggest:     "truncate table tbl",
+			Func:        (*Rewrite).RewriteTruncate,
+		},
+		{
+			Name:        "rmparenthesis",
+			Description: "去除没有意义的括号",
+			Original:    "select col from table where (col = 1);",
+			Suggest:     "select col from table where col = 1;",
+			Func:        (*Rewrite).RewriteRmParenthesis,
+		},
+		// delimiter要放在最后，不然补不上
+		{
+			Name:        "delimiter",
+			Description: "补全DELIMITER",
+			Original:    "use sakila",
+			Suggest:     "use sakila;",
+			Func:        (*Rewrite).RewriteDelimiter,
+		},
+		// TODO in to exists
+		// TODO exists to in
+	}
 }
 
 // ListRewriteRules 打印SQL重写规则
@@ -842,7 +846,7 @@ func (rw *Rewrite) RewriteAddOrderByNull() *Rewrite {
 }
 
 // RewriteOr2Union or2union: 将 OR 查询转写为 UNION ALL TODO: 暂无对应 HeuristicRules
-// https://sqlperformance.com/2014/09/sql-plan/rewriting-queries-improve-performance
+// TODO: https://sqlperformance.com/2014/09/sql-plan/rewriting-queries-improve-performance
 func (rw *Rewrite) RewriteOr2Union() *Rewrite {
 	return rw
 }

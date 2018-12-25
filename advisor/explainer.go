@@ -32,20 +32,13 @@ var explainRules map[string]Rule
 // [table_name]"suggest text"
 var tablesSuggests map[string][]string
 
-/*
-var explainIgnoreTables = []string{
-	"dual",
-	"",
-}
-*/
-
 // explain建议的形式
 // Item: EXP.XXX
 // Severity: L[0-8]
 // Summary: full table scan, not use index, full index scan...
 // Content: XX TABLE xxx
 
-//
+// checkExplainSelectType
 func checkExplainSelectType(exp *database.ExplainInfo) {
 	// 判断是否跳过不检查
 	if len(common.Config.ExplainWarnSelectType) == 1 {
@@ -70,7 +63,7 @@ func checkExplainSelectType(exp *database.ExplainInfo) {
 	}
 }
 
-// 用户可以设置AccessType的建议级别，匹配到的查询会给出建议
+// checkExplainAccessType 用户可以设置AccessType的建议级别，匹配到的查询会给出建议
 func checkExplainAccessType(exp *database.ExplainInfo) {
 	// 判断是否跳过不检查
 	if len(common.Config.ExplainWarnAccessType) == 1 {
@@ -95,43 +88,28 @@ func checkExplainAccessType(exp *database.ExplainInfo) {
 	}
 }
 
-// TODO:
 /*
+// TODO:
 func checkExplainPossibleKeys(exp *database.ExplainInfo) {
-	// 判断是否跳过不检查
-	if common.Config.ExplainMinPossibleKeys == 0 {
-		return
-	}
-
-	rows := exp.ExplainRows
-	if exp.ExplainFormat == database.JSONFormatExplain {
-		// JSON形式遍历分析不方便，转成Row格式统一处理
-		rows = database.ConvertExplainJSON2Row(exp.ExplainJSON)
-	}
-	for _, row := range rows {
-		if len(row.PossibleKeys) < common.Config.ExplainMinPossibleKeys {
-			tablesSuggests[row.TableName] = append(tablesSuggests[row.TableName], fmt.Sprintf("PossibleKeys:%d < %d",
-				len(row.PossibleKeys), common.Config.ExplainMinPossibleKeys))
-		}
-	}
 }
-*/
 
-// TODO:
-/*
 func checkExplainKeyLen(exp *database.ExplainInfo) {
 }
-*/
 
-// TODO:
-/*
 func checkExplainKey(exp *database.ExplainInfo) {
-	   // 小于最小使用试用key数量
-	   //return intval($explainResult) < intval($userCond);
-	   //explain-min-keys int
+	// 小于最小使用试用key数量
+	//return intval($explainResult) < intval($userCond);
+	//explain-min-keys int
+}
+
+func checkExplainExtra(exp *database.ExplainInfo) {
+	// 包含用户配置的逗号分隔关键词之一则提醒
+	// return self::contains($explainResult, $userCond);
+	// explain-warn-extra []string
 }
 */
 
+// checkExplainRef ...
 func checkExplainRef(exp *database.ExplainInfo) {
 	rows := exp.ExplainRows
 	if exp.ExplainFormat == database.JSONFormatExplain {
@@ -148,6 +126,7 @@ func checkExplainRef(exp *database.ExplainInfo) {
 	}
 }
 
+// checkExplainRows ...
 func checkExplainRows(exp *database.ExplainInfo) {
 	// 判断是否跳过不检查
 	if common.Config.ExplainMaxRows <= 0 {
@@ -167,15 +146,7 @@ func checkExplainRows(exp *database.ExplainInfo) {
 	}
 }
 
-// TODO:
-/*
-func checkExplainExtra(exp *database.ExplainInfo) {
-	   // 包含用户配置的逗号分隔关键词之一则提醒
-	   // return self::contains($explainResult, $userCond);
-	   // explain-warn-extra []string
-}
-*/
-
+// checkExplainFiltered ...
 func checkExplainFiltered(exp *database.ExplainInfo) {
 	// 判断是否跳过不检查
 	if common.Config.ExplainMaxFiltered <= 0.001 {
@@ -235,30 +206,7 @@ func ExplainAdvisor(exp *database.ExplainInfo) map[string]Rule {
 			Func:     (*Query4Audit).RuleOK,
 		}
 	}
-	/*
-		for t, s := range tablesSuggests {
-			// 检查explain对应的表是否需要跳过，如dual,空表等
-			ig := false
-			for _, ti := range explainIgnoreTables {
-				if ti == t {
-					ig = true
-				}
-			}
-			if ig {
-				continue
-			}
-			ruleId := fmt.Sprintf("EXP.%03d", explainRuleId+1)
-			explainRuleId = explainRuleId + 1
-			explainRules[ruleId] = Rule{
-				Item:     ruleId,
-				Severity: "L0",
-				Summary:  fmt.Sprintf("表 `%s` 查询效率不高", t),
-				Content:  fmt.Sprint("原因：", strings.Join(s, ",")),
-				Case:     "",
-				Func:     (*Query4Audit).RuleOK,
-			}
-		}
-	*/
+	// TODO: 检查explain对应的表是否需要跳过，如dual,空表等
 	return explainRules
 }
 

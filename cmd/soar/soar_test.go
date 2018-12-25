@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -42,32 +43,42 @@ func TestMain(m *testing.M) {
 }
 
 func Test_Main(_ *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	common.Config.OnlineDSN.Disable = true
 	common.Config.LogLevel = 0
 	common.Config.Query = "select * from film;alter table city add index idx_country_id(country_id);"
 	main()
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func Test_Main_More(_ *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	common.Config.LogLevel = 0
 	common.Config.Profiling = true
 	common.Config.Explain = true
 	common.Config.Query = "select * from film where country_id = 1;use sakila;alter table city add index idx_country_id(country_id);"
+	orgRerportType := common.Config.ReportType
 	for _, typ := range []string{
 		"json", "html", "markdown", "fingerprint", "compress", "pretty", "rewrite",
+		"ast", "tiast", "ast-json", "tiast-json", "tokenize",
 	} {
 		common.Config.ReportType = typ
 		main()
 	}
+	common.Config.ReportType = orgRerportType
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func Test_Main_checkConfig(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	if checkConfig() != 0 {
 		t.Error("checkConfig error")
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
 func Test_Main_initQuery(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	// direct query
 	query := initQuery("select 1")
 	if query != "select 1" {
@@ -79,4 +90,17 @@ func Test_Main_initQuery(t *testing.T) {
 
 	// TODO: read from stdin
 	// initQuery("")
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+func Test_Main_reportTool(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	orgRerportType := common.Config.ReportType
+	types := []string{"html", "md2html", "explain-digest", "chardet", "remove-comment"}
+	for _, tp := range types {
+		common.Config.ReportType = tp
+		fmt.Println(reportTool(tp, []byte{}))
+	}
+	common.Config.ReportType = orgRerportType
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

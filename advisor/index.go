@@ -665,7 +665,7 @@ func (idxAdv *IndexAdvisor) buildIndex(idxList map[string]map[string][]*common.C
 				continue
 			}
 
-			idxName := "idx_" + strings.Join(colNames, "_")
+			idxName := common.Config.IdxPrefix + strings.Join(colNames, "_")
 
 			// 索引名称最大长度64
 			if len(idxName) > IndexNameMaxLength {
@@ -699,7 +699,7 @@ func (idxAdv *IndexAdvisor) buildIndexWithNoEnv(indexList map[string]map[string]
 					common.Log.Warn("can not get the meta info of column '%s'", col.Name)
 					continue
 				}
-				idxName := "idx_" + col.Name
+				idxName := common.Config.IdxPrefix + col.Name
 				// 库、表、列名需要用反撇转义
 				alterSQL := fmt.Sprintf("alter table `%s`.`%s` add index `%s` (`%s`)", idxAdv.vEnv.RealDB(col.DB), col.Table, idxName, col.Name)
 				if col.DB == "" {

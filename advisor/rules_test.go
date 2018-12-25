@@ -48,9 +48,15 @@ func TestListHeuristicRules(t *testing.T) {
 
 func TestInBlackList(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		"select",
+		"select 1",
+	}
 	common.BlackList = []string{"select"}
-	if !InBlackList("select 1") {
-		t.Error("should be true")
+	for _, sql := range sqls {
+		if !InBlackList(sql) {
+			t.Error("should be true")
+		}
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
