@@ -17,6 +17,7 @@
 package ast
 
 import (
+	"flag"
 	"fmt"
 	"testing"
 
@@ -25,6 +26,23 @@ import (
 	"github.com/kr/pretty"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
+
+func TestMain(m *testing.M) {
+	// 初始化 init
+	common.BaseDir = common.DevPath
+	err := common.ParseConfig("")
+	common.LogIfError(err, "init ParseConfig")
+	common.Log.Debug("ast_test init")
+
+	// 分割线
+	flag.Parse()
+	m.Run()
+
+	// 环境清理
+	//
+}
 
 func TestGetTableFromExprs(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())

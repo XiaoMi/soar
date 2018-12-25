@@ -23,7 +23,9 @@ import (
 
 	"github.com/XiaoMi/soar/common"
 
+	"github.com/XiaoMi/soar/env"
 	"github.com/kr/pretty"
+	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 // ALI.001
@@ -471,6 +473,8 @@ func TestRuleAddDefaultValue(t *testing.T) {
 			`ALTER TABLE test modify id varchar(10) DEFAULT '';`,
 			`ALTER TABLE test CHANGE id id varchar(10) DEFAULT '';`,
 			"create table test(id int not null default 0 comment '用户id')",
+			`create table tb (a text)`,
+			`alter table tb add a text`,
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -931,6 +935,50 @@ func TestRuleLoadFile(t *testing.T) {
 		rule := q.RuleLoadFile()
 		if rule.Item != "OK" {
 			t.Error("Rule not match:", rule.Item, "Expect : OK, SQL: ", sql)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// RES.009
+func TestRuleMultiCompare(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			"SELECT * FROM tbl WHERE col = col = 'abc'",
+			"UPDATE tbl set col = 1 WHERE col = col = 'abc'",
+			"DELETE FROM tbl WHERE col = col = 'abc'",
+		},
+		{
+			"SELECT * FROM tbl WHERE col = 'abc'",
+			// https://github.com/XiaoMi/soar/issues/169
+			"SELECT * FROM tbl WHERE col = 'abc' and c = 1",
+			"update tb set c = 1 where a = 2 and b = 3",
+			"delete from tb where a = 2 and b = 3",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiCompare()
+			if rule.Item != "RES.009" {
+				t.Error("Rule not match:", rule.Item, "Expect : RES.009, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMultiCompare()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
 		}
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
@@ -2413,18 +2461,35 @@ func TestRuleAlterDropKey(t *testing.T) {
 // COL.012
 func TestRuleCantBeNull(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
-		"alter TABLE `tbl` add column `c` longblob;",
-		"alter TABLE `tbl` add column `c` text;",
-		"alter TABLE `tbl` add column `c` blob;",
+	sqls := [][]string{
+		{
+			"CREATE TABLE `tb`(`c` longblob NOT NULL);",
+		},
+		{
+			"CREATE TABLE `tbl` (`c` longblob);",
+			"alter TABLE `tbl` add column `c` longblob;",
+			"alter TABLE `tbl` add column `c` text;",
+			"alter TABLE `tbl` add column `c` blob;",
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
-			rule := q.RuleCantBeNull()
+			rule := q.RuleBLOBNotNull()
 			if rule.Item != "COL.012" {
 				t.Error("Rule not match:", rule.Item, "Expect : COL.012")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleBLOBNotNull()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)
@@ -2762,6 +2827,7 @@ func TestRuleTableCharsetCheck(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
+			"CREATE DATABASE sbtest /*!40100 DEFAULT CHARACTER SET latin1 */;",
 			"create table tbl (a int) DEFAULT CHARSET=latin1;",
 			"ALTER TABLE tbl CONVERT TO CHARACTER SET latin1;",
 		},
@@ -2796,6 +2862,44 @@ func TestRuleTableCharsetCheck(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// TBL.008
+func TestRuleTableCollateCheck(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			"CREATE DATABASE sbtest /*!40100 DEFAULT COLLATE latin1_bin */;",
+			"create table tbl (a int) DEFAULT COLLATE=latin1_bin;",
+		},
+		{
+			"create table tlb (a int);",
+			"ALTER TABLE `tbl` add column a int, add column b int ;",
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTableCollateCheck()
+			if rule.Item != "TBL.008" {
+				t.Error("Rule not match:", rule.Item, "Expect : TBL.008")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTableCollateCheck()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // COL.015
 func TestRuleBlobDefaultValue(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
@@ -2806,7 +2910,13 @@ func TestRuleBlobDefaultValue(t *testing.T) {
 		},
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL, PRIMARY KEY (`id`));",
-			"alter table `tb` add column `c` blob NOT NULL DEFAULT NULL;",
+			"CREATE TABLE `tb` (`col` text NOT NULL);",
+			"alter table `tb` add column `c` blob NOT NULL;",
+			"ALTER TABLE tb ADD COLUMN a BLOB DEFAULT NULL",
+			"CREATE TABLE tb ( a BLOB DEFAULT NULL)",
+			"alter TABLE `tbl` add column `c` longblob;",
+			"alter TABLE `tbl` add column `c` text;",
+			"alter TABLE `tbl` add column `c` blob;",
 		},
 	}
 
@@ -2924,6 +3034,89 @@ func TestRuleVarcharLength(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// COL.018
+func TestRuleColumnNotAllowType(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+
+	sqls := [][]string{
+		{
+			"CREATE TABLE tab (a BOOLEAN);",
+			"CREATE TABLE tab (a BOOLEAN );",
+			"ALTER TABLE `tb` add column `a` BOOLEAN;",
+		},
+		{
+			"CREATE TABLE `tb` ( `id` varchar(1024));",
+			"ALTER TABLE `tb` add column `id` varchar(35);",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleColumnNotAllowType()
+			if rule.Item != "COL.018" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.018")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleColumnNotAllowType()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// COL.019
+func TestRuleTimePrecision(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		// 正面的例子
+		{
+			"CREATE TABLE t1 (t TIME(3), dt DATETIME(6));",
+			"ALTER TABLE t1 add t TIME(3);",
+		},
+		// 反面的例子
+		{
+			"CREATE TABLE t1 (t TIME, dt DATETIME);",
+			"ALTER TABLE t1 add t TIME;",
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTimePrecision()
+			if rule.Item != "COL.019" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.019")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleTimePrecision()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // KEY.002
 func TestRuleNoOSCKey(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
@@ -2982,6 +3175,100 @@ func TestRuleTooManyFields(t *testing.T) {
 			t.Error("sqlparser.Parse Error:", err)
 		}
 	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// COL.007
+func TestRuleMaxTextColsCount(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		"create table tbl (a int, b text, c blob, d text);",
+	}
+
+	common.Config.MaxColCount = 0
+	for _, sql := range sqls {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleMaxTextColsCount()
+			if rule.Item != "COL.007" {
+				t.Error("Rule not match:", rule.Item, "Expect : COL.007")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// COL.007
+func TestRuleMaxTextColsCountWithEnv(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	orgMaxTextColsCount := common.Config.MaxTextColsCount
+	common.Config.MaxTextColsCount = 1
+
+	vEnv, rEnv := env.BuildEnv()
+	defer vEnv.CleanUp()
+	initSQLs := []string{
+		`CREATE TABLE t1 (id int, title text);`,
+		`CREATE TABLE t2 (id int, title text);`,
+	}
+
+	for _, sql := range initSQLs {
+		vEnv.BuildVirtualEnv(rEnv, sql)
+	}
+
+	sqls := [][]string{
+		{
+			"alter table t1 add column other text;",
+		},
+		{
+			"alter table t2 add column col varchar(10);",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		vEnv.BuildVirtualEnv(rEnv, sql)
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			t.Error(syntaxErr)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleMaxTextColsCount()
+			if rule.Item != "COL.007" {
+				t.Error("Rule not match:", rule, "Expect : COL.007, SQL:", sql)
+			}
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		vEnv.BuildVirtualEnv(rEnv, sql)
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			t.Error(syntaxErr)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleMaxTextColsCount()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule, "Expect : OK, SQL:", sql)
+			}
+		}
+	}
+
+	common.Config.MaxTextColsCount = orgMaxTextColsCount
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
@@ -3194,7 +3481,7 @@ func TestRuleSpaceAfterDot(t *testing.T) {
 
 func TestRuleMySQLError(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	err := errors.New(`Received #1146 error from MySQL server: "can't xxxx"`)
+	err := errors.New(`received #1146 error from MySQL server: "can't xxxx"`)
 	if RuleMySQLError("ERR.002", err).Content != "" {
 		t.Error("Want: '', Bug get: ", err)
 	}

@@ -14,52 +14,43 @@
  * limitations under the License.
  */
 
-package advisor
+package ast
 
 import (
-	"strings"
+	"fmt"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 )
 
-func TestListTestSQLs(t *testing.T) {
+func TestPrintPrettyStmtNode(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	for _, sql := range common.TestSQLs {
-		if !strings.HasSuffix(sql, ";") {
-			t.Errorf("%s should end with ';'", sql)
+	sqls := []string{
+		`select 1`,
+	}
+	err := common.GoldenDiff(func() {
+		for _, sql := range sqls {
+			PrintPrettyStmtNode(sql, "", "")
 		}
-	}
-	err := common.GoldenDiff(func() { ListTestSQLs() }, t.Name(), update)
+	}, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
-func TestListHeuristicRules(t *testing.T) {
+func TestStmtNode2JSON(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	err := common.GoldenDiff(func() { ListHeuristicRules(HeuristicRules) }, t.Name(), update)
+	sqls := []string{
+		`select 1`,
+	}
+	err := common.GoldenDiff(func() {
+		for _, sql := range sqls {
+			fmt.Println(StmtNode2JSON(sql, "", ""))
+		}
+	}, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
-	}
-	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
-}
-
-func TestInBlackList(t *testing.T) {
-	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	common.BlackList = []string{"select"}
-	if !InBlackList("select 1") {
-		t.Error("should be true")
-	}
-	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
-}
-
-func TestIsIgnoreRule(t *testing.T) {
-	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	common.Config.IgnoreRules = []string{"test"}
-	if !IsIgnoreRule("test") {
-		t.Error("should be true")
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

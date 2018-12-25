@@ -17,7 +17,6 @@
 package ast
 
 import (
-	"flag"
 	"fmt"
 	"testing"
 
@@ -25,8 +24,6 @@ import (
 
 	"vitess.io/vitess/go/vt/sqlparser"
 )
-
-var update = flag.Bool("update", false, "update .golden files")
 
 var TestSqlsPretty = []string{
 	"select sourcetable, if(f.lastcontent = ?, f.lastupdate, f.lastcontent) as lastactivity, f.totalcount as activity, type.class as type, (f.nodeoptions & ?) as nounsubscribe from node as f inner join contenttype as type on type.contenttypeid = f.contenttypeid inner join subscribed as sd on sd.did = f.nodeid and sd.userid = ? union all select f.name as title, f.userid as keyval, ? as sourcetable, ifnull(f.lastpost, f.joindate) as lastactivity, f.posts as activity, ? as type, ? as nounsubscribe from user as f inner join userlist as ul on ul.relationid = f.userid and ul.userid = ? where ul.type = ? and ul.aq = ? order by title limit ?",

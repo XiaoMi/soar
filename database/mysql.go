@@ -91,9 +91,16 @@ func (db *Connector) Query(sql string, params ...interface{}) (QueryResult, erro
 			db.Addr, db.Database, fmt.Sprintf(sql, params...))
 	}
 
+	if db.Database == "" {
+		db.Database = "information_schema"
+	}
+
 	common.Log.Debug("Execute SQL with DSN(%s/%s) : %s", db.Addr, db.Database, fmt.Sprintf(sql, params...))
 	_, err = db.Conn.Exec("USE " + db.Database)
-	common.LogIfError(err, "")
+	if err != nil {
+		common.Log.Error(err.Error())
+		return res, err
+	}
 	res.Rows, res.Error = db.Conn.Query(sql, params...)
 
 	if common.Config.ShowWarnings {
@@ -175,6 +182,7 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 	// 获取该表上的已有的索引
 
 	// show table status 获取总行数（近似）
+	common.Log.Debug("ColumnCardinality, ShowTableStatus check `%s` status Rows", tb)
 	tbStatus, err := db.ShowTableStatus(tb)
 	if err != nil {
 		common.Log.Warn("(db *Connector) ColumnCardinality() ShowTableStatus Error: %v", err)
@@ -227,6 +235,7 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 
 // IsView 判断表是否是视图
 func (db *Connector) IsView(tbName string) bool {
+	common.Log.Debug("IsView, ShowTableStatus check `%s` is view", tbName)
 	tbStatus, err := db.ShowTableStatus(tbName)
 	if err != nil {
 		common.Log.Error("(db *Connector) IsView Error: %v:", err)
@@ -289,7 +298,7 @@ func (db *Connector) dangerousQuery(query string) bool {
 	return false
 }
 
-// Sandard MySQL datetime format
+// TimeFormat standard MySQL datetime format
 const TimeFormat = "2006-01-02 15:04:05.000000000"
 
 // TimeString returns t as string in MySQL format Converts time.Time zero to MySQL zero.

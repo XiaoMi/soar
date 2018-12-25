@@ -23,7 +23,7 @@ import (
 )
 
 func TestDigestExplainText(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	var text = `+----+-------------+---------+-------+---------------------------------------------------------+-------------------+---------+---------------------------+------+-------------+
 | id | select_type | table   | type  | possible_keys                                           | key               | key_len | ref                       | rows | Extra       |
 +----+-------------+---------+-------+---------------------------------------------------------+-------------------+---------+---------------------------+------+-------------+

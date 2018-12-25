@@ -18,6 +18,7 @@ BUILD_TIME=`date +%Y%m%d%H%M`
 COMMIT_VERSION=`git rev-parse HEAD`
 
 # Add mysql version for testing `MYSQL_RELEASE=percona MYSQL_VERSION=5.7 make docker`
+# MySQL 5.1 `MYSQL_RELEASE=vsamov/mysql-5.1.73 make docker`
 # MYSQL_RELEASE: mysql, percona, mariadb ...
 # MYSQL_VERSION: latest, 8.0, 5.7, 5.6, 5.5 ...
 # use mysql:latest as default
@@ -45,8 +46,9 @@ deps:
 	@echo "\033[92mDependency check\033[0m"
 	@bash ./deps.sh
 	# The retool tools.json is setup from retool-install.sh
+	# some packages download need more open internet access
 	retool sync
-	retool do gometalinter.v2 intall
+	#retool do gometalinter.v2 --install
 
 # Code format
 .PHONY: fmt
@@ -63,6 +65,12 @@ test:
 	@echo "\033[92mRun all test cases ...\033[0m"
 	go test -race ./...
 	@echo "test Success!"
+
+# Rule golang test cases with `-update` flag
+test-update:
+	@echo "\033[92mRun all test cases with -update flag ...\033[0m"
+	go test ./... -update
+	@echo "test-update Success!"
 
 # Code Coverage
 # colorful coverage numerical >=90% GREEN, <80% RED, Other YELLOW
@@ -107,7 +115,7 @@ doc: build
 
 # Add or change a heuristic rule
 .PHONY: heuristic
-heuristic: doc docker
+heuristic: doc
 	@echo "\033[92mUpdate Heuristic rule golden files ...\033[0m"
 	go test github.com/XiaoMi/soar/advisor -v -update -run TestListHeuristicRules
 	go test github.com/XiaoMi/soar/advisor -v -update -run TestMergeConflictHeuristicRules
@@ -146,7 +154,7 @@ lint: build
 	@echo "gometalinter check your code is pretty good"
 
 .PHONY: release
-release: deps build
+release: build
 	@echo "\033[92mCross platform building for release ...\033[0m"
 	@mkdir -p release
 	@for GOOS in darwin linux windows; do \
@@ -163,6 +171,7 @@ release: deps build
 docker:
 	@echo "\033[92mBuild mysql test enviorment\033[0m"
 	@docker stop soar-mysql 2>/dev/null || true
+	@docker wait soar-mysql 2>/dev/null || true
 	@echo "docker run --name soar-mysql $(MYSQL_RELEASE):$(MYSQL_VERSION)"
 	@docker run --name soar-mysql --rm -d \
 	-e MYSQL_ROOT_PASSWORD=1tIsB1g3rt \
@@ -171,17 +180,22 @@ docker:
 	-v `pwd`/doc/example/sakila.sql.gz:/docker-entrypoint-initdb.d/sakila.sql.gz \
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
-	@echo -n "waiting for sakila database initializing "
-	@while ! mysql -h 127.0.0.1 -u root sakila -p1tIsB1g3rt -NBe "do 1;" 2>/dev/null; do \
+	@echo "waiting for sakila database initializing "
+	@while ! docker exec soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" --silent -NBe "do 1" >/dev/null 2>&1 ; do \
 	printf '.' ; \
 	sleep 1 ; \
 	done ; \
 	echo '.'
 	@echo "mysql test enviorment is ready!"
 
-.PHONY: connect
-connect:
-	mysql -h 127.0.0.1 -u root -p1tIsB1g3rt sakila -c
+.PHONY: docker-connect
+docker-connect:
+	docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1"
+
+# attach docker container with bash interactive mode
+.PHONY: docker-it
+docker-it:
+	docker exec -it soar-mysql /bin/bash
 
 .PHONY: main_test
 main_test: install
@@ -196,7 +210,7 @@ daily: | deps fmt vendor docker cover doc lint release install main_test clean l
 
 # vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
-daily-quick: | deps fmt cover doc lint logo
+daily-quick: | deps fmt cover main_test doc lint logo
 	@echo "\033[92mdaily-quick build finished\033[0m"
 
 .PHONY: logo

@@ -210,7 +210,7 @@
 }
 []ast.Token{
     {Type:57348, Val:"select", i:0},
-    {Type:57589, Val:"sql_calc_found_rows", i:0},
+    {Type:57590, Val:"sql_calc_found_rows", i:0},
     {Type:57396, Val:"col", i:0},
     {Type:57353, Val:"from", i:0},
     {Type:57396, Val:"tbl", i:0},

@@ -1,0 +1,44 @@
+[
+  {
+    "SQLCache": true,
+    "CalcFoundRows": false,
+    "StraightJoin": false,
+    "Priority": 0,
+    "Distinct": false,
+    "From": null,
+    "Where": null,
+    "Fields": {
+      "Fields": [
+        {
+          "Offset": 7,
+          "WildCard": null,
+          "Expr": {
+            "Type": {
+              "Tp": 8,
+              "Flag": 128,
+              "Flen": 1,
+              "Decimal": 0,
+              "Charset": "binary",
+              "Collate": "binary",
+              "Elems": null
+            }
+          },
+          "AsName": {
+            "O": "",
+            "L": ""
+          },
+          "Auxiliary": false
+        }
+      ]
+    },
+    "GroupBy": null,
+    "Having": null,
+    "WindowSpecs": null,
+    "OrderBy": null,
+    "Limit": null,
+    "LockTp": 0,
+    "TableHints": null,
+    "IsAfterUnionDistinct": false,
+    "IsInBraces": false
+  }
+]

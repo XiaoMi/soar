@@ -412,6 +412,16 @@ CREATE TABLE tbl (col int) ENGINE=InnoDB;
 ```sql
 CREATE TABLE tbl ( cols ....);
 ```
+## 表中包含有太多的 text/blob 列
+
+* **Item**:COL.007
+* **Severity**:L3
+* **Content**:表中包含超过2个的 text/blob 列
+* **Case**:
+
+```sql
+CREATE TABLE tbl ( cols ....);
+```
 ## 可使用 VARCHAR 代替 CHAR， VARBINARY 代替 BINARY
 
 * **Item**:COL.008
@@ -452,15 +462,15 @@ create table tab1(status ENUM('new','in progress','fixed'))
 ```sql
 select c1,c2,c3 from tbl where c4 is null or c4 <> 1
 ```
-## BLOB 和 TEXT 类型的字段不可设置为 NULL
+## BLOB 和 TEXT 类型的字段不建议设置为 NOT NULL
 
 * **Item**:COL.012
 * **Severity**:L5
-* **Content**:BLOB 和 TEXT 类型的字段不可设置为 NULL
+* **Content**:BLOB 和 TEXT 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。
 * **Case**:
 
 ```sql
-CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));
+CREATE TABLE `tb`(`c` longblob NOT NULL);
 ```
 ## TIMESTAMP 类型未设置默认值
 
@@ -482,15 +492,15 @@ CREATE TABLE tbl( `id` bigint not null, `create_time` timestamp);
 ```sql
 CREATE TABLE `tb2` ( `id` int(11) DEFAULT NULL, `col` char(10) CHARACTER SET utf8 DEFAULT NULL)
 ```
-## BLOB 类型的字段不可指定默认值
+## TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值
 
 * **Item**:COL.015
 * **Severity**:L4
-* **Content**:BLOB 类型的字段不可指定默认值
+* **Content**:MySQL 数据库中 TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。
 * **Case**:
 
 ```sql
-CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));
+CREATE TABLE `tbl` (`c` blob DEFAULT NULL);
 ```
 ## 整型定义建议采用 INT(10) 或 BIGINT(20)
 
@@ -511,6 +521,26 @@ CREATE TABLE tab (a INT(1));
 
 ```sql
 CREATE TABLE tab (a varchar(3500));
+```
+## 建表语句中使用了不推荐的字段类型
+
+* **Item**:COL.018
+* **Severity**:L1
+* **Content**:以下字段类型不被推荐使用：boolean
+* **Case**:
+
+```sql
+CREATE TABLE tab (a BOOLEAN);
+```
+## 不建议使用精度在秒级以下的时间数据类型
+
+* **Item**:COL.019
+* **Severity**:L1
+* **Content**:使用高精度的时间数据类型带来的存储空间消耗相对较大；MySQL 在5.6.4以上才可以支持精确到微秒的时间数据类型，使用时需要考虑版本兼容问题。
+* **Case**:
+
+```sql
+CREATE TABLE t1 (t TIME(3), dt DATETIME(6));
 ```
 ## 消除不必要的 DISTINCT 条件
 
@@ -1002,6 +1032,16 @@ select * from tbl where 1 = 1;
 ```sql
 LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;
 ```
+## 不建议使用连续判断
+
+* **Item**:RES.009
+* **Severity**:L2
+* **Content**:类似这样的 SELECT \* FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。
+* **Case**:
+
+```sql
+SELECT * FROM tbl WHERE col = col = 'abc'
+```
 ## 请谨慎使用TRUNCATE操作
 
 * **Item**:SEC.001
@@ -1176,7 +1216,7 @@ CREATE TABLE tbl (a int) AUTO_INCREMENT = 10;
 
 * **Item**:TBL.005
 * **Severity**:L4
-* **Content**:表字符集只允许设置为utf8,utf8mb4
+* **Content**:表字符集只允许设置为'utf8,utf8mb4'
 * **Case**:
 
 ```sql
@@ -1201,4 +1241,14 @@ create view v_today (today) AS SELECT CURRENT_DATE;
 
 ```sql
 CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;
+```
+## 请使用推荐的COLLATE
+
+* **Item**:TBL.008
+* **Severity**:L4
+* **Content**:COLLATE 只允许设置为''
+* **Case**:
+
+```sql
+CREATE TABLE tbl (a int) DEFAULT COLLATE = latin1_bin;
 ```

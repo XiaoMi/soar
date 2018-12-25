@@ -111,7 +111,11 @@ func NewAdvisor(env *env.VirtualEnv, rEnv database.Connector, q Query4Audit) (*I
 			}
 		}
 
-		return nil, nil
+		return &IndexAdvisor{
+			vEnv: env,
+			rEnv: rEnv,
+			Ast:  q.Stmt,
+		}, nil
 
 	case *sqlparser.DBDDL:
 		// 忽略建库语句
@@ -624,7 +628,6 @@ func (idxAdv *IndexAdvisor) buildJoinIndex(meta common.Meta) []IndexInfo {
 		indexColsList := make(map[string]map[string][]*common.Column)
 		for _, col := range IndexCols {
 			mergeIndex(indexColsList, col)
-
 		}
 
 		if common.Config.TestDSN.Disable || common.Config.OnlineDSN.Disable {
@@ -719,6 +722,11 @@ func (idxAdv *IndexAdvisor) buildIndexWithNoEnv(indexList map[string]map[string]
 
 // mergeIndex 将索引用到的列去重后合并到一起
 func mergeIndex(idxList map[string]map[string][]*common.Column, column *common.Column) {
+	// 散粒度低于阈值将不会添加索引
+	if common.Config.MinCardinality/100 > column.Cardinality {
+		return
+	}
+
 	db := column.DB
 	tb := column.Table
 	if idxList[db] == nil {
@@ -1010,11 +1018,12 @@ func (idxAdv *IndexAdvisor) HeuristicCheck(q Query4Audit) map[string]Rule {
 	}
 
 	ruleFuncs := []func(*IndexAdvisor) Rule{
+		(*IndexAdvisor).RuleMaxTextColsCount,   // COL.007
 		(*IndexAdvisor).RuleImplicitConversion, // ARG.003
+		(*IndexAdvisor).RuleGroupByConst,       // CLA.004
+		(*IndexAdvisor).RuleOrderByConst,       // CLA.005
+		(*IndexAdvisor).RuleUpdatePrimaryKey,   // CLA.016
 		// (*IndexAdvisor).RuleImpossibleOuterJoin, // TODO: JOI.003, JOI.004
-		(*IndexAdvisor).RuleGroupByConst,     // CLA.004
-		(*IndexAdvisor).RuleOrderByConst,     // CLA.005
-		(*IndexAdvisor).RuleUpdatePrimaryKey, // CLA.016
 	}
 
 	for _, f := range ruleFuncs {

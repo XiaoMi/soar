@@ -17,6 +17,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"runtime"
@@ -40,7 +41,16 @@ func init() {
 func LoggerInit() {
 	Log.SetLevel(Config.LogLevel)
 	func() { _ = Log.DelLogger(logs.AdapterFile) }()
-	err := Log.SetLogger(logs.AdapterFile, fmt.Sprintf(`{"filename":"%s","level":7,"maxlines":0,"maxsize":0,"daily":false,"maxdays":0}`, Config.LogOutput))
+	logConfig := map[string]interface{}{
+		"filename": Config.LogOutput,
+		"level":    7,
+		"maxlines": 0,
+		"maxsize":  0,
+		"daily":    false,
+		"maxdays":  0,
+	}
+	logConfigJSON, _ := json.Marshal(logConfig)
+	err := Log.SetLogger(logs.AdapterFile, string(logConfigJSON))
 	if err != nil {
 		fmt.Println(err.Error())
 	}

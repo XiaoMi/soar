@@ -293,7 +293,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					"date", "time", "datetime", "timestamp", "year",
 				},
 				sqlparser.IntVal: {
-					"tinyint", "smallint", "mediumint", "int", "integer", "bigint", "timestamp", "year",
+					"tinyint", "smallint", "mediumint", "int", "integer", "bigint", "timestamp", "year", "bit",
 				},
 				sqlparser.FloatVal: {
 					"float", "double", "real", "decimal",
@@ -328,7 +328,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 						continue
 					}
 
-					c := fmt.Sprintf("%s.%s definition is %s not %s",
+					c := fmt.Sprintf("%s表中列%s的定义是 %s 而不是 %s",
 						colList[0].Table, colList[0].Name, colList[0].DataType, typNameMap[val.Type])
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
@@ -818,6 +818,12 @@ func (q *Query4Audit) RuleAddDefaultValue() Rule {
 						colDefault = true
 					}
 				}
+
+				switch c.Tp.Tp {
+				case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+					colDefault = true
+				}
+
 				if !colDefault {
 					rule = HeuristicRules["COL.004"]
 					break
@@ -835,6 +841,12 @@ func (q *Query4Audit) RuleAddDefaultValue() Rule {
 								colDefault = true
 							}
 						}
+
+						switch c.Tp.Tp {
+						case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+							colDefault = true
+						}
+
 						if !colDefault {
 							rule = HeuristicRules["COL.004"]
 							break
@@ -1296,6 +1308,48 @@ func (q *Query4Audit) RuleLoadFile() Rule {
 	return rule
 }
 
+// RuleMultiCompare RES.009
+func (q *Query4Audit) RuleMultiCompare() Rule {
+	var rule = q.RuleOK()
+	if q.TiStmt != nil {
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.SelectStmt:
+				switch where := node.Where.(type) {
+				case *tidb.BinaryOperationExpr:
+					switch where.L.(type) {
+					case *tidb.BinaryOperationExpr:
+						if where.Op.String() == "eq" {
+							rule = HeuristicRules["RES.009"]
+						}
+					}
+				}
+			case *tidb.UpdateStmt:
+				switch where := node.Where.(type) {
+				case *tidb.BinaryOperationExpr:
+					switch where.L.(type) {
+					case *tidb.BinaryOperationExpr:
+						if where.Op.String() == "eq" {
+							rule = HeuristicRules["RES.009"]
+						}
+					}
+				}
+			case *tidb.DeleteStmt:
+				switch where := node.Where.(type) {
+				case *tidb.BinaryOperationExpr:
+					switch where.L.(type) {
+					case *tidb.BinaryOperationExpr:
+						if where.Op.String() == "eq" {
+							rule = HeuristicRules["RES.009"]
+						}
+					}
+				}
+			}
+		}
+	}
+	return rule
+}
+
 // RuleStandardINEQ STA.001
 func (q *Query4Audit) RuleStandardINEQ() Rule {
 	var rule = q.RuleOK()
@@ -1581,6 +1635,9 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 			case *tidb.CreateTableStmt:
 				// Create table statement
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeFloat, mysql.TypeDouble, mysql.TypeDecimal, mysql.TypeNewDecimal:
 						rule = HeuristicRules["COL.009"]
@@ -1593,6 +1650,9 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeFloat, mysql.TypeDouble,
 								mysql.TypeDecimal, mysql.TypeNewDecimal:
@@ -1638,6 +1698,9 @@ func (q *Query4Audit) RuleValuesInDefinition() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeSet, mysql.TypeEnum, mysql.TypeBit:
 						rule = HeuristicRules["COL.010"]
@@ -1648,6 +1711,9 @@ func (q *Query4Audit) RuleValuesInDefinition() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeSet, mysql.TypeEnum, mysql.TypeBit:
 								rule = HeuristicRules["COL.010"]
@@ -1755,9 +1821,12 @@ func (q *Query4Audit) RuleCountConst() Rule {
 func (q *Query4Audit) RuleSumNPE() Rule {
 	var rule = q.RuleOK()
 	fingerprint := query.Fingerprint(q.Query)
+	// TODO: https://github.com/XiaoMi/soar/issues/143
+	// https://dev.mysql.com/doc/refman/8.0/en/group-by-functions.html
 	sumReg := regexp.MustCompile(`(?i)sum\(\s*[0-9a-z?]*\s*\)`)
 	isnullReg := regexp.MustCompile(`(?i)isnull\(sum\(\s*[0-9a-z?]*\s*\)\)`)
 	if sumReg.MatchString(fingerprint) && !isnullReg.MatchString(fingerprint) {
+		// TODO: check wether column define with not null flag
 		rule = HeuristicRules["FUN.006"]
 		if position := isnullReg.FindIndex([]byte(q.Query)); len(position) > 0 {
 			rule.Position = position[0]
@@ -2187,6 +2256,9 @@ func (q *Query4Audit) RuleReadablePasswords() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeString, mysql.TypeVarchar, mysql.TypeVarString,
 						mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob:
@@ -2202,6 +2274,9 @@ func (q *Query4Audit) RuleReadablePasswords() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableModifyColumn, tidb.AlterTableChangeColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeString, mysql.TypeVarchar, mysql.TypeVarString,
 								mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob:
@@ -2375,6 +2450,9 @@ func (q *Query4Audit) RuleVarcharVSChar() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					// 在 TiDB 的 AST 中，char 和 binary 的 type 都是 mysql.TypeString
 					// 只是 binary 数据类型的 character 和 collate 是 binary
@@ -2388,6 +2466,9 @@ func (q *Query4Audit) RuleVarcharVSChar() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeString:
 								rule = HeuristicRules["COL.008"]
@@ -2493,8 +2574,8 @@ func (q *Query4Audit) RuleAlterDropKey() Rule {
 	return rule
 }
 
-// RuleCantBeNull COL.012
-func (q *Query4Audit) RuleCantBeNull() Rule {
+// RuleBLOBNotNull COL.012
+func (q *Query4Audit) RuleBLOBNotNull() Rule {
 	var rule = q.RuleOK()
 	switch q.Stmt.(type) {
 	case *sqlparser.DDL:
@@ -2502,10 +2583,20 @@ func (q *Query4Audit) RuleCantBeNull() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
-						if !mysql.HasNotNullFlag(col.Tp.Flag) {
+						for _, opt := range col.Options {
+							if opt.Tp == tidb.ColumnOptionNotNull {
+								rule = HeuristicRules["COL.012"]
+								break
+							}
+						}
+						if mysql.HasNotNullFlag(col.Tp.Flag) {
 							rule = HeuristicRules["COL.012"]
+							break
 						}
 					}
 				}
@@ -2515,10 +2606,20 @@ func (q *Query4Audit) RuleCantBeNull() Rule {
 					switch spec.Tp {
 					case tidb.AlterTableAddColumns, tidb.AlterTableModifyColumn, tidb.AlterTableChangeColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
-								if !mysql.HasNotNullFlag(col.Tp.Flag) {
+								for _, opt := range col.Options {
+									if opt.Tp == tidb.ColumnOptionNotNull {
+										rule = HeuristicRules["COL.012"]
+										break
+									}
+								}
+								if mysql.HasNotNullFlag(col.Tp.Flag) {
 									rule = HeuristicRules["COL.012"]
+									break
 								}
 							}
 						}
@@ -2743,6 +2844,9 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					if col.Tp.Tp == mysql.TypeTimestamp {
 						hasDefault := false
 						for _, option := range col.Options {
@@ -2764,6 +2868,9 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 						tidb.AlterTableChangeColumn,
 						tidb.AlterTableAlterColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							if col.Tp.Tp == mysql.TypeTimestamp {
 								hasDefault := false
 								for _, option := range col.Options {
@@ -2814,6 +2921,9 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					if col.Tp.Charset != "" || col.Tp.Collate != "" {
 						rule = HeuristicRules["COL.014"]
 						break
@@ -2825,13 +2935,15 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 					case tidb.AlterTableAlterColumn, tidb.AlterTableChangeColumn,
 						tidb.AlterTableModifyColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							if col.Tp.Charset != "" || col.Tp.Collate != "" {
 								rule = HeuristicRules["COL.014"]
 								break
 							}
 						}
 					}
-
 				}
 			}
 		}
@@ -2842,18 +2954,18 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 // RuleTableCharsetCheck TBL.005
 func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 	var rule = q.RuleOK()
+	var allow bool
+	var hasCharset bool
 
 	switch q.Stmt.(type) {
-	case *sqlparser.DDL:
+	case *sqlparser.DDL, *sqlparser.DBDDL:
 		for _, tiStmt := range q.TiStmt {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
-				var allow bool
-				var hasCharset bool
 				for _, opt := range node.Options {
 					if opt.Tp == tidb.TableOptionCharset {
 						hasCharset = true
-						for _, ch := range common.Config.TableAllowCharsets {
+						for _, ch := range common.Config.AllowCharsets {
 							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
 								allow = true
 								break
@@ -2862,22 +2974,27 @@ func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 					}
 				}
 
-				// 未指定字符集使用MySQL默认配置字符集，我们认为MySQL的配置是被优化过的。
-				if hasCharset && !allow {
-					rule = HeuristicRules["TBL.005"]
-					break
+			case *tidb.CreateDatabaseStmt:
+				for _, opt := range node.Options {
+					if opt.Tp == tidb.DatabaseOptionCharset {
+						hasCharset = true
+						for _, ch := range common.Config.AllowCharsets {
+							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.Value)) {
+								allow = true
+								break
+							}
+						}
+					}
 				}
 
 			case *tidb.AlterTableStmt:
 				for _, spec := range node.Specs {
-					var allow bool
-					var hasCharset bool
 					switch spec.Tp {
 					case tidb.AlterTableOption:
 						for _, opt := range spec.Options {
 							if opt.Tp == tidb.TableOptionCharset {
 								hasCharset = true
-								for _, ch := range common.Config.TableAllowCharsets {
+								for _, ch := range common.Config.AllowCharsets {
 									if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
 										allow = true
 										break
@@ -2885,15 +3002,15 @@ func (q *Query4Audit) RuleTableCharsetCheck() Rule {
 								}
 							}
 						}
-						// 未指定字符集使用MySQL默认配置字符集，我们认为MySQL的配置是被优化过的。
-						if hasCharset && !allow {
-							rule = HeuristicRules["TBL.005"]
-							break
-						}
 					}
 				}
 			}
 		}
+	}
+
+	// 未指定字符集使用MySQL默认配置字符集，我们认为MySQL的配置是被优化过的。
+	if hasCharset && !allow {
+		rule = HeuristicRules["TBL.005"]
 	}
 	return rule
 }
@@ -2949,6 +3066,70 @@ func (q *Query4Audit) RuleForbiddenTempTable() Rule {
 	return rule
 }
 
+// RuleTableCollateCheck TBL.008
+func (q *Query4Audit) RuleTableCollateCheck() Rule {
+	var rule = q.RuleOK()
+	var allow bool
+	var hasCollate bool
+
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL, *sqlparser.DBDDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, opt := range node.Options {
+					if opt.Tp == tidb.TableOptionCollate {
+						hasCollate = true
+						for _, ch := range common.Config.AllowCollates {
+							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
+								allow = true
+								break
+							}
+						}
+					}
+				}
+
+			case *tidb.CreateDatabaseStmt:
+				for _, opt := range node.Options {
+					if opt.Tp == tidb.DatabaseOptionCollate {
+						hasCollate = true
+						for _, ch := range common.Config.AllowCollates {
+							if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.Value)) {
+								allow = true
+								break
+							}
+						}
+					}
+				}
+
+			case *tidb.AlterTableStmt:
+				for _, spec := range node.Specs {
+					switch spec.Tp {
+					case tidb.AlterTableOption:
+						for _, opt := range spec.Options {
+							if opt.Tp == tidb.TableOptionCollate {
+								hasCollate = true
+								for _, ch := range common.Config.AllowCollates {
+									if strings.TrimSpace(strings.ToLower(ch)) == strings.TrimSpace(strings.ToLower(opt.StrValue)) {
+										allow = true
+										break
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 未指定字符集使用MySQL默认配置COLLATE，我们认为MySQL的配置是被优化过的。
+	if hasCollate && !allow {
+		rule = HeuristicRules["TBL.008"]
+	}
+	return rule
+}
+
 // RuleBlobDefaultValue COL.015
 func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 	var rule = q.RuleOK()
@@ -2958,6 +3139,9 @@ func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob:
 						for _, opt := range col.Options {
@@ -2974,6 +3158,9 @@ func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 					case tidb.AlterTableModifyColumn, tidb.AlterTableAlterColumn,
 						tidb.AlterTableChangeColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob:
 								for _, opt := range col.Options {
@@ -3001,6 +3188,9 @@ func (q *Query4Audit) RuleIntPrecision() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeLong:
 						if (col.Tp.Flen < 10 || col.Tp.Flen > 11) && col.Tp.Flen > 0 {
@@ -3021,6 +3211,9 @@ func (q *Query4Audit) RuleIntPrecision() Rule {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn,
 						tidb.AlterTableAlterColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeLong:
 								if (col.Tp.Flen < 10 || col.Tp.Flen > 11) && col.Tp.Flen > 0 {
@@ -3052,6 +3245,9 @@ func (q *Query4Audit) RuleVarcharLength() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					switch col.Tp.Tp {
 					case mysql.TypeVarchar, mysql.TypeVarString:
 						if col.Tp.Flen > common.Config.MaxVarcharLength {
@@ -3066,6 +3262,9 @@ func (q *Query4Audit) RuleVarcharLength() Rule {
 					case tidb.AlterTableAddColumns, tidb.AlterTableChangeColumn,
 						tidb.AlterTableAlterColumn, tidb.AlterTableModifyColumn:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							switch col.Tp.Tp {
 							case mysql.TypeVarchar, mysql.TypeVarString:
 								if col.Tp.Flen > common.Config.MaxVarcharLength {
@@ -3079,6 +3278,83 @@ func (q *Query4Audit) RuleVarcharLength() Rule {
 			}
 		}
 	}
+	return rule
+}
+
+// RuleColumnNotAllowType COL.018
+func (q *Query4Audit) RuleColumnNotAllowType() Rule {
+	var rule = q.RuleOK()
+
+	if len(common.Config.ColumnNotAllowType) == 0 {
+		return rule
+	}
+
+	switch s := q.Stmt.(type) {
+	case *sqlparser.DDL:
+		switch s.Action {
+		case "create", "alter":
+			tks := ast.Tokenize(q.Query)
+			for _, tk := range tks {
+				if tk.Type == ast.TokenTypeWord {
+					for _, tp := range common.Config.ColumnNotAllowType {
+						if len(tk.Val) <= len(tp)+1 &&
+							strings.HasPrefix(strings.ToLower(tk.Val), strings.ToLower(tp)) {
+							rule = HeuristicRules["COL.018"]
+							break
+						}
+					}
+				}
+				if rule.Item != "OK" {
+					break
+				}
+			}
+		}
+	}
+	return rule
+}
+
+// RuleTimePrecision COL.019
+func (q *Query4Audit) RuleTimePrecision() Rule {
+	var rule = q.RuleOK()
+
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
+					switch col.Tp.Tp {
+					case mysql.TypeDatetime, mysql.TypeTimestamp, mysql.TypeDuration:
+						if col.Tp.Decimal > 0 {
+							rule = HeuristicRules["COL.019"]
+						}
+					}
+				}
+			case *tidb.AlterTableStmt:
+				for _, spec := range node.Specs {
+					switch spec.Tp {
+					case tidb.AlterTableChangeColumn, tidb.AlterTableAlterColumn,
+						tidb.AlterTableModifyColumn, tidb.AlterTableAddColumns:
+						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
+							switch col.Tp.Tp {
+							case mysql.TypeDatetime, mysql.TypeTimestamp, mysql.TypeDuration:
+								if col.Tp.Decimal > 0 {
+									rule = HeuristicRules["COL.019"]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return rule
 }
 
@@ -3117,6 +3393,74 @@ func (q *Query4Audit) RuleTooManyFields() Rule {
 	return rule
 }
 
+// RuleMaxTextColsCount COL.007
+func (q *Query4Audit) RuleMaxTextColsCount() Rule {
+	var textColsCount int
+	var rule = q.RuleOK()
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
+					switch col.Tp.Tp {
+					case mysql.TypeBlob, mysql.TypeLongBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob:
+						textColsCount++
+					}
+				}
+			}
+		}
+	}
+	if textColsCount > common.Config.MaxTextColsCount {
+		rule = HeuristicRules["COL.007"]
+	}
+
+	return rule
+}
+
+// RuleMaxTextColsCount COL.007 checking for existed table
+func (idxAdv *IndexAdvisor) RuleMaxTextColsCount() Rule {
+	rule := HeuristicRules["OK"]
+	// 未开启测试环境不进行检查
+	if common.Config.TestDSN.Disable {
+		return rule
+	}
+
+	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+		switch stmt := node.(type) {
+		case *sqlparser.DDL:
+			if stmt.Action != "alter" {
+				return true, nil
+			}
+
+			// 添加字段的语句会在初始化环境的时候被执行
+			// 只需要获取该标的 CREATE 语句，后再对该语句进行检查即可
+			ddl, err := idxAdv.vEnv.ShowCreateTable(stmt.Table.Name.String())
+			if err != nil {
+				common.Log.Error("RuleMaxTextColsCount create statement got failed: %s", err.Error())
+				return false, err
+			}
+
+			q, err := NewQuery4Audit(ddl)
+			if err != nil {
+				return false, err
+			}
+
+			r := q.RuleMaxTextColsCount()
+			if r.Item != "OK" {
+				rule = r
+				return false, nil
+			}
+		}
+		return true, nil
+	}, idxAdv.Ast)
+	common.LogIfError(err, "")
+	return rule
+}
+
 // RuleAllowEngine TBL.002
 func (q *Query4Audit) RuleAllowEngine() Rule {
 	var rule = q.RuleOK()
@@ -3131,13 +3475,13 @@ func (q *Query4Audit) RuleAllowEngine() Rule {
 					if opt.Tp == tidb.TableOptionEngine {
 						hasDefaultEngine = true
 						// 使用了非推荐的存储引擎
-						for _, engine := range common.Config.TableAllowEngines {
+						for _, engine := range common.Config.AllowEngines {
 							if strings.EqualFold(opt.StrValue, engine) {
 								allowedEngine = true
 							}
 						}
-						// common.Config.TableAllowEngines 为空时不给予建议
-						if !allowedEngine && len(common.Config.TableAllowEngines) > 0 {
+						// common.Config.AllowEngines 为空时不给予建议
+						if !allowedEngine && len(common.Config.AllowEngines) > 0 {
 							rule = HeuristicRules["TBL.002"]
 							break
 						}
@@ -3155,13 +3499,13 @@ func (q *Query4Audit) RuleAllowEngine() Rule {
 						for _, opt := range spec.Options {
 							if opt.Tp == tidb.TableOptionEngine {
 								// 使用了非推荐的存储引擎
-								for _, engine := range common.Config.TableAllowEngines {
+								for _, engine := range common.Config.AllowEngines {
 									if strings.EqualFold(opt.StrValue, engine) {
 										allowedEngine = true
 									}
 								}
-								// common.Config.TableAllowEngines 为空时不给予建议
-								if !allowedEngine && len(common.Config.TableAllowEngines) > 0 {
+								// common.Config.AllowEngines 为空时不给予建议
+								if !allowedEngine && len(common.Config.AllowEngines) > 0 {
 									rule = HeuristicRules["TBL.002"]
 									break
 								}
@@ -3209,6 +3553,9 @@ func (q *Query4Audit) RuleAutoIncUnsigned() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateTableStmt:
 				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
 					for _, opt := range col.Options {
 						if opt.Tp == tidb.ColumnOptionAutoIncrement {
 							if !mysql.HasUnsignedFlag(col.Tp.Flag) {
@@ -3228,6 +3575,9 @@ func (q *Query4Audit) RuleAutoIncUnsigned() Rule {
 					case tidb.AlterTableChangeColumn, tidb.AlterTableAlterColumn,
 						tidb.AlterTableModifyColumn, tidb.AlterTableAddColumns:
 						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
 							for _, opt := range col.Options {
 								if opt.Tp == tidb.ColumnOptionAutoIncrement {
 									if !mysql.HasUnsignedFlag(col.Tp.Flag) {

@@ -136,8 +136,8 @@ func init() {
 		// SEMI JOIN
 		// 半连接： 当一张表在另一张表找到匹配的记录之后，半连接（semi-join）返回第一张表中的记录。
 		// 与条件连接相反，即使在右节点中找到几条匹配的记录，左节点的表也只会返回一条记录。
-		// 另外，右节点的表一条记录也不会返回。半连接通常使用IN  或 EXISTS 作为连接条件
-		"SELECT d.deptno,d.dname,d.loc FROM scott.dept d WHERE d.deptno IN  (SELECT e.deptno FROM scott.emp e);",
+		// 另外，右节点的表一条记录也不会返回。半连接通常使用 IN 或 EXISTS 作为连接条件
+		"SELECT a.address, a.postal_code FROM sakila.address a WHERE a.city_id IN  (SELECT c.city_id FROM sakila.city c);",
 
 		// Delayed Join
 		// https://www.percona.com/blog/2007/04/06/using-delayed-join-to-optimize-count-and-limit-queries/
@@ -196,8 +196,14 @@ func init() {
 		"alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);",
 
 		// https://github.com/XiaoMi/soar/issues/47
-		`SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d')	ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d')`,
+		`SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d');`,
 		// https://github.com/XiaoMi/soar/issues/17
 		"create table hello.t (id int unsigned);",
+
+		// https://github.com/XiaoMi/soar/issues/146
+		"select * from tb where data >= '';",
+
+		// https://github.com/XiaoMi/soar/issues/163
+		"alter table tb alter column id drop default;",
 	}
 }

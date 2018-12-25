@@ -1,0 +1,32 @@
+&sqlparser.Select{
+    Cache:       "",
+    Comments:    nil,
+    Distinct:    "",
+    Hints:       "",
+    SelectExprs: {
+        &sqlparser.AliasedExpr{
+            Expr: &sqlparser.SQLVal{
+                Type: 1,
+                Val:  {0x31},
+            },
+            As: sqlparser.ColIdent{},
+        },
+    },
+    From: {
+        &sqlparser.AliasedTableExpr{
+            Expr: sqlparser.TableName{
+                Name:      sqlparser.TableIdent{v:"dual"},
+                Qualifier: sqlparser.TableIdent{},
+            },
+            Partitions: nil,
+            As:         sqlparser.TableIdent{},
+            Hints:      (*sqlparser.IndexHints)(nil),
+        },
+    },
+    Where:   (*sqlparser.Where)(nil),
+    GroupBy: nil,
+    Having:  (*sqlparser.Where)(nil),
+    OrderBy: nil,
+    Limit:   (*sqlparser.Limit)(nil),
+    Lock:    "",
+}

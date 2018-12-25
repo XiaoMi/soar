@@ -1,0 +1,32 @@
+{
+  "Cache": "",
+  "Comments": null,
+  "Distinct": "",
+  "Hints": "",
+  "SelectExprs": [
+    {
+      "Expr": {
+        "Type": 1,
+        "Val": "MQ=="
+      },
+      "As": ""
+    }
+  ],
+  "From": [
+    {
+      "Expr": {
+        "Name": "dual",
+        "Qualifier": ""
+      },
+      "Partitions": null,
+      "As": "",
+      "Hints": null
+    }
+  ],
+  "Where": null,
+  "GroupBy": null,
+  "Having": null,
+  "OrderBy": null,
+  "Limit": null,
+  "Lock": ""
+}

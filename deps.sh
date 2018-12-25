@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NEEDED_COMMANDS="mysql docker git go govendor retool"
+NEEDED_COMMANDS="docker git go govendor retool"
 
 for cmd in ${NEEDED_COMMANDS} ; do
     if ! command -v "${cmd}" &> /dev/null ; then
@@ -10,3 +10,18 @@ for cmd in ${NEEDED_COMMANDS} ; do
         echo "${cmd} found"
     fi
 done
+
+# Docker
+## https://www.docker.com
+
+# Git
+## https://git-scm.com/
+
+# Go
+## https://golang.org/
+
+# Govendor
+## go get github.com/kardianos/govendor
+
+# retool
+## go get github.com/twitchtv/retool

@@ -32,7 +32,7 @@ func Pretty(sql string, method string) (output string) {
 	// 超出 Config.MaxPrettySQLLength 长度的 SQL 会对其指纹进行 pretty
 	if len(sql) > common.Config.MaxPrettySQLLength {
 		fingerprint := query.Fingerprint(sql)
-		// 超出 Config.MaxFpPrettySqlLength 长度的指纹不会进行pretty
+		// 超出 Config.MaxPrettySQLLength 长度的指纹不会进行pretty
 		if len(fingerprint) > common.Config.MaxPrettySQLLength {
 			return sql
 		}

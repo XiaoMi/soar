@@ -939,6 +939,9 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 		if res.Rows.Next() {
 			var explainString string
 			err = res.Rows.Scan(&explainString)
+			if err != nil {
+				common.Log.Debug(err.Error())
+			}
 			exp.ExplainJSON, err = parseJSONExplainText(explainString)
 		}
 		res.Rows.Close()
@@ -979,7 +982,10 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 	var explainRows []*ExplainRow
 
 	for res.Rows.Next() {
-		res.Rows.Scan(explainFields...)
+		err := res.Rows.Scan(explainFields...)
+		if err != nil {
+			common.Log.Debug(err.Error())
+		}
 		expRow.PossibleKeys = strings.Split(possibleKeys, ",")
 
 		// MySQL bug: https://bugs.mysql.com/bug.php?id=34124

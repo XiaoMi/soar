@@ -30,7 +30,8 @@ import (
 var connTest *Connector
 var update = flag.Bool("update", false, "update .golden files")
 
-func init() {
+func TestMain(m *testing.M) {
+	// 初始化 init
 	common.BaseDir = common.DevPath
 	err := common.ParseConfig("")
 	common.LogIfError(err, "init ParseConfig")
@@ -45,6 +46,13 @@ func init() {
 		common.Log.Critical("Test env Error: %v", err)
 		os.Exit(0)
 	}
+
+	// 分割线
+	flag.Parse()
+	m.Run()
+
+	// 环境清理
+	//
 }
 
 func TestQuery(t *testing.T) {

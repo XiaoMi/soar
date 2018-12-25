@@ -471,6 +471,14 @@ func init() {
 			Case:     "CREATE TABLE tbl ( cols ....);",
 			Func:     (*Query4Audit).RuleTooManyFields,
 		},
+		"COL.007": {
+			Item:     "COL.007",
+			Severity: "L3",
+			Summary:  "表中包含有太多的 text/blob 列",
+			Content:  fmt.Sprintf(`表中包含超过%d个的 text/blob 列`, common.Config.MaxTextColsCount),
+			Case:     "CREATE TABLE tbl ( cols ....);",
+			Func:     (*Query4Audit).RuleTooManyFields,
+		},
 		"COL.008": {
 			Item:     "COL.008",
 			Severity: "L1",
@@ -507,10 +515,10 @@ func init() {
 		"COL.012": {
 			Item:     "COL.012",
 			Severity: "L5",
-			Summary:  "BLOB 和 TEXT 类型的字段不可设置为 NULL",
-			Content:  `BLOB 和 TEXT 类型的字段不可设置为 NULL`,
-			Case:     "CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` longblob, PRIMARY KEY (`id`));",
-			Func:     (*Query4Audit).RuleCantBeNull,
+			Summary:  "BLOB 和 TEXT 类型的字段不建议设置为 NOT NULL",
+			Content:  `BLOB 和 TEXT 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。`,
+			Case:     "CREATE TABLE `tb`(`c` longblob NOT NULL);",
+			Func:     (*Query4Audit).RuleBLOBNotNull,
 		},
 		"COL.013": {
 			Item:     "COL.013",
@@ -528,12 +536,13 @@ func init() {
 			Case:     "CREATE TABLE `tb2` ( `id` int(11) DEFAULT NULL, `col` char(10) CHARACTER SET utf8 DEFAULT NULL)",
 			Func:     (*Query4Audit).RuleColumnWithCharset,
 		},
+		// https://stackoverflow.com/questions/3466872/why-cant-a-text-column-have-a-default-value-in-mysql
 		"COL.015": {
 			Item:     "COL.015",
 			Severity: "L4",
-			Summary:  "BLOB 类型的字段不可指定默认值",
-			Content:  `BLOB 类型的字段不可指定默认值`,
-			Case:     "CREATE TABLE `tbl` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
+			Summary:  "TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值",
+			Content:  `MySQL 数据库中 TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。`,
+			Case:     "CREATE TABLE `tbl` (`c` blob DEFAULT NULL);",
 			Func:     (*Query4Audit).RuleBlobDefaultValue,
 		},
 		"COL.016": {
@@ -551,6 +560,22 @@ func init() {
 			Content:  fmt.Sprintf(`varchar 是可变长字符串，不预先分配存储空间，长度不要超过%d，如果存储长度过长 MySQL 将定义字段类型为 text，独立出来一张表，用主键来对应，避免影响其它字段索引效率。`, common.Config.MaxVarcharLength),
 			Case:     "CREATE TABLE tab (a varchar(3500));",
 			Func:     (*Query4Audit).RuleVarcharLength,
+		},
+		"COL.018": {
+			Item:     "COL.018",
+			Severity: "L1",
+			Summary:  "建表语句中使用了不推荐的字段类型",
+			Content:  "以下字段类型不被推荐使用：" + strings.Join(common.Config.ColumnNotAllowType, ","),
+			Case:     "CREATE TABLE tab (a BOOLEAN);",
+			Func:     (*Query4Audit).RuleColumnNotAllowType,
+		},
+		"COL.019": {
+			Item:     "COL.019",
+			Severity: "L1",
+			Summary:  "不建议使用精度在秒级以下的时间数据类型",
+			Content:  "使用高精度的时间数据类型带来的存储空间消耗相对较大；MySQL 在5.6.4以上才可以支持精确到微秒的时间数据类型，使用时需要考虑版本兼容问题。",
+			Case:     "CREATE TABLE t1 (t TIME(3), dt DATETIME(6));",
+			Func:     (*Query4Audit).RuleTimePrecision,
 		},
 		"DIS.001": {
 			Item:     "DIS.001",
@@ -948,6 +973,14 @@ func init() {
 			Case:     "LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;",
 			Func:     (*Query4Audit).RuleLoadFile,
 		},
+		"RES.009": {
+			Item:     "RES.009",
+			Severity: "L2",
+			Summary:  "不建议使用连续判断",
+			Content:  "类似这样的 SELECT * FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。",
+			Case:     "SELECT * FROM tbl WHERE col = col = 'abc'",
+			Func:     (*Query4Audit).RuleMultiCompare,
+		},
 		"SEC.001": {
 			Item:     "SEC.001",
 			Severity: "L0",
@@ -1068,7 +1101,7 @@ func init() {
 			Item:     "TBL.002",
 			Severity: "L4",
 			Summary:  "请为表选择合适的存储引擎",
-			Content:  `建表或修改表的存储引擎时建议使用推荐的存储引擎，如：` + strings.Join(common.Config.TableAllowEngines, ","),
+			Content:  `建表或修改表的存储引擎时建议使用推荐的存储引擎，如：` + strings.Join(common.Config.AllowEngines, ","),
 			Case:     "create table test(`id` int(11) NOT NULL AUTO_INCREMENT)",
 			Func:     (*Query4Audit).RuleAllowEngine,
 		},
@@ -1092,7 +1125,7 @@ func init() {
 			Item:     "TBL.005",
 			Severity: "L4",
 			Summary:  "请使用推荐的字符集",
-			Content:  `表字符集只允许设置为` + strings.Join(common.Config.TableAllowCharsets, ","),
+			Content:  `表字符集只允许设置为'` + strings.Join(common.Config.AllowCharsets, ",") + "'",
 			Case:     "CREATE TABLE tbl (a int) DEFAULT CHARSET = latin1;",
 			Func:     (*Query4Audit).RuleTableCharsetCheck,
 		},
@@ -1111,6 +1144,14 @@ func init() {
 			Content:  `不建议使用临时表`,
 			Case:     "CREATE TEMPORARY TABLE `work` (`time` time DEFAULT NULL) ENGINE=InnoDB;",
 			Func:     (*Query4Audit).RuleForbiddenTempTable,
+		},
+		"TBL.008": {
+			Item:     "TBL.008",
+			Severity: "L4",
+			Summary:  "请使用推荐的COLLATE",
+			Content:  `COLLATE 只允许设置为'` + strings.Join(common.Config.AllowCollates, ",") + "'",
+			Case:     "CREATE TABLE tbl (a int) DEFAULT COLLATE = latin1_bin;",
+			Func:     (*Query4Audit).RuleTableCharsetCheck,
 		},
 	}
 }

@@ -154,7 +154,10 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 	}
 	// 获取值
 	for res.Rows.Next() {
-		res.Rows.Scan(statusFields...)
+		err := res.Rows.Scan(statusFields...)
+		if err != nil {
+			common.Log.Debug(err.Error())
+		}
 		tbStatus.Rows = append(tbStatus.Rows, ts)
 	}
 	res.Rows.Close()
@@ -243,7 +246,10 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 	}
 	// 获取值
 	for res.Rows.Next() {
-		res.Rows.Scan(indexFields...)
+		err := res.Rows.Scan(indexFields...)
+		if err != nil {
+			common.Log.Debug(err.Error())
+		}
 		tbIndex.Rows = append(tbIndex.Rows, ti)
 	}
 	res.Rows.Close()
@@ -374,7 +380,10 @@ func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 	}
 	// 获取值
 	for res.Rows.Next() {
-		res.Rows.Scan(columnFields...)
+		err := res.Rows.Scan(columnFields...)
+		if err != nil {
+			common.Log.Debug(err.Error())
+		}
 		tbDesc.DescValues = append(tbDesc.DescValues, tc)
 	}
 	res.Rows.Close()
@@ -399,7 +408,7 @@ func (db *Connector) showCreate(createType, name string) (string, error) {
 	// SHOW CREATE TABLE tbl_name
 	// SHOW CREATE TRIGGER trigger_name
 	// SHOW CREATE VIEW view_name
-	res, err := db.Query(fmt.Sprintf("show create %s `%s`", createType, name))
+	res, err := db.Query(fmt.Sprintf("SHOW CREATE %s `%s`", createType, name))
 	if err != nil {
 		return "", err
 	}
@@ -423,14 +432,17 @@ func (db *Connector) showCreate(createType, name string) (string, error) {
 		if _, ok := fields[col]; ok {
 			createFields = append(createFields, fields[col])
 		} else {
-			common.Log.Debug("showCreate by pass column %s", col)
+			common.Log.Debug("showCreate Type: %s, Name: %s, by pass column `%s`", createType, name, col)
 			createFields = append(createFields, &colByPass)
 		}
 	}
 
 	// 获取 CREATE 语句
 	for res.Rows.Next() {
-		res.Rows.Scan(createFields...)
+		err := res.Rows.Scan(createFields...)
+		if err != nil {
+			common.Log.Debug(err.Error())
+		}
 	}
 	res.Rows.Close()
 	return create, err
@@ -456,7 +468,7 @@ func (db *Connector) ShowCreateTable(tableName string) (string, error) {
 		}
 	}()
 
-	ddl, err := db.showCreate("table", tableName)
+	ddl, err := db.showCreate("TABLE", tableName)
 
 	// 去除外键关联条件
 	lines := strings.Split(ddl, "\n")

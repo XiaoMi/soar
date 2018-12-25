@@ -229,7 +229,9 @@ func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {
 	if common.Config.DropTestTemporary {
 		vEnv.CleanUp()
 	}
-	vEnv.Conn.Close()
-	rEnv.Conn.Close()
+	err := vEnv.Conn.Close()
+	common.LogIfWarn(err, "")
+	err = rEnv.Conn.Close()
+	common.LogIfWarn(err, "")
 	os.Exit(0)
 }

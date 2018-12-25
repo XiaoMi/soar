@@ -46,10 +46,10 @@ import (
  */
 
 // SamplingData 将数据从 onlineConn 拉取到 db 中
-func (db *Connector) SamplingData(onlineConn *Connector, database string, tables ...string) error {
+func (db *Connector) SamplingData(onlineConn *Connector, tables ...string) error {
 	var err error
-	if database == db.Database {
-		return fmt.Errorf("SamplingData the same database, From: %s/%s, To: %s/%s", onlineConn.Addr, database, db.Addr, db.Database)
+	if onlineConn.Database == db.Database {
+		return fmt.Errorf("SamplingData the same database, From: %s/%s, To: %s/%s", onlineConn.Addr, onlineConn.Database, db.Addr, db.Database)
 	}
 
 	// 计算需要泵取的数据量
@@ -82,21 +82,21 @@ func (db *Connector) SamplingData(onlineConn *Connector, database string, tables
 
 			factor := float64(wantRowsCount) / float64(tableRows)
 			common.Log.Debug("SamplingData, tableRows: %d, wantRowsCount: %d, factor: %f", tableRows, wantRowsCount, factor)
-			where = fmt.Sprintf("WHERE RAND() <= %f LIMIT %d", factor, wantRowsCount)
+			where = fmt.Sprintf("where RAND() <= %f LIMIT %d", factor, wantRowsCount)
 			if factor >= 1 {
 				where = ""
 			}
 		} else {
 			where = common.Config.SamplingCondition
 		}
-		err = db.startSampling(onlineConn.Conn, database, table, where)
+		err = db.startSampling(onlineConn.Conn, onlineConn.Database, table, where)
 	}
 	return err
 }
 
 // startSampling sampling data from OnlineDSN to TestDSN
 func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, where string) error {
-	samplingQuery := fmt.Sprintf("SELECT * FROM `%s`.`%s` %s", database, table, where)
+	samplingQuery := fmt.Sprintf("select * from `%s`.`%s` %s", database, table, where)
 	common.Log.Debug("startSampling with Query: %s", samplingQuery)
 	res, err := onlineConn.Query(samplingQuery)
 	if err != nil {
@@ -125,7 +125,10 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 	columnsStr := "`" + strings.Join(columns, "`,`") + "`"
 	for res.Next() {
 		var values []string
-		res.Scan(tableFields...)
+		err = res.Scan(tableFields...)
+		if err != nil {
+			common.Log.Debug(err.Error())
+		}
 		for i, val := range row {
 			if val == nil {
 				values = append(values, "NULL")
@@ -147,7 +150,6 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 			if err != nil {
 				break
 			}
-			values = make([]string, 0)
 			valuesStr = make([]string, 0)
 			valuesCount = 0
 		}
@@ -159,7 +161,7 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 // 将泵取的数据转换成 insert 语句并在 testConn 数据库中执行
 func (db *Connector) doSampling(table, colDef, values string) error {
 	// db.Database is hashed database name
-	query := fmt.Sprintf("INSERT INTO `%s`.`%s` (%s) VALUES %s;", db.Database, table, colDef, values)
+	query := fmt.Sprintf("insert into `%s`.`%s` (%s) values %s;", db.Database, table, colDef, values)
 	res, err := db.Query(query)
 	if res.Rows != nil {
 		res.Rows.Close()

@@ -35,7 +35,8 @@ var update = flag.Bool("update", false, "update .golden files")
 var vEnv *env.VirtualEnv
 var rEnv *database.Connector
 
-func init() {
+func TestMain(m *testing.M) {
+	// 初始化 init
 	common.BaseDir = common.DevPath
 	err := common.ParseConfig("")
 	common.LogIfError(err, "init ParseConfig")
@@ -50,7 +51,13 @@ func init() {
 		fmt.Println(err.Error(), ", By pass all advisor test cases")
 		os.Exit(0)
 	}
-	defer vEnv.CleanUp()
+
+	// 分割线
+	flag.Parse()
+	m.Run()
+
+	// 环境清理
+	vEnv.CleanUp()
 }
 
 // ARG.003
@@ -63,19 +70,27 @@ func TestRuleImplicitConversion(t *testing.T) {
 		`CREATE TABLE t1 (id int, title varchar(255) CHARSET utf8 COLLATE utf8_general_ci);`,
 		`CREATE TABLE t2 (id int, title varchar(255) CHARSET utf8mb4);`,
 		`CREATE TABLE t3 (id int, title varchar(255) CHARSET utf8 COLLATE utf8_bin);`,
+		`CREATE TABLE t4 (id int, col bit(1));`,
 	}
 	for _, sql := range initSQLs {
 		vEnv.BuildVirtualEnv(rEnv, sql)
 	}
 
-	sqls := []string{
-		"SELECT * FROM t1 WHERE title >= 60;",
-		"SELECT * FROM t1, t2 WHERE t1.title = t2.title;",
-		"SELECT * FROM t1, t3 WHERE t1.title = t3.title;",
-		"SELECT * FROM t1 WHERE title in (60, '60');",
-		"SELECT * FROM t1 WHERE title in (60);",
+	sqls := [][]string{
+		{
+			"SELECT * FROM t1 WHERE title >= 60;",
+			"SELECT * FROM t1, t2 WHERE t1.title = t2.title;",
+			"SELECT * FROM t1, t3 WHERE t1.title = t3.title;",
+			"SELECT * FROM t1 WHERE title in (60, '60');",
+			"SELECT * FROM t1 WHERE title in (60);",
+			"SELECT * FROM t4 WHERE col = '1'",
+		},
+		{
+			// https://github.com/XiaoMi/soar/issues/151
+			"SELECT * FROM t4 WHERE col = 1",
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		stmt, syntaxErr := sqlparser.Parse(sql)
 		if syntaxErr != nil {
 			common.Log.Critical("Syntax Error: %v, SQL: %s", syntaxErr, sql)
@@ -95,6 +110,28 @@ func TestRuleImplicitConversion(t *testing.T) {
 			}
 		}
 	}
+	for _, sql := range sqls[1] {
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			common.Log.Critical("Syntax Error: %v, SQL: %s", syntaxErr, sql)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleImplicitConversion()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule, "Expect : OK, SQL:", sql)
+			}
+		}
+	}
+
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 	common.Config.OnlineDSN = dsn
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
@@ -320,6 +357,8 @@ func TestRuleUpdatePrimaryKey(t *testing.T) {
 
 func TestIndexAdvise(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	orgMinCardinality := common.Config.MinCardinality
+	common.Config.MinCardinality = 20
 
 	for _, sql := range common.TestSQLs {
 		stmt, syntaxErr := sqlparser.Parse(sql)
@@ -338,11 +377,12 @@ func TestIndexAdvise(t *testing.T) {
 			if idxAdvisor != nil {
 				rule := idxAdvisor.IndexAdvise().Format()
 				if len(rule) > 0 {
-					pretty.Println(rule)
+					_, _ = pretty.Println(rule)
 				}
 			}
 		}
 	}
+	common.Config.MinCardinality = orgMinCardinality
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
@@ -457,7 +497,7 @@ func TestIdxColsTypeCheck(t *testing.T) {
 }
 
 func TestGetRandomIndexSuffix(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	for i := 0; i < 5; i++ {
 		r := getRandomIndexSuffix()
 		if !(strings.HasPrefix(r, "_") && len(r) == 5) {

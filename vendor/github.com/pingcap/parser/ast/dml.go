@@ -14,6 +14,7 @@
 package ast
 
 import (
+	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/auth"
 	"github.com/pingcap/parser/model"
 	"github.com/pingcap/parser/mysql"
@@ -82,6 +83,11 @@ type Join struct {
 	StraightJoin bool
 }
 
+// Restore implements Node interface.
+func (n *Join) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *Join) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -125,6 +131,22 @@ type TableName struct {
 	IndexHints []*IndexHint
 }
 
+// Restore implements Node interface.
+func (n *TableName) Restore(ctx *RestoreCtx) error {
+	if n.Schema.String() != "" {
+		ctx.WriteName(n.Schema.String())
+		ctx.WritePlain(".")
+	}
+	ctx.WriteName(n.Name.String())
+	for _, value := range n.IndexHints {
+		ctx.WritePlain(" ")
+		if err := value.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while splicing IndexHints")
+		}
+	}
+	return nil
+}
+
 // IndexHintType is the type for index hint use, ignore or force.
 type IndexHintType int
 
@@ -153,6 +175,47 @@ type IndexHint struct {
 	HintScope  IndexHintScope
 }
 
+// IndexHint Restore (The const field uses switch to facilitate understanding)
+func (n *IndexHint) Restore(ctx *RestoreCtx) error {
+	indexHintType := ""
+	switch n.HintType {
+	case 1:
+		indexHintType = "USE INDEX"
+	case 2:
+		indexHintType = "IGNORE INDEX"
+	case 3:
+		indexHintType = "FORCE INDEX"
+	default: // Prevent accidents
+		return errors.New("IndexHintType has an error while matching")
+	}
+
+	indexHintScope := ""
+	switch n.HintScope {
+	case 1:
+		indexHintScope = ""
+	case 2:
+		indexHintScope = " FOR JOIN"
+	case 3:
+		indexHintScope = " FOR ORDER BY"
+	case 4:
+		indexHintScope = " FOR GROUP BY"
+	default: // Prevent accidents
+		return errors.New("IndexHintScope has an error while matching")
+	}
+	ctx.WriteKeyWord(indexHintType)
+	ctx.WriteKeyWord(indexHintScope)
+	ctx.WritePlain(" (")
+	for i, value := range n.IndexNames {
+		if i > 0 {
+			ctx.WritePlain(", ")
+		}
+		ctx.WriteName(value.O)
+	}
+	ctx.WritePlain(")")
+
+	return nil
+}
+
 // Accept implements Node Accept interface.
 func (n *TableName) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -167,6 +230,11 @@ func (n *TableName) Accept(v Visitor) (Node, bool) {
 type DeleteTableList struct {
 	node
 	Tables []*TableName
+}
+
+// Restore implements Node interface.
+func (n *DeleteTableList) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -195,6 +263,11 @@ type OnCondition struct {
 	Expr ExprNode
 }
 
+// Restore implements Node interface.
+func (n *OnCondition) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *OnCondition) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -220,6 +293,11 @@ type TableSource struct {
 
 	// AsName is the alias name of the table source.
 	AsName model.CIStr
+}
+
+// Restore implements Node interface.
+func (n *TableSource) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -268,6 +346,11 @@ type WildCardField struct {
 	Schema model.CIStr
 }
 
+// Restore implements Node interface.
+func (n *WildCardField) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *WildCardField) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -298,6 +381,11 @@ type SelectField struct {
 	Auxiliary bool
 }
 
+// Restore implements Node interface.
+func (n *SelectField) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *SelectField) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -320,6 +408,11 @@ type FieldList struct {
 	node
 
 	Fields []*SelectField
+}
+
+// Restore implements Node interface.
+func (n *FieldList) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -346,6 +439,11 @@ type TableRefsClause struct {
 	TableRefs *Join
 }
 
+// Restore implements Node interface.
+func (n *TableRefsClause) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *TableRefsClause) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -369,6 +467,11 @@ type ByItem struct {
 	Desc bool
 }
 
+// Restore implements Node interface.
+func (n *ByItem) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *ByItem) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -388,6 +491,11 @@ func (n *ByItem) Accept(v Visitor) (Node, bool) {
 type GroupByClause struct {
 	node
 	Items []*ByItem
+}
+
+// Restore implements Node interface.
+func (n *GroupByClause) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -413,6 +521,11 @@ type HavingClause struct {
 	Expr ExprNode
 }
 
+// Restore implements Node interface.
+func (n *HavingClause) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *HavingClause) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -433,6 +546,11 @@ type OrderByClause struct {
 	node
 	Items    []*ByItem
 	ForUnion bool
+}
+
+// Restore implements Node interface.
+func (n *OrderByClause) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -486,6 +604,11 @@ type SelectStmt struct {
 	IsAfterUnionDistinct bool
 	// IsInBraces indicates whether it's a stmt in brace.
 	IsInBraces bool
+}
+
+// Restore implements Node interface.
+func (n *SelectStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -582,6 +705,11 @@ type UnionSelectList struct {
 	Selects []*SelectStmt
 }
 
+// Restore implements Node interface.
+func (n *UnionSelectList) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *UnionSelectList) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -608,6 +736,11 @@ type UnionStmt struct {
 	SelectList *UnionSelectList
 	OrderBy    *OrderByClause
 	Limit      *Limit
+}
+
+// Restore implements Node interface.
+func (n *UnionStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -650,6 +783,11 @@ type Assignment struct {
 	Expr ExprNode
 }
 
+// Restore implements Node interface.
+func (n *Assignment) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *Assignment) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -682,6 +820,11 @@ type LoadDataStmt struct {
 	FieldsInfo  *FieldsClause
 	LinesInfo   *LinesClause
 	IgnoreLines uint64
+}
+
+// Restore implements Node interface.
+func (n *LoadDataStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -735,6 +878,11 @@ type InsertStmt struct {
 	Priority    mysql.PriorityEnum
 	OnDuplicate []*Assignment
 	Select      ResultSetNode
+}
+
+// Restore implements Node interface.
+func (n *InsertStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -813,6 +961,11 @@ type DeleteStmt struct {
 	TableHints []*TableOptimizerHint
 }
 
+// Restore implements Node interface.
+func (n *DeleteStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *DeleteStmt) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -873,6 +1026,11 @@ type UpdateStmt struct {
 	TableHints    []*TableOptimizerHint
 }
 
+// Restore implements Node interface.
+func (n *UpdateStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *UpdateStmt) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -922,6 +1080,21 @@ type Limit struct {
 
 	Count  ExprNode
 	Offset ExprNode
+}
+
+// Restore implements Node interface.
+func (n *Limit) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("LIMIT ")
+	if n.Offset != nil {
+		if err := n.Offset.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore Limit.Offset")
+		}
+		ctx.WritePlain(",")
+	}
+	if err := n.Count.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore Limit.Count")
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -1004,6 +1177,11 @@ type ShowStmt struct {
 	Where       ExprNode
 }
 
+// Restore implements Node interface.
+func (n *ShowStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *ShowStmt) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -1064,6 +1242,11 @@ type WindowSpec struct {
 	Frame       *FrameClause
 }
 
+// Restore implements Node interface.
+func (n *WindowSpec) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *WindowSpec) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -1102,6 +1285,11 @@ type PartitionByClause struct {
 	Items []*ByItem
 }
 
+// Restore implements Node interface.
+func (n *PartitionByClause) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *PartitionByClause) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -1136,6 +1324,11 @@ type FrameClause struct {
 
 	Type   FrameType
 	Extent FrameExtent
+}
+
+// Restore implements Node interface.
+func (n *FrameClause) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -1184,6 +1377,11 @@ type FrameBound struct {
 	// `Unit` is used to indicate the units in which the `Expr` should be interpreted.
 	// For example: '2:30' MINUTE_SECOND.
 	Unit ExprNode
+}
+
+// Restore implements Node interface.
+func (n *FrameBound) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.

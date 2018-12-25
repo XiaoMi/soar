@@ -34,10 +34,10 @@ import (
 type VirtualEnv struct {
 	*database.Connector
 
-	// 保存DB测试环境映射关系，防止vEnv环境冲突。
+	// 保存 DB 测试环境映射关系，防止 vEnv 环境冲突。
 	DBRef   map[string]string // db -> optimizer_xxx
-	hash2Db map[string]string // optimizer_xxx -> db
-	// 保存Table创建关系，防止重复创建表
+	Hash2DB map[string]string // optimizer_xxx -> db
+	// 保存 Table 创建关系，防止重复创建表
 	TableMap map[string]map[string]string
 	// 错误
 	Error error
@@ -48,7 +48,7 @@ func NewVirtualEnv(vEnv *database.Connector) *VirtualEnv {
 	return &VirtualEnv{
 		Connector: vEnv,
 		DBRef:     make(map[string]string),
-		hash2Db:   make(map[string]string),
+		Hash2DB:   make(map[string]string),
 		TableMap:  make(map[string]map[string]string),
 	}
 }
@@ -86,7 +86,7 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 	common.Config.OnlineDSN.Version = rEnvVersion
 	if err != nil {
 		common.Log.Warn("BuildEnv OnlineDSN: %s:********@%s/%s not available , Error: %s",
-			vEnv.User, vEnv.Addr, vEnv.Database, err.Error())
+			connOnline.User, connOnline.Addr, connOnline.Database, err.Error())
 		common.Config.TestDSN.Disable = true
 	}
 
@@ -109,42 +109,50 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 }
 
 // RealDB 从测试环境中获取通过hash后的DB
-func (ve VirtualEnv) RealDB(hash string) string {
-	if _, ok := ve.hash2Db[hash]; ok {
-		return ve.hash2Db[hash]
+func (vEnv *VirtualEnv) RealDB(hash string) string {
+	if _, ok := vEnv.Hash2DB[hash]; ok {
+		return vEnv.Hash2DB[hash]
+	}
+	// hash may be real database name not hash
+	if strings.HasPrefix(hash, "optimizer_") {
+		common.Log.Warning("RealDB, Hash2DB missing hash map: %s", hash)
 	}
 	return hash
 }
 
 // DBHash 从测试环境中根据DB找到对应的hash值
-func (ve VirtualEnv) DBHash(db string) string {
-	if _, ok := ve.DBRef[db]; ok {
-		return ve.DBRef[db]
+func (vEnv *VirtualEnv) DBHash(db string) string {
+	if _, ok := vEnv.DBRef[db]; ok {
+		return vEnv.DBRef[db]
 	}
 	return db
 }
 
 // CleanUp 环境清理
-func (ve VirtualEnv) CleanUp() bool {
+func (vEnv *VirtualEnv) CleanUp() bool {
 	if !common.Config.TestDSN.Disable && common.Config.DropTestTemporary {
 		common.Log.Debug("CleanUp ...")
-		for db := range ve.hash2Db {
-			ve.Database = db
-			_, err := ve.Query(fmt.Sprintf("drop database %s", db))
+		for db := range vEnv.Hash2DB {
+			_, err := vEnv.Query(fmt.Sprintf("drop database %s", db))
 			if err != nil {
 				common.Log.Error("CleanUp failed Error: %s", err)
 				return false
 			}
 		}
+		// cleanup hash map
+		vEnv.DBRef = make(map[string]string)
+		vEnv.Hash2DB = make(map[string]string)
+		vEnv.TableMap = make(map[string]map[string]string)
+
 		common.Log.Debug("CleanUp, done")
 	}
 	return true
 }
 
 // CleanupTestDatabase 清除一小时前的环境
-func (ve *VirtualEnv) CleanupTestDatabase() {
+func (vEnv *VirtualEnv) CleanupTestDatabase() {
 	common.Log.Debug("CleanupTestDatabase ...")
-	dbs, err := ve.Query("show databases like 'optimizer%%'")
+	dbs, err := vEnv.Query("show databases like 'optimizer%%'")
 	if err != nil {
 		common.Log.Error("CleanupTestDatabase failed Error:%s", err.Error())
 		return
@@ -172,7 +180,7 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 
 		subHour := time.Since(pastTime).Hours()
 		if subHour > float64(minHour) {
-			if _, err := ve.Query(fmt.Sprintf("drop database %s", testDatabase)); err != nil {
+			if _, err := vEnv.Query(fmt.Sprintf("drop database %s", testDatabase)); err != nil {
 				common.Log.Error("CleanupTestDatabase failed Error: %s", err.Error())
 				continue
 			}
@@ -188,14 +196,14 @@ func (ve *VirtualEnv) CleanupTestDatabase() {
 
 // BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取
 // 注意：如果是USE,DDL等语句，执行完第一条就会返回，后面的SQL不会执行
-func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) bool {
+func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) bool {
 	var stmt sqlparser.Statement
 	var err error
 
 	// 置空错误信息
-	ve.Error = nil
+	vEnv.Error = nil
 	// 检测是否已经创建初始数据库，如果未创建则创建一个名称hash过的映射数据库
-	err = ve.createDatabase(rEnv, rEnv.Database)
+	err = vEnv.createDatabase(rEnv)
 	common.LogIfWarn(err, "")
 
 	// 测试环境检测
@@ -232,15 +240,14 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 				rEnv.Database = stmt.DBName.String()
 
 				// use DB 后检查 DB是否已经创建，如果没有创建则创建DB
-				err = ve.createDatabase(rEnv, rEnv.Database)
+				err = vEnv.createDatabase(rEnv)
 				common.LogIfWarn(err, "")
 			}
 			return true
 		case *sqlparser.DDL:
 			// 如果是DDL，则先获取DDL对应的表结构，然后直接在测试环境接执行SQL
 			// 为不影响其他SQL操作，复制一个Connector对象，将数据库切换到对应的DB上直接执行
-			tmpDB := *ve.Connector
-			tmpDB.Database = ve.DBRef[rEnv.Database]
+			vEnv.Database = vEnv.DBRef[rEnv.Database]
 
 			// 为了支持并发，需要将DB进行映射，但db.table这种形式无法保证DB的映射是正确的
 			// TODO：暂不支持 create db.tableName (id int) 形式的建表语句
@@ -266,7 +273,7 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 			// 拉取表结构
 			table := stmt.Table.Name.String()
 			if table != "" {
-				err = ve.createTable(rEnv, rEnv.Database, table)
+				err = vEnv.createTable(rEnv, table)
 				// 这里如果报错可能有两种可能：
 				// 1. SQL 是 Create 语句，线上环境并没有相关的库表结构
 				// 2. 在测试环境中执行 SQL 报错
@@ -274,16 +281,16 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 				// 如果是因为执行 SQL 报错，那么其他地方执行 SQL 的时候也一定会报错
 				// 所以这里不需要 `return false`，可以继续执行
 				if err != nil {
-					common.Log.Error("BuildVirtualEnv Error : %v", err)
+					common.Log.Warning("BuildVirtualEnv Error : %v", err)
 				}
 			}
 
-			_, err = tmpDB.Query(sql)
+			_, err = vEnv.Query(sql)
 			if err != nil {
 				switch stmt.Action {
 				case "create", "alter":
 					// 如果是创建或者修改语句，且报错信息为如重复建表、重复索引等信息，将错误反馈到上一次层输出建议
-					ve.Error = err
+					vEnv.Error = err
 				default:
 					common.Log.Error("BuildVirtualEnv DDL Execute Error : %v", err)
 				}
@@ -298,8 +305,7 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 			if db == "" {
 				db = rEnv.Database
 			}
-			tmpEnv := rEnv
-			tmpEnv.Database = db
+			rEnv.Database = db
 
 			// 创建数据库环境
 			for _, tb := range table.Table {
@@ -308,8 +314,8 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 				}
 
 				// 视图检查
-				common.Log.Debug("BuildVirtualEnv Checking view -- %s.%s", tmpEnv.Database, tb.TableName)
-				tbStatus, err := tmpEnv.ShowTableStatus(tb.TableName)
+				common.Log.Debug("BuildVirtualEnv Checking view -- %s.%s", rEnv.Database, tb.TableName)
+				tbStatus, err := rEnv.ShowTableStatus(tb.TableName)
 				if err != nil {
 					common.Log.Error("BuildVirtualEnv ShowTableStatus Error : %v", err)
 					return false
@@ -317,9 +323,8 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 
 				// 如果是视图，解析语句
 				if len(tbStatus.Rows) > 0 && string(tbStatus.Rows[0].Comment) == "VIEW" {
-					tmpEnv.Database = db
 					var viewDDL string
-					viewDDL, err = tmpEnv.ShowCreateTable(tb.TableName)
+					viewDDL, err = rEnv.ShowCreateTable(tb.TableName)
 					if err != nil {
 						common.Log.Error("BuildVirtualEnv create view failed: %v", err)
 						return false
@@ -331,14 +336,14 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 						return false
 					}
 					viewDDL = viewDDL[startIdx+2:]
-					if !ve.BuildVirtualEnv(tmpEnv, viewDDL) {
+					if !vEnv.BuildVirtualEnv(rEnv, viewDDL) {
 						return false
 					}
 				}
 
-				err = ve.createTable(tmpEnv, db, tb.TableName)
+				err = vEnv.createTable(rEnv, tb.TableName)
 				if err != nil {
-					common.Log.Error("BuildVirtualEnv %s.%s Error : %v", db, tb.TableName, err)
+					common.Log.Error("BuildVirtualEnv %s.%s Error : %v", rEnv.Database, tb.TableName, err)
 					return false
 				}
 			}
@@ -347,36 +352,39 @@ func (ve *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) 
 	return true
 }
 
-func (ve VirtualEnv) createDatabase(rEnv *database.Connector, dbName string) error {
+func (vEnv *VirtualEnv) createDatabase(rEnv *database.Connector) error {
 	// 生成映射关系
-	if _, ok := ve.DBRef[dbName]; ok {
-		common.Log.Debug("createDatabase, Database `%s` created", dbName)
+	if _, ok := vEnv.DBRef[rEnv.Database]; ok {
+		common.Log.Debug("createDatabase, Database `%s` has created, mapping from `%s`", vEnv.DBRef[rEnv.Database], rEnv.Database)
 		return nil
 	}
 
 	// optimizer_YYMMDDHHmmss_xxxx
-	dbHash := fmt.Sprintf("optimizer_%s_%s", time.Now().Format("060102150405"), uniuri.New())
-	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", dbName, dbName, dbHash)
-	ddl, err := rEnv.ShowCreateDatabase(dbName)
+	dbHash := fmt.Sprintf("optimizer_%s_%s", // Total 39 bytes
+		time.Now().Format("060102150405"), // 12 Bytes 20180102030405
+		strings.ToLower(uniuri.New()))     // 16 Bytes random string
+	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", rEnv.Database, rEnv.Database, dbHash)
+	ddl, err := rEnv.ShowCreateDatabase(rEnv.Database)
 	if err != nil {
 		common.Log.Warning("createDatabase, rEnv.ShowCreateDatabase Error : %v", err)
-		ddl = fmt.Sprintf("create database `%s` character set utf8mb4", dbName)
+		ddl = fmt.Sprintf("create database `%s` character set utf8mb4", rEnv.Database)
 	}
 
-	ddl = strings.Replace(ddl, dbName, dbHash, -1)
+	ddl = strings.Replace(ddl, rEnv.Database, dbHash, -1)
 	if ddl == "" {
-		return fmt.Errorf("dbName: '%s' get create info error", dbName)
+		return fmt.Errorf("dbName: '%s' get create info error", rEnv.Database)
 	}
-	res, err := ve.Query(ddl)
+	res, err := vEnv.Query(ddl)
 	if err != nil {
 		common.Log.Warning("createDatabase, Error : %v", err)
 		return err
 	}
-	res.Rows.Close()
+	err = res.Rows.Close()
+	common.LogIfWarn(err, "")
 
 	// 创建成功，添加映射记录
-	ve.DBRef[dbName] = dbHash
-	ve.hash2Db[dbHash] = dbName
+	vEnv.DBRef[rEnv.Database] = dbHash
+	vEnv.Hash2DB[dbHash] = rEnv.Database
 	return nil
 }
 
@@ -400,16 +408,18 @@ func (ve VirtualEnv) createDatabase(rEnv *database.Connector, dbName string) err
 		soar 能够做出判断并进行 session 级别的修改，但是这一阶段可用性保证应该是由用户提供两个完全相同（或测试环境兼容线上环境）
 		的数据库环境来实现的。
 */
-func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string) error {
-
-	if dbName == "" {
-		dbName = rEnv.Database
+func (vEnv *VirtualEnv) createTable(rEnv *database.Connector, tbName string) error {
+	// 判断数据库是否已经创建
+	if vEnv.DBRef[rEnv.Database] == "" {
+		// 若没创建，则创建数据库
+		err := vEnv.createDatabase(rEnv)
+		if err != nil {
+			return err
+		}
 	}
-	// 如果 dbName 不为空，说明指定了DB，临时修改rEnv中DB参数，来确保执行正确性
-	rEnv.Database = dbName
 
-	if ve.TableMap[dbName] == nil {
-		ve.TableMap[dbName] = make(map[string]string)
+	if vEnv.TableMap[rEnv.Database] == nil {
+		vEnv.TableMap[rEnv.Database] = make(map[string]string)
 	}
 
 	if strings.ToLower(tbName) == "dual" {
@@ -417,30 +427,20 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 		return nil
 	}
 
-	if ve.TableMap[dbName][tbName] != "" {
-		common.Log.Debug("createTable, `%s`.`%s` created", dbName, tbName)
+	if vEnv.TableMap[rEnv.Database][tbName] != "" {
+		common.Log.Debug("createTable, `%s`.`%s` has created, mapping from `%s`.`%s`", vEnv.DBRef[rEnv.Database], tbName, rEnv.Database, tbName)
 		return nil
 	}
 
-	common.Log.Debug("createTable, Database: %s, TableName: %s", dbName, tbName)
+	common.Log.Debug("createTable, Database: %s, TableName: %s", vEnv.DBRef[rEnv.Database], tbName)
 
 	//  TODO：查看是否有外键关联（done），对外键的支持 (未解决循环依赖的问题)
 
-	// 判断数据库是否已经创建
-	if ve.DBRef[dbName] == "" {
-		// 若没创建，则创建数据库
-		err := ve.createDatabase(rEnv, dbName)
-		if err != nil {
-			return err
-		}
-	}
-
 	// 记录Table创建信息
-	ve.TableMap[dbName][tbName] = tbName
+	vEnv.TableMap[rEnv.Database][tbName] = tbName
 
 	// 生成建表语句
 	common.Log.Debug("createTable DSN(%s/%s): generate ddl", rEnv.Addr, rEnv.Database)
-
 	ddl, err := rEnv.ShowCreateTable(tbName)
 	if err != nil {
 		// 有可能是用户新建表，因此线上环境查不到
@@ -449,25 +449,26 @@ func (ve VirtualEnv) createTable(rEnv *database.Connector, dbName, tbName string
 	}
 
 	// 改变数据环境
-	ve.Database = ve.DBRef[dbName]
-	res, err := ve.Query(ddl)
+	vEnv.Database = vEnv.DBRef[rEnv.Database]
+	res, err := vEnv.Query(ddl)
 	if err != nil {
 		// 有可能是用户新建表，因此线上环境查不到
 		common.Log.Error("createTable: %s Error : %v", tbName, err)
 		return err
 	}
-	res.Rows.Close()
+	err = res.Rows.Close()
+	common.LogIfWarn(err, "")
 
 	// 泵取数据
 	if common.Config.Sampling {
-		common.Log.Debug("createTable, Start Sampling data from %s.%s to %s.%s ...", dbName, tbName, ve.DBRef[dbName], tbName)
-		err = ve.SamplingData(rEnv, dbName, tbName)
+		common.Log.Debug("createTable, Start Sampling data from %s.%s to %s.%s ...", rEnv.Database, tbName, vEnv.DBRef[rEnv.Database], tbName)
+		err = vEnv.SamplingData(rEnv, tbName)
 	}
 	return err
 }
 
 // GenTableColumns 为 Rewrite 提供的结构体初始化
-func (ve *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
+func (vEnv *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
 	tableColumns := make(common.TableColumns)
 	for dbName, db := range meta {
 		for _, tb := range db.Table {
@@ -475,7 +476,7 @@ func (ve *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
 			if tb == nil {
 				break
 			}
-			td, err := ve.Connector.ShowColumns(tb.TableName)
+			td, err := vEnv.Connector.ShowColumns(tb.TableName)
 			if err != nil {
 				common.Log.Warn("GenTableColumns, ShowColumns Error: " + err.Error())
 				break
@@ -483,7 +484,7 @@ func (ve *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
 
 			// tableColumns 初始化
 			if dbName == "" {
-				dbName = ve.RealDB(ve.Connector.Database)
+				dbName = vEnv.RealDB(vEnv.Connector.Database)
 			}
 
 			if _, ok := tableColumns[dbName]; !ok {

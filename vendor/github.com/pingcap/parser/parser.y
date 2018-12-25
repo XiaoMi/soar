@@ -462,6 +462,9 @@ import (
 	timestampDiff		"TIMESTAMPDIFF"
 	top			"TOP"
 	trim			"TRIM"
+	variance		"VARIANCE"
+	varPop			"VAR_POP"
+	varSamp			"VAR_SAMP"
 
 	/* The following tokens belong to TiDBKeyword. */
 	admin		"ADMIN"
@@ -1081,6 +1084,13 @@ AlterTableSpec:
 			Name: $3,
 		}
 	}	
+|	"TRUNCATE" "PARTITION" Identifier
+	{
+		$$ = &ast.AlterTableSpec{
+			Tp: ast.AlterTableTruncatePartition,
+			Name: $3,
+		}
+	}
 |	"DROP" KeyOrIndex Identifier
 	{
 		$$ = &ast.AlterTableSpec{
@@ -2132,14 +2142,24 @@ CreateViewStmt:
     {
 		startOffset := parser.startOffset(&yyS[yypt-1])
 		selStmt := $10.(*ast.SelectStmt)
-		selStmt.SetText(string(parser.src[startOffset:]))
+		selStmt.SetText(strings.TrimSpace(parser.src[startOffset:]))
 		x := &ast.CreateViewStmt {
  			OrReplace:     $2.(bool),
 			ViewName:      $7.(*ast.TableName),
 			Select:        selStmt,
+			Algorithm:     $3.(model.ViewAlgorithm),
+			Definer:       $4.(*auth.UserIdentity),
+			Security:      $5.(model.ViewSecurity),
 		}
 		if $8 != nil{
 			x.Cols = $8.([]model.CIStr)
+		}
+		if $11 !=nil {
+		    x.CheckOption = $11.(model.ViewCheckOption)
+		    endOffset := parser.startOffset(&yyS[yypt])
+		    selStmt.SetText(strings.TrimSpace(parser.src[startOffset:endOffset]))
+		} else {
+		    x.CheckOption = model.CheckOptionCascaded
 		}
 		$$ = x
 	}
@@ -2156,25 +2176,25 @@ OrReplace:
 ViewAlgorithm:
 	/* EMPTY */
 	{
-		$$ = "UNDEFINED"
+		$$ = model.AlgorithmUndefined
 	}
 |	"ALGORITHM" "=" "UNDEFINED"
 	{
-		$$ = strings.ToUpper($3)
+		$$ = model.AlgorithmUndefined
 	}
 |	"ALGORITHM" "=" "MERGE"
 	{
-		$$ = strings.ToUpper($3)
+		$$ = model.AlgorithmMerge
 	}
 |	"ALGORITHM" "=" "TEMPTABLE"
 	{
-		$$ = strings.ToUpper($3)
+		$$ = model.AlgorithmTemptable
 	}
 
 ViewDefiner:
 	/* EMPTY */
 	{
-		$$ = nil
+		$$ = &auth.UserIdentity{CurrentUser: true}
 	}
 |   "DEFINER" "=" Username
 	{
@@ -2184,15 +2204,15 @@ ViewDefiner:
 ViewSQLSecurity:
 	/* EMPTY */
 	{
-		$$ = "DEFINER"
+		$$ = model.SecurityDefiner
 	}
 |   "SQL" "SECURITY" "DEFINER"
 	 {
-		 $$ = $3
+		 $$ = model.SecurityDefiner
 	 }
 |   "SQL" "SECURITY" "INVOKER"
 	 {
-		 $$ = $3
+		 $$ = model.SecurityInvoker
 	 }
 
 ViewName:
@@ -2228,11 +2248,11 @@ ViewCheckOption:
 	}
 |   "WITH" "CASCADED" "CHECK" "OPTION"
 	{
-		$$ = $2
+		$$ = model.CheckOptionCascaded
 	}
 |   "WITH" "LOCAL" "CHECK" "OPTION"
 	{
-		$$ = $2
+		$$ = model.CheckOptionLocal
 	}
 
 /******************************************************************
@@ -2336,17 +2356,22 @@ DropIndexStmt:
 DropTableStmt:
 	"DROP" TableOrTables TableNameList RestrictOrCascadeOpt
 	{
-		$$ = &ast.DropTableStmt{Tables: $3.([]*ast.TableName)}
+		$$ = &ast.DropTableStmt{Tables: $3.([]*ast.TableName), IsView: false}
 	}
 |	"DROP" TableOrTables "IF" "EXISTS" TableNameList RestrictOrCascadeOpt
 	{
-		$$ = &ast.DropTableStmt{IfExists: true, Tables: $5.([]*ast.TableName)}
+		$$ = &ast.DropTableStmt{IfExists: true, Tables: $5.([]*ast.TableName), IsView: false}
 	}
 
 DropViewStmt:
-	"DROP" "VIEW" "IF" "EXISTS" TableNameList
+	"DROP" "VIEW" TableNameList RestrictOrCascadeOpt
 	{
-		$$ = &ast.DoStmt{}
+		$$ = &ast.DropTableStmt{Tables: $3.([]*ast.TableName), IsView: true}
+	}
+|
+	"DROP" "VIEW" "IF" "EXISTS" TableNameList RestrictOrCascadeOpt
+	{
+		$$ = &ast.DropTableStmt{IfExists: true, Tables: $5.([]*ast.TableName), IsView: true}
 	}
 
 DropUserStmt:
@@ -2901,6 +2926,8 @@ IndexOptionList:
 				opt1.Comment = opt2.Comment
 			} else if opt2.Tp != 0 {
 				opt1.Tp = opt2.Tp
+			} else if opt2.KeyBlockSize > 0 {
+			    opt1.KeyBlockSize = opt2.KeyBlockSize
 			}
 			$$ = opt1
 		}
@@ -2911,8 +2938,7 @@ IndexOption:
 	"KEY_BLOCK_SIZE" EqOpt LengthNum
 	{
 		$$ = &ast.IndexOption{
-			// TODO bug should be fix here!
-			// KeyBlockSize: $1.(uint64),
+			KeyBlockSize: $3.(uint64),
 		}
 	}
 |	IndexType
@@ -2973,7 +2999,8 @@ TiDBKeyword:
 
 NotKeywordToken:
  "ADDDATE" | "BIT_AND" | "BIT_OR" | "BIT_XOR" | "CAST" | "COPY" | "COUNT" | "CURTIME" | "DATE_ADD" | "DATE_SUB" | "EXTRACT" | "GET_FORMAT" | "GROUP_CONCAT"
-| "INPLACE" | "INTERNAL" |"MIN" | "MAX" | "MAX_EXECUTION_TIME" | "NOW" | "RECENT" | "POSITION" | "SUBDATE" | "SUBSTRING" | "SUM" | "STD" | "STDDEV" | "STDDEV_POP" | "STDDEV_SAMP" 
+| "INPLACE" | "INTERNAL" |"MIN" | "MAX" | "MAX_EXECUTION_TIME" | "NOW" | "RECENT" | "POSITION" | "SUBDATE" | "SUBSTRING" | "SUM"
+| "STD" | "STDDEV" | "STDDEV_POP" | "STDDEV_SAMP" | "VARIANCE" | "VAR_POP" | "VAR_SAMP"
 | "TIMESTAMPADD" | "TIMESTAMPDIFF" | "TOP" | "TRIM" | "NEXT_ROW_ID"
 
 /************************************************************************************
@@ -4009,6 +4036,14 @@ SumExpr:
 		} else {
 			$$ = &ast.AggregateFuncExpr{F: $1, Args: []ast.ExprNode{$4}, Distinct: $3.(bool)}
 		}
+	}
+|	builtinVarPop '(' BuggyDefaultFalseDistinctOpt Expression ')'  OptWindowingClause
+	{
+		$$ = &ast.AggregateFuncExpr{F: ast.AggFuncVarPop, Args: []ast.ExprNode{$4}, Distinct: $3.(bool)}
+	}
+|	builtinVarSamp '(' BuggyDefaultFalseDistinctOpt Expression ')'  OptWindowingClause
+	{
+		$$ = &ast.AggregateFuncExpr{F: $1, Args: []ast.ExprNode{$4}, Distinct: $3.(bool)}
 	}
 
 OptGConcatSeparator:
@@ -5155,6 +5190,11 @@ TableOptimizerHints:
 |	hintBegin TableOptimizerHintList hintEnd
 	{
 		$$ = $2
+	}
+|	hintBegin error hintEnd
+	{
+		yyerrok()
+		parser.lastErrorAsWarn()
 	}
 
 HintTableList:

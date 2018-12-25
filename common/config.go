@@ -25,6 +25,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -89,6 +90,7 @@ type Configuration struct {
 	MaxGroupByColsCount  int      `yaml:"max-group-by-cols-count"`   // 单条 SQL 中 GroupBy 包含列的最大数量
 	MaxDistinctCount     int      `yaml:"max-distinct-count"`        // 单条 SQL 中 Distinct 的最大数量
 	MaxIdxColsCount      int      `yaml:"max-index-cols-count"`      // 复合索引中包含列的最大数量
+	MaxTextColsCount     int      `yaml:"max-text-cols-count"`       // 表中含有的 text/blob 列的最大数量
 	MaxTotalRows         int64    `yaml:"max-total-rows"`            // 计算散粒度时，当数据行数大于 MaxTotalRows 即开启数据库保护模式，散粒度返回结果可信度下降
 	MaxQueryCost         int64    `yaml:"max-query-cost"`            // last_query_cost 超过该值时将给予警告
 	SpaghettiQueryLength int      `yaml:"spaghetti-query-length"`    // SQL最大长度警告，超过该长度会给警告
@@ -96,8 +98,9 @@ type Configuration struct {
 	MaxInCount           int      `yaml:"max-in-count"`              // IN()最大数量
 	MaxIdxBytesPerColumn int      `yaml:"max-index-bytes-percolumn"` // 索引中单列最大字节数，默认767
 	MaxIdxBytes          int      `yaml:"max-index-bytes"`           // 索引总长度限制，默认3072
-	TableAllowCharsets   []string `yaml:"table-allow-charsets"`      // TableName 允许使用的 DEFAULT CHARSET
-	TableAllowEngines    []string `yaml:"table-allow-engines"`       // TableName 允许使用的 Engine
+	AllowCharsets        []string `yaml:"allow-charsets"`            // 允许使用的 DEFAULT CHARSET
+	AllowCollates        []string `yaml:"allow-collates"`            // 允许使用的 COLLATE
+	AllowEngines         []string `yaml:"allow-engines"`             // 允许使用的存储引擎
 	MaxIdxCount          int      `yaml:"max-index-count"`           // 单张表允许最多索引数
 	MaxColCount          int      `yaml:"max-column-count"`          // 单张表允许最大列数
 	MaxValueCount        int      `yaml:"max-value-count"`           // INSERT/REPLACE 单次允许批量写入的行数
@@ -105,6 +108,8 @@ type Configuration struct {
 	UkPrefix             string   `yaml:"unique-key-prefix"`         // 唯一键建议使用的前缀
 	MaxSubqueryDepth     int      `yaml:"max-subquery-depth"`        // 子查询最大尝试
 	MaxVarcharLength     int      `yaml:"max-varchar-length"`        // varchar最大长度
+	ColumnNotAllowType   []string `yaml:"column-not-allow-type"`     // 字段不允许使用的数据类型
+	MinCardinality       float64  `yaml:"min-cardinality"`           // 添加索引散粒度阈值，范围 0~100
 
 	// ++++++++++++++EXPLAIN检查项+++++++++++++
 	ExplainSQLReportType   string   `yaml:"explain-sql-report-type"`  // EXPLAIN markdown 格式输出 SQL 样式，支持 sample, fingerprint, pretty 等
@@ -158,11 +163,13 @@ var Config = &Configuration{
 	Trace:                   false,
 	Explain:                 true,
 	Delimiter:               ";",
+	MinCardinality:          0,
 
 	MaxJoinTableCount:    5,
 	MaxGroupByColsCount:  5,
 	MaxDistinctCount:     5,
 	MaxIdxColsCount:      5,
+	MaxTextColsCount:     2,
 	MaxIdxBytesPerColumn: 767,
 	MaxIdxBytes:          3072,
 	MaxTotalRows:         9999999,
@@ -176,8 +183,9 @@ var Config = &Configuration{
 	ReportJavascript:     "",
 	ReportTitle:          "SQL优化分析报告",
 	BlackList:            "",
-	TableAllowCharsets:   []string{"utf8", "utf8mb4"},
-	TableAllowEngines:    []string{"innodb"},
+	AllowCharsets:        []string{"utf8", "utf8mb4"},
+	AllowCollates:        []string{},
+	AllowEngines:         []string{"innodb"},
 	MaxIdxCount:          10,
 	MaxColCount:          40,
 	MaxValueCount:        100,
@@ -186,6 +194,7 @@ var Config = &Configuration{
 	UkPrefix:             "uk_",
 	MaxSubqueryDepth:     5,
 	MaxVarcharLength:     1024,
+	ColumnNotAllowType:   []string{"boolean"},
 
 	MarkdownExtensions: 94,
 	MarkdownHTMLFlags:  0,
@@ -252,7 +261,8 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 	}
 
 	if d != nil {
-		addr = d.Addr
+		// 原来有个判断，后来判断条件被删除了就导致第一次addr无论如何都会被修改。所以这边先注释掉
+		// addr = d.Addr
 		user = d.User
 		password = d.Password
 		schema = d.Schema
@@ -265,60 +275,52 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 		return &Dsn{Disable: true}
 	}
 
-	// username:password@ip:port/database
-	l1 := strings.Split(odbc, "@")
-	if len(l1) < 2 {
-		if strings.HasPrefix(l1[0], ":") {
-			// ":port/database"
-			l2 := strings.Split(strings.TrimLeft(l1[0], ":"), "/")
-			if l2[0] == "" {
-				addr = strings.Split(addr, ":")[0] + ":3306"
-				if len(l2) > 1 {
-					schema = strings.Split(l2[1], "?")[0]
-				}
-			} else {
-				addr = strings.Split(addr, ":")[0] + ":" + l2[0]
-				if len(l2) > 1 {
-					schema = strings.Split(l2[1], "?")[0]
-				}
-			}
-		} else if strings.HasPrefix(l1[0], "/") {
-			// "/database"
-			l2 := strings.TrimLeft(l1[0], "/")
-			schema = l2
-		} else {
-			// ip:port/database
-			l2 := strings.Split(l1[0], "/")
-			if len(l2) == 2 {
-				addr = l2[0]
-				schema = strings.Split(l2[1], "?")[0]
-			} else {
-				addr = l2[0]
-			}
-		}
+	var userInfo, hostInfo, query string
+
+	// DSN 格式匹配
+	if res := regexp.MustCompile(`^(.*)@(.*?)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 5 {
+		// userInfo@hostInfo/database
+		userInfo = res[1]
+		hostInfo = res[2]
+		schema = res[3]
+		query = res[5]
+	} else if res := regexp.MustCompile(`^(.*)/(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 4 {
+		// hostInfo/database
+		hostInfo = res[1]
+		schema = res[2]
+		query = res[4]
+	} else if res := regexp.MustCompile(`^(.*)@(.*?)($|\?)(.*)`).FindStringSubmatch(odbc); len(res) > 4 {
+		// userInfo@hostInfo
+		userInfo = res[1]
+		hostInfo = res[2]
+		query = res[4]
 	} else {
-		// user:password
-		l2 := strings.Split(l1[0], ":")
-		if len(l2) == 2 {
-			user = l2[0]
-			password = l2[1]
-		} else {
-			user = l2[0]
-		}
-		// ip:port/database
-		l3 := strings.Split(l1[1], "/")
-		if len(l3) == 2 {
-			addr = l3[0]
-			schema = strings.Split(l3[1], "?")[0]
-		} else {
-			addr = l3[0]
-		}
+		// hostInfo
+		hostInfo = odbc
 	}
 
-	// 其他flag参数，目前只支持charset :(
-	if len(strings.Split(odbc, "?")) > 1 {
-		flags := strings.Split(strings.Split(odbc, "?")[1], "&")
-		for _, f := range flags {
+	// 解析用户信息
+	if userInfo != "" {
+		user = strings.Split(userInfo, ":")[0]
+		// 防止密码中含有与用户名相同的字符, 所以用正则替换, 剩下的就是密码
+		password = strings.TrimLeft(regexp.MustCompile("^"+user).ReplaceAllString(userInfo, ""), ":")
+	}
+
+	// 解析主机信息
+	host := strings.Split(hostInfo, ":")[0]
+	port := strings.TrimLeft(strings.Replace(hostInfo, host, "", 1), ":")
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	if port == "" {
+		port = "3306"
+	}
+	addr = host + ":" + port
+
+	// 解析查询字符串
+	if query != "" {
+		params := strings.Split(query, "&")
+		for _, f := range params {
 			attr := strings.Split(f, "=")
 			if len(attr) > 1 {
 				arg := strings.TrimSpace(attr[0])
@@ -330,20 +332,6 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 				}
 			}
 		}
-	}
-
-	// 自动补端口
-	if !strings.Contains(addr, ":") {
-		addr = addr + ":3306"
-	} else {
-		if strings.HasSuffix(addr, ":") {
-			addr = addr + "3306"
-		}
-	}
-
-	// 默认走127.0.0.1
-	if strings.HasPrefix(addr, ":") {
-		addr = "127.0.0.1" + addr
 	}
 
 	// 默认用information_schema库
@@ -509,10 +497,11 @@ func readCmdFlags() error {
 	samplingStatisticTarget := flag.Int("sampling-statistic-target", Config.SamplingStatisticTarget, "SamplingStatisticTarget, 数据采样因子，对应 PostgreSQL 的 default_statistics_target")
 	samplingCondition := flag.String("sampling-condition", Config.SamplingCondition, "SamplingCondition, 数据采样条件，如： WHERE xxx LIMIT xxx")
 	delimiter := flag.String("delimiter", Config.Delimiter, "Delimiter, SQL分隔符")
+	minCardinality := flag.Float64("min-cardinality", Config.MinCardinality, "MinCardinality，索引列散粒度最低阈值，散粒度低于该值的列不添加索引，建议范围0.0 ~ 100.0")
 	// +++++++++++++++日志相关+++++++++++++++++
 	logLevel := flag.Int("log-level", Config.LogLevel, "LogLevel, 日志级别, [0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]")
 	logOutput := flag.String("log-output", Config.LogOutput, "LogOutput, 日志输出位置")
-	reportType := flag.String("report-type", Config.ReportType, "ReportType, 化建议输出格式，目前支持: json, text, markdown, html等")
+	reportType := flag.String("report-type", Config.ReportType, "ReportType, 优化建议输出格式，目前支持: json, text, markdown, html等")
 	reportCSS := flag.String("report-css", Config.ReportCSS, "ReportCSS, 当 ReportType 为 html 格式时使用的 css 风格，如不指定会提供一个默认风格。CSS可以是本地文件，也可以是一个URL")
 	reportJavascript := flag.String("report-javascript", Config.ReportJavascript, "ReportJavascript, 当 ReportType 为 html 格式时使用的javascript脚本，如不指定默认会加载SQL pretty 使用的 javascript。像CSS一样可以是本地文件，也可以是一个URL")
 	reportTitle := flag.String("report-title", Config.ReportTitle, "ReportTitle, 当 ReportType 为 html 格式时，HTML 的 title")
@@ -527,6 +516,7 @@ func readCmdFlags() error {
 	maxGroupByColsCount := flag.Int("max-group-by-cols-count", Config.MaxGroupByColsCount, "MaxGroupByColsCount, 单条 SQL 中 GroupBy 包含列的最大数量")
 	maxDistinctCount := flag.Int("max-distinct-count", Config.MaxDistinctCount, "MaxDistinctCount, 单条 SQL 中 Distinct 的最大数量")
 	maxIdxColsCount := flag.Int("max-index-cols-count", Config.MaxIdxColsCount, "MaxIdxColsCount, 复合索引中包含列的最大数量")
+	maxTextColsCount := flag.Int("max-text-cols-count", Config.MaxTextColsCount, "MaxTextColsCount, 表中含有的 text/blob 列的最大数量")
 	maxTotalRows := flag.Int64("max-total-rows", Config.MaxTotalRows, "MaxTotalRows, 计算散粒度时，当数据行数大于MaxTotalRows即开启数据库保护模式，不计算散粒度")
 	maxQueryCost := flag.Int64("max-query-cost", Config.MaxQueryCost, "MaxQueryCost, last_query_cost 超过该值时将给予警告")
 	spaghettiQueryLength := flag.Int("spaghetti-query-length", Config.SpaghettiQueryLength, "SpaghettiQueryLength, SQL最大长度警告，超过该长度会给警告")
@@ -534,8 +524,9 @@ func readCmdFlags() error {
 	maxInCount := flag.Int("max-in-count", Config.MaxInCount, "MaxInCount, IN()最大数量")
 	maxIdxBytesPerColumn := flag.Int("max-index-bytes-percolumn", Config.MaxIdxBytesPerColumn, "MaxIdxBytesPerColumn, 索引中单列最大字节数")
 	maxIdxBytes := flag.Int("max-index-bytes", Config.MaxIdxBytes, "MaxIdxBytes, 索引总长度限制")
-	tableAllowCharsets := flag.String("table-allow-charsets", strings.ToLower(strings.Join(Config.TableAllowCharsets, ",")), "TableAllowCharsets")
-	tableAllowEngines := flag.String("table-allow-engines", strings.ToLower(strings.Join(Config.TableAllowEngines, ",")), "TableAllowEngines")
+	allowCharsets := flag.String("allow-charsets", strings.ToLower(strings.Join(Config.AllowCharsets, ",")), "AllowCharsets")
+	allowCollates := flag.String("allow-collates", strings.ToLower(strings.Join(Config.AllowCollates, ",")), "AllowCollates")
+	allowEngines := flag.String("allow-engines", strings.ToLower(strings.Join(Config.AllowEngines, ",")), "AllowEngines")
 	maxIdxCount := flag.Int("max-index-count", Config.MaxIdxCount, "MaxIdxCount, 单表最大索引个数")
 	maxColCount := flag.Int("max-column-count", Config.MaxColCount, "MaxColCount, 单表允许的最大列数")
 	maxValueCount := flag.Int("max-value-count", Config.MaxValueCount, "MaxValueCount, INSERT/REPLACE 单次批量写入允许的行数")
@@ -543,6 +534,7 @@ func readCmdFlags() error {
 	ukPrefix := flag.String("unique-key-prefix", Config.UkPrefix, "UkPrefix")
 	maxSubqueryDepth := flag.Int("max-subquery-depth", Config.MaxSubqueryDepth, "MaxSubqueryDepth")
 	maxVarcharLength := flag.Int("max-varchar-length", Config.MaxVarcharLength, "MaxVarcharLength")
+	columnNotAllowType := flag.String("column-not-allow-type", strings.Join(Config.ColumnNotAllowType, ","), "ColumnNotAllowType")
 	// ++++++++++++++EXPLAIN检查项+++++++++++++
 	explainSQLReportType := flag.String("explain-sql-report-type", strings.ToLower(Config.ExplainSQLReportType), "ExplainSQLReportType [pretty, sample, fingerprint]")
 	explainType := flag.String("explain-type", strings.ToLower(Config.ExplainType), "ExplainType [extended, partitions, traditional]")
@@ -590,19 +582,13 @@ func readCmdFlags() error {
 	Config.SamplingCondition = *samplingCondition
 
 	Config.LogLevel = *logLevel
-	if strings.HasPrefix(*logOutput, "/") {
+
+	if filepath.IsAbs(*logOutput) || *logOutput == "" {
 		Config.LogOutput = *logOutput
 	} else {
-		if BaseDir == "" {
-			Config.LogOutput = *logOutput
-		} else {
-			if runtime.GOOS == "windows" {
-				Config.LogOutput = *logOutput
-			} else {
-				Config.LogOutput = BaseDir + "/" + *logOutput
-			}
-		}
+		Config.LogOutput = filepath.Join(BaseDir, *logOutput)
 	}
+
 	Config.ReportType = strings.ToLower(*reportType)
 	Config.ReportCSS = *reportCSS
 	Config.ReportJavascript = *reportJavascript
@@ -612,12 +598,14 @@ func readCmdFlags() error {
 	Config.IgnoreRules = strings.Split(*ignoreRules, ",")
 	Config.RewriteRules = strings.Split(*rewriteRules, ",")
 	*blackList = strings.TrimSpace(*blackList)
-	if strings.HasPrefix(*blackList, "/") || *blackList == "" {
+	Config.MinCardinality = *minCardinality
+
+	if filepath.IsAbs(*blackList) || *blackList == "" {
 		Config.BlackList = *blackList
 	} else {
-		pwd, _ := os.Getwd()
-		Config.BlackList = pwd + "/" + *blackList
+		Config.BlackList = filepath.Join(BaseDir, *blackList)
 	}
+
 	Config.MaxJoinTableCount = *maxJoinTableCount
 	Config.MaxGroupByColsCount = *maxGroupByColsCount
 	Config.MaxDistinctCount = *maxDistinctCount
@@ -628,10 +616,18 @@ func readCmdFlags() error {
 		Config.MaxIdxColsCount = 16
 	}
 
+	Config.MaxTextColsCount = *maxTextColsCount
 	Config.MaxIdxBytesPerColumn = *maxIdxBytesPerColumn
 	Config.MaxIdxBytes = *maxIdxBytes
-	Config.TableAllowCharsets = strings.Split(strings.ToLower(*tableAllowCharsets), ",")
-	Config.TableAllowEngines = strings.Split(strings.ToLower(*tableAllowEngines), ",")
+	if *allowCharsets != "" {
+		Config.AllowCharsets = strings.Split(strings.ToLower(*allowCharsets), ",")
+	}
+	if *allowCollates != "" {
+		Config.AllowCollates = strings.Split(strings.ToLower(*allowCollates), ",")
+	}
+	if *allowEngines != "" {
+		Config.AllowEngines = strings.Split(strings.ToLower(*allowEngines), ",")
+	}
 	Config.MaxIdxCount = *maxIdxCount
 	Config.MaxColCount = *maxColCount
 	Config.MaxValueCount = *maxValueCount
@@ -667,6 +663,9 @@ func readCmdFlags() error {
 	Config.DryRun = *dryrun
 	Config.MaxPrettySQLLength = *maxPrettySQLLength
 	Config.MaxVarcharLength = *maxVarcharLength
+	if *columnNotAllowType != "" {
+		Config.ColumnNotAllowType = strings.Split(strings.ToLower(*columnNotAllowType), ",")
+	}
 
 	PrintVersion = *printVersion
 	PrintConfig = *printConfig
@@ -684,8 +683,8 @@ func ParseConfig(configFile string) error {
 	if configFile == "" {
 		configs = []string{
 			"/etc/soar.yaml",
-			BaseDir + "/etc/soar.yaml",
-			BaseDir + "/soar.yaml",
+			filepath.Join(BaseDir, "etc", "soar.yaml"),
+			filepath.Join(BaseDir, "soar.yaml"),
 		}
 	} else {
 		configs = []string{

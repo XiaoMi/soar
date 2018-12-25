@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/model"
 	"github.com/pingcap/parser/types"
 )
@@ -327,6 +328,11 @@ type FuncCallExpr struct {
 	Args []ExprNode
 }
 
+// Restore implements Node interface.
+func (n *FuncCallExpr) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Format the ExprNode into a Writer.
 func (n *FuncCallExpr) Format(w io.Writer) {
 	fmt.Fprintf(w, "%s(", n.FnName.L)
@@ -397,6 +403,11 @@ type FuncCastExpr struct {
 	Tp *types.FieldType
 	// FunctionType is either Cast, Convert or Binary.
 	FunctionType CastFunctionType
+}
+
+// Restore implements Node interface.
+func (n *FuncCastExpr) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Format the ExprNode into a Writer.
@@ -484,6 +495,10 @@ const (
 	AggFuncBitXor = "bit_xor"
 	// AggFuncBitAnd is the name of bit_and function.
 	AggFuncBitAnd = "bit_and"
+	// AggFuncVarPop is the name of var_pop function
+	AggFuncVarPop = "var_pop"
+	// AggFuncVarSamp is the name of var_samp function
+	AggFuncVarSamp = "var_samp"
 	// AggFuncStddevPop is the name of stddev_pop function
 	AggFuncStddevPop = "stddev_pop"
 	// AggFuncStddevSamp is the name of stddev_samp function
@@ -501,6 +516,11 @@ type AggregateFuncExpr struct {
 	// For example, column c1 values are "1", "2", "2",  "sum(c1)" is "5",
 	// but "sum(distinct c1)" is "3".
 	Distinct bool
+}
+
+// Restore implements Node interface.
+func (n *AggregateFuncExpr) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Format the ExprNode into a Writer.
@@ -569,6 +589,11 @@ type WindowFuncExpr struct {
 	FromLast bool
 	// Spec is the specification of this window.
 	Spec WindowSpec
+}
+
+// Restore implements Node interface.
+func (n *WindowFuncExpr) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Format formats the window function expression into a Writer.

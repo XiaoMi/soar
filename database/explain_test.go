@@ -2332,7 +2332,7 @@ possible_keys: idx_fk_country_id,idx_country_id_city,idx_all,idx_other
 }
 
 func TestExplain(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	// TraditionalFormatExplain
 	for idx, sql := range sqls {
 		exp, err := connTest.Explain(sql, TraditionalExplainType, TraditionalFormatExplain)
@@ -2355,7 +2355,7 @@ func TestExplain(t *testing.T) {
 }
 
 func TestParseExplainText(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	for _, content := range exp {
 		pretty.Println(RemoveSQLComments(content))
 		pretty.Println(ParseExplainText(content))
@@ -2371,7 +2371,7 @@ func TestParseExplainText(t *testing.T) {
 }
 
 func TestFindTablesInJson(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	idx := 9
 	for _, j := range exp[idx : idx+1] {
 		pretty.Println(j)
@@ -2382,7 +2382,7 @@ func TestFindTablesInJson(t *testing.T) {
 }
 
 func TestFormatJsonIntoTraditional(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	idx := 11
 	for _, j := range exp[idx : idx+1] {
 		pretty.Println(j)
@@ -2392,7 +2392,7 @@ func TestFormatJsonIntoTraditional(t *testing.T) {
 }
 
 func TestPrintMarkdownExplainTable(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	expInfo, err := connTest.Explain("select 1", TraditionalExplainType, TraditionalFormatExplain)
 	if err != nil {
 		t.Error(err)
@@ -2408,7 +2408,7 @@ func TestPrintMarkdownExplainTable(t *testing.T) {
 }
 
 func TestExplainInfoTranslator(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	expInfo, err := connTest.Explain("select 1", TraditionalExplainType, TraditionalFormatExplain)
 	if err != nil {
 		t.Error(err)
@@ -2423,7 +2423,7 @@ func TestExplainInfoTranslator(t *testing.T) {
 }
 
 func TestMySQLExplainWarnings(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	expInfo, err := connTest.Explain("select 1", TraditionalExplainType, TraditionalFormatExplain)
 	if err != nil {
 		t.Error(err)
@@ -2438,7 +2438,7 @@ func TestMySQLExplainWarnings(t *testing.T) {
 }
 
 func TestMySQLExplainQueryCost(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	expInfo, err := connTest.Explain("select 1", TraditionalExplainType, TraditionalFormatExplain)
 	if err != nil {
 		t.Error(err)
@@ -2453,7 +2453,7 @@ func TestMySQLExplainQueryCost(t *testing.T) {
 }
 
 func TestSupportExplainWrite(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	_, err := connTest.supportExplainWrite()
 	if err != nil {
 		t.Error(err)
@@ -2462,7 +2462,7 @@ func TestSupportExplainWrite(t *testing.T) {
 }
 
 func TestExplainAbleSQL(t *testing.T) {
-	common.Log.Debug("Enter function: %s", common.GetFunctionName())
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	for _, sql := range sqls {
 		if _, err := connTest.explainAbleSQL(sql); err != nil {
 			t.Errorf("SQL: %s, not explain able", sql)

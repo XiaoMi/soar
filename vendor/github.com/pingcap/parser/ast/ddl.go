@@ -14,6 +14,8 @@
 package ast
 
 import (
+	"github.com/pingcap/errors"
+	"github.com/pingcap/parser/auth"
 	"github.com/pingcap/parser/model"
 	"github.com/pingcap/parser/types"
 )
@@ -61,6 +63,23 @@ type DatabaseOption struct {
 	Value string
 }
 
+// Restore implements Node interface.
+func (n *DatabaseOption) Restore(ctx *RestoreCtx) error {
+	switch n.Tp {
+	case DatabaseOptionCharset:
+		ctx.WriteKeyWord("CHARACTER SET")
+		ctx.WritePlain(" = ")
+		ctx.WritePlain(n.Value)
+	case DatabaseOptionCollate:
+		ctx.WriteKeyWord("COLLATE")
+		ctx.WritePlain(" = ")
+		ctx.WritePlain(n.Value)
+	default:
+		return errors.Errorf("invalid DatabaseOptionType: %d", n.Tp)
+	}
+	return nil
+}
+
 // CreateDatabaseStmt is a statement to create a database.
 // See https://dev.mysql.com/doc/refman/5.7/en/create-database.html
 type CreateDatabaseStmt struct {
@@ -69,6 +88,23 @@ type CreateDatabaseStmt struct {
 	IfNotExists bool
 	Name        string
 	Options     []*DatabaseOption
+}
+
+// Restore implements Node interface.
+func (n *CreateDatabaseStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("CREATE DATABASE ")
+	if n.IfNotExists {
+		ctx.WriteKeyWord("IF NOT EXISTS ")
+	}
+	ctx.WriteName(n.Name)
+	for _, option := range n.Options {
+		ctx.WritePlain(" ")
+		err := option.Restore(ctx)
+		if err != nil {
+			return errors.Trace(err)
+		}
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -90,6 +126,16 @@ type DropDatabaseStmt struct {
 	Name     string
 }
 
+// Restore implements Node interface.
+func (n *DropDatabaseStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("DROP DATABASE ")
+	if n.IfExists {
+		ctx.WriteKeyWord("IF EXISTS ")
+	}
+	ctx.WriteName(n.Name)
+	return nil
+}
+
 // Accept implements Node Accept interface.
 func (n *DropDatabaseStmt) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -106,6 +152,11 @@ type IndexColName struct {
 
 	Column *ColumnName
 	Length int
+}
+
+// Restore implements Node interface.
+func (n *IndexColName) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -132,6 +183,11 @@ type ReferenceDef struct {
 	IndexColNames []*IndexColName
 	OnDelete      *OnDeleteOpt
 	OnUpdate      *OnUpdateOpt
+}
+
+// Restore implements Node interface.
+func (n *ReferenceDef) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -199,6 +255,11 @@ type OnDeleteOpt struct {
 	ReferOpt ReferOptionType
 }
 
+// Restore implements Node interface.
+func (n *OnDeleteOpt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *OnDeleteOpt) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -213,6 +274,11 @@ func (n *OnDeleteOpt) Accept(v Visitor) (Node, bool) {
 type OnUpdateOpt struct {
 	node
 	ReferOpt ReferOptionType
+}
+
+// Restore implements Node interface.
+func (n *OnUpdateOpt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -259,6 +325,11 @@ type ColumnOption struct {
 	Refer *ReferenceDef
 }
 
+// Restore implements Node interface.
+func (n *ColumnOption) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *ColumnOption) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -288,6 +359,34 @@ type IndexOption struct {
 	KeyBlockSize uint64
 	Tp           model.IndexType
 	Comment      string
+}
+
+// Restore implements Node interface.
+func (n *IndexOption) Restore(ctx *RestoreCtx) error {
+	hasPrevOption := false
+	if n.KeyBlockSize > 0 {
+		ctx.WriteKeyWord("KEY_BLOCK_SIZE")
+		ctx.WritePlainf("=%d", n.KeyBlockSize)
+		hasPrevOption = true
+	}
+
+	if n.Tp != model.IndexTypeInvalid {
+		if hasPrevOption {
+			ctx.WritePlain(" ")
+		}
+		ctx.WriteKeyWord("USING ")
+		ctx.WritePlain(n.Tp.String())
+		hasPrevOption = true
+	}
+
+	if n.Comment != "" {
+		if hasPrevOption {
+			ctx.WritePlain(" ")
+		}
+		ctx.WriteKeyWord("COMMENT ")
+		ctx.WriteString(n.Comment)
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -330,6 +429,11 @@ type Constraint struct {
 	Option *IndexOption // Index Options
 }
 
+// Restore implements Node interface.
+func (n *Constraint) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *Constraint) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -370,6 +474,11 @@ type ColumnDef struct {
 	Options []*ColumnOption
 }
 
+// Restore implements Node interface.
+func (n *ColumnDef) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *ColumnDef) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -406,6 +515,11 @@ type CreateTableStmt struct {
 	Partition   *PartitionOptions
 	OnDuplicate OnDuplicateCreateTableSelectType
 	Select      ResultSetNode
+}
+
+// Restore implements Node interface.
+func (n *CreateTableStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -459,6 +573,12 @@ type DropTableStmt struct {
 
 	IfExists bool
 	Tables   []*TableName
+	IsView   bool
+}
+
+// Restore implements Node interface.
+func (n *DropTableStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -489,6 +609,11 @@ type RenameTableStmt struct {
 	// TableToTables is only useful for syncer which depends heavily on tidb parser to do some dirty work for now.
 	// TODO: Refactor this when you are going to add full support for multiple schema changes.
 	TableToTables []*TableToTable
+}
+
+// Restore implements Node interface.
+func (n *RenameTableStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -527,6 +652,11 @@ type TableToTable struct {
 	NewTable *TableName
 }
 
+// Restore implements Node interface.
+func (n *TableToTable) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *TableToTable) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -552,16 +682,39 @@ func (n *TableToTable) Accept(v Visitor) (Node, bool) {
 type CreateViewStmt struct {
 	ddlNode
 
-	OrReplace bool
-	ViewName  *TableName
-	Cols      []model.CIStr
-	Select    StmtNode
+	OrReplace   bool
+	ViewName    *TableName
+	Cols        []model.CIStr
+	Select      StmtNode
+	Algorithm   model.ViewAlgorithm
+	Definer     *auth.UserIdentity
+	Security    model.ViewSecurity
+	CheckOption model.ViewCheckOption
+}
+
+// Restore implements Node interface.
+func (n *CreateViewStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
 func (n *CreateViewStmt) Accept(v Visitor) (Node, bool) {
-	// TODO: implement the details.
-	return n, true
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*CreateViewStmt)
+	node, ok := n.ViewName.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.ViewName = node.(*TableName)
+	selnode, ok := n.Select.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.Select = selnode.(*SelectStmt)
+	return v.Leave(n)
 }
 
 // CreateIndexStmt is a statement to create an index.
@@ -574,6 +727,11 @@ type CreateIndexStmt struct {
 	Unique        bool
 	IndexColNames []*IndexColName
 	IndexOption   *IndexOption
+}
+
+// Restore implements Node interface.
+func (n *CreateIndexStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -613,6 +771,22 @@ type DropIndexStmt struct {
 	IfExists  bool
 	IndexName string
 	Table     *TableName
+}
+
+// Restore implements Node interface.
+func (n *DropIndexStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("DROP INDEX ")
+	if n.IfExists {
+		ctx.WriteKeyWord("IF EXISTS ")
+	}
+	ctx.WriteName(n.IndexName)
+	ctx.WriteKeyWord(" ON ")
+
+	if err := n.Table.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while add index")
+	}
+
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -703,6 +877,11 @@ type ColumnPosition struct {
 	RelativeColumn *ColumnName
 }
 
+// Restore implements Node interface.
+func (n *ColumnPosition) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *ColumnPosition) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -743,8 +922,9 @@ const (
 	AlterTableAddPartitions
 	AlterTableCoalescePartitions
 	AlterTableDropPartition
+	AlterTableTruncatePartition
 
-// TODO: Add more actions
+	// TODO: Add more actions
 )
 
 // LockType is the type for AlterTableSpec.
@@ -777,6 +957,11 @@ type AlterTableSpec struct {
 	ToKey           model.CIStr
 	PartDefinitions []*PartitionDefinition
 	Num             uint64
+}
+
+// Restore implements Node interface.
+func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.
@@ -833,6 +1018,11 @@ type AlterTableStmt struct {
 	Specs []*AlterTableSpec
 }
 
+// Restore implements Node interface.
+func (n *AlterTableStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
 // Accept implements Node Accept interface.
 func (n *AlterTableStmt) Accept(v Visitor) (Node, bool) {
 	newNode, skipChildren := v.Enter(n)
@@ -861,6 +1051,11 @@ type TruncateTableStmt struct {
 	ddlNode
 
 	Table *TableName
+}
+
+// Restore implements Node interface.
+func (n *TruncateTableStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
 }
 
 // Accept implements Node Accept interface.

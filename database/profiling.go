@@ -68,7 +68,12 @@ func (db *Connector) Profiling(sql string, params ...interface{}) ([]ProfilingRo
 	if err != nil {
 		return rows, err
 	}
-	defer trx.Rollback()
+	defer func() {
+		trxErr := trx.Rollback()
+		if trxErr != nil {
+			common.Log.Debug(trxErr.Error())
+		}
+	}()
 
 	// 开启 Profiling
 	_, err = trx.Query("set @@profiling=1")
@@ -86,7 +91,10 @@ func (db *Connector) Profiling(sql string, params ...interface{}) ([]ProfilingRo
 	// 返回 Profiling 结果
 	res, err := trx.Query("show profile")
 	if err != nil {
-		trx.Rollback()
+		trxErr := trx.Rollback()
+		if trxErr != nil {
+			common.Log.Debug(trxErr.Error())
+		}
 		return rows, err
 	}
 	var profileRow ProfilingRow

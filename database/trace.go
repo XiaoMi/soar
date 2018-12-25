@@ -77,7 +77,12 @@ func (db *Connector) Trace(sql string, params ...interface{}) ([]TraceRow, error
 	if err != nil {
 		return rows, err
 	}
-	defer trx.Rollback()
+	defer func() {
+		trxErr := trx.Rollback()
+		if trxErr != nil {
+			common.Log.Debug(trxErr.Error())
+		}
+	}()
 	_, err = trx.Query("SET SESSION OPTIMIZER_TRACE='enabled=on'")
 	common.LogIfError(err, "")
 
@@ -93,7 +98,10 @@ func (db *Connector) Trace(sql string, params ...interface{}) ([]TraceRow, error
 	// 返回Trace结果
 	res, err := trx.Query("SELECT * FROM information_schema.OPTIMIZER_TRACE")
 	if err != nil {
-		trx.Rollback()
+		trxErr := trx.Rollback()
+		if trxErr != nil {
+			common.Log.Debug(trxErr.Error())
+		}
 		return rows, err
 	}
 	for res.Next() {

@@ -31,7 +31,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/kr/pretty"
 	"github.com/percona/go-mysql/query"
-	"vitess.io/vitess/go/vt/sqlparser"
 )
 
 func main() {
@@ -143,19 +142,20 @@ func main() {
 			fmt.Println(ast.Compress(sql) + common.Config.Delimiter)
 			continue
 		case "ast":
-			// SQL 抽象语法树
-			var tree sqlparser.Statement
-			tree, err = sqlparser.Parse(sql)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				_, err = pretty.Println(tree)
-				common.LogIfWarn(err, "")
-			}
+			// print vitess AST data struct
+			ast.PrintPrettyVitessStmtNode(sql)
+			continue
+		case "ast-json":
+			// print vitess SQL AST into json format
+			fmt.Println(ast.VitessStmtNode2JSON(sql))
 			continue
 		case "tiast":
-			// TiDB SQL 抽象语法树
+			// print TiDB AST data struct
 			ast.PrintPrettyStmtNode(sql, "", "")
+			continue
+		case "tiast-json":
+			// print TiDB SQL AST into json format
+			fmt.Println(ast.StmtNode2JSON(sql, "", ""))
 			continue
 		case "tokenize":
 			// SQL 切词
@@ -185,16 +185,12 @@ func main() {
 		if syntaxErr != nil {
 			errContent := fmt.Sprintf("At SQL %d : %v", sqlCounter, syntaxErr)
 			common.Log.Warning(errContent)
-			if common.Config.OnlySyntaxCheck {
+			if common.Config.OnlySyntaxCheck || common.Config.ReportType == "rewrite" {
 				fmt.Println(errContent)
-			}
-			if !common.Config.DryRun {
 				os.Exit(1)
 			}
 			// tidb parser 语法检查给出的建议 ERR.000
-			if common.Config.TestDSN.Disable {
-				mysqlSuggest["ERR.000"] = advisor.RuleMySQLError("ERR.000", syntaxErr)
-			}
+			mysqlSuggest["ERR.000"] = advisor.RuleMySQLError("ERR.000", syntaxErr)
 		}
 		// 如果只想检查语法直接跳过后面的步骤
 		if common.Config.OnlySyntaxCheck {
@@ -255,6 +251,9 @@ func main() {
 							}
 						default:
 							// vEnv.VEnvBuild 阶段给出的 ERROR 是 ERR.001
+							if _, ok := mysqlSuggest["ERR.000"]; ok {
+								delete(mysqlSuggest, "ERR.000")
+							}
 							mysqlSuggest["ERR.001"] = advisor.RuleMySQLError("ERR.001", vEnv.Error)
 							common.Log.Error("BuildVirtualEnv DDL Execute Error : %v", vEnv.Error)
 						}
@@ -277,7 +276,7 @@ func main() {
 				explainInfo, err := rEnv.Explain(q.Query,
 					database.ExplainType[common.Config.ExplainType],
 					database.ExplainFormatType[common.Config.ExplainFormat])
-				if err != nil && strings.HasPrefix(vEnv.Database, "optimizer_") {
+				if err != nil {
 					// 线上环境执行失败才到测试环境 EXPLAIN，比如在用户提供建表语句及查询语句的场景
 					common.Log.Warn("rEnv.Explain Warn: %v", err)
 					explainInfo, err = vEnv.Explain(q.Query,
@@ -287,7 +286,6 @@ func main() {
 						// EXPLAIN 阶段给出的 ERROR 是 ERR.002
 						mysqlSuggest["ERR.002"] = advisor.RuleMySQLError("ERR.002", err)
 						common.Log.Error("vEnv.Explain Error: %v", err)
-						continue
 					}
 				}
 				// 分析 EXPLAIN 结果
@@ -425,5 +423,10 @@ func main() {
 			common.Log.Error("FormatSuggest json.Marshal Error: %v", err)
 		}
 		return
+	}
+
+	// syntax check verbose mode, add output for success!
+	if common.Config.OnlySyntaxCheck && common.Config.Verbose {
+		fmt.Println("Syntax check OK!")
 	}
 }

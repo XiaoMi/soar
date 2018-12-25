@@ -17,13 +17,28 @@
 package main
 
 import (
+	"flag"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
 )
 
-func init() {
-	common.Config.OnlineDSN.Schema = "sakila"
+var update = flag.Bool("update", false, "update .golden files")
+
+func TestMain(m *testing.M) {
+	// 初始化 init
+	common.BaseDir = common.DevPath
+	err := common.ParseConfig("")
+	common.LogIfError(err, "init ParseConfig")
+	common.Log.Debug("mysql_test init")
+	_ = update // check if var success init
+
+	// 分割线
+	flag.Parse()
+	m.Run()
+
+	// 环境清理
+	//
 }
 
 func Test_Main(_ *testing.T) {
@@ -44,4 +59,24 @@ func Test_Main_More(_ *testing.T) {
 		common.Config.ReportType = typ
 		main()
 	}
+}
+
+func Test_Main_checkConfig(t *testing.T) {
+	if checkConfig() != 0 {
+		t.Error("checkConfig error")
+	}
+}
+
+func Test_Main_initQuery(t *testing.T) {
+	// direct query
+	query := initQuery("select 1")
+	if query != "select 1" {
+		t.Errorf("want 'select 1', got %s", query)
+	}
+
+	// read from file
+	initQuery(common.DevPath + "/README.md")
+
+	// TODO: read from stdin
+	// initQuery("")
 }
