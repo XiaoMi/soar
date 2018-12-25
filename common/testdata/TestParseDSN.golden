@@ -3,8 +3,8 @@
 &common.Dsn{Net:"", Addr:"hostname:3307", Schema:"information_schema", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
 &common.Dsn{Net:"", Addr:"hostname:3306", Schema:"database", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
 &common.Dsn{Net:"", Addr:"127.0.0.1:3307", Schema:"database", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
-&common.Dsn{Net:"", Addr:"hostname:3306", Schema:"dbname", User:"user", Password:"", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
-&common.Dsn{Net:"", Addr:"hostname:3306", Schema:"dbname", User:"user", Password:"pwd:pwd@pwd/pwd", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
+&common.Dsn{Net:"", Addr:"hostname:3306", Schema:"database", User:"user", Password:"", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
+&common.Dsn{Net:"", Addr:"hostname:3306", Schema:"database", User:"user", Password:"pwd:pwd@pwd/pwd", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
 &common.Dsn{Net:"", Addr:"127.0.0.1:3306", Schema:"information_schema", User:"user", Password:"password", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
 &common.Dsn{Net:"", Addr:"hostname:3307", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
 &common.Dsn{Net:"", Addr:"hostname:3307", Schema:"database", User:"", Password:"", Charset:"utf8mb4", Disable:false, Timeout:0, ReadTimeout:0, WriteTimeout:0, Version:999}
