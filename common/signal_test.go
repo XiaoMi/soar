@@ -22,7 +22,9 @@ import (
 )
 
 func TestHandleSignal(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	HandleSignal(func() {
 		fmt.Println("done")
 	})
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }

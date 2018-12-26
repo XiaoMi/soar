@@ -19,6 +19,7 @@ package common
 import "fmt"
 
 func ExampleFormatDSN() {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	dsxExp := &Dsn{
 		Addr:     "127.0.0.1:3306",
 		Schema:   "mysql",
@@ -32,9 +33,11 @@ func ExampleFormatDSN() {
 	fmt.Println(FormatDSN(dsxExp))
 
 	// Output: root:1t'sB1g3rt@127.0.0.1:3306/mysql?charset=utf8mb4
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func ExampleIsColsPart() {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	// IsColsPart() 会 按照顺序 检查两个Column队列是否是包含（或相等）关系。
 	a := []*Column{{Name: "1"}, {Name: "2"}, {Name: "3"}}
 	b := []*Column{{Name: "1"}, {Name: "2"}}
@@ -47,9 +50,11 @@ func ExampleIsColsPart() {
 
 	fmt.Println(ab, ac, ad)
 	// Output: true false true
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func ExampleSortedKey() {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	ages := map[string]int{
 		"a": 1,
 		"c": 3,
@@ -60,4 +65,5 @@ func ExampleSortedKey() {
 		fmt.Print(ages[name])
 	}
 	// Output: 1234
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }

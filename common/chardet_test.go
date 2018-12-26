@@ -23,6 +23,7 @@ import (
 )
 
 func TestChardet(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	charsets := []string{
 		"GB-18030",
 		"UTF-8",
@@ -38,9 +39,11 @@ func TestChardet(t *testing.T) {
 			t.Errorf("file: %s, Want: %s, Get: %s", fileName, c, name)
 		}
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestRemoveBOM(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	fileName := DevPath + "/common/testdata/UTF-8.bom.sql"
 	buf, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -49,9 +52,11 @@ func TestRemoveBOM(t *testing.T) {
 	GoldenDiff(func() {
 		fmt.Println(RemoveBOM(buf))
 	}, t.Name(), update)
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestCheckCharsetByBOM(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	fileName := DevPath + "/common/testdata/UTF-8.bom.sql"
 	buf, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -61,4 +66,5 @@ func TestCheckCharsetByBOM(t *testing.T) {
 	if CheckCharsetByBOM(buf) != "UTF-8" {
 		t.Errorf("checkCharsetByBOM Want: UTF-8, Get: %s", CheckCharsetByBOM(buf))
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }

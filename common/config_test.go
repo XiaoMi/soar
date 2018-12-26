@@ -30,6 +30,9 @@ var update = flag.Bool("update", false, "update .golden files")
 func TestMain(m *testing.M) {
 	// 初始化 init
 	BaseDir = DevPath
+	err := ParseConfig("")
+	LogIfError(err, "init ParseConfig")
+	Log.Debug("mysql_test init")
 
 	// 分割线
 	flag.Parse()
@@ -40,20 +43,25 @@ func TestMain(m *testing.M) {
 }
 
 func TestParseConfig(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	err := ParseConfig("")
 	if err != nil {
 		t.Error("sqlparser.Parse Error:", err)
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestReadConfigFile(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	if Config == nil {
 		Config = new(Configuration)
 	}
 	Config.readConfigFile(filepath.Join(DevPath, "etc/soar.yaml"))
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestParseDSN(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	var dsns = []string{
 		"",
 		"user:password@hostname:3307/database",
@@ -82,16 +90,20 @@ func TestParseDSN(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestListReportTypes(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	err := GoldenDiff(func() { ListReportTypes() }, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestArgConfig(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	testArgs1 := [][]string{
 		{"soar", "-config", "=", "soar.yaml"},
 		{"soar", "-print-config", "-config", "soar.yaml"},
@@ -115,9 +127,11 @@ func TestArgConfig(t *testing.T) {
 			t.Errorf("should return soar.yaml, but got %s", configFile)
 		}
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestPrintConfiguration(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	Config.readConfigFile(filepath.Join(DevPath, "etc/soar.yaml"))
 	oldLogOutput := Config.LogOutput
 	Config.LogOutput = "soar.log"
@@ -128,4 +142,5 @@ func TestPrintConfiguration(t *testing.T) {
 		t.Error(err)
 	}
 	Config.LogOutput = oldLogOutput
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }

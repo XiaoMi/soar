@@ -26,6 +26,7 @@ import (
 )
 
 func TestMarkdownEscape(_ *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	var strs = []string{
 		"a`bc",
 		"abc",
@@ -35,9 +36,11 @@ func TestMarkdownEscape(_ *testing.T) {
 	for _, str := range strs {
 		fmt.Println(MarkdownEscape(str))
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestMarkdown2Html(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	md := filepath.Join("testdata", t.Name()+".md")
 	buf, err := ioutil.ReadFile(md)
 	if err != nil {
@@ -60,16 +63,28 @@ func TestMarkdown2Html(t *testing.T) {
 		t.Fatal(err)
 	}
 	io.Copy(html, gd)
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestScore(t *testing.T) {
-	score := Score(50)
-	if score != "★ ★ ☆ ☆ ☆ 50分" {
-		t.Error(score)
+	Log.Debug("Entering function: %s", GetFunctionName())
+	scores := map[int]string{
+		50:  "★ ★ ☆ ☆ ☆ 50分",
+		100: "★ ★ ★ ★ ★ 100分",
+		-1:  "☆ ☆ ☆ ☆ ☆ 0分",
+		101: "★ ★ ★ ★ ★ 100分",
 	}
+	for score, want := range scores {
+		get := Score(score)
+		if want != get {
+			t.Error(score, want, get)
+		}
+	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestLoadExternalResource(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	buf := loadExternalResource("../doc/themes/github.css")
 	if buf == "" {
 		t.Error("loadExternalResource local error")
@@ -78,13 +93,16 @@ func TestLoadExternalResource(t *testing.T) {
 	if buf == "" {
 		t.Error("loadExternalResource http error")
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestMarkdownHTMLHeader(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	err := GoldenDiff(func() {
 		MarkdownHTMLHeader()
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }

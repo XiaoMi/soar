@@ -101,7 +101,7 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 
 	// 判断测试环境与remote环境版本是否一致
 	if vEnvVersion < rEnvVersion {
-		common.Log.Warning("TestDSN MySQL version older than OnlineDSN, TestDSN will not be used", vEnvVersion, rEnvVersion)
+		common.Log.Warning("TestDSN MySQL version older than OnlineDSN(%d), TestDSN(%d) will not be used", vEnvVersion, rEnvVersion)
 		common.Config.TestDSN.Disable = true
 	}
 

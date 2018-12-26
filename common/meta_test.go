@@ -21,6 +21,7 @@ import (
 )
 
 func TestGetDataTypeLength(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	typeList := map[string][]int{
 		"varchar(20)":  {20},
 		"int(2)":       {2},
@@ -37,10 +38,11 @@ func TestGetDataTypeLength(t *testing.T) {
 			}
 		}
 	}
-
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestGetDataTypeBase(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	typeList := map[string]string{
 		"varchar(20)":  "varchar",
 		"int(2)":       "int",
@@ -52,10 +54,11 @@ func TestGetDataTypeBase(t *testing.T) {
 			t.Errorf("Not match, want %s, got %s", typeList[typ], got)
 		}
 	}
-
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 
 func TestGetDataBytes(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	cols50604 := map[*Column]int{
 		// numeric type
 		{Name: "col000", DataType: "tinyint", Character: "utf8"}:        1,
@@ -137,4 +140,5 @@ func TestGetDataBytes(t *testing.T) {
 			t.Errorf("Version: 5.5.0, %s Not match, want %d, got %d", col.Name, bytes, got)
 		}
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }

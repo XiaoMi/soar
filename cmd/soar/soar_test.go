@@ -60,7 +60,7 @@ func Test_Main_More(_ *testing.T) {
 	orgRerportType := common.Config.ReportType
 	for _, typ := range []string{
 		"json", "html", "markdown", "fingerprint", "compress", "pretty", "rewrite",
-		"ast", "tiast", "ast-json", "tiast-json", "tokenize",
+		"ast", "tiast", "ast-json", "tiast-json", "tokenize", "lint",
 	} {
 		common.Config.ReportType = typ
 		main()
@@ -102,5 +102,45 @@ func Test_Main_reportTool(t *testing.T) {
 		fmt.Println(reportTool(tp, []byte{}))
 	}
 	common.Config.ReportType = orgRerportType
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+func Test_Main_helpTools(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+
+	orgConfig := common.CheckConfig
+	common.CheckConfig = true
+	helpTools()
+	common.CheckConfig = orgConfig
+
+	orgConfig = common.PrintVersion
+	common.PrintVersion = true
+	helpTools()
+	common.PrintVersion = orgConfig
+
+	orgConfig = common.PrintConfig
+	common.PrintConfig = true
+	helpTools()
+	common.PrintConfig = orgConfig
+
+	orgConfig = common.Config.ListHeuristicRules
+	common.Config.ListHeuristicRules = true
+	helpTools()
+	common.Config.ListHeuristicRules = orgConfig
+
+	orgConfig = common.Config.ListRewriteRules
+	common.Config.ListRewriteRules = true
+	helpTools()
+	common.Config.ListRewriteRules = orgConfig
+
+	orgConfig = common.Config.ListTestSqls
+	common.Config.ListTestSqls = true
+	helpTools()
+	common.Config.ListTestSqls = orgConfig
+
+	orgConfig = common.Config.ListReportTypes
+	common.Config.ListReportTypes = true
+	helpTools()
+	common.Config.ListReportTypes = orgConfig
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

@@ -3,6 +3,16 @@
 ## 2018-12
 
 - DOING: english translation
+- replace mysql database driver mymysql with go-sql-driver
+- add new -report-type [ast-json, tiast-json]
+- command line dsn args support '@', '/', ':' in password
+- add new heuristic rule RES.009, "SELECT * FROM tbl WHERE col = col = 'abc'"
+- add new heuristic rule RuleColumnNotAllowType COL.018
+- fix #58 sampling not deal with NULL able string
+- fix #172 compatible with mysql 5.1, which explain has no Index_Comment column
+- fix #163 column.Tp may be nil, which may raise panic
+- fix #151 bit type not config as int, when two columns compare will give ARG.003 suggestion.
+- 
 
 ## 2018-11
 
