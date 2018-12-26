@@ -154,6 +154,12 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 			valuesCount = 0
 		}
 	}
+	if len(valuesStr) > 0 {
+		err = db.doSampling(table, columnsStr, strings.Join(valuesStr, `,`))
+		if err != nil {
+			common.LogIfWarn(err, "")
+		}
+	}
 	res.Close()
 	return err
 }

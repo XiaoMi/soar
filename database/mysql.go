@@ -235,7 +235,7 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 
 // IsView 判断表是否是视图
 func (db *Connector) IsView(tbName string) bool {
-	common.Log.Debug("IsView, ShowTableStatus check `%s` is view", tbName)
+	common.Log.Debug("IsView, ShowTableStatus check if `%s` is view", tbName)
 	tbStatus, err := db.ShowTableStatus(tbName)
 	if err != nil {
 		common.Log.Error("(db *Connector) IsView Error: %v:", err)

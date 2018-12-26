@@ -106,7 +106,7 @@ func main() {
 		mysqlSuggest := make(map[string]advisor.Rule)     // MySQL 返回的 ERROR 信息
 
 		if buf == "" {
-			common.Log.Debug("buf: %s, sql: %s empty", buf, sql)
+			common.Log.Debug("Ending, buf: '%s', sql: '%s'", buf, sql)
 			break
 		}
 		// 查询请求切分
