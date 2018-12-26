@@ -184,3 +184,17 @@ func TestIsView(t *testing.T) {
 	connTest.Database = originalDatabase
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestNullString(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	cases := [][]byte{
+		nil,
+		[]byte("NULL"),
+	}
+	for _, buf := range cases {
+		if NullString(buf) != "NULL" {
+			t.Errorf("%s want NULL", string(buf))
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

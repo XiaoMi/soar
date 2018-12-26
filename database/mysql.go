@@ -311,3 +311,11 @@ func TimeString(t time.Time) string {
 	}
 	return t.Format(TimeFormat)
 }
+
+// NullString null able string
+func NullString(buf []byte) string {
+	if buf == nil {
+		return "NULL"
+	}
+	return string(buf)
+}

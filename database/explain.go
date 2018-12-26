@@ -948,23 +948,31 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 		return exp, err
 	}
 
+	/*
+		+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+		| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+		|  1 | SIMPLE      | film  | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 1000 |   100.00 | NULL  |
+		+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+	*/
+
 	// Different MySQL version has different columns define
-	var possibleKeys string
+	var selectType, table, partitions, accessType, possibleKeys, key, keyLen, ref, extra []byte
 	expRow := &ExplainRow{}
 	explainFields := make([]interface{}, 0)
 	fields := map[string]interface{}{
-		"id":            expRow.ID,
-		"select_type":   expRow.SelectType,
-		"table":         expRow.TableName,
-		"partitions":    expRow.Partitions,
-		"type":          expRow.AccessType,
+		"id":            &expRow.ID,
+		"select_type":   &selectType,
+		"table":         &table,
+		"partitions":    &partitions,
+		"type":          &accessType,
 		"possible_keys": &possibleKeys,
-		"key":           expRow.Key,
-		"key_len":       expRow.KeyLen,
-		"ref":           expRow.Ref,
-		"rows":          expRow.Rows,
-		"filtered":      expRow.Filtered,
-		"extra":         expRow.Extra,
+		"key":           &key,
+		"key_len":       &keyLen,
+		"ref":           &ref,
+		"rows":          &expRow.Rows,
+		"filtered":      &expRow.Filtered,
+		"Extra":         &extra,
 	}
 	cols, err := res.Rows.Columns()
 	common.LogIfError(err, "")
@@ -980,13 +988,20 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 
 	// 补全 ExplainRows
 	var explainRows []*ExplainRow
-
 	for res.Rows.Next() {
 		err := res.Rows.Scan(explainFields...)
 		if err != nil {
-			common.Log.Debug(err.Error())
+			common.Log.Warn(err.Error())
 		}
-		expRow.PossibleKeys = strings.Split(possibleKeys, ",")
+		expRow.SelectType = NullString(selectType)
+		expRow.TableName = NullString(table)
+		expRow.Partitions = NullString(partitions)
+		expRow.AccessType = NullString(accessType)
+		expRow.PossibleKeys = strings.Split(NullString(possibleKeys), ",")
+		expRow.Key = NullString(key)
+		expRow.KeyLen = NullString(keyLen)
+		expRow.Ref = strings.Split(NullString(ref), ",")
+		expRow.Extra = NullString(extra)
 
 		// MySQL bug: https://bugs.mysql.com/bug.php?id=34124
 		if expRow.Filtered > 100.00 {
