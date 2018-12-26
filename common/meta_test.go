@@ -160,7 +160,7 @@ func TestStringStorageReq(t *testing.T) {
 		"char(-1)",
 	}
 	err := GoldenDiff(func() {
-		for name, _ := range CharSets {
+		for name := range CharSets {
 			for _, tp := range dataTypes {
 				fmt.Println(tp, name, StringStorageReq(tp, name))
 			}

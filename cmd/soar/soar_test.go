@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -88,8 +89,14 @@ func Test_Main_initQuery(t *testing.T) {
 	// read from file
 	initQuery(common.DevPath + "/README.md")
 
-	// TODO: read from stdin
-	// initQuery("")
+	orgStdin := os.Stdin
+	tmpStdin, err := os.Open(common.DevPath + "/VERSION")
+	if err != nil {
+		t.Error(err)
+	}
+	os.Stdin = tmpStdin
+	fmt.Println(initQuery(""))
+	os.Stdin = orgStdin
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
