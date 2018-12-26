@@ -17,6 +17,7 @@
 package common
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -139,6 +140,34 @@ func TestGetDataBytes(t *testing.T) {
 		if got := col.GetDataBytes(50500); got != bytes {
 			t.Errorf("Version: 5.5.0, %s Not match, want %d, got %d", col.Name, bytes, got)
 		}
+	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
+}
+
+func TestStringStorageReq(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
+	dataTypes := []string{
+		"char(10)",
+		"char(256)",
+		"binary(10)",
+		"binary(256)",
+		"varchar(10)",
+		"varbinary(10)",
+		"enum('G','PG','PG-13','R','NC-17')",
+		"set('one', 'two')",
+		// wrong case
+		"not_exist",
+		"char(-1)",
+	}
+	err := GoldenDiff(func() {
+		for name, _ := range CharSets {
+			for _, tp := range dataTypes {
+				fmt.Println(tp, name, StringStorageReq(tp, name))
+			}
+		}
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
 	}
 	Log.Debug("Exiting function: %s", GetFunctionName())
 }

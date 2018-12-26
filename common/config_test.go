@@ -65,6 +65,7 @@ func TestParseDSN(t *testing.T) {
 	var dsns = []string{
 		"",
 		"user:password@hostname:3307/database",
+		"user:password@hostname:3307/database?charset=utf8",
 		"user:password@hostname:3307",
 		"user:password@hostname:/database",
 		"user:password@:3307/database",
