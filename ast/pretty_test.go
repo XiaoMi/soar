@@ -169,38 +169,3 @@ func TestRemoveComments(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
-
-func TestMysqlEscapeString(t *testing.T) {
-	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	var strs = []map[string]string{
-		{
-			"input":  "abc",
-			"output": "abc",
-		},
-		{
-			"input":  "'abc",
-			"output": "\\'abc",
-		},
-		{
-			"input": `
-abc`,
-			"output": `\
-abc`,
-		},
-		{
-			"input":  "\"abc",
-			"output": "\\\"abc",
-		},
-	}
-	for _, str := range strs {
-		output, err := MysqlEscapeString(str["input"])
-		if err != nil {
-			t.Error("TestMysqlEscapeString", err)
-		} else {
-			if output != str["output"] {
-				t.Error("TestMysqlEscapeString", output, str["output"])
-			}
-		}
-	}
-	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
-}

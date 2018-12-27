@@ -198,3 +198,27 @@ func TestNullString(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestStringEscaple(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	cases := []string{
+		"",
+		"hello world",
+		"hello' world",
+		`hello" world`,
+		"hello\000world",
+		`hello\ world`,
+		"hello\032world",
+		"hello\rworld",
+		"hello\nworld",
+	}
+	err := common.GoldenDiff(func() {
+		for _, str := range cases {
+			fmt.Println(StringEscape(str))
+		}
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

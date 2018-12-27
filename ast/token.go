@@ -17,7 +17,6 @@
 package ast
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -612,51 +611,6 @@ func Tokenizer(sql string) []Token {
 		typ, val = tkn.Scan()
 	}
 	return tokens
-}
-
-// MysqlEscapeString mysql_real_escape_string
-// https://github.com/liule/golang_escape
-func MysqlEscapeString(source string) (string, error) {
-	var j = 0
-	if len(source) == 0 {
-		return "", errors.New("source is null")
-	}
-	tempStr := source[:]
-	desc := make([]byte, len(tempStr)*2)
-	for i := 0; i < len(tempStr); i++ {
-		flag := false
-		var escape byte
-		switch tempStr[i] {
-		case '\r':
-			flag = true
-			escape = '\r'
-		case '\n':
-			flag = true
-			escape = '\n'
-		case '\\':
-			flag = true
-			escape = '\\'
-		case '\'':
-			flag = true
-			escape = '\''
-		case '"':
-			flag = true
-			escape = '"'
-		case '\032':
-			flag = true
-			escape = 'Z'
-		default:
-		}
-		if flag {
-			desc[j] = '\\'
-			desc[j+1] = escape
-			j = j + 2
-		} else {
-			desc[j] = tempStr[i]
-			j = j + 1
-		}
-	}
-	return string(desc[0:j]), nil
 }
 
 // IsMysqlKeyword 判断是否是关键字

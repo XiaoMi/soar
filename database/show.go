@@ -113,7 +113,7 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 	tbStatus := newTableStat(tableName)
 
 	// 执行 show table status
-	res, err := db.Query(fmt.Sprintf("show table status where name = '%s'", tbStatus.Name))
+	res, err := db.Query(fmt.Sprintf("show table status where name = '%s'", StringEscape(tbStatus.Name)))
 	if err != nil {
 		return tbStatus, err
 	}
@@ -208,7 +208,7 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 	}
 
 	// 执行 show create table
-	res, err := db.Query(fmt.Sprintf("show index from `%s`.`%s`", db.Database, tableName))
+	res, err := db.Query(fmt.Sprintf("show index from `%s`.`%s`", StringEscape(db.Database), StringEscape(tableName)))
 	if err != nil {
 		return nil, err
 	}
@@ -348,7 +348,7 @@ func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 	tbDesc := NewTableDesc(tableName)
 
 	// 执行 show create table
-	res, err := db.Query(fmt.Sprintf("show full columns from `%s`.`%s`", db.Database, tableName))
+	res, err := db.Query(fmt.Sprintf("show full columns from `%s`.`%s`", StringEscape(db.Database), StringEscape(tableName)))
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +408,7 @@ func (db *Connector) showCreate(createType, name string) (string, error) {
 	// SHOW CREATE TABLE tbl_name
 	// SHOW CREATE TRIGGER trigger_name
 	// SHOW CREATE VIEW view_name
-	res, err := db.Query(fmt.Sprintf("SHOW CREATE %s `%s`", createType, name))
+	res, err := db.Query(fmt.Sprintf("SHOW CREATE %s `%s`", StringEscape(createType), StringEscape(name)))
 	if err != nil {
 		return "", err
 	}
@@ -500,10 +500,10 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 	var columns []*common.Column
 	sql := fmt.Sprintf("SELECT "+
 		"c.TABLE_NAME,c.TABLE_SCHEMA,c.COLUMN_TYPE,c.CHARACTER_SET_NAME, c.COLLATION_NAME "+
-		"FROM `INFORMATION_SCHEMA`.`COLUMNS` as c where c.COLUMN_NAME = '%s' ", name)
+		"FROM `INFORMATION_SCHEMA`.`COLUMNS` as c where c.COLUMN_NAME = '%s' ", StringEscape(name))
 
 	if dbName != "" {
-		sql += fmt.Sprintf(" and c.table_schema = '%s'", dbName)
+		sql += fmt.Sprintf(" and c.table_schema = '%s'", StringEscape(dbName))
 	}
 
 	if len(tables) > 0 {
@@ -511,7 +511,7 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 		for _, table := range tables {
 			tmp = append(tmp, "'"+table+"'")
 		}
-		sql += fmt.Sprintf(" and c.table_name in (%s)", strings.Join(tmp, ","))
+		sql += fmt.Sprintf(" and c.table_name in (%s)", StringEscape(strings.Join(tmp, ",")))
 	}
 
 	common.Log.Debug("FindColumn, execute SQL: %s", sql)
@@ -538,7 +538,7 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 			// 由于 `INFORMATION_SCHEMA`.`TABLES` 表中未找到表的 character，所以从按照 MySQL 中 collation 的规则从中截取 character
 
 			sql = fmt.Sprintf("SELECT `t`.`TABLE_COLLATION` FROM `INFORMATION_SCHEMA`.`TABLES` AS `t` "+
-				"WHERE `t`.`TABLE_NAME`='%s' AND `t`.`TABLE_SCHEMA` = '%s'", col.Table, col.DB)
+				"WHERE `t`.`TABLE_NAME`='%s' AND `t`.`TABLE_SCHEMA` = '%s'", StringEscape(col.Table), StringEscape(col.DB))
 
 			common.Log.Debug("FindColumn, execute SQL: %s", sql)
 			var newRes QueryResult
@@ -573,7 +573,7 @@ func (db *Connector) IsForeignKey(dbName, tbName, column string) bool {
 		"WHERE REFERENCED_TABLE_SCHEMA <> 'NULL' AND"+
 		" TABLE_NAME='%s' AND"+
 		" TABLE_SCHEMA='%s' AND"+
-		" COLUMN_NAME='%s'", tbName, dbName, column)
+		" COLUMN_NAME='%s'", StringEscape(tbName), StringEscape(dbName), StringEscape(column))
 
 	common.Log.Debug("IsForeignKey, execute SQL: %s", sql)
 	res, err := db.Query(sql)
@@ -604,10 +604,10 @@ type ReferenceValue struct {
 func (db *Connector) ShowReference(dbName string, tbName ...string) ([]ReferenceValue, error) {
 	var referenceValues []ReferenceValue
 	sql := `SELECT DISTINCT C.REFERENCED_TABLE_SCHEMA,C.REFERENCED_TABLE_NAME,C.TABLE_SCHEMA,C.TABLE_NAME,C.CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C JOIN INFORMATION_SCHEMA. TABLES T ON T.TABLE_NAME = C.TABLE_NAME WHERE C.REFERENCED_TABLE_NAME IS NOT NULL`
-	sql = sql + fmt.Sprintf(` AND C.TABLE_SCHEMA = "%s"`, dbName)
+	sql = sql + fmt.Sprintf(` AND C.TABLE_SCHEMA = "%s"`, StringEscape(dbName))
 
 	if len(tbName) > 0 {
-		extra := fmt.Sprintf(` AND C.TABLE_NAME IN ("%s")`, strings.Join(tbName, `","`))
+		extra := fmt.Sprintf(` AND C.TABLE_NAME IN ("%s")`, StringEscape(strings.Join(tbName, `","`)))
 		sql = sql + extra
 	}
 
