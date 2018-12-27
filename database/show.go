@@ -408,7 +408,7 @@ func (db *Connector) showCreate(createType, name string) (string, error) {
 	// SHOW CREATE TABLE tbl_name
 	// SHOW CREATE TRIGGER trigger_name
 	// SHOW CREATE VIEW view_name
-	res, err := db.Query(fmt.Sprintf("SHOW CREATE %s `%s`", StringEscape(createType), StringEscape(name)))
+	res, err := db.Query(fmt.Sprintf("SHOW CREATE %s `%s`", createType, StringEscape(name)))
 	if err != nil {
 		return "", err
 	}
@@ -509,9 +509,9 @@ func (db *Connector) FindColumn(name, dbName string, tables ...string) ([]*commo
 	if len(tables) > 0 {
 		var tmp []string
 		for _, table := range tables {
-			tmp = append(tmp, "'"+table+"'")
+			tmp = append(tmp, "'"+StringEscape(table)+"'")
 		}
-		sql += fmt.Sprintf(" and c.table_name in (%s)", StringEscape(strings.Join(tmp, ",")))
+		sql += fmt.Sprintf(" and c.table_name in (%s)", strings.Join(tmp, ","))
 	}
 
 	common.Log.Debug("FindColumn, execute SQL: %s", sql)
@@ -606,8 +606,12 @@ func (db *Connector) ShowReference(dbName string, tbName ...string) ([]Reference
 	sql := `SELECT DISTINCT C.REFERENCED_TABLE_SCHEMA,C.REFERENCED_TABLE_NAME,C.TABLE_SCHEMA,C.TABLE_NAME,C.CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C JOIN INFORMATION_SCHEMA. TABLES T ON T.TABLE_NAME = C.TABLE_NAME WHERE C.REFERENCED_TABLE_NAME IS NOT NULL`
 	sql = sql + fmt.Sprintf(` AND C.TABLE_SCHEMA = "%s"`, StringEscape(dbName))
 
+	var tables []string
+	for _, tb := range tbName {
+		tables = append(tables, "'"+StringEscape(tb)+"'")
+	}
 	if len(tbName) > 0 {
-		extra := fmt.Sprintf(` AND C.TABLE_NAME IN ("%s")`, StringEscape(strings.Join(tbName, `","`)))
+		extra := fmt.Sprintf(` AND C.TABLE_NAME IN ("%s")`, strings.Join(tables, ","))
 		sql = sql + extra
 	}
 
