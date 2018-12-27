@@ -131,6 +131,10 @@ func TestPretty(t *testing.T) {
 			fmt.Println(sql)
 			fmt.Println(Pretty(sql, "builtin"))
 		}
+		orgMaxPrettySQLLength := common.Config.MaxPrettySQLLength
+		common.Config.MaxPrettySQLLength = 1
+		fmt.Println(Pretty("select 1", "builtin"))
+		common.Config.MaxPrettySQLLength = orgMaxPrettySQLLength
 	}, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)

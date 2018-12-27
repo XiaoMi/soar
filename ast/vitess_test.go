@@ -27,6 +27,7 @@ func TestPrintPrettyVitessStmtNode(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`select 1`,
+		`select * f`, // syntax error case
 	}
 	err := common.GoldenDiff(func() {
 		for _, sql := range sqls {
@@ -43,6 +44,7 @@ func TestVitessStmtNode2JSON(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`select 1`,
+		`select * f`, // syntax error case
 	}
 	err := common.GoldenDiff(func() {
 		for _, sql := range sqls {
