@@ -606,7 +606,30 @@ type PatternInExpr struct {
 
 // Restore implements Node interface.
 func (n *PatternInExpr) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore PatternInExpr.Expr")
+	}
+	if n.Not {
+		ctx.WriteKeyWord(" NOT IN ")
+	} else {
+		ctx.WriteKeyWord(" IN ")
+	}
+	ctx.WritePlain("(")
+	for i, expr := range n.List {
+		if i != 0 {
+			ctx.WritePlain(",")
+		}
+		if err := expr.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore PatternInExpr.List[%d]", i)
+		}
+	}
+	if n.Sel != nil {
+		if err := n.Sel.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore PatternInExpr.Sel")
+		}
+	}
+	ctx.WritePlain(")")
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -618,10 +641,10 @@ func (n *PatternInExpr) Format(w io.Writer) {
 		fmt.Fprint(w, " IN (")
 	}
 	for i, expr := range n.List {
-		expr.Format(w)
-		if i != len(n.List)-1 {
+		if i != 0 {
 			fmt.Fprint(w, ",")
 		}
+		expr.Format(w)
 	}
 	fmt.Fprint(w, ")")
 }
@@ -898,7 +921,8 @@ type PositionExpr struct {
 
 // Restore implements Node interface.
 func (n *PositionExpr) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WritePlainf("%d", n.N)
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -1134,7 +1158,29 @@ type VariableExpr struct {
 
 // Restore implements Node interface.
 func (n *VariableExpr) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if n.IsSystem {
+		ctx.WritePlain("@@")
+		if n.ExplicitScope {
+			if n.IsGlobal {
+				ctx.WriteKeyWord("GLOBAL")
+			} else {
+				ctx.WriteKeyWord("SESSION")
+			}
+			ctx.WritePlain(".")
+		}
+	} else {
+		ctx.WritePlain("@")
+	}
+	ctx.WriteName(n.Name)
+
+	if n.Value != nil {
+		ctx.WritePlain(":=")
+		if err := n.Value.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore VariableExpr.Value")
+		}
+	}
+
+	return nil
 }
 
 // Format the ExprNode into a Writer.
