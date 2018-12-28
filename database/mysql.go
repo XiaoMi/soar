@@ -279,6 +279,7 @@ func (db *Connector) dangerousQuery(query string) bool {
 			"show",
 			"explain",
 			"describe",
+			"desc",
 		}
 
 		for _, prefix := range whiteList {

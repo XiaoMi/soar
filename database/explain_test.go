@@ -17,6 +17,7 @@
 package database
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
@@ -2439,12 +2440,13 @@ func TestMySQLExplainWarnings(t *testing.T) {
 
 func TestMySQLExplainQueryCost(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	expInfo, err := connTest.Explain("select 1", TraditionalExplainType, TraditionalFormatExplain)
-	if err != nil {
-		t.Error(err)
-	}
-	err = common.GoldenDiff(func() {
-		MySQLExplainQueryCost(expInfo)
+	err := common.GoldenDiff(func() {
+		expInfo, err := connTest.Explain("select 1", TraditionalExplainType, TraditionalFormatExplain)
+		fmt.Println(err, MySQLExplainQueryCost(expInfo))
+		expInfo, err = connTest.Explain("select 1", ExtendedExplainType, TraditionalFormatExplain)
+		fmt.Println(err, MySQLExplainQueryCost(expInfo))
+		expInfo, err = connTest.Explain("select 1", TraditionalExplainType, JSONFormatExplain)
+		fmt.Println(err, MySQLExplainQueryCost(expInfo))
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)

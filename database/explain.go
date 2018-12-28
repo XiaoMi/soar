@@ -604,6 +604,9 @@ func MySQLExplainWarnings(exp *ExplainInfo) string {
 // MySQLExplainQueryCost 将last_query_cost信息补充到评审结果中
 func MySQLExplainQueryCost(exp *ExplainInfo) string {
 	var content string
+	if exp == nil {
+		return content
+	}
 	if exp.QueryCost > 0 {
 
 		tmp := fmt.Sprintf("%.3f\n", exp.QueryCost)
@@ -819,7 +822,7 @@ func parseTraditionalExplainText(content string) (explainRows []*ExplainRow, err
 		}
 		// filtered may larger than 100.00
 		// https://bugs.mysql.com/bug.php?id=34124
-		if filtered > 100.00 {
+		if filtered >= 100.00 {
 			filtered = 100.00
 		}
 
@@ -1039,6 +1042,7 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 
 // Explain 获取 SQL 的 explain 信息
 func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *ExplainInfo, err error) {
+	exp = &ExplainInfo{SQL: sql}
 	if explainType != TraditionalExplainType {
 		formatType = TraditionalFormatExplain
 	}
@@ -1054,13 +1058,14 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 	}()
 
 	// 执行EXPLAIN请求
-	sql = db.explainQuery(sql, explainType, formatType)
-	res, err := db.Query(sql)
+	exp.SQL = db.explainQuery(sql, explainType, formatType)
+	res, err := db.Query(exp.SQL)
+	if err != nil {
+		return exp, err
+	}
 
 	// 解析mysql结果，输出ExplainInfo
 	exp, err = ParseExplainResult(res, formatType)
-	exp.SQL = sql
-
 	return exp, err
 }
 

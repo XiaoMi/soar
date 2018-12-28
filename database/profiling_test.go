@@ -30,6 +30,10 @@ func TestProfiling(t *testing.T) {
 		t.Error(err)
 	}
 	pretty.Println(rows)
+	_, err = connTest.Profiling("delete from film")
+	if err == nil {
+		t.Error(err)
+	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 

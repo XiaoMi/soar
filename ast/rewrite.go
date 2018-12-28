@@ -312,7 +312,7 @@ func (rw *Rewrite) RewriteStandard() *Rewrite {
 	return rw
 }
 
-// RewriteAlwaysTrue alwaystrue: 删除恒真条件
+// RewriteAlwaysTrue always true: 删除恒真条件
 func (rw *Rewrite) RewriteAlwaysTrue() (reWriter *Rewrite) {
 	array := NewNodeList(rw.Stmt)
 	tNode := array.Head
@@ -340,7 +340,7 @@ func isAlwaysTrue(expr *sqlparser.ComparisonExpr) bool {
 		expr.Operator = "!="
 	case "<=>":
 		expr.Operator = "="
-	case ">=", "<=", "!=", "=":
+	case ">=", "<=", "!=", "=", ">", "<":
 	default:
 		return false
 	}

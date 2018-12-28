@@ -31,7 +31,13 @@ func TestDigestExplainText(t *testing.T) {
 |  1 | SIMPLE      | city    | ref   | idx_fk_country_id,idx_country_id_city,idx_all,idx_other | idx_fk_country_id | 2       | sakila.country.country_id |    2 | Using index |
 +----+-------------+---------+-------+---------------------------------------------------------+-------------------+---------+---------------------------+------+-------------+`
 	common.Config.ReportType = "explain-digest"
-	err := common.GoldenDiff(func() { DigestExplainText(text) }, t.Name(), update)
+	err := common.GoldenDiff(func() {
+		DigestExplainText(text)
+		orgReportType := common.Config.ReportType
+		common.Config.ReportType = "html"
+		DigestExplainText(text)
+		common.Config.ReportType = orgReportType
+	}, t.Name(), update)
 	if nil != err {
 		t.Fatal(err)
 	}

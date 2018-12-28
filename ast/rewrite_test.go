@@ -434,7 +434,15 @@ func TestRewriteAlwaysTrue(t *testing.T) {
 			"output": "select count(col) from tbl",
 		},
 		{
+			"input":  "SELECT count(col) FROM tbl where 2>1;",
+			"output": "select count(col) from tbl",
+		},
+		{
 			"input":  "SELECT count(col) FROM tbl where 1<=1;",
+			"output": "select count(col) from tbl",
+		},
+		{
+			"input":  "SELECT count(col) FROM tbl where 1<2;",
 			"output": "select count(col) from tbl",
 		},
 		{
@@ -460,6 +468,10 @@ func TestRewriteAlwaysTrue(t *testing.T) {
 		{
 			"input":  "SELECT count(col) FROM tbl where (1=1);",
 			"output": "select count(col) from tbl",
+		},
+		{
+			"input":  "SELECT count(col) FROM tbl where a=1;",
+			"output": "select count(col) from tbl where a = 1",
 		},
 		{
 			"input":  "SELECT count(col) FROM tbl where ('a'= 'a' or 'b' = 'b') and a = 'b';",
@@ -777,6 +789,10 @@ func TestListRewriteRules(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	err := common.GoldenDiff(func() {
 		ListRewriteRules(RewriteRules)
+		orgReportType := common.Config.ReportType
+		common.Config.ReportType = "json"
+		ListRewriteRules(RewriteRules)
+		common.Config.ReportType = orgReportType
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)
