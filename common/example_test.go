@@ -20,19 +20,18 @@ import "fmt"
 
 func ExampleFormatDSN() {
 	Log.Debug("Entering function: %s", GetFunctionName())
-	dsxExp := &Dsn{
-		Addr:     "127.0.0.1:3306",
-		Schema:   "mysql",
-		User:     "root",
-		Password: "1t'sB1g3rt",
-		Charset:  "utf8mb4",
-		Disable:  false,
-	}
+	dsxExp := newDSN(nil)
+	dsxExp.Addr = "127.0.0.1:3306"
+	dsxExp.Schema = "mysql"
+	dsxExp.User = "root"
+	dsxExp.Password = "1t'sB1g3rt"
+	dsxExp.Charset = "utf8mb4"
+	dsxExp.Disable = false
 
 	// 根据 &dsn 生成 dsnStr
 	fmt.Println(FormatDSN(dsxExp))
 
-	// Output: root:1t'sB1g3rt@127.0.0.1:3306/mysql?charset=utf8mb4
+	// Output: root:1t'sB1g3rt@tcp(127.0.0.1:3306)/mysql?charset=utf8mb4
 	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 

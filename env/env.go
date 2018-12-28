@@ -73,7 +73,7 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 
 	// 连接线上环境
 	// 如果未配置线上环境线测试环境配置为线上环境
-	if common.Config.OnlineDSN.Addr == "" {
+	if common.Config.OnlineDSN.User == "" {
 		common.Log.Warn("BuildEnv AllowOnlineAsTest: OnlineDSN not config, use TestDSN： %s:********@%s/%s as OnlineDSN",
 			vEnv.User, vEnv.Addr, vEnv.Database)
 		common.Config.OnlineDSN = common.Config.TestDSN
@@ -235,7 +235,7 @@ func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string
 		case *sqlparser.Use:
 			// 如果是use语句，则更改基础环配置
 			if _, ok := meta[stmt.DBName.String()]; !ok {
-				// 如果USE了一个线上环境不存在的数据库，将创建该数据库，字符集默认utf8mb4
+				// 如果USE了一个线上环境不存在的数据库，将创建该数据库
 				meta[stmt.DBName.String()] = common.NewDB(stmt.DBName.String())
 				rEnv.Database = stmt.DBName.String()
 
@@ -367,7 +367,7 @@ func (vEnv *VirtualEnv) createDatabase(rEnv *database.Connector) error {
 	ddl, err := rEnv.ShowCreateDatabase(rEnv.Database)
 	if err != nil {
 		common.Log.Warning("createDatabase, rEnv.ShowCreateDatabase Error : %v", err)
-		ddl = fmt.Sprintf("create database `%s` character set utf8mb4", rEnv.Database)
+		ddl = fmt.Sprintf("create database `%s` character set %s", rEnv.Database, rEnv.Charset)
 	}
 
 	ddl = strings.Replace(ddl, rEnv.Database, dbHash, -1)

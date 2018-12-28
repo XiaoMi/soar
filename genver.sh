@@ -1,9 +1,11 @@
 #!/bin/bash
 
 ## Generate Repository Version
-version="$(git log --date=iso --pretty=format:"%cd" -1) $(git describe --tags --always)"
+tag="$(git describe --tags --always)"
+version="$(git log --date=iso --pretty=format:"%cd" -1) ${tag}"
 if [ "X${version}" == "X" ]; then
     version="not a git repo"
+    tag="not a git repo"
 fi
 
 git_dirty=$(git diff --no-ext-diff 2>/dev/null | wc -l)
@@ -29,3 +31,5 @@ const (
     DevPath = "${dev_path}"
 )
 EOF
+
+echo "${tag}" | awk -F '-' '{print $1}' > VERSION

@@ -63,6 +63,7 @@ func TestReadConfigFile(t *testing.T) {
 func TestParseDSN(t *testing.T) {
 	Log.Debug("Entering function: %s", GetFunctionName())
 	var dsns = []string{
+		// version < 0.11.0
 		"",
 		"user:password@hostname:3307/database",
 		"user:password@hostname:3307/database?charset=utf8",
@@ -81,11 +82,24 @@ func TestParseDSN(t *testing.T) {
 		"@:3307/database",
 		":3307/database",
 		"/database",
+		// go-sql-driver dsn
+		"user@unix(/path/to/socket)/dbname",
+		"root:pw@unix(/tmp/mysql.sock)/myDatabase?loc=Local",
+		"user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true",
+		"user:password@/dbname?sql_mode=TRADITIONAL",
+		"user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s&collation=utf8mb4_unicode_ci",
+		"id:password@tcp(your-amazonaws-uri.com:3306)/dbname",
+		"user@cloudsql(project-id:instance-name)/dbname",
+		"user@cloudsql(project-id:regionname:instance-name)/dbname",
+		"user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped",
+		"user:password@/dbname",
+		"user:password@/",
 	}
 
 	err := GoldenDiff(func() {
 		for _, dsn := range dsns {
-			pretty.Println(parseDSN(dsn, nil))
+			pretty.Println(dsn)
+			pretty.Println(ParseDSN(dsn, nil))
 		}
 	}, t.Name(), update)
 	if nil != err {

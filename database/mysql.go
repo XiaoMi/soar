@@ -53,14 +53,7 @@ type QueryResult struct {
 
 // NewConnector 创建新连接
 func NewConnector(dsn *common.Dsn) (*Connector, error) {
-	conn, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s)/%s?parseTime=true&charset=%s",
-		dsn.User,
-		dsn.Password,
-		dsn.Net,
-		dsn.Addr,
-		dsn.Schema,
-		dsn.Charset,
-	))
+	conn, err := sql.Open("mysql", common.FormatDSN(dsn))
 	if err != nil {
 		return nil, err
 	}
