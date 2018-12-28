@@ -672,6 +672,18 @@ func (rw *Rewrite) RewriteStar2Columns() *Rewrite {
 		return rw
 	}
 
+	// 单张表 select * 不补全表名，避免SQL过长，多张表的 select tb1.*, tb2.* 需要补全表名
+	var multiTable bool
+	if len(rw.Columns) > 1 {
+		multiTable = true
+	} else {
+		for db := range rw.Columns {
+			if len(rw.Columns[db]) > 1 {
+				multiTable = true
+			}
+		}
+	}
+
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
 		case *sqlparser.Select:
@@ -692,12 +704,16 @@ func (rw *Rewrite) RewriteStar2Columns() *Rewrite {
 					for _, tables := range rw.Columns {
 						for _, cols := range tables {
 							for _, col := range cols {
+								var table string
+								if multiTable {
+									table = col.Table
+								}
 								newExpr := &sqlparser.AliasedExpr{
 									Expr: &sqlparser.ColName{
 										Metadata: nil,
 										Name:     sqlparser.NewColIdent(col.Name),
 										Qualifier: sqlparser.TableName{
-											Name: sqlparser.NewTableIdent(col.Table),
+											Name: sqlparser.NewTableIdent(table),
 											// 因为不建议跨DB的查询，所以这里的db前缀将不进行补齐
 											Qualifier: sqlparser.TableIdent{},
 										},

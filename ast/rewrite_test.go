@@ -110,11 +110,11 @@ func TestRewriteStar2Columns(t *testing.T) {
 	testSQL := []map[string]string{
 		{
 			"input":  `SELECT * FROM film`,
-			"output": `select film.film_id, film.title from film`,
+			"output": `select film_id, title from film`,
 		},
 		{
-			"input":  `SELECT film.*, actor.actor_id FROM film,actor`,
-			"output": `select film.film_id, film.title, actor.actor_id from film, actor`,
+			"input":  `SELECT film.* FROM film`,
+			"output": `select film_id, title from film`,
 		},
 	}
 
@@ -125,6 +125,36 @@ func TestRewriteStar2Columns(t *testing.T) {
 				"film": {
 					{Name: "film_id", Table: "film"},
 					{Name: "title", Table: "film"},
+				},
+			},
+		}
+		rw.RewriteStar2Columns()
+		if rw.NewSQL != sql["output"] {
+			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
+		}
+	}
+
+	testSQL2 := []map[string]string{
+		{
+			"input":  `SELECT film.* FROM film, actor`,
+			"output": `select film.film_id, film.title from film, actor`,
+		},
+		{
+			"input":  `SELECT film.*, actor.actor_id FROM film, actor`,
+			"output": `select film.film_id, film.title, actor.actor_id from film, actor`,
+		},
+	}
+
+	for _, sql := range testSQL2 {
+		rw := NewRewrite(sql["input"])
+		rw.Columns = map[string]map[string][]*common.Column{
+			"sakila": {
+				"film": {
+					{Name: "film_id", Table: "film"},
+					{Name: "title", Table: "film"},
+				},
+				"actor": {
+					{Name: "actor_id", Table: "actor"},
 				},
 			},
 		}
