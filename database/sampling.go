@@ -96,7 +96,10 @@ func (db *Connector) SamplingData(onlineConn *Connector, tables ...string) error
 
 // startSampling sampling data from OnlineDSN to TestDSN
 func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, where string) error {
-	samplingQuery := fmt.Sprintf("select * from `%s`.`%s` %s", StringEscape(database), StringEscape(table), StringEscape(where))
+	samplingQuery := fmt.Sprintf("select * from `%s`.`%s` %s",
+		Escape(database, false),
+		Escape(table, false),
+		Escape(where, false))
 	common.Log.Debug("startSampling with Query: %s", samplingQuery)
 	res, err := onlineConn.Query(samplingQuery)
 	if err != nil {
@@ -136,8 +139,11 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 				switch columnTypes[i].DatabaseTypeName() {
 				case "TIMESTAMP", "DATETIME":
 					t, err := time.Parse(time.RFC3339, string(val))
-					common.LogIfWarn(err, "")
-					values = append(values, fmt.Sprintf(`"%s"`, TimeString(t)))
+					if err != nil {
+						values = append(values, fmt.Sprintf(`"%s"`, string(val)))
+					} else {
+						values = append(values, fmt.Sprintf(`"%s"`, TimeString(t)))
+					}
 				default:
 					values = append(values, fmt.Sprintf(`unhex("%s")`, fmt.Sprintf("%x", val)))
 				}
@@ -167,7 +173,10 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 // 将泵取的数据转换成 insert 语句并在 testConn 数据库中执行
 func (db *Connector) doSampling(table, colDef, values string) error {
 	// db.Database is hashed database name
-	query := fmt.Sprintf("insert into `%s`.`%s` (%s) values %s;", StringEscape(db.Database), StringEscape(table), StringEscape(colDef), values)
+	query := fmt.Sprintf("insert into `%s`.`%s` (%s) values %s;",
+		Escape(db.Database, false),
+		Escape(table, false),
+		Escape(colDef, false), values)
 	res, err := db.Query(query)
 	if res.Rows != nil {
 		res.Rows.Close()

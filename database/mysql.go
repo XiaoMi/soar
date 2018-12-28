@@ -17,9 +17,11 @@
 package database
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"strconv"
 	"strings"
@@ -39,7 +41,6 @@ type Connector struct {
 	Pass     string
 	Database string
 	Charset  string
-	Net      string
 	Conn     *sql.DB
 }
 
@@ -202,7 +203,11 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 	}
 
 	// 计算该列散粒度
-	res, err := db.Query(fmt.Sprintf("select count(distinct `%s`) from `%s`.`%s`", StringEscape(col), StringEscape(db.Database), StringEscape(tb)))
+	db.Conn.Stats()
+	res, err := db.Query(fmt.Sprintf("select count(distinct `%s`) from `%s`.`%s`",
+		Escape(col, false),
+		Escape(db.Database, false),
+		Escape(tb, false)))
 	if err != nil {
 		common.Log.Warn("(db *Connector) ColumnCardinality() Query Error: %v", err)
 		return 0
@@ -313,19 +318,37 @@ func NullString(buf []byte) string {
 	return string(buf)
 }
 
-// StringEscape like C API mysql_escape_string()
+// quoteEscape sql_mode=no_backslash_escapes
+func quoteEscape(source string) string {
+	var buf bytes.Buffer
+	last := 0
+	for ii, bb := range source {
+		if bb == '\'' {
+			_, err := io.WriteString(&buf, source[last:ii])
+			common.LogIfWarn(err, "")
+			_, err = io.WriteString(&buf, `''`)
+			common.LogIfWarn(err, "")
+			last = ii + 1
+		}
+	}
+	_, err := io.WriteString(&buf, source[last:])
+	common.LogIfWarn(err, "")
+	return buf.String()
+}
+
+// stringEscape mysql_escape_string
 // https://github.com/liule/golang_escape
-func StringEscape(source string) string {
+func stringEscape(source string) string {
 	var j int
 	if source == "" {
 		return source
 	}
 	tempStr := source[:]
 	desc := make([]byte, len(tempStr)*2)
-	for i := 0; i < len(tempStr); i++ {
+	for i, b := range tempStr {
 		flag := false
 		var escape byte
-		switch tempStr[i] {
+		switch b {
 		case '\000':
 			flag = true
 			escape = '\000'
@@ -359,4 +382,14 @@ func StringEscape(source string) string {
 		}
 	}
 	return string(desc[0:j])
+}
+
+// Escape like C API mysql_escape_string()
+func Escape(source string, NoBackslashEscapes bool) string {
+	// NoBackslashEscapes https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_no_backslash_escapes
+	// TODO: NoBackslashEscapes always false
+	if NoBackslashEscapes {
+		return quoteEscape(source)
+	}
+	return stringEscape(source)
 }

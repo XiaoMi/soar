@@ -199,7 +199,7 @@ func TestNullString(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
-func TestStringEscaple(t *testing.T) {
+func TestEscape(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	cases := []string{
 		"",
@@ -214,7 +214,8 @@ func TestStringEscaple(t *testing.T) {
 	}
 	err := common.GoldenDiff(func() {
 		for _, str := range cases {
-			fmt.Println(StringEscape(str))
+			fmt.Println(Escape(str, false))
+			fmt.Println(Escape(str, true))
 		}
 	}, t.Name(), update)
 	if err != nil {
