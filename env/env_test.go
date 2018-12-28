@@ -61,6 +61,8 @@ func TestMain(m *testing.M) {
 func TestNewVirtualEnv(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []string{
+		"use sakila",
+		"select frm syntaxError",
 		"create table t(id int,c1 varchar(20),PRIMARY KEY (id));",
 		"alter table t add index `idx_c1`(c1);",
 		"select * from city where country_id = 44;",

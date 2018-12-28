@@ -26,13 +26,16 @@ import (
 
 func TestTrace(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	res, err := connTest.Trace("select 1")
-	if err != nil {
-		t.Error(err)
+	sqls := []string{
+		"select 1",
+		"explain select 1",
+		"show create table film",
 	}
-
-	err = common.GoldenDiff(func() {
-		pretty.Println(res)
+	err := common.GoldenDiff(func() {
+		for _, sql := range sqls {
+			res, err := connTest.Trace(sql)
+			pretty.Println(sql, res, err)
+		}
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)

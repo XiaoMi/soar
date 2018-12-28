@@ -1,3 +1,5 @@
+use sakila OK
+select frm syntaxError OK
 create table t(id int,c1 varchar(20),PRIMARY KEY (id)); OK
 alter table t add index `idx_c1`(c1); OK
 select * from city where country_id = 44; OK

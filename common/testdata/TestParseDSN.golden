@@ -17,7 +17,7 @@
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@hostname:3307/database
@@ -39,7 +39,7 @@ user:password@hostname:3307/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@hostname:3307/database?charset=utf8
@@ -61,7 +61,7 @@ user:password@hostname:3307/database?charset=utf8
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@hostname:3307
@@ -83,7 +83,7 @@ user:password@hostname:3307
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@hostname:/database
@@ -105,7 +105,7 @@ user:password@hostname:/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@:3307/database
@@ -127,7 +127,7 @@ user:password@:3307/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user@hostname/database
@@ -149,7 +149,7 @@ user@hostname/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:pwd:pwd@pwd/pwd@hostname/database
@@ -171,7 +171,7 @@ user:pwd:pwd@pwd/pwd@hostname/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@
@@ -193,7 +193,7 @@ user:password@
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 hostname:3307/database
@@ -215,7 +215,7 @@ hostname:3307/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 @hostname:3307/database
@@ -237,7 +237,7 @@ hostname:3307/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 @hostname
@@ -259,7 +259,7 @@ hostname:3307/database
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 hostname
@@ -281,7 +281,7 @@ hostname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 @/database
@@ -303,7 +303,7 @@ hostname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 @hostname:3307
@@ -325,7 +325,7 @@ hostname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 @:3307/database
@@ -347,7 +347,7 @@ hostname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 :3307/database
@@ -369,7 +369,7 @@ hostname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 /database
@@ -391,7 +391,7 @@ hostname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user@unix(/path/to/socket)/dbname
@@ -413,7 +413,7 @@ user@unix(/path/to/socket)/dbname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 root:pw@unix(/tmp/mysql.sock)/myDatabase?loc=Local
@@ -435,7 +435,7 @@ root:pw@unix(/tmp/mysql.sock)/myDatabase?loc=Local
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
@@ -457,7 +457,7 @@ user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@/dbname?sql_mode=TRADITIONAL
@@ -479,7 +479,7 @@ user:password@/dbname?sql_mode=TRADITIONAL
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s&collation=utf8mb4_unicode_ci
@@ -501,7 +501,7 @@ user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s&collation=utf8mb4_
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 id:password@tcp(your-amazonaws-uri.com:3306)/dbname
@@ -523,7 +523,7 @@ id:password@tcp(your-amazonaws-uri.com:3306)/dbname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user@cloudsql(project-id:instance-name)/dbname
@@ -545,7 +545,7 @@ user@cloudsql(project-id:instance-name)/dbname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user@cloudsql(project-id:regionname:instance-name)/dbname
@@ -567,7 +567,7 @@ user@cloudsql(project-id:regionname:instance-name)/dbname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped
@@ -589,7 +589,7 @@ user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@/dbname
@@ -611,7 +611,7 @@ user:password@/dbname
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
     Version:              99999,
 }
 user:password@/
@@ -633,6 +633,28 @@ user:password@/
     WriteTimeout:         0,
     AllowNativePasswords: true,
     AllowOldPasswords:    false,
-    Disable:              true,
+    Disable:              false,
+    Version:              99999,
+}
+user:password@tcp(localhost:3307)/database?charset=utf8&timeout=5s
+&common.Dsn{
+    User:                 "user",
+    Password:             "password",
+    Net:                  "tcp",
+    Addr:                 "localhost:3307",
+    Schema:               "database",
+    Charset:              "utf8",
+    Collation:            "utf8_general_ci",
+    Loc:                  "UTC",
+    TLS:                  "",
+    ServerPubKey:         "",
+    MaxAllowedPacket:     4194304,
+    Params:               {"charset":"utf8"},
+    Timeout:              5,
+    ReadTimeout:          0,
+    WriteTimeout:         0,
+    AllowNativePasswords: true,
+    AllowOldPasswords:    false,
+    Disable:              false,
     Version:              99999,
 }

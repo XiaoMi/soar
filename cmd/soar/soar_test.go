@@ -47,6 +47,8 @@ func Test_Main(_ *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	common.Config.OnlineDSN.Disable = true
 	common.Config.LogLevel = 0
+	common.Config.Query = "select * syntaxError"
+	main()
 	common.Config.Query = "select * from film;alter table city add index idx_country_id(country_id);"
 	main()
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())

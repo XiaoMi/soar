@@ -8,12 +8,14 @@
 - command line dsn args support '@', '/', ':' in password
 - add new heuristic rule RES.009, "SELECT * FROM tbl WHERE col = col = 'abc'"
 - add new heuristic rule RuleColumnNotAllowType COL.018
+- add string escape function for security
+- fix #122 single table select * don't auto-complete table name
+- fix #171 support socket access type
 - fix #58 sampling not deal with NULL able string
 - fix #172 compatible with mysql 5.1, which explain has no Index_Comment column
 - fix #163 column.Tp may be nil, which may raise panic
 - fix #151 bit type not config as int, when two columns compare will give ARG.003 suggestion.
 - 
-
 ## 2018-11
 
 - add all third-party lib into vendor

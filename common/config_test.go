@@ -94,6 +94,7 @@ func TestParseDSN(t *testing.T) {
 		"user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped",
 		"user:password@/dbname",
 		"user:password@/",
+		"user:password@tcp(localhost:3307)/database?charset=utf8&timeout=5s",
 	}
 
 	err := GoldenDiff(func() {
