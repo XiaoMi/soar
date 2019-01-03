@@ -36,6 +36,8 @@ where col = 1
 tb;
 18 
 -- comment
+19 INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);
+20 select /*!50000 1,*/ 1;
 0 select * from test\Ghello
 1 select 'hello\Gworld', col from test\Ghello
 2 -- select * from test\Ghello

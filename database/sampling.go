@@ -137,6 +137,9 @@ func (db *Connector) startSampling(onlineConn *sql.DB, database, table string, w
 				values = append(values, "NULL")
 			} else {
 				switch columnTypes[i].DatabaseTypeName() {
+				case "JSON":
+					// https://github.com/XiaoMi/soar/issues/178
+					values = append(values, fmt.Sprintf(`convert(X'%s' using utf8mb4)`, fmt.Sprintf("%x", val)))
 				case "TIMESTAMP", "DATETIME":
 					t, err := time.Parse(time.RFC3339, string(val))
 					if err != nil {

@@ -898,8 +898,11 @@ func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 		}
 
 		// multi line comment
+		// https://dev.mysql.com/doc/refman/8.0/en/comments.html
+		// https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html
 		if b == '/' && i+1 < len(buf) && buf[i+1] == '*' {
-			if !multiLineComment && !singleLineComment && !quoted && buf[i+2] != '!' {
+			if !multiLineComment && !singleLineComment && !quoted &&
+				(buf[i+2] != '!' && buf[i+2] != '+') {
 				i = i + 2
 				multiLineComment = true
 				continue

@@ -14,6 +14,8 @@
 package ast
 
 import (
+	"strings"
+
 	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/auth"
 	"github.com/pingcap/parser/model"
@@ -930,7 +932,14 @@ type Assignment struct {
 
 // Restore implements Node interface.
 func (n *Assignment) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if err := n.Column.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore Assignment.Column")
+	}
+	ctx.WritePlain("=")
+	if err := n.Expr.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore Assignment.Expr")
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -1308,13 +1317,14 @@ type ShowStmt struct {
 	dmlNode
 	resultSetNode
 
-	Tp     ShowStmtType // Databases/Tables/Columns/....
-	DBName string
-	Table  *TableName  // Used for showing columns.
-	Column *ColumnName // Used for `desc table column`.
-	Flag   int         // Some flag parsed from sql, such as FULL.
-	Full   bool
-	User   *auth.UserIdentity // Used for show grants.
+	Tp          ShowStmtType // Databases/Tables/Columns/....
+	DBName      string
+	Table       *TableName  // Used for showing columns.
+	Column      *ColumnName // Used for `desc table column`.
+	Flag        int         // Some flag parsed from sql, such as FULL.
+	Full        bool
+	User        *auth.UserIdentity // Used for show grants.
+	IfNotExists bool               // Used for `show create database if not exists`
 
 	// GlobalScope is used by show variables
 	GlobalScope bool
@@ -1526,7 +1536,36 @@ type FrameBound struct {
 
 // Restore implements Node interface.
 func (n *FrameBound) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if n.UnBounded {
+		ctx.WriteKeyWord("UNBOUNDED")
+	}
+	switch n.Type {
+	case CurrentRow:
+		ctx.WriteKeyWord("CURRENT ROW")
+	case Preceding, Following:
+		if n.Unit != nil {
+			ctx.WriteKeyWord("INTERVAL ")
+		}
+		if n.Expr != nil {
+			if err := n.Expr.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore FrameBound.Expr")
+			}
+		}
+		if n.Unit != nil {
+			// Here the Unit string should not be quoted.
+			// TODO: This is a temporary workaround that should be changed once something like "Keyword Expression" is implemented.
+			var sb strings.Builder
+			n.Unit.Restore(NewRestoreCtx(0, &sb))
+			ctx.WritePlain(" ")
+			ctx.WriteKeyWord(sb.String())
+		}
+		if n.Type == Preceding {
+			ctx.WriteKeyWord(" PRECEDING")
+		} else {
+			ctx.WriteKeyWord(" FOLLOWING")
+		}
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.

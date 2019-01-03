@@ -166,6 +166,8 @@ select col from tb where col = 1;`),
 select col from tb;
 select col from tb;
 `),
+		[]byte(`INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);`),
+		[]byte(`select /*!50000 1,*/ 1;`),
 	}
 	buf2s := [][]byte{
 		[]byte("select * from test\\Ghello"),
