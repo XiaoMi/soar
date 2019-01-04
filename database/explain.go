@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -652,6 +653,7 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 	}
 	if len(selectTypeBuf) > 0 {
 		buf = append(buf, fmt.Sprint("#### SelectType信息解读\n"))
+		sort.Strings(selectTypeBuf)
 		buf = append(buf, strings.Join(selectTypeBuf, "\n"))
 	}
 
@@ -681,6 +683,7 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 	}
 	if len(accessTypeBuf) > 0 {
 		buf = append(buf, fmt.Sprint("#### Type信息解读\n"))
+		sort.Strings(accessTypeBuf)
 		buf = append(buf, strings.Join(accessTypeBuf, "\n"))
 	}
 
@@ -716,6 +719,7 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 	}
 	if len(extraTypeBuf) > 0 {
 		buf = append(buf, fmt.Sprint("#### Extra信息解读\n"))
+		sort.Strings(extraTypeBuf)
 		buf = append(buf, strings.Join(extraTypeBuf, "\n"))
 	}
 

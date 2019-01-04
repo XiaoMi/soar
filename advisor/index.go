@@ -18,6 +18,7 @@ package advisor
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/XiaoMi/soar/ast"
@@ -989,7 +990,13 @@ func (idxAdvs IndexAdvises) Format() map[string]Rule {
 		rules[advKey].Content = strings.Trim(rules[advKey].Content, common.Config.Delimiter)
 	}
 
+	var sortAdvs []string
 	for adv := range rules {
+		sortAdvs = append(sortAdvs, adv)
+	}
+	sort.Strings(sortAdvs)
+
+	for _, adv := range sortAdvs {
 		key := fmt.Sprintf("IDX.%03d", number)
 		ddl := ast.MergeAlterTables(sqls[adv]...)
 		// 由于传入合并的SQL都是一张表的，所以一定只会输出一条ddl语句

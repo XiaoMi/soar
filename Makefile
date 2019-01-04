@@ -83,7 +83,7 @@ test-update:
 
 # Using bats test framework run all cli test cases
 # https://github.com/sstephenson/bats
-test-cli:
+test-cli: build
 	@echo "$(CGREEN)Run all cli test cases ...$(CEND)"
 	bats ./test
 	@echo "test-cli Success!"
@@ -213,20 +213,13 @@ docker-connect:
 docker-it:
 	docker exec -it soar-mysql /bin/bash
 
-.PHONY: main_test
-main_test: install
-	@echo "$(CGREEN)running main_test ...$(CEND)"
-	@echo "soar -list-test-sqls | soar"
-	@./doc/example/main_test.sh
-	@echo "main_test Success!"
-
 .PHONY: daily
-daily: | deps fmt vendor docker cover doc lint release install main_test clean logo
+daily: | deps fmt vendor docker cover doc lint release install test-cli clean logo
 	@echo "$(CGREEN)daily build finished ...$(CEND)"
 
 # vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
-daily-quick: | deps fmt cover test-cli main_test doc lint logo
+daily-quick: | deps fmt cover test-cli doc lint logo
 	@echo "$(CGREEN)daily-quick build finished ...$(CEND)"
 
 .PHONY: logo
