@@ -302,14 +302,14 @@ var ExplainSelectType = map[string]string{
 // ExplainAccessType EXPLAIN中ACCESS TYPE会出现的类型
 var ExplainAccessType = map[string]string{
 	"system":          "这是const连接类型的一种特例, 该表仅有一行数据(=系统表).",
-	"const":           `const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col =1.`,
-	"eq_ref":          `除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.`,
+	"const":           `const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col = 1.`,
+	"eq_ref":          `除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例: 'SELECT * FROM RefTbl, tbl WHERE RefTbl.col=tbl.col;'.`,
 	"ref":             `连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.`,
 	"fulltext":        "查询时使用 FULLTEXT 索引.",
 	"ref_or_null":     "如同ref, 但是MySQL必须在初次查找的结果里找出null条目, 然后进行二次查找.",
 	"index_merge":     `表示使用了索引合并优化方法. 在这种情况下. key列包含了使用的索引的清单, key_len包含了使用的索引的最长的关键元素. 详情请见 8.2.1.4, “Index Merge Optimization”.`,
-	"unique_subquery": `在某些IN查询中使用此种类型，而不是常规的ref:'value IN (SELECT primary_key FROM single_table WHERE some_expr)'.`,
-	"index_subquery":  "在某些IN查询中使用此种类型, 与unique_subquery类似, 但是查询的是非唯一索引性索引.",
+	"unique_subquery": `在某些IN查询中使用此种类型，而不是常规的ref:'value IN (SELECT PrimaryKey FROM SingleTable WHERE SomeExpr)'.`,
+	"index_subquery":  "在某些IN查询中使用此种类型, 与 unique_subquery 类似, 但是查询的是非唯一索引性索引.",
 	"range":           `只检索给定范围的行, 使用一个索引来选择行. key列显示使用了哪个索引. key_len包含所使用索引的最长关键元素.`,
 	"index":           "全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.",
 	"ALL":             `最坏的情况, 从头到尾全表扫描.`,
