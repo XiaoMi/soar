@@ -20,11 +20,15 @@ services:
 
 before_install:
   - docker pull mysql
+  - sudo add-apt-repository ppa:duggan/bats --yes
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq bats
 
 script:
   - make build
   - make docker
   - make cover
+  - make test-cli
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

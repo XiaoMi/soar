@@ -81,6 +81,13 @@ test-update:
 	go test ./... -update
 	@echo "test-update Success!"
 
+# Using bats test framework run all cli test cases
+# https://github.com/sstephenson/bats
+test-cli:
+	@echo "$(CGREEN)Run all cli test cases ...$(CEND)"
+	bats ./test
+	@echo "test-cli Success!"
+
 # Code Coverage
 # colorful coverage numerical >=90% GREEN, <80% RED, Other YELLOW
 .PHONY: cover
@@ -219,7 +226,7 @@ daily: | deps fmt vendor docker cover doc lint release install main_test clean l
 
 # vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
-daily-quick: | deps fmt cover main_test doc lint logo
+daily-quick: | deps fmt cover test-cli main_test doc lint logo
 	@echo "$(CGREEN)daily-quick build finished ...$(CEND)"
 
 .PHONY: logo

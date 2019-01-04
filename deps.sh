@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NEEDED_COMMANDS="docker git go govendor retool"
+NEEDED_COMMANDS="docker git go govendor retool bats"
 
 for cmd in ${NEEDED_COMMANDS} ; do
     if ! command -v "${cmd}" &> /dev/null ; then
@@ -25,3 +25,7 @@ done
 
 # retool
 ## go get github.com/twitchtv/retool
+
+# bats https://github.com/sstephenson/bats
+## Ubuntu: apt-get install bats
+## Mac: brew install bats
