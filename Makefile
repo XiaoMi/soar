@@ -245,7 +245,7 @@ clean:
 			rm -f ${BINARY}.$${GOOS}-$${GOARCH} ;\
 		done ;\
 	done
-	rm -f ${BINARY} coverage.*
+	rm -f ${BINARY} coverage.* test/tmp/*
 	find . -name "*.log" -delete
 	git clean -fi
 	docker stop soar-mysql 2>/dev/null || true
