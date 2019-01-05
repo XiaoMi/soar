@@ -67,9 +67,9 @@ var ExplainType = map[string]int{
 type ExplainInfo struct {
 	SQL           string
 	ExplainFormat int
-	ExplainRows   []*ExplainRow
+	ExplainRows   []ExplainRow
 	ExplainJSON   *ExplainJSON
-	Warnings      []*ExplainWarning
+	Warnings      []ExplainWarning
 	QueryCost     float64
 }
 
@@ -420,12 +420,12 @@ func findTablesInJSON(explainJSON string, depth int) {
 }
 
 // FormatJSONIntoTraditional 将JSON形式转换为TRADITIONAL形式，方便前端展现
-func FormatJSONIntoTraditional(explainJSON string) []*ExplainRow {
+func FormatJSONIntoTraditional(explainJSON string) []ExplainRow {
 	// 查找JSON中的所有ExplainJSONTable
 	explainJSONTables = []*ExplainJSONTable{}
 	findTablesInJSON(explainJSON, 0)
 
-	var explainRows []*ExplainRow
+	var explainRows []ExplainRow
 	id := -1
 	for _, table := range explainJSONTables {
 		keyLen := table.KeyLength
@@ -436,7 +436,7 @@ func FormatJSONIntoTraditional(explainJSON string) []*ExplainRow {
 		if filtered > 100.00 {
 			filtered = 100.00
 		}
-		explainRows = append(explainRows, &ExplainRow{
+		explainRows = append(explainRows, ExplainRow{
 			ID:           id + 1,
 			SelectType:   "",
 			TableName:    table.TableName,
@@ -457,7 +457,7 @@ func FormatJSONIntoTraditional(explainJSON string) []*ExplainRow {
 
 // ConvertExplainJSON2Row 将 JSON 格式转成 ROW 格式，为方便统一做优化建议
 // 但是会损失一些 JSON 特有的分析结果
-func ConvertExplainJSON2Row(explainJSON *ExplainJSON) []*ExplainRow {
+func ConvertExplainJSON2Row(explainJSON *ExplainJSON) []ExplainRow {
 	buf, err := json.Marshal(explainJSON)
 	if err != nil {
 		return nil
@@ -755,7 +755,7 @@ func ParseExplainText(content string) (exp *ExplainInfo, err error) {
 }
 
 // 解析文本形式传统形式Explain信息
-func parseTraditionalExplainText(content string) (explainRows []*ExplainRow, err error) {
+func parseTraditionalExplainText(content string) (explainRows []ExplainRow, err error) {
 	LS := regexp.MustCompile(`^\+`) // 华丽的分隔线:)
 
 	// 格式正确性检查
@@ -831,7 +831,7 @@ func parseTraditionalExplainText(content string) (explainRows []*ExplainRow, err
 		}
 
 		// 拼接结构体
-		explainRows = append(explainRows, &ExplainRow{
+		explainRows = append(explainRows, ExplainRow{
 			ID:           id,
 			SelectType:   colsMap["select_type"],
 			TableName:    colsMap["table"],
@@ -851,9 +851,9 @@ func parseTraditionalExplainText(content string) (explainRows []*ExplainRow, err
 }
 
 // 解析文本形式竖排版 Explain信息
-func parseVerticalExplainText(content string) (explainRows []*ExplainRow, err error) {
+func parseVerticalExplainText(content string) (explainRows []ExplainRow, err error) {
 	var lines []string
-	explainRow := &ExplainRow{
+	explainRow := ExplainRow{
 		Partitions: "NULL",
 		Filtered:   0.00,
 	}
@@ -965,7 +965,7 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 
 	// Different MySQL version has different columns define
 	var selectType, table, partitions, accessType, possibleKeys, key, keyLen, ref, extra []byte
-	expRow := &ExplainRow{}
+	expRow := ExplainRow{}
 	explainFields := make([]interface{}, 0)
 	fields := map[string]interface{}{
 		"id":            &expRow.ID,
@@ -994,7 +994,7 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 	}
 
 	// 补全 ExplainRows
-	var explainRows []*ExplainRow
+	var explainRows []ExplainRow
 	for res.Rows.Next() {
 		err := res.Rows.Scan(explainFields...)
 		if err != nil {
@@ -1024,8 +1024,8 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 	// check explain warning info
 	if common.Config.ShowWarnings {
 		for res.Warning.Next() {
-			var expWarning *ExplainWarning
-			err = res.Warning.Scan(expWarning.Level, expWarning.Code, expWarning.Message)
+			var expWarning ExplainWarning
+			err = res.Warning.Scan(&expWarning.Level, &expWarning.Code, &expWarning.Message)
 			if err != nil {
 				break
 			}
@@ -1063,6 +1063,9 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 
 	// 执行EXPLAIN请求
 	exp.SQL = db.explainQuery(sql, explainType, formatType)
+	if exp.SQL == "" {
+		return exp, nil
+	}
 	res, err := db.Query(exp.SQL)
 	if err != nil {
 		return exp, err

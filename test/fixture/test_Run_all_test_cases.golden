@@ -2081,7 +2081,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *b* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -2095,6 +2095,8 @@ FROM
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  建议使用 AS 关键字显示声明一个别名
@@ -2138,7 +2140,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -2152,6 +2154,8 @@ FROM
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  建议使用 AS 关键字显示声明一个别名
@@ -2195,7 +2199,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -2209,6 +2213,8 @@ FROM
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  建议使用 AS 关键字显示声明一个别名
@@ -2254,7 +2260,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | SIMPLE | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
 
 
@@ -2268,6 +2274,8 @@ WHERE
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2330,7 +2338,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | SIMPLE | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
 
 
@@ -2344,6 +2352,8 @@ WHERE
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2410,9 +2420,9 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 2  | UNION | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
@@ -2422,11 +2432,17 @@ FROM
 
 #### SelectType信息解读
 
+* **PRIMARY**: 最外层的select.
+
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
 #### Type信息解读
 
+* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  建议使用 AS 关键字显示声明一个别名
@@ -2488,9 +2504,9 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | PRIMARY | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 2  | UNION | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
 | 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
 
@@ -2500,11 +2516,17 @@ WHERE
 
 #### SelectType信息解读
 
+* **PRIMARY**: 最外层的select.
+
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2576,7 +2598,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *country* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where |
 
 
@@ -2590,6 +2612,8 @@ FROM
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2621,7 +2645,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
 
 
@@ -2635,6 +2659,8 @@ FROM
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2666,7 +2692,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *country* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
 
 
@@ -2680,6 +2706,8 @@ FROM
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2710,7 +2738,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | SIMPLE | *a* | NULL | ALL | idx\_fk\_country\_id | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -2724,6 +2752,8 @@ FROM
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -2768,7 +2798,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.c.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *c* | NULL | index | PRIMARY | idx\_fk\_country\_id | 2 | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 | 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.c.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -2781,7 +2811,13 @@ FROM
 
 #### Type信息解读
 
+* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
+
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+#### Extra信息解读
+
+* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
 ##  建议使用 AS 关键字显示声明一个别名
@@ -2837,9 +2873,9 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | DERIVED | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
-| 2  | DERIVED | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
-| 2  | DERIVED | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
+| 1  | PRIMARY | *<derived2>* | NULL | ALL | NULL | NULL | NULL | NULL | 60 | ☠️ **100.00%** | ☠️ **O(n)** | Using temporary; Using filesort |
+| 1  | PRIMARY | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | I.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 | 2  | DERIVED | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
 
 
@@ -2850,15 +2886,23 @@ ORDER BY
 
 * **DERIVED**: 用于from子句里有子查询的情况. MySQL会递归执行这些子查询, 把结果放在临时表里.
 
+* **PRIMARY**: 最外层的select.
+
 #### Type信息解读
+
+* **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
 
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
+* **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
+
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 * ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
+
+* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
 
 
 ##  为sakila库的city表添加索引
@@ -2913,7 +2957,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | DELETE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | DELETE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -2958,7 +3002,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | DELETE | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
 
 
@@ -2972,6 +3016,8 @@ WHERE
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -3024,7 +3070,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | DELETE | *a2* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -3034,6 +3080,8 @@ WHERE
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  不建议使用联表删除或更新
@@ -3069,7 +3117,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | DELETE | *a2* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -3079,6 +3127,8 @@ WHERE
 #### Type信息解读
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  不建议使用联表删除或更新
@@ -3168,7 +3218,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -3210,8 +3260,8 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *address* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 1  | SIMPLE | *address* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *address* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -3223,6 +3273,8 @@ WHERE
 * **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
 
 #### Type信息解读
+
+* **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col =1.
 
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
 
@@ -3260,7 +3312,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
@@ -3321,7 +3373,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *country* | NULL | index | NULL | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | INSERT | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | 0.00% | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *country* | NULL | index | NULL | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -3335,6 +3387,8 @@ FROM
 #### Type信息解读
 
 * **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -3435,7 +3489,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *country* | NULL | index | NULL | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | REPLACE | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | 0.00% | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *country* | NULL | index | NULL | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -3449,6 +3503,8 @@ FROM
 #### Type信息解读
 
 * **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -3688,7 +3744,7 @@ LIMIT
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | SUBQUERY | *language* | NULL | index | NULL | PRIMARY | 1 | NULL | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | PRIMARY | *film* | NULL | ALL | idx\_fk\_language\_id | NULL | NULL | NULL | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
 | 2  | SUBQUERY | *language* | NULL | index | NULL | PRIMARY | 1 | NULL | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -3697,15 +3753,21 @@ LIMIT
 
 #### SelectType信息解读
 
+* **PRIMARY**: 最外层的select.
+
 * **SUBQUERY**: 子查询中的第一个SELECT查询, 不依赖于外部查询的结果集.
 
 #### Type信息解读
 
 * **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
 
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
 #### Extra信息解读
 
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
+
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
 ##  最外层 SELECT 未指定 WHERE 条件
@@ -3763,9 +3825,9 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *i* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 2  | UNION | *o* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
@@ -3775,11 +3837,15 @@ FROM
 
 #### SelectType信息解读
 
+* **PRIMARY**: 最外层的select.
+
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
 ##  建议使用 AS 关键字显示声明一个别名
@@ -3909,9 +3975,9 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
+| 1  | PRIMARY | *i* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
+| 2  | UNION | *o* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
 | 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
 
@@ -3921,11 +3987,15 @@ WHERE
 
 #### SelectType信息解读
 
+* **PRIMARY**: 最外层的select.
+
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -3974,7 +4044,7 @@ FROM
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *address* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.customer.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | SIMPLE | *customer* | NULL | ALL | idx\_fk\_address\_id | NULL | NULL | NULL | 599 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 1  | SIMPLE | *address* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.customer.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -3988,6 +4058,8 @@ FROM
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 #### Extra信息解读
 
@@ -4032,15 +4104,15 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | PRIMARY | *country* | NULL | index | PRIMARY | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index; Using temporary; Using filesort |
+| 1  | PRIMARY | *city* | NULL | ref | PRIMARY,<br>idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *c* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using join buffer (Block Nested Loop) |
+| 1  | PRIMARY | *a* | NULL | ref | PRIMARY,<br>idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.city.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *cu* | NULL | ref | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *<derived2>* | NULL | ref | <auto\_key0> | <auto\_key0> | 152 | sakila.a.address | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 2  | DERIVED | *a* | NULL | ALL | PRIMARY,<br>idx\_fk\_city\_id | NULL | NULL | NULL | 603 | ☠️ **100.00%** | ☠️ **O(n)** | Using filesort |
+| 2  | DERIVED | *cu* | NULL | ref | idx\_fk\_store\_id,<br>idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | 54.42% | ☠️ **O(n)** | Using where |
+| 2  | DERIVED | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | sakila.a.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
@@ -4051,13 +4123,29 @@ ORDER BY
 
 * **DERIVED**: 用于from子句里有子查询的情况. MySQL会递归执行这些子查询, 把结果放在临时表里.
 
+* **PRIMARY**: 最外层的select.
+
 #### Type信息解读
 
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例:'SELECT * FROM ref_table,tbl WHERE ref_table.key_column=tbl.column;'.
 
+* **index**: 全表扫描, 只是扫描表的时候按照索引次序进行而不是行. 主要优点就是避免了排序, 但是开销仍然非常大.
+
+* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
 #### Extra信息解读
 
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
+
+* **Using join buffer**: 从已有连接中找被读入缓存的数据, 并且通过缓存来完成与当前表的连接.
+
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
+
+* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
+
+* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
 
 
 ##  为sakila库的city表添加索引
@@ -4328,6 +4416,8 @@ ALTER TABLE
 ADD  
   index  idx_city_id( city_id)
 ```
+
+##  OK
 
 # Query: C315BC4EE0F4E523
 
