@@ -1059,6 +1059,9 @@ func (db *Connector) Explain(sql string, explainType int, formatType int) (exp *
 
 	// 执行EXPLAIN请求
 	exp.SQL = db.explainQuery(sql, explainType, formatType)
+	if exp.SQL == "" {
+		return exp, nil
+	}
 	res, err := db.Query(exp.SQL)
 	if err != nil {
 		return exp, err
