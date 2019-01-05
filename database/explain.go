@@ -696,10 +696,11 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 		for _, row := range rows {
 			for k, c := range explainExtra {
 				if strings.Contains(row.Extra, k) {
-					if k == "Impossible WHERE" {
-						if strings.Contains(row.Extra, "Impossible WHERE noticed after reading const tables") {
-							continue
-						}
+					if k == "Impossible WHERE" && strings.Contains(row.Extra, "Impossible WHERE noticed after reading const tables") {
+						continue
+					}
+					if k == "Using index" && strings.Contains(row.Extra, "Using index condition") {
+						continue
 					}
 					warn := false
 					for _, w := range common.Config.ExplainWarnExtra {
