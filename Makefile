@@ -189,7 +189,7 @@ release: build
 docker:
 	@echo "$(CGREEN)Build mysql test enviorment ...$(CEND)"
 	@docker stop soar-mysql 2>/dev/null || true
-	@docker wait soar-mysql 2>/dev/null || true
+	@docker wait soar-mysql 2>/dev/null >/dev/null || true
 	@echo "docker run --name soar-mysql $(MYSQL_RELEASE):$(MYSQL_VERSION)"
 	@docker run --name soar-mysql --rm -d \
 	-e MYSQL_ROOT_PASSWORD=1tIsB1g3rt \
@@ -199,12 +199,17 @@ docker:
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
 	@echo "waiting for sakila database initializing "
-	@while ! docker exec soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" --silent -NBe "do 1" >/dev/null 2>&1 ; do \
-	printf '.' ; \
-	sleep 1 ; \
-	done ; \
-	echo '.'
-	@echo "mysql test enviorment is ready!"
+	@timeout=180; while [ $${timeout} -gt 0 ] ; do \
+		if ! docker exec soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" --silent -NBe "do 1" >/dev/null 2>&1 ; then \
+			timeout=`expr $$timeout - 1`; \
+			printf '.' ;  sleep 1 ; \
+		else \
+			echo "." ; echo "mysql test enviorment is ready!" ; break ; \
+		fi ; \
+		if [ $$timeout = 0 ] ; then \
+			echo "." ; echo "$(CRED)docker soar-mysql start timeout(180 s)!$(CEND)" ; exit 1 ; \
+		fi ; \
+	done
 
 .PHONY: docker-connect
 docker-connect:

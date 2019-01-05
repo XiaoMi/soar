@@ -26,6 +26,7 @@ import (
 )
 
 var sqls = []string{
+	`use sakila`, // not explain able sql, will convert to empty!
 	`select * from city where country_id = 44;`,
 	`select * from address where address2 is not null;`,
 	`select * from address where address2 is null;`,
