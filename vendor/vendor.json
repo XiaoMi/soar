@@ -173,44 +173,44 @@
 		{
 			"checksumSHA1": "MxoLdFWi8nwd0uqTJnYqw+JaDAY=",
 			"path": "github.com/pingcap/tidb/sessionctx/stmtctx",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "wlD7aGqTJ5eBQYK0ub4b2Ick1j8=",
 			"path": "github.com/pingcap/tidb/types",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "DWVD7+ygtT66IQ+cqXmMJ5OVqUk=",
 			"path": "github.com/pingcap/tidb/types/json",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "6vi/eCZXqNTa5eAUpxDZet4LPlY=",
 			"path": "github.com/pingcap/tidb/types/parser_driver",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "SS7twHZofFKr8w/pwIKmkp3u5qU=",
 			"path": "github.com/pingcap/tidb/util/execdetails",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "nUC7zVoAMNR2a+z2iGqHoN2AkFE=",
 			"path": "github.com/pingcap/tidb/util/hack",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "xSyepiuqsoaaeDch7cXeumvVHKM=",
 			"path": "github.com/pingcap/tidb/util/memory",
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
+			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
+			"revisionTime": "2019-01-05T13:32:32Z"
 		},
 		{
 			"checksumSHA1": "SmYeIK/fIYXNu8IKxD6HOVQVTuU=",
