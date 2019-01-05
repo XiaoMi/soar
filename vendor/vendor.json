@@ -173,79 +173,44 @@
 		{
 			"checksumSHA1": "MxoLdFWi8nwd0uqTJnYqw+JaDAY=",
 			"path": "github.com/pingcap/tidb/sessionctx/stmtctx",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "wlD7aGqTJ5eBQYK0ub4b2Ick1j8=",
 			"path": "github.com/pingcap/tidb/types",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "DWVD7+ygtT66IQ+cqXmMJ5OVqUk=",
 			"path": "github.com/pingcap/tidb/types/json",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "6vi/eCZXqNTa5eAUpxDZet4LPlY=",
 			"path": "github.com/pingcap/tidb/types/parser_driver",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "SS7twHZofFKr8w/pwIKmkp3u5qU=",
 			"path": "github.com/pingcap/tidb/util/execdetails",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "nUC7zVoAMNR2a+z2iGqHoN2AkFE=",
 			"path": "github.com/pingcap/tidb/util/hack",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "xSyepiuqsoaaeDch7cXeumvVHKM=",
 			"path": "github.com/pingcap/tidb/util/memory",
-<<<<<<< HEAD
 			"revision": "78a51a4626999279749c460f3f42a2e92897c2e3",
 			"revisionTime": "2019-01-05T13:32:32Z"
-=======
-			"revision": "081a2c5cccf4d82ca2ad33cdc9f2f21d3319e2d5",
-			"revisionTime": "2019-01-05T02:32:10Z"
->>>>>>> master
 		},
 		{
 			"checksumSHA1": "SmYeIK/fIYXNu8IKxD6HOVQVTuU=",
