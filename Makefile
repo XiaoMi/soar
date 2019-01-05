@@ -208,7 +208,7 @@ docker:
 
 .PHONY: docker-connect
 docker-connect:
-	docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1"
+	docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" sakila
 
 # attach docker container with bash interactive mode
 .PHONY: docker-it

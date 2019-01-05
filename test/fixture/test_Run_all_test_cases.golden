@@ -3688,8 +3688,8 @@ LIMIT
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2  | SUBQUERY | *language* | NULL | index | NULL | PRIMARY | 1 | NULL | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 2  | SUBQUERY | *language* | NULL | index | NULL | PRIMARY | 1 | NULL | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 2  | SUBQUERY | *language* | NULL | index | NULL | PRIMARY | 1 | NULL | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 2  | SUBQUERY | *language* | NULL | index | NULL | PRIMARY | 1 | NULL | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
 
 
 
