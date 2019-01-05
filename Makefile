@@ -76,6 +76,7 @@ test:
 	@echo "test Success!"
 
 # Rule golang test cases with `-update` flag
+.PHONY: test-update
 test-update:
 	@echo "$(CGREEN)Run all test cases with -update flag ...$(CEND)"
 	go test ./... -update
@@ -83,6 +84,7 @@ test-update:
 
 # Using bats test framework run all cli test cases
 # https://github.com/sstephenson/bats
+.PHONY: test-cli
 test-cli: build
 	@echo "$(CGREEN)Run all cli test cases ...$(CEND)"
 	bats ./test
@@ -193,7 +195,7 @@ docker:
 	-e MYSQL_ROOT_PASSWORD=1tIsB1g3rt \
 	-e MYSQL_DATABASE=sakila \
 	-p 3306:3306 \
-	-v `pwd`/doc/example/sakila.sql.gz:/docker-entrypoint-initdb.d/sakila.sql.gz \
+	-v `pwd`/test/sql/init.sql.gz:/docker-entrypoint-initdb.d/init.sql.gz \
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
 	@echo "waiting for sakila database initializing "
