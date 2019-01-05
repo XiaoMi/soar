@@ -32,4 +32,7 @@ const (
 )
 EOF
 
-echo "${tag}" | awk -F '-' '{print $1}' > VERSION
+XIAOMI=$(git ls-remote --get-url | grep XiaoMi)
+if [ "x${XIAOMI}" != "x" ]; then
+    echo "${tag}" | awk -F '-' '{print $1}' > VERSION
+fi
