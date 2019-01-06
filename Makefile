@@ -72,7 +72,7 @@ fmt: go_version_check
 .PHONY: test
 test:
 	@echo "$(CGREEN)Run all test cases ...$(CEND)"
-	go test -race ./...
+	go test -timeout 10m -race ./...
 	@echo "test Success!"
 
 # Rule golang test cases with `-update` flag
@@ -213,7 +213,7 @@ docker:
 
 .PHONY: docker-connect
 docker-connect:
-	docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" sakila
+	@docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" sakila
 
 # attach docker container with bash interactive mode
 .PHONY: docker-it

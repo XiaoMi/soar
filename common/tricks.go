@@ -20,7 +20,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -67,24 +66,22 @@ func captureOutput(f func()) string {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
+	// copy the output in a separate goroutine so printing can't block indefinitely
+	outC := make(chan string)
+	go func() {
+		buf, err := ioutil.ReadAll(r)
+		if err != nil {
+			panic(err)
+		}
+		outC <- string(buf)
+	}()
+
 	// execute function
 	f()
 
-	outC := make(chan string)
-	// copy the output in a separate goroutine so printing can't block indefinitely
-	go func() {
-		var buf bytes.Buffer
-		_, err := io.Copy(&buf, r)
-		if err != nil {
-			Log.Warning(err.Error())
-		}
-		outC <- buf.String()
-	}()
-
 	// back to normal state
-	err := w.Close()
-	if err != nil {
-		Log.Warning(err.Error())
+	if err := w.Close(); err != nil {
+		panic(err)
 	}
 	os.Stdout = oldStdout // restoring the real stdout
 	out := <-outC
