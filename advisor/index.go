@@ -979,7 +979,7 @@ func (idxAdvs IndexAdvises) Format() map[string]Rule {
 			if common.Config.Sampling {
 				cardinal := fmt.Sprintf("%0.2f", col.Cardinality*100)
 				if cardinal != "0.00" {
-					rules[advKey].Content += fmt.Sprintf("为列%s添加索引,散粒度为: %s%%; ",
+					rules[advKey].Content += fmt.Sprintf("为列%s添加索引，散粒度为: %s%%; ",
 						col.Name, cardinal)
 				}
 			} else {
