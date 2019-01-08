@@ -18,6 +18,7 @@ import (
 
 	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/auth"
+	. "github.com/pingcap/parser/format"
 	"github.com/pingcap/parser/model"
 	"github.com/pingcap/parser/mysql"
 )
@@ -1293,6 +1294,7 @@ const (
 	ShowStatus
 	ShowCollation
 	ShowCreateTable
+	ShowCreateUser
 	ShowGrants
 	ShowTriggers
 	ShowProcedureStatus
@@ -1323,7 +1325,7 @@ type ShowStmt struct {
 	Column      *ColumnName // Used for `desc table column`.
 	Flag        int         // Some flag parsed from sql, such as FULL.
 	Full        bool
-	User        *auth.UserIdentity // Used for show grants.
+	User        *auth.UserIdentity // Used for show grants/create user.
 	IfNotExists bool               // Used for `show create database if not exists`
 
 	// GlobalScope is used by show variables
