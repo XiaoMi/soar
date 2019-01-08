@@ -1,8 +1,17 @@
 # CHANGELOG
 
-## 2018-12
+## 2019-01
 
 - DOING: english translation
+- add JSONFind function, which support JSON iterate
+- add new test database `world_x`
+- SplitStatement support optimizer hint `/*+xxx */`
+- include [bats](https://github.com/bats-core/bats-core) bash auto test framework
+- fix explain result with multi rows error
+- fix #178 JSON datatype only support utf8mb4
+
+## 2018-12
+
 - replace mysql database driver mymysql with go-sql-driver
 - add new -report-type [ast-json, tiast-json]
 - command line dsn args support '@', '/', ':' in password
