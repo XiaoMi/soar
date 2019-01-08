@@ -1,0 +1,56 @@
+# Query: 5767EE37339B2402
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 120
+```
+
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | 33.33% | ☠️ **O(n)** | Using where |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Type信息解读
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
+#### Extra信息解读
+
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
+
+
+##  为sakila库的film表添加索引
+
+* **Item:**  IDX.001
+
+* **Severity:**  L2
+
+
+* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
+
+
+
+##  不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
