@@ -129,17 +129,12 @@ func jsonFind(json string, name string, find *[]string) (next []string) {
 func JSONFind(json string, name string) []string {
 	var find []string
 	next := []string{json}
-	for {
+	for len(next) > 0 {
 		var tmpNext []string
 		for _, subJSON := range next {
-			for _, tmp := range jsonFind(subJSON, name, &find) {
-				tmpNext = append(tmpNext, tmp)
-			}
+			tmpNext = append(tmpNext, jsonFind(subJSON, name, &find)...)
 		}
 		next = tmpNext
-		if len(next) == 0 {
-			break
-		}
 	}
 	return find
 }
