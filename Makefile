@@ -72,14 +72,23 @@ fmt: go_version_check
 .PHONY: test
 test:
 	@echo "$(CGREEN)Run all test cases ...$(CEND)"
-	go test -race ./...
+	go test -timeout 10m -race ./...
 	@echo "test Success!"
 
 # Rule golang test cases with `-update` flag
+.PHONY: test-update
 test-update:
 	@echo "$(CGREEN)Run all test cases with -update flag ...$(CEND)"
 	go test ./... -update
 	@echo "test-update Success!"
+
+# Using bats test framework run all cli test cases
+# https://github.com/sstephenson/bats
+.PHONY: test-cli
+test-cli: build
+	@echo "$(CGREEN)Run all cli test cases ...$(CEND)"
+	bats ./test
+	@echo "test-cli Success!"
 
 # Code Coverage
 # colorful coverage numerical >=90% GREEN, <80% RED, Other YELLOW
@@ -180,46 +189,44 @@ release: build
 docker:
 	@echo "$(CGREEN)Build mysql test enviorment ...$(CEND)"
 	@docker stop soar-mysql 2>/dev/null || true
-	@docker wait soar-mysql 2>/dev/null || true
+	@docker wait soar-mysql 2>/dev/null >/dev/null || true
 	@echo "docker run --name soar-mysql $(MYSQL_RELEASE):$(MYSQL_VERSION)"
 	@docker run --name soar-mysql --rm -d \
 	-e MYSQL_ROOT_PASSWORD=1tIsB1g3rt \
 	-e MYSQL_DATABASE=sakila \
 	-p 3306:3306 \
-	-v `pwd`/doc/example/sakila.sql.gz:/docker-entrypoint-initdb.d/sakila.sql.gz \
+	-v `pwd`/test/sql/init.sql.gz:/docker-entrypoint-initdb.d/init.sql.gz \
 	$(MYSQL_RELEASE):$(MYSQL_VERSION)
 
 	@echo "waiting for sakila database initializing "
-	@while ! docker exec soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" --silent -NBe "do 1" >/dev/null 2>&1 ; do \
-	printf '.' ; \
-	sleep 1 ; \
-	done ; \
-	echo '.'
-	@echo "mysql test enviorment is ready!"
+	@timeout=180; while [ $${timeout} -gt 0 ] ; do \
+		if ! docker exec soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" --silent -NBe "do 1" >/dev/null 2>&1 ; then \
+			timeout=`expr $$timeout - 1`; \
+			printf '.' ;  sleep 1 ; \
+		else \
+			echo "." ; echo "mysql test enviorment is ready!" ; break ; \
+		fi ; \
+		if [ $$timeout = 0 ] ; then \
+			echo "." ; echo "$(CRED)docker soar-mysql start timeout(180 s)!$(CEND)" ; exit 1 ; \
+		fi ; \
+	done
 
 .PHONY: docker-connect
 docker-connect:
-	docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1"
+	@docker exec -it soar-mysql mysql --user=root --password=1tIsB1g3rt --host "127.0.0.1" sakila
 
 # attach docker container with bash interactive mode
 .PHONY: docker-it
 docker-it:
 	docker exec -it soar-mysql /bin/bash
 
-.PHONY: main_test
-main_test: install
-	@echo "$(CGREEN)running main_test ...$(CEND)"
-	@echo "soar -list-test-sqls | soar"
-	@./doc/example/main_test.sh
-	@echo "main_test Success!"
-
 .PHONY: daily
-daily: | deps fmt vendor docker cover doc lint release install main_test clean logo
+daily: | deps fmt vendor docker cover doc lint release install test-cli clean logo
 	@echo "$(CGREEN)daily build finished ...$(CEND)"
 
 # vendor, docker will cost long time, if all those are ready, daily-quick will much more fast.
 .PHONY: daily-quick
-daily-quick: | deps fmt cover main_test doc lint logo
+daily-quick: | deps fmt cover test-cli doc lint logo
 	@echo "$(CGREEN)daily-quick build finished ...$(CEND)"
 
 .PHONY: logo
@@ -238,7 +245,7 @@ clean:
 			rm -f ${BINARY}.$${GOOS}-$${GOARCH} ;\
 		done ;\
 	done
-	rm -f ${BINARY} coverage.*
+	rm -f ${BINARY} coverage.* test/tmp/*
 	find . -name "*.log" -delete
 	git clean -fi
 	docker stop soar-mysql 2>/dev/null || true

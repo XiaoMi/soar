@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -652,6 +653,7 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 	}
 	if len(selectTypeBuf) > 0 {
 		buf = append(buf, fmt.Sprint("#### SelectType信息解读\n"))
+		sort.Strings(selectTypeBuf)
 		buf = append(buf, strings.Join(selectTypeBuf, "\n"))
 	}
 
@@ -681,6 +683,7 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 	}
 	if len(accessTypeBuf) > 0 {
 		buf = append(buf, fmt.Sprint("#### Type信息解读\n"))
+		sort.Strings(accessTypeBuf)
 		buf = append(buf, strings.Join(accessTypeBuf, "\n"))
 	}
 
@@ -693,10 +696,11 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 		for _, row := range rows {
 			for k, c := range explainExtra {
 				if strings.Contains(row.Extra, k) {
-					if k == "Impossible WHERE" {
-						if strings.Contains(row.Extra, "Impossible WHERE noticed after reading const tables") {
-							continue
-						}
+					if k == "Impossible WHERE" && strings.Contains(row.Extra, "Impossible WHERE noticed after reading const tables") {
+						continue
+					}
+					if k == "Using index" && strings.Contains(row.Extra, "Using index condition") {
+						continue
 					}
 					warn := false
 					for _, w := range common.Config.ExplainWarnExtra {
@@ -716,6 +720,7 @@ func ExplainInfoTranslator(exp *ExplainInfo) string {
 	}
 	if len(extraTypeBuf) > 0 {
 		buf = append(buf, fmt.Sprint("#### Extra信息解读\n"))
+		sort.Strings(extraTypeBuf)
 		buf = append(buf, strings.Join(extraTypeBuf, "\n"))
 	}
 
