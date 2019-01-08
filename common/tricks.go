@@ -25,6 +25,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"sort"
+
+	"github.com/tidwall/gjson"
 )
 
 // GoldenDiff 从 gofmt 学来的测试方法
@@ -103,4 +105,17 @@ func SortedKey(m interface{}) []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+// JSONFind iterate find name in json
+func JSONFind(json string, name string, result *[]string) {
+	res := gjson.Parse(json)
+	res.ForEach(func(key, value gjson.Result) bool {
+		if key.String() == name {
+			*result = append(*result, value.String())
+		} else {
+			JSONFind(value.String(), name, result)
+		}
+		return true // keep iterating
+	})
 }

@@ -24,6 +24,7 @@ import (
 )
 
 func TestCaptureOutput(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	c1 := make(chan string, 1)
 	// test output buf large than 65535
 	length := 1<<16 + 1
@@ -48,4 +49,36 @@ func TestCaptureOutput(t *testing.T) {
 	case <-time.After(1 * time.Second):
 		t.Error("capture timeout, pipe read hangup")
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
+}
+
+func TestJSONFind(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
+	jsons := []string{
+		`{
+  "programmers": [
+    {
+      "firstName": "Janet",
+      "lastName": "McLaughlin",
+    }, {
+      "firstName": "Elliotte",
+      "lastName": "Hunter",
+    }, {
+      "firstName": "Jason",
+      "lastName": "Harold",
+    }
+  ]
+}`,
+	}
+	err := GoldenDiff(func() {
+		for _, json := range jsons {
+			var result []string
+			JSONFind(json, "firstName", &result)
+			fmt.Println(result)
+		}
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 }
