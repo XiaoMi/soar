@@ -107,15 +107,39 @@ func SortedKey(m interface{}) []string {
 	return keys
 }
 
-// JSONFind iterate find name in json
-func JSONFind(json string, name string, result *[]string) {
+// jsonFind internal function
+func jsonFind(json string, name string, find *[]string) (next []string) {
 	res := gjson.Parse(json)
 	res.ForEach(func(key, value gjson.Result) bool {
 		if key.String() == name {
-			*result = append(*result, value.String())
+			*find = append(*find, value.String())
 		} else {
-			JSONFind(value.String(), name, result)
+			switch value.Type {
+			case gjson.Number, gjson.True, gjson.False, gjson.Null:
+			default:
+				next = append(next, value.String())
+			}
 		}
 		return true // keep iterating
 	})
+	return next
+}
+
+// JSONFind iterate find name in json
+func JSONFind(json string, name string) []string {
+	var find []string
+	next := []string{json}
+	for {
+		var tmpNext []string
+		for _, subJSON := range next {
+			for _, tmp := range jsonFind(subJSON, name, &find) {
+				tmpNext = append(tmpNext, tmp)
+			}
+		}
+		next = tmpNext
+		if len(next) == 0 {
+			break
+		}
+	}
+	return find
 }
