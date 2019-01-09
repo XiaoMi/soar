@@ -8,7 +8,7 @@ load test_helper
   [ "${lines[0]%% *}" == "Version:" ]
   [ "${lines[1]%% *}" == "Branch:" ]
   [ "${lines[2]%% *}" == "Compile:" ]
-  echo  $output|grep "Compile: $(date +'%Y-%m-%d')"  # 检查版本是否为当天编译的
+  [ $(expr "${lines[2]}" : "Compile: $(date +'%Y-%m-%d').*") -ne 0 ]
 }
 
 @test "No arguments prints message" {
@@ -18,14 +18,13 @@ load test_helper
 }
 
 @test "Run default printconfig cases" {
-  ${SOAR_BIN} -print-config -log-output=/tmp/soar.log  > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  ${SOAR_BIN} -print-config -log-output=/dev/null  > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff ${BATS_TEST_NAME}
   [ $status -eq 0 ]
 }
 
-
 @test "Check config cases" {
-   run ${SOAR_BIN_ENV} -check-config
+  run ${SOAR_BIN_ENV} -check-config
   [ $status -eq 0 ]
   [ -z ${output} ]
 }
@@ -33,17 +32,11 @@ load test_helper
 @test "Syntax Check OK" {
   run ${SOAR_BIN} -query "select * from film" -only-syntax-check
   [ $status -eq 0 ]
-  [ -z $ouput  ]
+  [ -z $ouput ]
 }
 
 @test "Syntax Check Error" {
   run ${SOAR_BIN} -query "select * frm film" -only-syntax-check
   [ $status -eq 1 ]
-  [ -n $ouput  ]
+  [ -n $ouput ]
 }
-
-
-
-
-
-

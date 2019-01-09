@@ -50,7 +50,7 @@ trace: false
 explain: true
 delimiter: ;
 log-level: 3
-log-output: /tmp/soar.log
+log-output: /dev/null
 report-type: markdown
 report-css: ""
 report-javascript: ""
