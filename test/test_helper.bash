@@ -10,5 +10,4 @@ setup() {
 golden_diff() {
   FUNC_NAME=$1
   diff "${BATS_TMP_DIRNAME}/${FUNC_NAME}.golden" "${BATS_FIXTURE_DIRNAME}/${FUNC_NAME}.golden" >/dev/null
-  return $?
 }

@@ -90,7 +90,7 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 		common.Config.TestDSN.Disable = true
 	}
 
-	// 检查是否允许Online和Test一致，防止误操作
+	// 检查是否允许 Online 和 Test 一致，防止误操作
 	if common.FormatDSN(common.Config.OnlineDSN) == common.FormatDSN(common.Config.TestDSN) &&
 		!common.Config.AllowOnlineAsTest {
 		common.Log.Warn("BuildEnv AllowOnlineAsTest: %s:********@%s/%s OnlineDSN can't config as TestDSN",
@@ -108,7 +108,7 @@ func BuildEnv() (*VirtualEnv, *database.Connector) {
 	return vEnv, connOnline
 }
 
-// RealDB 从测试环境中获取通过hash后的DB
+// RealDB 从测试环境中获取通过 hash 后的 DB
 func (vEnv *VirtualEnv) RealDB(hash string) string {
 	if _, ok := vEnv.Hash2DB[hash]; ok {
 		return vEnv.Hash2DB[hash]
@@ -120,7 +120,7 @@ func (vEnv *VirtualEnv) RealDB(hash string) string {
 	return hash
 }
 
-// DBHash 从测试环境中根据DB找到对应的hash值
+// DBHash 从测试环境中根据 DB 找到对应的 hash 值
 func (vEnv *VirtualEnv) DBHash(db string) string {
 	if _, ok := vEnv.DBRef[db]; ok {
 		return vEnv.DBRef[db]
@@ -194,15 +194,15 @@ func (vEnv *VirtualEnv) CleanupTestDatabase() {
 	common.Log.Debug("CleanupTestDatabase done")
 }
 
-// BuildVirtualEnv rEnv为SQL源环境，DB使用的信息从接口获取
-// 注意：如果是USE,DDL等语句，执行完第一条就会返回，后面的SQL不会执行
+// BuildVirtualEnv rEnv 为 SQL 源环境，DB 使用的信息从接口获取
+// 注意：如果是 USE, DDL 等语句，执行完第一条就会返回，后面的 SQL 不会执行
 func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) bool {
 	var stmt sqlparser.Statement
 	var err error
 
 	// 置空错误信息
 	vEnv.Error = nil
-	// 检测是否已经创建初始数据库，如果未创建则创建一个名称hash过的映射数据库
+	// 检测是否已经创建初始数据库，如果未创建则创建一个名称 hash 过的映射数据库
 	err = vEnv.createDatabase(rEnv)
 	common.LogIfWarn(err, "")
 
@@ -212,7 +212,7 @@ func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string
 		return true
 	}
 
-	// 判断rEnv中是否指定了DB
+	// 判断 rEnv 中是否指定了 DB
 	if rEnv.Database == "" {
 		common.Log.Error("BuildVirtualEnv no database specified, TestDSN init failed")
 		return false
@@ -221,9 +221,7 @@ func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string
 	// 库表提取
 	meta := make(map[string]*common.DB)
 	for _, sql := range SQLs {
-
 		common.Log.Debug("BuildVirtualEnv Database&TableName Mapping, SQL: %s", sql)
-
 		stmt, err = sqlparser.Parse(sql)
 		if err != nil {
 			common.Log.Error("BuildVirtualEnv Error : %v", err)
@@ -249,7 +247,7 @@ func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string
 			// 为不影响其他SQL操作，复制一个Connector对象，将数据库切换到对应的DB上直接执行
 			vEnv.Database = vEnv.DBRef[rEnv.Database]
 
-			// 为了支持并发，需要将DB进行映射，但db.table这种形式无法保证DB的映射是正确的
+			// 为了支持并发，需要将DB进行映射，但 db.table 这种形式无法保证 DB 的映射是正确的
 			// TODO：暂不支持 create db.tableName (id int) 形式的建表语句
 			if stmt.Table.Qualifier.String() != "" {
 				common.Log.Error("BuildVirtualEnv DDL Not support db.tb format")
@@ -300,7 +298,7 @@ func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string
 
 		meta := ast.GetMeta(stmt, nil)
 
-		// 由于DB环境可能是变的，所以需要每一次都单独的提取库表结构，整体随着rEnv的变动而发生变化
+		// 由于 DB 环境可能是变的，所以需要每一次都单独的提取库表结构，整体随着 rEnv 的变动而发生变化
 		for db, table := range meta {
 			if db == "" {
 				db = rEnv.Database
@@ -361,7 +359,7 @@ func (vEnv *VirtualEnv) createDatabase(rEnv *database.Connector) error {
 
 	// optimizer_YYMMDDHHmmss_xxxx
 	dbHash := fmt.Sprintf("optimizer_%s_%s", // Total 39 bytes
-		time.Now().Format("060102150405"), // 12 Bytes 20180102030405
+		time.Now().Format("060102150405"), // 12 Bytes 180102030405
 		strings.ToLower(uniuri.New()))     // 16 Bytes random string
 	common.Log.Debug("createDatabase, mapping `%s` :`%s`-->`%s`", rEnv.Database, rEnv.Database, dbHash)
 	ddl, err := rEnv.ShowCreateDatabase(rEnv.Database)
@@ -496,7 +494,7 @@ func (vEnv *VirtualEnv) GenTableColumns(meta common.Meta) common.TableColumns {
 			}
 
 			if len(tb.Column) == 0 {
-				// tb.column为空说明SQL里这个表是用的*来查询
+				// tb.column 为空说明 SQL 里这个表是用的*来查询
 				if err != nil {
 					common.Log.Error("ast.Rewrite ShowColumns, Error: %v", err)
 					break
