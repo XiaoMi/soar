@@ -19,7 +19,7 @@ load test_helper
 
 @test "Run default printconfig cases" {
   ${SOAR_BIN} -print-config -log-output=/dev/null  > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
-  run golden_diff ${BATS_TEST_NAME}
+  run golden_diff
   [ $status -eq 0 ]
 }
 
