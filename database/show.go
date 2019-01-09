@@ -59,7 +59,7 @@ type tableStatusRow struct {
 	// 其他不同的存储引擎中该值的意义可能不尽相同
 	IndexLength int
 
-	DataFree      int    // 已分配但未使用的字节数
+	DataFree      uint    // 已分配但未使用的字节数
 	AutoIncrement []byte // 下一个自增值
 	CreateTime    []byte // 创建时间
 	UpdateTime    []byte // 最近一次更新时间，该值不准确
