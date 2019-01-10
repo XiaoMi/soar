@@ -210,6 +210,7 @@ func initQuery(query string) string {
 		if err != nil {
 			common.Log.Critical("ioutil.ReadAll Error: %v", err)
 		}
+		common.Log.Debug("initQuery get query from os.Stdin")
 		return string(data)
 	}
 
@@ -219,6 +220,7 @@ func initQuery(query string) string {
 		if err != nil {
 			common.Log.Critical("ioutil.ReadFile Error: %v", err)
 		}
+		common.Log.Debug("initQuery get query from file: %s", query)
 		return string(data)
 	}
 

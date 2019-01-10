@@ -426,7 +426,7 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 func ParseDSN(odbc string, d *Dsn) *Dsn {
 	cfg, err := mysql.ParseDSN(odbc)
 	if err != nil {
-		Log.Warn("go-sql-driver/mysql.ParseDSN Error: %s, DSN: %s, try to use old version parseDSN", err.Error(), odbc)
+		Log.Debug("go-sql-driver/mysql.ParseDSN Error: %s, DSN: %s, try to use old version parseDSN", err.Error(), odbc)
 		return parseDSN(odbc, d)
 	}
 	return newDSN(cfg)
