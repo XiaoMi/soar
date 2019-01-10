@@ -93,7 +93,7 @@ type Configuration struct {
 	MaxDistinctCount     int      `yaml:"max-distinct-count"`        // 单条 SQL 中 Distinct 的最大数量
 	MaxIdxColsCount      int      `yaml:"max-index-cols-count"`      // 复合索引中包含列的最大数量
 	MaxTextColsCount     int      `yaml:"max-text-cols-count"`       // 表中含有的 text/blob 列的最大数量
-	MaxTotalRows         int64    `yaml:"max-total-rows"`            // 计算散粒度时，当数据行数大于 MaxTotalRows 即开启数据库保护模式，散粒度返回结果可信度下降
+	MaxTotalRows         uint64   `yaml:"max-total-rows"`            // 计算散粒度时，当数据行数大于 MaxTotalRows 即开启数据库保护模式，散粒度返回结果可信度下降
 	MaxQueryCost         int64    `yaml:"max-query-cost"`            // last_query_cost 超过该值时将给予警告
 	SpaghettiQueryLength int      `yaml:"spaghetti-query-length"`    // SQL最大长度警告，超过该长度会给警告
 	AllowDropIndex       bool     `yaml:"allow-drop-index"`          // 允许输出删除重复索引的建议
@@ -596,7 +596,7 @@ func readCmdFlags() error {
 	maxDistinctCount := flag.Int("max-distinct-count", Config.MaxDistinctCount, "MaxDistinctCount, 单条 SQL 中 Distinct 的最大数量")
 	maxIdxColsCount := flag.Int("max-index-cols-count", Config.MaxIdxColsCount, "MaxIdxColsCount, 复合索引中包含列的最大数量")
 	maxTextColsCount := flag.Int("max-text-cols-count", Config.MaxTextColsCount, "MaxTextColsCount, 表中含有的 text/blob 列的最大数量")
-	maxTotalRows := flag.Int64("max-total-rows", Config.MaxTotalRows, "MaxTotalRows, 计算散粒度时，当数据行数大于MaxTotalRows即开启数据库保护模式，不计算散粒度")
+	maxTotalRows := flag.Uint64("max-total-rows", Config.MaxTotalRows, "MaxTotalRows, 计算散粒度时，当数据行数大于MaxTotalRows即开启数据库保护模式，不计算散粒度")
 	maxQueryCost := flag.Int64("max-query-cost", Config.MaxQueryCost, "MaxQueryCost, last_query_cost 超过该值时将给予警告")
 	spaghettiQueryLength := flag.Int("spaghetti-query-length", Config.SpaghettiQueryLength, "SpaghettiQueryLength, SQL最大长度警告，超过该长度会给警告")
 	allowDropIdx := flag.Bool("allow-drop-index", Config.AllowDropIndex, "AllowDropIndex, 允许输出删除重复索引的建议")
