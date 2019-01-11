@@ -946,6 +946,9 @@ func TestRuleMultiCompare(t *testing.T) {
 	sqls := [][]string{
 		{
 			"SELECT * FROM tbl WHERE col = col = 'abc'",
+			"SELECT * FROM tbl WHERE col = 'def' and col = col = 'abc'",
+			"SELECT * FROM tbl WHERE col = 'def' or col = col = 'abc'",
+			"SELECT * FROM tbl WHERE col = col = 'abc' and col = 'def'",
 			"UPDATE tbl set col = 1 WHERE col = col = 'abc'",
 			"DELETE FROM tbl WHERE col = col = 'abc'",
 		},

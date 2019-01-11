@@ -7,8 +7,7 @@ setup() {
   mkdir -p "${BATS_TMP_DIRNAME}"
 }
 
+# golden_diff like gofmt golden file check method, use this function check output different with template
 golden_diff() {
-  FUNC_NAME=$1
-  diff "${BATS_TMP_DIRNAME}/${FUNC_NAME}.golden" "${BATS_FIXTURE_DIRNAME}/${FUNC_NAME}.golden" >/dev/null
-  return $?
+  diff "${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden" "${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden" >/dev/null
 }

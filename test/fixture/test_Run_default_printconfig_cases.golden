@@ -1,0 +1,125 @@
+online-dsn:
+  user: ""
+  password: '********'
+  net: tcp
+  addr: 127.0.0.1:3306
+  schema: information_schema
+  charset: utf8
+  collation: utf8_general_ci
+  loc: UTC
+  tls: ""
+  server-public-key: ""
+  maxallowedpacket: 4194304
+  params:
+    charset: utf8
+  timeout: 0
+  read-timeout: 0
+  write-timeout: 0
+  allow-native-passwords: true
+  allow-old-passwords: false
+  disable: false
+test-dsn:
+  user: ""
+  password: '********'
+  net: tcp
+  addr: 127.0.0.1:3306
+  schema: information_schema
+  charset: utf8
+  collation: utf8_general_ci
+  loc: UTC
+  tls: ""
+  server-public-key: ""
+  maxallowedpacket: 4194304
+  params:
+    charset: utf8
+  timeout: 0
+  read-timeout: 0
+  write-timeout: 0
+  allow-native-passwords: true
+  allow-old-passwords: false
+  disable: false
+allow-online-as-test: false
+drop-test-temporary: true
+cleanup-test-database: false
+only-syntax-check: false
+sampling-statistic-target: 100
+sampling: false
+sampling-condition: ""
+profiling: false
+trace: false
+explain: true
+delimiter: ;
+log-level: 3
+log-output: /dev/null
+report-type: markdown
+report-css: ""
+report-javascript: ""
+report-title: SQL优化分析报告
+markdown-extensions: 94
+markdown-html-flags: 0
+ignore-rules:
+- COL.011
+rewrite-rules:
+- delimiter
+- orderbynull
+- groupbyconst
+- dmlorderby
+- having
+- star2columns
+- insertcolumns
+- distinctstar
+blacklist: ""
+max-join-table-count: 5
+max-group-by-cols-count: 5
+max-distinct-count: 5
+max-index-cols-count: 5
+max-text-cols-count: 2
+max-total-rows: 9999999
+max-query-cost: 9999
+spaghetti-query-length: 2048
+allow-drop-index: false
+max-in-count: 10
+max-index-bytes-percolumn: 767
+max-index-bytes: 3072
+allow-charsets:
+- utf8
+- utf8mb4
+allow-collates: []
+allow-engines:
+- innodb
+max-index-count: 10
+max-column-count: 40
+max-value-count: 100
+index-prefix: idx_
+unique-key-prefix: uk_
+max-subquery-depth: 5
+max-varchar-length: 1024
+column-not-allow-type:
+- boolean
+min-cardinality: 0
+explain-sql-report-type: pretty
+explain-type: extended
+explain-format: traditional
+explain-warn-select-type:
+- ""
+explain-warn-access-type:
+- ALL
+explain-max-keys: 3
+explain-min-keys: 0
+explain-max-rows: 10000
+explain-warn-extra:
+- Using temporary
+- Using filesort
+explain-max-filtered: 100
+explain-warn-scalability:
+- O(n)
+show-warnings: false
+show-last-query-cost: false
+query: ""
+list-heuristic-rules: false
+list-rewrite-rules: false
+list-test-sqls: false
+list-report-types: false
+verbose: false
+dry-run: true
+max-pretty-sql-length: 1024

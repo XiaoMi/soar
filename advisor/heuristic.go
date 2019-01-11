@@ -31,6 +31,7 @@ import (
 	"github.com/percona/go-mysql/query"
 	tidb "github.com/pingcap/parser/ast"
 	"github.com/pingcap/parser/mysql"
+	"github.com/tidwall/gjson"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
@@ -1312,37 +1313,16 @@ func (q *Query4Audit) RuleLoadFile() Rule {
 func (q *Query4Audit) RuleMultiCompare() Rule {
 	var rule = q.RuleOK()
 	if q.TiStmt != nil {
-		for _, tiStmt := range q.TiStmt {
-			switch node := tiStmt.(type) {
-			case *tidb.SelectStmt:
-				switch where := node.Where.(type) {
-				case *tidb.BinaryOperationExpr:
-					switch where.L.(type) {
-					case *tidb.BinaryOperationExpr:
-						if where.Op.String() == "eq" {
-							rule = HeuristicRules["RES.009"]
-						}
-					}
-				}
-			case *tidb.UpdateStmt:
-				switch where := node.Where.(type) {
-				case *tidb.BinaryOperationExpr:
-					switch where.L.(type) {
-					case *tidb.BinaryOperationExpr:
-						if where.Op.String() == "eq" {
-							rule = HeuristicRules["RES.009"]
-						}
-					}
-				}
-			case *tidb.DeleteStmt:
-				switch where := node.Where.(type) {
-				case *tidb.BinaryOperationExpr:
-					switch where.L.(type) {
-					case *tidb.BinaryOperationExpr:
-						if where.Op.String() == "eq" {
-							rule = HeuristicRules["RES.009"]
-						}
-					}
+		json := ast.StmtNode2JSON(q.Query, "", "")
+		whereJSON := common.JSONFind(json, "Where")
+		for _, where := range whereJSON {
+			conds := []string{where}
+			conds = append(conds, common.JSONFind(where, "L")...)
+			conds = append(conds, common.JSONFind(where, "R")...)
+			for _, cond := range conds {
+				if gjson.Get(cond, "Op").Int() == 7 && gjson.Get(cond, "L.Op").Int() == 7 {
+					rule = HeuristicRules["RES.009"]
+					return rule
 				}
 			}
 		}

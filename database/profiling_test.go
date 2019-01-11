@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/XiaoMi/soar/common"
+
 	"github.com/kr/pretty"
 )
 

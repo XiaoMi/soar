@@ -187,7 +187,7 @@ release: build
 
 .PHONY: docker
 docker:
-	@echo "$(CGREEN)Build mysql test enviorment ...$(CEND)"
+	@echo "$(CGREEN)Build mysql test environment ...$(CEND)"
 	@docker stop soar-mysql 2>/dev/null || true
 	@docker wait soar-mysql 2>/dev/null >/dev/null || true
 	@echo "docker run --name soar-mysql $(MYSQL_RELEASE):$(MYSQL_VERSION)"
@@ -204,7 +204,7 @@ docker:
 			timeout=`expr $$timeout - 1`; \
 			printf '.' ;  sleep 1 ; \
 		else \
-			echo "." ; echo "mysql test enviorment is ready!" ; break ; \
+			echo "." ; echo "mysql test environment is ready!" ; break ; \
 		fi ; \
 		if [ $$timeout = 0 ] ; then \
 			echo "." ; echo "$(CRED)docker soar-mysql start timeout(180 s)!$(CEND)" ; exit 1 ; \

@@ -29,6 +29,3 @@ script:
   - make docker
   - make cover
   - make test-cli
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)

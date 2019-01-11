@@ -17,13 +17,13 @@
 package ast
 
 import (
-	"encoding/json"
-
 	"github.com/XiaoMi/soar/common"
 
 	"github.com/kr/pretty"
 	"github.com/pingcap/parser"
 	"github.com/pingcap/parser/ast"
+
+	json "github.com/CorgiMan/json2"
 
 	// for pingcap parser
 	_ "github.com/pingcap/tidb/types/parser_driver"

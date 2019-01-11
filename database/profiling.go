@@ -26,7 +26,7 @@ import (
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
-// Profiling show profile输出的结果
+// Profiling show profile 输出的结果
 type Profiling struct {
 	Rows []ProfilingRow
 }
@@ -35,7 +35,7 @@ type Profiling struct {
 type ProfilingRow struct {
 	Status   string
 	Duration float64
-	// TODO: 支持show profile all，不过目前看all的信息过多有点眼花缭乱
+	// TODO: 支持show profile all, 不过目前看所有的信息过多有点眼花缭乱
 }
 
 // Profiling 执行SQL，并对其 Profile
@@ -48,14 +48,14 @@ func (db *Connector) Profiling(sql string, params ...interface{}) ([]ProfilingRo
 		return rows, errors.New("no need profiling")
 	}
 
-	// 测试环境如果检查是关闭的，则SQL不会被执行
+	// 测试环境如果检查是关闭的，则 SQL 不会被执行
 	if common.Config.TestDSN.Disable {
 		return rows, errors.New("dsn is disable")
 	}
 
 	// 数据库安全性检查：如果 Connector 的 IP 端口与 TEST 环境不一致，则启用 SQL 白名单
 	// 不在白名单中的 SQL 不允许执行
-	// 执行环境与test环境不相同
+	// 执行环境与 test 环境不相同
 	if db.Addr != common.Config.TestDSN.Addr && db.dangerousQuery(sql) {
 		return rows, fmt.Errorf("query execution deny: Execute SQL with DSN(%s/%s) '%s'",
 			db.Addr, db.Database, fmt.Sprintf(sql, params...))
@@ -114,7 +114,7 @@ func (db *Connector) Profiling(sql string, params ...interface{}) ([]ProfilingRo
 	return rows, err
 }
 
-// FormatProfiling 格式化输出Profiling信息
+// FormatProfiling 格式化输出 Profiling 信息
 func FormatProfiling(rows []ProfilingRow) string {
 	str := []string{"| Status | Duration |"}
 	str = append(str, "| --- | --- |")

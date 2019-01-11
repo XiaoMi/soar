@@ -41,25 +41,25 @@ type tableStatusRow struct {
 	Engine       []byte // 该表使用的存储引擎
 	Version      []byte // 该表的 .frm 文件版本号
 	RowFormat    []byte // 该表使用的行存储格式
-	Rows         int64  // 表行数, InnoDB 引擎中为预估值，甚至可能会有40%~50%的数值偏差
-	AvgRowLength int    // 平均行长度
+	Rows         uint64 // 表行数, InnoDB 引擎中为预估值，甚至可能会有40%~50%的数值偏差
+	AvgRowLength uint64 // 平均行长度
 
 	// MyISAM: Data_length 为数据文件的大小，单位为 bytes
 	// InnoDB: Data_length 为聚簇索引分配的近似内存量，单位为 bytes, 计算方式为聚簇索引数量乘以 InnoDB 页面大小
 	// 其他不同的存储引擎中该值的意义可能不尽相同
-	DataLength int
+	DataLength uint64
 
 	// MyISAM: Max_data_length 为数据文件长度的最大值。这是在给定使用的数据指针大小的情况下，可以存储在表中的数据的最大字节数
 	// InnoDB: 未使用
 	// 其他不同的存储引擎中该值的意义可能不尽相同
-	MaxDataLength int
+	MaxDataLength uint64
 
 	// MyISAM: Index_length 为 index 文件的大小，单位为 bytes
 	// InnoDB: Index_length 为非聚簇索引分配的近似内存量，单位为 bytes，计算方式为非聚簇索引数量乘以 InnoDB 页面大小
 	// 其他不同的存储引擎中该值的意义可能不尽相同
-	IndexLength int
+	IndexLength uint64
 
-	DataFree      int    // 已分配但未使用的字节数
+	DataFree      uint64 // 已分配但未使用的字节数
 	AutoIncrement []byte // 下一个自增值
 	CreateTime    []byte // 创建时间
 	UpdateTime    []byte // 最近一次更新时间，该值不准确
