@@ -1,5 +1,7 @@
 [
   {
+    "text": "select 1",
+    "resultFields": null,
     "SQLCache": true,
     "CalcFoundRows": false,
     "StraightJoin": false,
@@ -8,11 +10,14 @@
     "From": null,
     "Where": null,
     "Fields": {
+      "text": "",
       "Fields": [
         {
+          "text": "1",
           "Offset": 7,
           "WildCard": null,
           "Expr": {
+            "text": "",
             "Type": {
               "Tp": 8,
               "Flag": 128,
@@ -21,7 +26,16 @@
               "Charset": "binary",
               "Collate": "binary",
               "Elems": null
-            }
+            },
+            "flag": 0,
+            "k": 1,
+            "collation": 0,
+            "decimal": 0,
+            "length": 0,
+            "i": 1,
+            "b": null,
+            "x": null,
+            "projectionOffset": -1
           },
           "AsName": {
             "O": "",

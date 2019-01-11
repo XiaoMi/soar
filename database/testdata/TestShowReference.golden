@@ -1,4 +1,1 @@
-[]database.ReferenceValue{
-    {ReferencedTableSchema:"sakila", ReferencedTableName:"language", TableSchema:"sakila", TableName:"film", ConstraintName:"fk_film_language"},
-    {ReferencedTableSchema:"sakila", ReferencedTableName:"language", TableSchema:"sakila", TableName:"film", ConstraintName:"fk_film_language_original"},
-}
+[]database.ReferenceValue(nil)

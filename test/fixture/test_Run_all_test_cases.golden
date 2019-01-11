@@ -46,7 +46,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -102,7 +102,7 @@ WHERE
 
 
 
-##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
@@ -110,7 +110,7 @@ WHERE
 
 * **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -151,7 +151,7 @@ HAVING
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -159,7 +159,7 @@ HAVING
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 HAVING 子句
+## 不建议使用 HAVING 子句
 
 * **Item:**  CLA.013
 
@@ -167,7 +167,7 @@ HAVING
 
 * **Content:**  将查询的 HAVING 子句改写为 WHERE 中的查询条件，可以在查询处理期间使用索引。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -223,7 +223,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -280,7 +280,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -325,7 +325,7 @@ WHERE
 * **Using index condition**: 在5.6版本后加入的新特性（Index Condition Pushdown）。Using index condition 会先条件过滤索引，过滤完索引后找到所有符合索引条件的数据行，随后用 WHERE 子句中的其他条件去过滤这些数据行。
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -370,7 +370,7 @@ WHERE
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
@@ -378,7 +378,7 @@ WHERE
 
 * **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -435,7 +435,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -492,7 +492,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -550,7 +550,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -607,7 +607,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -668,7 +668,7 @@ GROUP BY
 
 
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -676,7 +676,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  使用 SUM(COL) 时需注意 NPE 问题
+## 使用 SUM(COL) 时需注意 NPE 问题
 
 * **Item:**  FUN.006
 
@@ -736,7 +736,7 @@ GROUP BY
 
 
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -744,7 +744,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  使用 SUM(COL) 时需注意 NPE 问题
+## 使用 SUM(COL) 时需注意 NPE 问题
 
 * **Item:**  FUN.006
 
@@ -800,7 +800,7 @@ GROUP BY
 
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -808,7 +808,7 @@ GROUP BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -816,7 +816,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  使用 SUM(COL) 时需注意 NPE 问题
+## 使用 SUM(COL) 时需注意 NPE 问题
 
 * **Item:**  FUN.006
 
@@ -876,7 +876,7 @@ GROUP BY
 
 
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -884,7 +884,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  GROUP BY 的条件为表达式
+## GROUP BY 的条件为表达式
 
 * **Item:**  CLA.010
 
@@ -892,7 +892,7 @@ GROUP BY
 
 * **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
 
-##  使用 SUM(COL) 时需注意 NPE 问题
+## 使用 SUM(COL) 时需注意 NPE 问题
 
 * **Item:**  FUN.006
 
@@ -948,7 +948,7 @@ GROUP BY
 
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -956,7 +956,7 @@ GROUP BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -989,7 +989,7 @@ GROUP BY
 
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -997,7 +997,7 @@ GROUP BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -1005,7 +1005,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1013,7 +1013,7 @@ GROUP BY
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  非确定性的 GROUP BY
+## 非确定性的 GROUP BY
 
 * **Item:**  RES.001
 
@@ -1060,7 +1060,7 @@ GROUP BY
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -1068,7 +1068,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  避免在 WHERE 条件中使用函数或其他运算符
+## 避免在 WHERE 条件中使用函数或其他运算符
 
 * **Item:**  FUN.001
 
@@ -1105,7 +1105,7 @@ ORDER BY
 
 
 
-##  非确定性的 GROUP BY
+## 非确定性的 GROUP BY
 
 * **Item:**  RES.001
 
@@ -1221,7 +1221,7 @@ ORDER BY
 
 
 
-##  ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
+## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
 
 * **Item:**  CLA.007
 
@@ -1229,7 +1229,7 @@ ORDER BY
 
 * **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1237,7 +1237,7 @@ ORDER BY
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  ORDER BY 多个列但排序方向不同时可能无法使用索引
+## ORDER BY 多个列但排序方向不同时可能无法使用索引
 
 * **Item:**  KEY.008
 
@@ -1357,7 +1357,7 @@ LIMIT
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1404,7 +1404,7 @@ LIMIT
 * ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -1412,7 +1412,7 @@ LIMIT
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1459,7 +1459,7 @@ LIMIT
 * ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -1521,7 +1521,7 @@ LIMIT
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1583,7 +1583,7 @@ LIMIT
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1643,7 +1643,7 @@ ORDER BY
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1704,7 +1704,7 @@ ORDER BY
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1712,7 +1712,7 @@ ORDER BY
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  '!=' 运算符是非标准的
+## '!=' 运算符是非标准的
 
 * **Item:**  STA.001
 
@@ -1923,7 +1923,7 @@ ORDER BY
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -1986,7 +1986,7 @@ ORDER BY
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2046,7 +2046,7 @@ ORDER BY
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2089,7 +2089,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2097,7 +2097,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2105,7 +2105,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2148,7 +2148,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2156,7 +2156,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2164,7 +2164,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2207,7 +2207,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2215,7 +2215,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2223,7 +2223,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2285,7 +2285,7 @@ WHERE
 
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2293,7 +2293,7 @@ WHERE
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
@@ -2301,7 +2301,7 @@ WHERE
 
 * **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2363,7 +2363,7 @@ WHERE
 
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2371,7 +2371,7 @@ WHERE
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
 
 * **Item:**  ARG.006
 
@@ -2379,7 +2379,7 @@ WHERE
 
 * **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2435,7 +2435,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2443,7 +2443,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2451,7 +2451,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2459,7 +2459,7 @@ FROM
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -2547,7 +2547,7 @@ WHERE
 
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2555,7 +2555,7 @@ WHERE
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -2563,7 +2563,7 @@ WHERE
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -2610,7 +2610,7 @@ FROM
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2657,7 +2657,7 @@ FROM
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2704,7 +2704,7 @@ FROM
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2750,7 +2750,7 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2758,7 +2758,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2810,7 +2810,7 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -2818,7 +2818,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2826,7 +2826,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  MySQL 对子查询的优化效果不佳
+## MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
@@ -2906,7 +2906,7 @@ ORDER BY
 
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -2914,7 +2914,7 @@ ORDER BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  同一张表被连接两次
+## 同一张表被连接两次
 
 * **Item:**  JOI.002
 
@@ -2922,7 +2922,7 @@ ORDER BY
 
 * **Content:**  相同的表在 FROM 子句中至少出现两次，可以简化为对该表的单次访问。
 
-##  MySQL 对子查询的优化效果不佳
+## MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
@@ -2959,7 +2959,7 @@ WHERE
 * **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col = 1.
 
 
-##  不建议使用联表删除或更新
+## 不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
@@ -2967,7 +2967,7 @@ WHERE
 
 * **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
-##  使用DELETE/DROP/TRUNCATE等操作时注意备份
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
 
 * **Item:**  SEC.003
 
@@ -3027,7 +3027,7 @@ WHERE
 
 
 
-##  不建议使用联表删除或更新
+## 不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
@@ -3035,7 +3035,7 @@ WHERE
 
 * **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
-##  使用DELETE/DROP/TRUNCATE等操作时注意备份
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
 
 * **Item:**  SEC.003
 
@@ -3074,7 +3074,7 @@ WHERE
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  不建议使用联表删除或更新
+## 不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
@@ -3082,7 +3082,7 @@ WHERE
 
 * **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
-##  使用DELETE/DROP/TRUNCATE等操作时注意备份
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
 
 * **Item:**  SEC.003
 
@@ -3121,7 +3121,7 @@ WHERE
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  不建议使用联表删除或更新
+## 不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
@@ -3129,7 +3129,7 @@ WHERE
 
 * **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
 
-##  使用DELETE/DROP/TRUNCATE等操作时注意备份
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
 
 * **Item:**  SEC.003
 
@@ -3179,7 +3179,7 @@ WHERE
 
 
 
-##  使用DELETE/DROP/TRUNCATE等操作时注意备份
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
 
 * **Item:**  SEC.003
 
@@ -3220,7 +3220,7 @@ WHERE
 * **const**: const用于使用常数值比较PRIMARY KEY时, 当查询的表仅有一行时, 使用system. 例:SELECT * FROM tbl WHERE col = 1.
 
 
-##  不建议使用联表删除或更新
+## 不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
@@ -3273,7 +3273,7 @@ WHERE
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  不建议使用联表删除或更新
+## 不建议使用联表删除或更新
 
 * **Item:**  JOI.007
 
@@ -3385,7 +3385,7 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -3393,7 +3393,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
@@ -3455,7 +3455,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
@@ -3501,7 +3501,7 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -3509,7 +3509,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
@@ -3571,7 +3571,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
 
 * **Item:**  LCK.001
 
@@ -3694,7 +3694,7 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -3702,7 +3702,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  执行计划中嵌套连接深度过深
+## 执行计划中嵌套连接深度过深
 
 * **Item:**  SUB.004
 
@@ -3760,7 +3760,7 @@ LIMIT
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -3768,7 +3768,7 @@ LIMIT
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -3776,7 +3776,7 @@ LIMIT
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  未使用 ORDER BY 的 LIMIT 查询
+## 未使用 ORDER BY 的 LIMIT 查询
 
 * **Item:**  RES.002
 
@@ -3784,7 +3784,7 @@ LIMIT
 
 * **Content:**  没有 ORDER BY 的 LIMIT 会导致非确定性的结果，这取决于查询执行计划。
 
-##  MySQL 对子查询的优化效果不佳
+## MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
@@ -3838,7 +3838,7 @@ FROM
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -3846,7 +3846,7 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -3854,7 +3854,7 @@ FROM
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -3862,7 +3862,7 @@ FROM
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -3906,7 +3906,7 @@ GROUP BY
 
 
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -3914,7 +3914,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -3922,7 +3922,7 @@ GROUP BY
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  非确定性的 GROUP BY
+## 非确定性的 GROUP BY
 
 * **Item:**  RES.001
 
@@ -3930,7 +3930,7 @@ GROUP BY
 
 * **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
 
-##  MySQL 对子查询的优化效果不佳
+## MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
@@ -3994,7 +3994,7 @@ WHERE
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -4002,7 +4002,7 @@ WHERE
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -4010,7 +4010,7 @@ WHERE
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
 
 * **Item:**  SUB.002
 
@@ -4056,7 +4056,7 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -4149,7 +4149,7 @@ ORDER BY
 
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -4157,7 +4157,7 @@ ORDER BY
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -4165,7 +4165,7 @@ ORDER BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
+## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
 
 * **Item:**  CLA.007
 
@@ -4173,7 +4173,7 @@ ORDER BY
 
 * **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
 
-##  同一张表被连接两次
+## 同一张表被连接两次
 
 * **Item:**  JOI.002
 
@@ -4181,7 +4181,7 @@ ORDER BY
 
 * **Content:**  相同的表在 FROM 子句中至少出现两次，可以简化为对该表的单次访问。
 
-##  MySQL 对子查询的优化效果不佳
+## MySQL 对子查询的优化效果不佳
 
 * **Item:**  SUB.001
 
@@ -4226,7 +4226,7 @@ WHERE
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
@@ -4234,7 +4234,7 @@ WHERE
 
 * **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
 
-##  避免在 WHERE 条件中使用函数或其他运算符
+## 避免在 WHERE 条件中使用函数或其他运算符
 
 * **Item:**  FUN.001
 
@@ -4256,7 +4256,7 @@ GROUP BY
   DATE( last_update)
 ```
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -4264,7 +4264,7 @@ GROUP BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -4272,7 +4272,7 @@ GROUP BY
 
 * **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
 
-##  GROUP BY 的条件为表达式
+## GROUP BY 的条件为表达式
 
 * **Item:**  CLA.010
 
@@ -4317,7 +4317,7 @@ ORDER BY
 * ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
 
 
-##  最外层 SELECT 未指定 WHERE 条件
+## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item:**  CLA.001
 
@@ -4325,7 +4325,7 @@ ORDER BY
 
 * **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
-##  ORDER BY 的条件为表达式
+## ORDER BY 的条件为表达式
 
 * **Item:**  CLA.009
 
@@ -4387,7 +4387,7 @@ GROUP BY
 
 
 
-##  请为 GROUP BY 显示添加 ORDER BY 条件
+## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item:**  CLA.008
 
@@ -4407,7 +4407,7 @@ ADD
   index  idx_city_id( city_id)
 ```
 
-##  OK
+## OK
 
 # Query: C315BC4EE0F4E523
 
@@ -4422,7 +4422,7 @@ ADD
     `store_id`, `film_id`)
 ```
 
-##  提醒：请将索引属性顺序与查询对齐
+## 提醒：请将索引属性顺序与查询对齐
 
 * **Item:**  KEY.004
 
@@ -4460,7 +4460,7 @@ ADD
 * **Case:** alter table inventory add index \`idx\_store\_film\` (\`store\_id\`,\`film\_id\`),add index \`idx\_store\_film\` (\`store\_id\`,\`film\_id\`),add index \`idx\_store\_film\` (\`store\_id\`,\`film\_id\`)
 
 
-##  提醒：请将索引属性顺序与查询对齐
+## 提醒：请将索引属性顺序与查询对齐
 
 * **Item:**  KEY.004
 
@@ -4519,7 +4519,7 @@ ORDER BY
 
 
 
-##  建议使用 AS 关键字显示声明一个别名
+## 建议使用 AS 关键字显示声明一个别名
 
 * **Item:**  ALI.001
 
@@ -4527,7 +4527,7 @@ ORDER BY
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-##  不建议使用前项通配符查找
+## 不建议使用前项通配符查找
 
 * **Item:**  ARG.001
 
@@ -4535,7 +4535,7 @@ ORDER BY
 
 * **Content:**  例如 "％foo"，查询参数有一个前项通配符的情况无法使用已有索引。
 
-##  ORDER BY 的条件为表达式
+## ORDER BY 的条件为表达式
 
 * **Item:**  CLA.009
 
@@ -4543,7 +4543,7 @@ ORDER BY
 
 * **Content:**  当 ORDER BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
 
-##  GROUP BY 的条件为表达式
+## GROUP BY 的条件为表达式
 
 * **Item:**  CLA.010
 
@@ -4551,7 +4551,7 @@ ORDER BY
 
 * **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
 
-##  ORDER BY 多个列但排序方向不同时可能无法使用索引
+## ORDER BY 多个列但排序方向不同时可能无法使用索引
 
 * **Item:**  KEY.008
 
@@ -4567,7 +4567,7 @@ ORDER BY
 create  table  hello. t  (id  int  unsigned)
 ```
 
-##  建议为表添加注释
+## 建议为表添加注释
 
 * **Item:**  CLA.011
 
@@ -4575,7 +4575,7 @@ create  table  hello. t  (id  int  unsigned)
 
 * **Content:**  为表添加注释能够使得表的意义更明确，从而为日后的维护带来极大的便利。
 
-##  请为列添加默认值
+## 请为列添加默认值
 
 * **Item:**  COL.004
 
@@ -4583,7 +4583,7 @@ create  table  hello. t  (id  int  unsigned)
 
 * **Content:**  请为列添加默认值，如果是 ALTER 操作，请不要忘记将原字段的默认值写上。字段无默认值，当表较大时无法在线变更表结构。
 
-##  列未添加注释
+## 列未添加注释
 
 * **Item:**  COL.005
 
@@ -4591,7 +4591,7 @@ create  table  hello. t  (id  int  unsigned)
 
 * **Content:**  建议对表中每个列添加注释，来明确每个列在表中的含义及作用。
 
-##  未指定主键或主键非 int 或 bigint
+## 未指定主键或主键非 int 或 bigint
 
 * **Item:**  KEY.007
 
@@ -4599,7 +4599,7 @@ create  table  hello. t  (id  int  unsigned)
 
 * **Content:**  未指定主键或主键非 int 或 bigint，建议将主键设置为 int unsigned 或 bigint unsigned。
 
-##  请为表选择合适的存储引擎
+## 请为表选择合适的存储引擎
 
 * **Item:**  TBL.002
 
@@ -4621,7 +4621,7 @@ WHERE
   data  >= ''
 ```
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 

@@ -237,3 +237,28 @@ func shutdown(vEnv *env.VirtualEnv, rEnv *database.Connector) {
 	common.LogIfWarn(err, "")
 	os.Exit(0)
 }
+
+func verboseInfo() {
+	if !common.Config.Verbose {
+		return
+	}
+	// syntax check verbose mode, add output for success!
+	if common.Config.OnlySyntaxCheck {
+		fmt.Println("Syntax check OK!")
+		return
+	}
+	switch common.Config.ReportType {
+	case "markdown":
+		if common.Config.TestDSN.Disable || common.Config.OnlineDSN.Disable {
+			fmt.Println("MySQL environment verbose info")
+			// TestDSN
+			if common.Config.TestDSN.Disable {
+				fmt.Println("* test-dsn:", common.Config.TestDSN.Addr, "is disable, please check log.")
+			}
+			// OnlineDSN
+			if common.Config.OnlineDSN.Disable {
+				fmt.Println("* online-dsn:", common.Config.OnlineDSN.Addr, "is disable, please check log.")
+			}
+		}
+	}
+}

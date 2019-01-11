@@ -46,7 +46,7 @@ SELECT country_id, last_update FROM city NATURAL LEFT JOIN country;
 SELECT country_id, last_update FROM city NATURAL RIGHT JOIN country;
 SELECT a.country_id, a.last_update FROM city a STRAIGHT_JOIN country b ON a.country_id=b.country_id;
 SELECT a.address, a.postal_code FROM sakila.address a WHERE a.city_id IN  (SELECT c.city_id FROM sakila.city c);
-SELECT visitor_id, url FROM (SELECT id FROM log WHERE ip="123.45.67.89" order by ts desc limit 50, 10) I JOIN log ON (I.id=log.id) JOIN url ON (url.id=log.url_id) order by TS desc;
+SELECT city FROM( SELECT city_id FROM city WHERE city = "A Corua (La Corua)" ORDER BY last_update DESC LIMIT 50, 10) I JOIN city ON (I.city_id = city.city_id) JOIN country ON (country.country_id = city.country_id) ORDER BY city DESC;
 DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;
 DELETE city FROM city LEFT JOIN country ON city.country_id = country.country_id WHERE country.country IS NULL;
 DELETE a1, a2 FROM city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;
@@ -79,7 +79,7 @@ SELECT description FROM film WHERE description IN('NEWS','asd') GROUP BY descrip
 alter table address add index idx_city_id(city_id);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
-SELECT	DATE_FORMAT(t.atm, '%Y-%m-%d'),	COUNT(DISTINCT (t.usr))	FROM usr_terminal t WHERE t.atm > '2018-10-22 00:00:00'	AND t.agent LIKE '%Chrome%'	AND t.system = 'eip' GROUP BY DATE_FORMAT(t.atm, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.atm, '%Y-%m-%d');
+SELECT	DATE_FORMAT(t.last_update, '%Y-%m-%d'),	COUNT(DISTINCT (t.city))	FROM city t WHERE t.last_update > '2018-10-22 00:00:00'	AND t.city LIKE '%Chrome%'	AND t.city = 'eip' GROUP BY DATE_FORMAT(t.last_update, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.last_update, '%Y-%m-%d');
 create table hello.t (id int unsigned);
 select * from tb where data >= '';
 alter table tb alter column id drop default;

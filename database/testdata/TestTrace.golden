@@ -2,3 +2,4 @@ select 1 []database.TraceRow{
     {Query:"explain select 1", Trace:"{\n  \"steps\": [\n    {\n      \"join_preparation\": {\n        \"select#\": 1,\n        \"steps\": [\n          {\n            \"expanded_query\": \"/* select#1 */ select 1 AS `1`\"\n          }\n        ]\n      }\n    },\n    {\n      \"join_optimization\": {\n        \"select#\": 1,\n        \"steps\": [\n        ]\n      }\n    },\n    {\n      \"join_explain\": {\n        \"select#\": 1,\n        \"steps\": [\n        ]\n      }\n    }\n  ]\n}", MissingBytesBeyondMaxMemSize:0, InsufficientPrivileges:0},
 } nil
 explain select 1 []database.TraceRow(nil) &errors.errorString{s:"no need trace"}
+show create table film []database.TraceRow(nil) &errors.errorString{s:"no need trace"}
