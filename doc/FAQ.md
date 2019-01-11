@@ -25,6 +25,14 @@ SOAR是命令行工具，开源版本无UI界面需要在 `cmd.exe` 下运行。
 
 ![SOAR__Windows_Installation](https://wx4.sinaimg.cn/large/7143d93fly1fx9z0lw0k8g211j0jlkjo.gif)
 
+## Windows 环境下 -query 文件找不到问题
+
+![](https://raw.githubusercontent.com/XiaoMi/soar/master/doc/images/windows_query_error.png)
+
+将 Window 文件后缀名显示打开，并检查文件名是否正确。
+
+![](https://raw.githubusercontent.com/XiaoMi/soar/master/doc/images/windows_query_check.png)
+
 ## Windows环境下双击`soar.windows-amd64`文件无反应。
 
 `soar` 是命令行工具，不是图形化桌面工具，Windows环境需要在 `cmd.exe` 下以命令行方式运行。使用 `soar` 前您需要先熟悉Windows命令行使用。
