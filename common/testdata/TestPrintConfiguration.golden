@@ -1,25 +1,43 @@
 online-dsn:
+  user: root
+  password: '********'
   net: tcp
   addr: 127.0.0.1:3306
   schema: sakila
-  user: root
-  password: '********'
-  charset: utf8mb4
-  disable: false
+  charset: utf8
+  collation: utf8_general_ci
+  loc: UTC
+  tls: ""
+  server-public-key: ""
+  maxallowedpacket: 4194304
+  params:
+    charset: utf8
   timeout: 0
   read-timeout: 0
   write-timeout: 0
+  allow-native-passwords: true
+  allow-old-passwords: false
+  disable: false
 test-dsn:
+  user: root
+  password: '********'
   net: tcp
   addr: 127.0.0.1:3306
   schema: sakila
-  user: root
-  password: '********'
-  charset: utf8mb4
-  disable: false
+  charset: utf8
+  collation: utf8_general_ci
+  loc: UTC
+  tls: ""
+  server-public-key: ""
+  maxallowedpacket: 4194304
+  params:
+    charset: utf8
   timeout: 0
   read-timeout: 0
   write-timeout: 0
+  allow-native-passwords: true
+  allow-old-passwords: false
+  disable: false
 allow-online-as-test: true
 drop-test-temporary: true
 cleanup-test-database: false

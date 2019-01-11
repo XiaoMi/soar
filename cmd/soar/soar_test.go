@@ -153,3 +153,33 @@ func Test_Main_helpTools(t *testing.T) {
 	common.Config.ListReportTypes = orgConfig
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func Test_Main_verboseInfo(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	orgVerbose := common.Config.Verbose
+	common.Config.Verbose = true
+	err := common.GoldenDiff(func() {
+		// Syntax check OK
+		orgSyntaxCheck := common.Config.OnlySyntaxCheck
+		common.Config.OnlySyntaxCheck = true
+		verboseInfo()
+		common.Config.OnlySyntaxCheck = orgSyntaxCheck
+
+		// MySQL environment verbose info
+		orgTestDSNDisable := common.Config.TestDSN.Disable
+		common.Config.TestDSN.Disable = true
+		verboseInfo()
+		common.Config.TestDSN.Disable = orgTestDSNDisable
+
+		orgOnlineDSNDisable := common.Config.OnlineDSN.Disable
+		common.Config.OnlineDSN.Disable = true
+		verboseInfo()
+		common.Config.OnlineDSN.Disable = orgOnlineDSNDisable
+	}, t.Name(), update)
+	if err != nil {
+		t.Error(err)
+	}
+
+	common.Config.Verbose = orgVerbose
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

@@ -1405,7 +1405,7 @@ func FormatSuggest(sql string, format string, suggests ...map[string]Rule) (map[
 		}
 		sort.Strings(sortedHeuristicSuggest)
 		for _, item := range sortedHeuristicSuggest {
-			buf = append(buf, fmt.Sprintln("## ", suggest[item].Summary))
+			buf = append(buf, fmt.Sprintln("##", suggest[item].Summary))
 			if item == "OK" {
 				continue
 			}

@@ -46,7 +46,7 @@ WHERE
 
 
 
-##  不建议使用 SELECT * 类型查询
+## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
 
