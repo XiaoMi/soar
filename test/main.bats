@@ -65,15 +65,68 @@ load test_helper
   run golden_diff
   [ $status -eq 0 ]
 }
+# 10.	report 为 json 格式是否正常
+@test "Check soar report for json" {
+  ${SOAR_BIN} -query "select * from film" \
+    -report-type json > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  [ $status -eq 0 ]
+}
 
-# 17. 语法检查（正确）
+# 10.	report 为 markdown 格式是否正常 
+@test "Check soar report for markdown" {
+  ${SOAR_BIN} -query "select * from film" \
+    -report-type markdown > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  [ $status -eq 0 ]
+}
+
+# 11. report 格式 html 检查
+@test "Check soar report for html" {
+  ${SOAR_BIN} -query "select * from film" \
+    -report-title "soar report check" \
+    -report-javascript "https://cdn.bootcss.com/twitter-bootstrap/3.4.0/js/npm.js" \
+    -report-css "https://cdn.bootcss.com/twitter-bootstrap/3.4.0/css/bootstrap-theme.css"  \
+    -report-type html > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  [ $status -eq 0 ]
+}
+
+# 12.	黑名单功能是否正常
+@test "Check soar blacklist" {
+
+}
+
+# 13.	soar -check-config 数据库连接配置检查 *
+@test "Check soar check_config" {
+
+}
+
+# 14.	soar -help 检查
+@test "Check soar help" {
+
+}
+
+# 15.	soar 数据库测试（线上、线下、-allow-online-as-test）
+@test "Check soar allow_online_as_test" {
+
+}
+
+# 16. 语法检查（正确）
 @test "Syntax Check OK" {
   run ${SOAR_BIN} -query "select * from film" -only-syntax-check
   [ $status -eq 0 ]
   [ -z $ouput ]
 }
-# 17. 语法检查（错误）
+# 16. 语法检查（错误）
 @test "Syntax Check Error" {
+  run ${SOAR_BIN} -query "select * frm film" -only-syntax-check
+  [ $status -eq 1 ]
+  [ -n $ouput ]
+}
+
+# 17.	dsn 检查
+@test "Check soar dsn" {
   run ${SOAR_BIN} -query "select * frm film" -only-syntax-check
   [ $status -eq 1 ]
   [ -n $ouput ]
