@@ -36,22 +36,43 @@ load test_helper
 
 # 6. soar 使用配置文件修改默认参数是否正确
 # 注意  不启用的配置为默认配置项目
-@test "check config change default config" {
-      ${SOAR_BIN} -config ${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden -print-config  -log-output=/dev/null > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
-      # 去掉 2019/01/12 05:45:14.922 [D] [config.go:429]  go-sql-driver/mysql.ParseDSN Error: invalid value / unknown server pub 
-      sed  -n '3,$p' ${BATS_TMP_DIRNAME}/test_check_config_change_default_config.golden > ${BATS_TMP_DIRNAME}/test_check_config_change_default_config.golden1
-      mv ${BATS_TMP_DIRNAME}/test_check_config_change_default_config.golden1  ${BATS_TMP_DIRNAME}/test_check_config_change_default_config.golden
+@test "Check the default config of the changes" {
+  ${SOAR_BIN} -config ${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden -print-config  -log-output=/dev/null > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  # 去掉 2019/01/12 05:45:14.922 [D] [config.go:429]  go-sql-driver/mysql.ParseDSN Error: invalid value / unknown server pub 
+  sed  -n '3,$p' ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden1
+  mv ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden1  ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
   [ $status -eq 0 ]
 }
 
+# 8.	执行 soar -query  为string时是否正常
+@test "Check soar query for input string" {
+  ${SOAR_BIN} -query "`${SOAR_BIN} -list-test-sqls`" > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  [ $status -eq 0 ]
+}
 
+# 8.	执行 soar -query  为文件时是否正常
+@test "Check soar query for input file" {
+  ${SOAR_BIN} -query <(${SOAR_BIN} -list-test-sqls) > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  [ $status -eq 0 ]
+}
+
+# 9.	管道输入 sql 是否正常
+@test "Check soar for pipe input" {
+  ${SOAR_BIN} -list-test-sqls |${SOAR_BIN} > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  [ $status -eq 0 ]
+}
+
+# 17. 语法检查（正确）
 @test "Syntax Check OK" {
   run ${SOAR_BIN} -query "select * from film" -only-syntax-check
   [ $status -eq 0 ]
   [ -z $ouput ]
 }
-
+# 17. 语法检查（错误）
 @test "Syntax Check Error" {
   run ${SOAR_BIN} -query "select * frm film" -only-syntax-check
   [ $status -eq 1 ]

@@ -8,7 +8,7 @@ online-dsn:
   collation: utf8mb4_general_ci
   loc: GMT
   tls: dsfsfdsf
-  server-public-key: sdfsffsdfffffffwefwef
+  server-public-key: AAAAB3NzaC1yc2EAAAADAQABAAABAQC0JFhoEgrl5/51UHlIIlfWwhiJLR/EEeF8enGnY0PnAldLQ8STdWD8Um2BUtVjgE9COl1X3mN4vMvnSm8A6aPn66enHn0hKzwh1GvcuZNTPgeaZyGKWG0kcvbziUjAPsxxvRvvoaUspSkRYAP/9vpq3SImJKuIHCPfjnGMurKV1n7W/QfpmNjUEwYOswDjL1Ik6Jy6Lrzf8T0hQEy+dYoV4zNM0HcROCXFuu1LyG+WTch3FW660BecNT8+c4sVTHuUMXgGot8OUtwgfXrt5ZL5as7cuyKiWsLVrtrtvL3T0ZHlV8qxQ3DT1gqjSw6jBOzyDOx3jwthAbdsWjyK4Oqp
   maxallowedpacket: 419437
   params:
     charset: utf8mb4
