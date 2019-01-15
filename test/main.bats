@@ -119,6 +119,10 @@ load test_helper
 }
 
 # 17.	dsn 检查
-@test "Check soar test dsn" {
-
+@test "Check soar test dsn root:passwd@host:port/db" {
+run ${SOAR_BIN} -online-dsn="root:pase@D@192.168.12.11:3306/testDB" -print-config
+  [ $(expr "$output" : ".*user: root") -ne 0 ]
+  [ $(expr "$output" : ".*addr: 192.168.12.11:3306") -ne 0 ]
+  [ $(expr "$output" : ".*schema: testDB") -ne 0 ]
+  [ $(expr "$output" : ".*charset: utf8") -ne 0 ]
 }
