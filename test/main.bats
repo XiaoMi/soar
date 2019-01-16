@@ -126,3 +126,17 @@ run ${SOAR_BIN} -online-dsn="root:pase@D@192.168.12.11:3306/testDB" -print-confi
   [ $(expr "$output" : ".*schema: testDB") -ne 0 ]
   [ $(expr "$output" : ".*charset: utf8") -ne 0 ]
 }
+
+# 18. 日志中是否含有密码
+@test "Check log has password" {
+    ${SOAR_BIN_ENV} -query "select * from film" -log-level=7
+    run grep "1tIsB1g3rt" ${SOAR_BIN}.log
+    [ ${status} -eq 1 ]
+}
+
+# 18. 输出中是否含有密码
+@test "Check stdout has password" {
+    run ${SOAR_BIN_ENV} -query "select * from film" -log-level=7
+    [ $(expr "$output" : ".*1tIsB1g3rt.*") -eq 0 ]
+    [ ${status} -eq 0 ]
+}
