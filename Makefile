@@ -20,10 +20,10 @@ COMMIT_VERSION=`git rev-parse HEAD`
 # colors compatible setting
 COLOR_ENABLE=$(shell tput colors > /dev/null; echo $$?)
 ifeq "$(COLOR_ENABLE)" "0"
-CRED=$(shell echo "\033[91m")
-CGREEN=$(shell echo "\033[92m")
-CYELLOW=$(shell echo "\033[93m")
-CEND=$(shell echo "\033[0m")
+CRED=$(shell printf "\033[91m")
+CGREEN=$(shell printf "\033[92m")
+CYELLOW=$(shell printf "\033[93m")
+CEND=$(shell printf "\033[0m")
 endif
 
 # Add mysql version for testing `MYSQL_RELEASE=percona MYSQL_VERSION=5.7 make docker`
