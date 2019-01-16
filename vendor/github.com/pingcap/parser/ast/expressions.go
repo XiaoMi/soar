@@ -158,7 +158,7 @@ func (n *BinaryOperationExpr) Restore(ctx *RestoreCtx) error {
 	if err := n.L.Restore(ctx); err != nil {
 		return errors.Annotate(err, "An error occurred when restore BinaryOperationExpr.L")
 	}
-	if err := n.Op.Restore(ctx.In); err != nil {
+	if err := n.Op.Restore(ctx); err != nil {
 		return errors.Annotate(err, "An error occurred when restore BinaryOperationExpr.Op")
 	}
 	if err := n.R.Restore(ctx); err != nil {
@@ -347,7 +347,12 @@ type SubqueryExpr struct {
 
 // Restore implements Node interface.
 func (n *SubqueryExpr) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WritePlain("(")
+	if err := n.Query.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore SubqueryExpr.Query")
+	}
+	ctx.WritePlain(")")
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -388,7 +393,21 @@ type CompareSubqueryExpr struct {
 
 // Restore implements Node interface.
 func (n *CompareSubqueryExpr) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if err := n.L.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore CompareSubqueryExpr.L")
+	}
+	if err := n.Op.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore CompareSubqueryExpr.Op")
+	}
+	if n.All {
+		ctx.WriteKeyWord("ALL ")
+	} else {
+		ctx.WriteKeyWord("ANY ")
+	}
+	if err := n.R.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore CompareSubqueryExpr.R")
+	}
+	return nil
 }
 
 // Format the ExprNode into a Writer.
@@ -615,21 +634,22 @@ func (n *PatternInExpr) Restore(ctx *RestoreCtx) error {
 	} else {
 		ctx.WriteKeyWord(" IN ")
 	}
-	ctx.WritePlain("(")
-	for i, expr := range n.List {
-		if i != 0 {
-			ctx.WritePlain(",")
-		}
-		if err := expr.Restore(ctx); err != nil {
-			return errors.Annotatef(err, "An error occurred while restore PatternInExpr.List[%d]", i)
-		}
-	}
 	if n.Sel != nil {
 		if err := n.Sel.Restore(ctx); err != nil {
 			return errors.Annotate(err, "An error occurred while restore PatternInExpr.Sel")
 		}
+	} else {
+		ctx.WritePlain("(")
+		for i, expr := range n.List {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			if err := expr.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore PatternInExpr.List[%d]", i)
+			}
+		}
+		ctx.WritePlain(")")
 	}
-	ctx.WritePlain(")")
 	return nil
 }
 
@@ -817,6 +837,12 @@ func (n *PatternLikeExpr) Restore(ctx *RestoreCtx) error {
 		return errors.Annotate(err, "An error occurred while restore PatternLikeExpr.Pattern")
 	}
 
+	escape := string(n.Escape)
+	if escape != "\\" {
+		ctx.WriteKeyWord(" ESCAPE ")
+		ctx.WriteString(escape)
+
+	}
 	return nil
 }
 
@@ -1071,7 +1097,7 @@ type UnaryOperationExpr struct {
 
 // Restore implements Node interface.
 func (n *UnaryOperationExpr) Restore(ctx *RestoreCtx) error {
-	if err := n.Op.Restore(ctx.In); err != nil {
+	if err := n.Op.Restore(ctx); err != nil {
 		return errors.Trace(err)
 	}
 	if err := n.V.Restore(ctx); err != nil {

@@ -161,8 +161,6 @@ pingcap-parser: tidb
 .PHONY: vendor
 vendor: vitess pingcap-parser
 # gometalinter
-# 如果有不想改的lint问题可以使用metalinter.sh加黑名单
-#@bash doc/example/metalinter.sh
 .PHONY: lint
 lint: build
 	@echo "$(CGREEN)Run linter check ...$(CEND)"
