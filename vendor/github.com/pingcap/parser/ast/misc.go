@@ -44,6 +44,8 @@ var (
 	_ StmtNode = &UseStmt{}
 	_ StmtNode = &FlushStmt{}
 	_ StmtNode = &KillStmt{}
+	_ StmtNode = &CreateBindingStmt{}
+	_ StmtNode = &DropBindingStmt{}
 
 	_ Node = &PrivElem{}
 	_ Node = &VariableAssignment{}
@@ -685,6 +687,64 @@ func (n *DropUserStmt) Accept(v Visitor) (Node, bool) {
 	return v.Leave(n)
 }
 
+// CreateBindingStmt creates sql binding hint.
+type CreateBindingStmt struct {
+	stmtNode
+
+	GlobalScope bool
+	OriginSel   StmtNode
+	HintedSel   StmtNode
+}
+
+func (n *CreateBindingStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
+func (n *CreateBindingStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*CreateBindingStmt)
+	selnode, ok := n.OriginSel.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.OriginSel = selnode.(*SelectStmt)
+	hintedSelnode, ok := n.HintedSel.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.HintedSel = hintedSelnode.(*SelectStmt)
+	return v.Leave(n)
+}
+
+// DropBindingStmt deletes sql binding hint.
+type DropBindingStmt struct {
+	stmtNode
+
+	GlobalScope bool
+	OriginSel   StmtNode
+}
+
+func (n *DropBindingStmt) Restore(ctx *RestoreCtx) error {
+	return errors.New("Not implemented")
+}
+
+func (n *DropBindingStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*DropBindingStmt)
+	selnode, ok := n.OriginSel.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.OriginSel = selnode.(*SelectStmt)
+	return v.Leave(n)
+}
+
 // DoStmt is the struct for DO statement.
 type DoStmt struct {
 	stmtNode
@@ -985,7 +1045,20 @@ type TableOptimizerHint struct {
 
 // Restore implements Node interface.
 func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WriteKeyWord(n.HintName.String())
+	ctx.WritePlain("(")
+	if n.HintName.L == "max_execution_time" {
+		ctx.WritePlainf("%d", n.MaxExecutionTime)
+	} else {
+		for i, table := range n.Tables {
+			if i != 0 {
+				ctx.WritePlain(", ")
+			}
+			ctx.WriteName(table.String())
+		}
+	}
+	ctx.WritePlain(")")
+	return nil
 }
 
 // Accept implements Node Accept interface.

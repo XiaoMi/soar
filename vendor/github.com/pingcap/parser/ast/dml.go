@@ -183,7 +183,8 @@ type TableName struct {
 	DBInfo    *model.DBInfo
 	TableInfo *model.TableInfo
 
-	IndexHints []*IndexHint
+	IndexHints     []*IndexHint
+	PartitionNames []model.CIStr
 }
 
 // Restore implements Node interface.
@@ -756,7 +757,110 @@ type SelectStmt struct {
 
 // Restore implements Node interface.
 func (n *SelectStmt) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WriteKeyWord("SELECT ")
+
+	if n.SelectStmtOpts.Priority > 0 {
+		ctx.WriteKeyWord(mysql.Priority2Str[n.SelectStmtOpts.Priority])
+		ctx.WritePlain(" ")
+	}
+
+	if !n.SelectStmtOpts.SQLCache {
+		ctx.WriteKeyWord("SQL_NO_CACHE ")
+	}
+
+	if n.TableHints != nil && len(n.TableHints) != 0 {
+		ctx.WritePlain("/*+ ")
+		for i, tableHint := range n.TableHints {
+			if err := tableHint.Restore(ctx); err != nil {
+				errors.Annotatef(err, "An error occurred while restore SelectStmt.TableHints[%d]", i)
+			}
+		}
+		ctx.WritePlain("*/ ")
+	}
+
+	if n.Distinct {
+		ctx.WriteKeyWord("DISTINCT ")
+	}
+	if n.SelectStmtOpts.StraightJoin {
+		ctx.WriteKeyWord("STRAIGHT_JOIN ")
+	}
+	if n.Fields != nil {
+		for i, field := range n.Fields.Fields {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			if err := field.Restore(ctx); err != nil {
+				errors.Annotatef(err, "An error occurred while restore SelectStmt.Fields[%d]", i)
+			}
+		}
+	}
+
+	if n.From != nil {
+		ctx.WriteKeyWord(" FROM ")
+		if err := n.From.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore SelectStmt.From")
+		}
+	}
+
+	if n.From == nil && n.Where != nil {
+		ctx.WriteKeyWord(" FROM DUAL")
+	}
+	if n.Where != nil {
+		ctx.WriteKeyWord(" WHERE ")
+		if err := n.Where.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore SelectStmt.Where")
+		}
+	}
+
+	if n.GroupBy != nil {
+		ctx.WritePlain(" ")
+		if err := n.GroupBy.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore SelectStmt.GroupBy")
+		}
+	}
+
+	if n.Having != nil {
+		ctx.WritePlain(" ")
+		if err := n.Having.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore SelectStmt.Having")
+		}
+	}
+
+	if n.WindowSpecs != nil {
+		ctx.WriteKeyWord(" WINDOW ")
+		for i, windowsSpec := range n.WindowSpecs {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			if err := windowsSpec.Restore(ctx); err != nil {
+				errors.Annotatef(err, "An error occurred while restore SelectStmt.WindowSpec[%d]", i)
+			}
+		}
+	}
+
+	if n.OrderBy != nil {
+		ctx.WritePlain(" ")
+		if err := n.OrderBy.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore SelectStmt.OrderBy")
+		}
+	}
+
+	if n.Limit != nil {
+		ctx.WritePlain(" ")
+		if err := n.Limit.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore SelectStmt.Limit")
+		}
+	}
+
+	switch n.LockTp {
+	case SelectLockInShareMode:
+		ctx.WriteKeyWord(" LOCK ")
+		ctx.WriteKeyWord(n.LockTp.String())
+	case SelectLockForUpdate:
+		ctx.WritePlain(" ")
+		ctx.WriteKeyWord(n.LockTp.String())
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -855,7 +959,24 @@ type UnionSelectList struct {
 
 // Restore implements Node interface.
 func (n *UnionSelectList) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	for i, selectStmt := range n.Selects {
+		if i != 0 {
+			ctx.WriteKeyWord(" UNION ")
+			if !selectStmt.IsAfterUnionDistinct {
+				ctx.WriteKeyWord("ALL ")
+			}
+		}
+		if selectStmt.IsInBraces {
+			ctx.WritePlain("(")
+		}
+		if err := selectStmt.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore UnionSelectList.SelectStmt")
+		}
+		if selectStmt.IsInBraces {
+			ctx.WritePlain(")")
+		}
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -888,7 +1009,24 @@ type UnionStmt struct {
 
 // Restore implements Node interface.
 func (n *UnionStmt) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if err := n.SelectList.Restore(ctx); err != nil {
+		errors.Annotate(err, "An error occurred while restore UnionStmt.SelectList")
+	}
+
+	if n.OrderBy != nil {
+		ctx.WritePlain(" ")
+		if err := n.OrderBy.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore UnionStmt.OrderBy")
+		}
+	}
+
+	if n.Limit != nil {
+		ctx.WritePlain(" ")
+		if err := n.Limit.Restore(ctx); err != nil {
+			errors.Annotate(err, "An error occurred while restore UnionStmt.Limit")
+		}
+	}
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -1037,7 +1175,90 @@ type InsertStmt struct {
 
 // Restore implements Node interface.
 func (n *InsertStmt) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	if n.IsReplace {
+		ctx.WriteKeyWord("REPLACE ")
+	} else {
+		ctx.WriteKeyWord("INSERT ")
+	}
+	switch n.Priority {
+	case mysql.LowPriority:
+		ctx.WriteKeyWord("LOW_PRIORITY ")
+	case mysql.HighPriority:
+		ctx.WriteKeyWord("HIGH_PRIORITY ")
+	case mysql.DelayedPriority:
+		ctx.WriteKeyWord("DELAYED ")
+	}
+	if n.IgnoreErr {
+		ctx.WriteKeyWord("IGNORE ")
+	}
+	ctx.WriteKeyWord("INTO ")
+	if err := n.Table.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore InsertStmt.Table")
+	}
+	if n.Columns != nil {
+		ctx.WritePlain(" (")
+		for i, v := range n.Columns {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			if err := v.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore InsertStmt.Columns[%d]", i)
+			}
+		}
+		ctx.WritePlain(")")
+	}
+	if n.Lists != nil {
+		ctx.WriteKeyWord(" VALUES ")
+		for i, row := range n.Lists {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			ctx.WritePlain("(")
+			for j, v := range row {
+				if j != 0 {
+					ctx.WritePlain(",")
+				}
+				if err := v.Restore(ctx); err != nil {
+					return errors.Annotatef(err, "An error occurred while restore InsertStmt.Lists[%d][%d]", i, j)
+				}
+			}
+			ctx.WritePlain(")")
+		}
+	}
+	if n.Select != nil {
+		switch v := n.Select.(type) {
+		case *SelectStmt, *UnionStmt:
+			if err := v.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore InsertStmt.Select")
+			}
+		default:
+			return errors.Errorf("Incorrect type for InsertStmt.Select: %T", v)
+		}
+	}
+	if n.Setlist != nil {
+		ctx.WriteKeyWord(" SET ")
+		for i, v := range n.Setlist {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			if err := v.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore InsertStmt.Setlist[%d]", i)
+			}
+		}
+	}
+	if n.OnDuplicate != nil {
+		ctx.WriteKeyWord(" ON DUPLICATE KEY UPDATE ")
+		for i, v := range n.OnDuplicate {
+			if i != 0 {
+				ctx.WritePlain(",")
+			}
+			if err := v.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore InsertStmt.OnDuplicate[%d]", i)
+			}
+		}
+	}
+
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -1311,6 +1532,7 @@ const (
 	ShowMasterStatus
 	ShowPrivileges
 	ShowErrors
+	ShowBindings
 )
 
 // ShowStmt is a statement to provide information about databases, tables, columns and so on.

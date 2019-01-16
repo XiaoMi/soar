@@ -37,21 +37,29 @@ load test_helper
 }
 
 # 6. soar 使用配置文件修改默认参数是否正确
-# 注意  不启用的配置为默认配置项目
+# 注意：不启用的配置为默认配置项目
 @test "Check the default config of the changes" {
+<<<<<<< HEAD
   ${SOAR_BIN} -config ${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden -log-level=3 -print-config  -log-output=/dev/null|grep -v "go:" > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+=======
+  ${SOAR_BIN} -config ${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.yaml -print-config  -log-output=/dev/null > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+>>>>>>> upstream/dev
   run golden_diff
   [ $status -eq 0 ]
 }
 
+<<<<<<< HEAD
 # 8.	执行 soar -query  为文件时是否正常
+=======
+# 8. 执行 soar -query 为文件时是否正常
+>>>>>>> upstream/dev
 @test "Check soar query for input file" {
   ${SOAR_BIN} -query <(${SOAR_BIN} -list-test-sqls) > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
   [ $status -eq 0 ]
 }
 
-# 9.	管道输入 sql 是否正常
+# 9. 管道输入 SQL 是否正常
 @test "Check soar for pipe input" {
   ${SOAR_BIN} -list-test-sqls |${SOAR_BIN} > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
