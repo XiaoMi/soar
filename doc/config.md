@@ -27,8 +27,8 @@ allow-online-as-test: true
 drop-test-temporary: true
 # 语法检查小工具
 only-syntax-check: false
-sampling-data-factor: 100
-sampling: true
+sampling-statistic-target: 100
+sampling: false
 # 日志级别，[0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]
 log-level: 7
 log-output: ${your_log_dir}/soar.log
