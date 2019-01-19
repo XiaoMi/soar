@@ -18,13 +18,10 @@ BUILD_TIME=`date +%Y%m%d%H%M`
 COMMIT_VERSION=`git rev-parse HEAD`
 
 # colors compatible setting
-COLOR_ENABLE=$(shell tput colors > /dev/null; echo $$?)
-ifeq "$(COLOR_ENABLE)" "0"
-CRED=$(shell printf "\033[91m")
-CGREEN=$(shell printf "\033[92m")
-CYELLOW=$(shell printf "\033[93m")
-CEND=$(shell printf "\033[0m")
-endif
+CRED:=$(shell tput setaf 1 2>/dev/null)
+CGREEN:=$(shell tput setaf 2 2>/dev/null)
+CYELLOW:=$(shell tput setaf 3 2>/dev/null)
+CEND:=$(shell tput sgr0 2>/dev/null)
 
 # Add mysql version for testing `MYSQL_RELEASE=percona MYSQL_VERSION=5.7 make docker`
 # MySQL 5.1 `MYSQL_RELEASE=vsamov/mysql-5.1.73 make docker`
