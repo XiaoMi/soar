@@ -49,7 +49,7 @@ profiling: true
 trace: true
 explain: false
 delimiter: ;
-log-level: 5
+log-level: 3
 log-output: /dev/null
 report-type: html
 report-css: sdfs

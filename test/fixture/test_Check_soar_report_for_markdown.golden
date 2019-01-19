@@ -1,0 +1,28 @@
+# Query: 687D590364E29465
+
+★ ★ ★ ☆ ☆ 75分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
