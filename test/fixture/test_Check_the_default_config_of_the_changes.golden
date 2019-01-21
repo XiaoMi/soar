@@ -1,0 +1,126 @@
+online-dsn:
+  user: online-test
+  password: '********'
+  net: tcp
+  addr: 192.168.12.200:3307
+  schema: information_schema
+  charset: utf8mb4
+  collation: utf8mb4_general_ci
+  loc: GMT
+  tls: dsfsfdsf
+  server-public-key: AAAAB3NzaC1yc2EAAAADAQABAAABAQC0JFhoEgrl5/51UHlIIlfWwhiJLR/EEeF8enGnY0PnAldLQ8STdWD8Um2BUtVjgE9COl1X3mN4vMvnSm8A6aPn66enHn0hKzwh1GvcuZNTPgeaZyGKWG0kcvbziUjAPsxxvRvvoaUspSkRYAP/9vpq3SImJKuIHCPfjnGMurKV1n7W/QfpmNjUEwYOswDjL1Ik6Jy6Lrzf8T0hQEy+dYoV4zNM0HcROCXFuu1LyG+WTch3FW660BecNT8+c4sVTHuUMXgGot8OUtwgfXrt5ZL5as7cuyKiWsLVrtrtvL3T0ZHlV8qxQ3DT1gqjSw6jBOzyDOx3jwthAbdsWjyK4Oqp
+  maxallowedpacket: 419437
+  params:
+    charset: utf8mb4
+  timeout: 60
+  read-timeout: 70
+  write-timeout: 80
+  allow-native-passwords: false
+  allow-old-passwords: true
+  disable: false
+test-dsn:
+  user: test-user
+  password: '********'
+  net: tcp
+  addr: 192.168.12.34:3309
+  schema: information_schema
+  charset: utf8mb4
+  collation: utf8mb4_general_ci
+  loc: GMT
+  tls: aabbbaa
+  server-public-key: this is a tset serverpublic
+  maxallowedpacket: 4194309
+  params:
+    charset: utf8mb4
+  timeout: 50
+  read-timeout: 40
+  write-timeout: 30
+  allow-native-passwords: false
+  allow-old-passwords: true
+  disable: false
+allow-online-as-test: true
+drop-test-temporary: false
+cleanup-test-database: true
+only-syntax-check: true
+sampling-statistic-target: 110
+sampling: true
+sampling-condition: aaa
+profiling: true
+trace: true
+explain: false
+delimiter: ;
+log-level: 3
+log-output: /dev/null
+report-type: html
+report-css: sdfs
+report-javascript: sdfsd
+report-title: SQL优化分析报告-test
+markdown-extensions: 92
+markdown-html-flags: 10
+ignore-rules:
+- COL.012
+rewrite-rules:
+- delimiter
+- orderbynull
+- groupbyconst
+- dmlorderby
+- having
+- star2columns
+- insertcolumns
+- distinctstar
+blacklist: /tmp/blacklist
+max-join-table-count: 12
+max-group-by-cols-count: 15
+max-distinct-count: 7
+max-index-cols-count: 2
+max-text-cols-count: 3
+max-total-rows: 9999991
+max-query-cost: 9992
+spaghetti-query-length: 2041
+allow-drop-index: true
+max-in-count: 101
+max-index-bytes-percolumn: 762
+max-index-bytes: 3073
+allow-charsets:
+- utf8
+- utf8mb4
+allow-collates: []
+allow-engines:
+- innodb
+- tokudb
+max-index-count: 12
+max-column-count: 41
+max-value-count: 102
+index-prefix: idx_
+unique-key-prefix: uk_
+max-subquery-depth: 6
+max-varchar-length: 1022
+column-not-allow-type:
+- boolean
+min-cardinality: 2
+explain-sql-report-type: pretty
+explain-type: extended
+explain-format: traditional
+explain-warn-select-type:
+- ""
+explain-warn-access-type:
+- ALL
+explain-max-keys: 31
+explain-min-keys: 10
+explain-max-rows: 10002
+explain-warn-extra:
+- Using temporary
+- Using filesort
+explain-max-filtered: 120
+explain-warn-scalability:
+- O(log(n))
+show-warnings: true
+show-last-query-cost: true
+query: ""
+list-heuristic-rules: true
+list-rewrite-rules: true
+list-test-sqls: true
+list-report-types: true
+verbose: true
+dry-run: false
+max-pretty-sql-length: 1022

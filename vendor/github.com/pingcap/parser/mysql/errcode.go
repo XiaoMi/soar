@@ -901,7 +901,7 @@ const (
 	ErrWindowFrameEndIllegal                                        = 3585
 	ErrWindowFrameIllegal                                           = 3586
 	ErrWindowRangeFrameOrderType                                    = 3587
-	ErrWindowRangeFrameTEMPORALType                                 = 3588
+	ErrWindowRangeFrameTemporalType                                 = 3588
 	ErrWindowRangeFrameNumericType                                  = 3589
 	ErrWindowRangeBoundNotConstant                                  = 3590
 	ErrWindowDuplicateName                                          = 3591
@@ -915,9 +915,18 @@ const (
 	ErrWindowFunctionIgnoresFrame                                   = 3599
 
 	// TiDB self-defined errors.
-	ErrMemExceedThreshold = 8001
-	ErrForUpdateCantRetry = 8002
-	ErrAdminCheckTable    = 8003
+	ErrMemExceedThreshold         = 8001
+	ErrForUpdateCantRetry         = 8002
+	ErrAdminCheckTable            = 8003
+	ErrInvalidPluginID            = 8101
+	ErrInvalidPluginManifest      = 8102
+	ErrInvalidPluginName          = 8103
+	ErrInvalidPluginVersion       = 8104
+	ErrDuplicatePlugin            = 8105
+	ErrInvalidPluginSysVarName    = 8106
+	ErrRequireVersionCheckFail    = 8107
+	ErrUnsupportedReloadPlugin    = 8018
+	ErrUnsupportedReloadPluginVar = 8019
 
 	// TiKV/PD errors.
 	ErrPDServerTimeout    = 9001

@@ -6,4 +6,3 @@ load test_helper
   run ${SOAR_BIN} -query "select * from film where length > 120"
   [ $status -eq 0 ]
 }
-

@@ -1,0 +1,2505 @@
+# Query: C3FAEDA6AD6D762B
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 86
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: E969B9297DA79BA6
+
+★ ★ ★ ★ ☆ 90分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  IS  NULL
+```
+
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+
+* **Item:**  ARG.006
+
+* **Severity:**  L1
+
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 8A106444D14B9880
+
+★ ★ ★ ☆ ☆ 60分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+HAVING  
+  title  = 'abc'
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 HAVING 子句
+
+* **Item:**  CLA.013
+
+* **Severity:**  L3
+
+* **Content:**  将查询的 HAVING 子句改写为 WHERE 中的查询条件，可以在查询处理期间使用索引。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: A0C5E62C724A121A
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  sakila. film  
+WHERE  
+  LENGTH  >= 60
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 868317D1973FD1B0
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  BETWEEN  60  
+  AND  84
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 707FE669669FA075
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  title  LIKE  'AIR%'
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: DF916439ABD07664
+
+★ ★ ★ ★ ☆ 90分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  title  IS  NOT  NULL
+```
+
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+
+* **Item:**  ARG.006
+
+* **Severity:**  L1
+
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: B9336971FF3D3792
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 114  
+  AND  title  = 'ALABAMA DEVIL'
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 68E48001ECD53152
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  title  = 'ALABAMA DEVIL'
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 12FF1DAA3D425FA9
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  language_id  < 10  
+  AND  title  = 'xyz'
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: E84CBAAC2E12BDEA
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  language_id  < 10
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 6A0F035BD4E01018
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+
+SELECT  
+  release_year, SUM( LENGTH) 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+  AND  language_id  = 1  
+GROUP BY  
+  release_year
+```
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## 使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
+
+# Query: 23D176AEA2947002
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+
+SELECT  
+  release_year, SUM( LENGTH) 
+FROM  
+  film  
+WHERE  
+  LENGTH  >= 123  
+GROUP BY  
+  release_year
+```
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## 使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
+
+# Query: 73DDF6E6D9E40384
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+
+SELECT  
+  release_year, language_id, SUM( LENGTH) 
+FROM  
+  film  
+GROUP BY  
+  release_year, language_id
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## 使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
+
+# Query: B3C502B4AA344196
+
+★ ★ ★ ☆ ☆ 75分
+
+```sql
+
+SELECT  
+  release_year, SUM( LENGTH) 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year, (LENGTH+ language_id)
+```
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## GROUP BY 的条件为表达式
+
+* **Item:**  CLA.010
+
+* **Severity:**  L2
+
+* **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+## 使用 SUM(COL) 时需注意 NPE 问题
+
+* **Item:**  FUN.006
+
+* **Severity:**  L1
+
+* **Content:**  当某一列的值全是 NULL 时，COUNT(COL) 的返回结果为0,但 SUM(COL) 的返回结果为 NULL，因此使用 SUM() 时需注意 NPE 问题。可以使用如下方式来避免 SUM 的 NPE 问题: SELECT IF(ISNULL(SUM(COL)), 0, SUM(COL)) FROM tbl
+
+# Query: 47044E1FE1A965A5
+
+★ ★ ★ ☆ ☆ 70分
+
+```sql
+
+SELECT  
+  release_year, SUM( film_id) 
+FROM  
+  film  
+GROUP BY  
+  release_year
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+# Query: 2BA1217F6C8CF0AB
+
+★ ★ ☆ ☆ ☆ 45分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  address  
+GROUP BY  
+  address, district
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 非确定性的 GROUP BY
+
+* **Item:**  RES.001
+
+* **Severity:**  L4
+
+* **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
+
+# Query: 863A85207E4F410D
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  title  
+FROM  
+  film  
+WHERE  
+  ABS( language_id) = 3  
+GROUP BY  
+  title
+```
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## 避免在 WHERE 条件中使用函数或其他运算符
+
+* **Item:**  FUN.001
+
+* **Severity:**  L2
+
+* **Content:**  虽然在 SQL 中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。也不建议在查询比较条件两侧书写多余的括号，这会对阅读产生比较大的困扰。
+
+# Query: DF59FD602E4AA368
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  language_id  
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year  
+ORDER BY  
+  language_id
+```
+
+## 非确定性的 GROUP BY
+
+* **Item:**  RES.001
+
+* **Severity:**  L4
+
+* **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
+
+# Query: F6DBEAA606D800FC
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+SELECT  
+  release_year  
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year  
+ORDER BY  
+  release_year
+```
+
+## OK
+
+# Query: 6E9B96CA3F0E6BDA
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+ORDER BY  
+  release_year  ASC, language_id  DESC
+```
+
+## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
+
+* **Item:**  CLA.007
+
+* **Severity:**  L2
+
+* **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## ORDER BY 多个列但排序方向不同时可能无法使用索引
+
+* **Item:**  KEY.008
+
+* **Severity:**  L4
+
+* **Content:**  在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
+
+# Query: 2EAACFD7030EA528
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+SELECT  
+  release_year  
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+GROUP BY  
+  release_year  
+ORDER BY  
+  release_year  
+LIMIT  
+  10
+```
+
+## OK
+
+# Query: 5CE2F187DBF2A710
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 123  
+ORDER BY  
+  release_year  
+LIMIT  
+  10
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: E75234155B5E2E14
+
+★ ★ ★ ☆ ☆ 75分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+ORDER BY  
+  release_year  
+LIMIT  
+  10
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: AFEEBF10A8D74E32
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  film_id  
+FROM  
+  film  
+ORDER BY  
+  release_year  
+LIMIT  
+  10
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: 965D5AC955824512
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+ORDER BY  
+  LENGTH  
+LIMIT  
+  10
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 1E2CF4145EE706A5
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  < 100  
+ORDER BY  
+  LENGTH  
+LIMIT  
+  10
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: A314542EEE8571EE
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  customer  
+WHERE  
+  address_id  in  (224, 510) 
+ORDER BY  
+  last_name
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 0BE2D79E2F1E7CB0
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  release_year  = 2016  
+  AND  LENGTH  != 1  
+ORDER BY  
+  title
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## '!=' 运算符是非标准的
+
+* **Item:**  STA.001
+
+* **Severity:**  L0
+
+* **Content:**  "<>"才是标准SQL中的不等于运算符。
+
+# Query: 4E73AA068370E6A8
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+SELECT  
+  title  
+FROM  
+  film  
+WHERE  
+  release_year  = 1995
+```
+
+## OK
+
+# Query: BA7111449E4F1122
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+SELECT  
+  title, replacement_cost  
+FROM  
+  film  
+WHERE  
+  language_id  = 5  
+  AND  LENGTH  = 70
+```
+
+## OK
+
+# Query: B13E0ACEAF8F3119
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+SELECT  
+  title  
+FROM  
+  film  
+WHERE  
+  language_id  > 5  
+  AND  LENGTH  > 70
+```
+
+## OK
+
+# Query: A3FAB6027484B88B
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  = 100  
+  AND  title  = 'xyz' 
+ORDER BY  
+  release_year
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: CB42080E9F35AB07
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+  AND  title  = 'xyz' 
+ORDER BY  
+  release_year
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: C4A212A42400411D
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  LENGTH  > 100  
+ORDER BY  
+  release_year
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 4ECCA9568BE69E68
+
+★ ★ ★ ☆ ☆ 75分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  INNER JOIN  country  b  ON  a. country_id= b. country_id
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 485D56FC88BBBDB9
+
+★ ★ ★ ☆ ☆ 75分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 0D0DABACEDFF5765
+
+★ ★ ★ ☆ ☆ 75分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 1E56C6CCEA2131CC
+
+★ ★ ★ ★ ☆ 90分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  b. last_update  IS  NULL
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+
+* **Item:**  ARG.006
+
+* **Severity:**  L1
+
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: F5D30BCAC1E206A1
+
+★ ★ ★ ★ ☆ 90分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  a. last_update  IS  NULL
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
+
+* **Item:**  ARG.006
+
+* **Severity:**  L1
+
+* **Content:**  使用 IS NULL 或 IS NOT NULL 将可能导致引擎放弃使用索引而进行全表扫描，如：select id from t where num is null;可以在num上设置默认值0，确保表中 num 列没有 NULL 值，然后这样查询： select id from t where num=0;
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 17D5BCF21DC2364C
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+
+* **Item:**  SUB.002
+
+* **Severity:**  L2
+
+* **Content:**  与去除重复的UNION不同，UNION ALL允许重复元组。如果您不关心重复元组，那么使用UNION ALL将是一个更快的选项。
+
+# Query: A4911095C201896F
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  a  
+  RIGHT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  a. last_update  IS  NULL  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  a  
+  LEFT JOIN  country  b  ON  a. country_id= b. country_id  
+WHERE  
+  b. last_update  IS  NULL
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+
+* **Item:**  SUB.002
+
+* **Severity:**  L2
+
+* **Content:**  与去除重复的UNION不同，UNION ALL允许重复元组。如果您不关心重复元组，那么使用UNION ALL将是一个更快的选项。
+
+# Query: 3FF20E28EC9CBEF9
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  country_id, last_update  
+FROM  
+  city  NATURAL  
+  JOIN  country
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: 5C547F08EADBB131
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  country_id, last_update  
+FROM  
+  city  NATURAL  
+  LEFT JOIN  country
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: AF0C1EB58B23D2FA
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  country_id, last_update  
+FROM  
+  city  NATURAL  
+  RIGHT JOIN  country
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: 626571EAE84E2C8A
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  a. country_id, a. last_update  
+FROM  
+  city  a  STRAIGHT_JOIN  country  b  ON  a. country_id= b. country_id
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: 50F2AB4243CE2071
+
+★ ★ ★ ☆ ☆ 60分
+
+```sql
+
+SELECT  
+  a. address, a. postal_code  
+FROM  
+  sakila. address  a  
+WHERE  
+  a. city_id  IN  (
+SELECT  
+  c. city_id  
+FROM  
+  sakila. city  c)
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+# Query: 584CCEC8069B6947
+
+★ ★ ☆ ☆ ☆ 40分
+
+```sql
+
+SELECT  
+  city  
+FROM( 
+SELECT  
+  city_id  
+FROM  
+  city  
+WHERE  
+  city  = "A Corua (La Corua)" 
+ORDER BY  
+  last_update  DESC  
+LIMIT  
+  50, 10) I  
+  JOIN  city  ON  (I. city_id  = city. city_id) 
+  JOIN  country  ON  (country. country_id  = city. country_id) 
+ORDER BY  
+  city  DESC
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 同一张表被连接两次
+
+* **Item:**  JOI.002
+
+* **Severity:**  L4
+
+* **Content:**  相同的表在 FROM 子句中至少出现两次，可以简化为对该表的单次访问。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+# Query: 7F02E23D44A38A6D
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+DELETE  city, country  
+FROM  
+  city  
+  INNER JOIN  country  using  (country_id) 
+WHERE  
+  city. city_id  = 1
+```
+
+## 不建议使用联表删除或更新
+
+* **Item:**  JOI.007
+
+* **Severity:**  L4
+
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
+
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
+
+* **Item:**  SEC.003
+
+* **Severity:**  L0
+
+* **Content:**  在执行高危操作之前对数据进行备份是十分有必要的。
+
+# Query: F8314ABD1CBF2FF1
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+DELETE  city  
+FROM  
+  city  
+  LEFT JOIN  country  ON  city. country_id  = country. country_id  
+WHERE  
+  country. country  IS  NULL
+```
+
+## 不建议使用联表删除或更新
+
+* **Item:**  JOI.007
+
+* **Severity:**  L4
+
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
+
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
+
+* **Item:**  SEC.003
+
+* **Severity:**  L0
+
+* **Content:**  在执行高危操作之前对数据进行备份是十分有必要的。
+
+# Query: 1A53649C43122975
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+DELETE  a1, a2  
+FROM  
+  city  AS  a1  
+  INNER JOIN  country  AS  a2  
+WHERE  
+  a1. country_id= a2. country_id
+```
+
+## 不建议使用联表删除或更新
+
+* **Item:**  JOI.007
+
+* **Severity:**  L4
+
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
+
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
+
+* **Item:**  SEC.003
+
+* **Severity:**  L0
+
+* **Content:**  在执行高危操作之前对数据进行备份是十分有必要的。
+
+# Query: B862978586C6338B
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+DELETE FROM  
+  a1, a2  USING  city  AS  a1  
+  INNER JOIN  country  AS  a2  
+WHERE  
+  a1. country_id= a2. country_id
+```
+
+## 不建议使用联表删除或更新
+
+* **Item:**  JOI.007
+
+* **Severity:**  L4
+
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
+
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
+
+* **Item:**  SEC.003
+
+* **Severity:**  L0
+
+* **Content:**  在执行高危操作之前对数据进行备份是十分有必要的。
+
+# Query: F16FD63381EF8299
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+DELETE FROM  
+  film  
+WHERE  
+  LENGTH  > 100
+```
+
+## 使用DELETE/DROP/TRUNCATE等操作时注意备份
+
+* **Item:**  SEC.003
+
+* **Severity:**  L0
+
+* **Content:**  在执行高危操作之前对数据进行备份是十分有必要的。
+
+# Query: 08CFE41C7D20AAC8
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+UPDATE  
+  city  
+  INNER JOIN  country  USING( country_id) 
+SET  
+  city. city  = 'Abha', 
+  city. last_update  = '2006-02-15 04:45:25', 
+  country. country  = 'Afghanistan' 
+WHERE  
+  city. city_id= 10
+```
+
+## 不建议使用联表删除或更新
+
+* **Item:**  JOI.007
+
+* **Severity:**  L4
+
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
+
+# Query: C15BDF2C73B5B7ED
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+UPDATE  
+  city  
+  INNER JOIN  country  ON  city. country_id  = country. country_id  
+  INNER JOIN  address  ON  city. city_id  = address. city_id  
+SET  
+  city. city  = 'Abha', 
+  city. last_update  = '2006-02-15 04:45:25', 
+  country. country  = 'Afghanistan' 
+WHERE  
+  city. city_id= 10
+```
+
+## 不建议使用联表删除或更新
+
+* **Item:**  JOI.007
+
+* **Severity:**  L4
+
+* **Content:**  当需要同时删除或更新多张表时建议使用简单语句，一条 SQL 只删除或更新一张表，尽量不要将多张表的操作在同一条语句。
+
+# Query: FCD1ABF36F8CDAD7
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+UPDATE  
+  city, country  
+SET  
+  city. city  = 'Abha', 
+  city. last_update  = '2006-02-15 04:45:25', 
+  country. country  = 'Afghanistan' 
+WHERE  
+  city. country_id  = country. country_id  
+  AND  city. city_id= 10
+```
+
+## OK
+
+# Query: FE409EB794EE91CF
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+UPDATE  
+  film  
+SET  
+  LENGTH  = 10  
+WHERE  
+  language_id  = 20
+```
+
+## OK
+
+# Query: 3656B13CC4F888E2
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+INSERT  INTO  city  (country_id) 
+SELECT  
+  country_id  
+FROM  
+  country
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+* **Item:**  LCK.001
+
+* **Severity:**  L3
+
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+# Query: 2F7439623B712317
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+INSERT  INTO  city  (country_id) 
+VALUES  
+  (1), 
+  (2), 
+  (3)
+```
+
+## OK
+
+# Query: 11EC7AAACC97DC0F
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+INSERT  INTO  city  (country_id) 
+SELECT  
+  10  
+FROM  
+  DUAL
+```
+
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+* **Item:**  LCK.001
+
+* **Severity:**  L3
+
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+# Query: E3DDA1A929236E72
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+REPLACE  INTO  city  (country_id) 
+SELECT  
+  country_id  
+FROM  
+  country
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+* **Item:**  LCK.001
+
+* **Severity:**  L3
+
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+# Query: 466F1AC2F5851149
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+REPLACE  INTO  city  (country_id) 
+VALUES  
+  (1), 
+  (2), 
+  (3)
+```
+
+## OK
+
+# Query: A7973BDD268F926E
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+REPLACE  INTO  city  (country_id) 
+SELECT  
+  10  
+FROM  
+  DUAL
+```
+
+## INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+* **Item:**  LCK.001
+
+* **Severity:**  L3
+
+* **Content:**  INSERT INTO xx SELECT 加锁粒度较大请谨慎
+
+# Query: 105C870D5DFB6710
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  (
+SELECT  
+  film_id  
+FROM  
+  film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+) film
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 执行计划中嵌套连接深度过深
+
+* **Item:**  SUB.004
+
+* **Severity:**  L3
+
+* **Content:**  MySQL对子查询的优化效果不佳,MySQL将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。
+
+# Query: 16C2B14E7DAA9906
+
+★ ☆ ☆ ☆ ☆ 35分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  language_id  = (
+SELECT  
+  language_id  
+FROM  
+  language  
+LIMIT  
+  1)
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 未使用 ORDER BY 的 LIMIT 查询
+
+* **Item:**  RES.002
+
+* **Severity:**  L4
+
+* **Content:**  没有 ORDER BY 的 LIMIT 会导致非确定性的结果，这取决于查询执行计划。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+# Query: 16CB4628D2597D40
+
+★ ★ ★ ☆ ☆ 65分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  i  
+  LEFT JOIN  country  o  ON  i. city_id= o. country_id  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  i  
+  RIGHT JOIN  country  o  ON  i. city_id= o. country_id
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+
+* **Item:**  SUB.002
+
+* **Severity:**  L2
+
+* **Content:**  与去除重复的UNION不同，UNION ALL允许重复元组。如果您不关心重复元组，那么使用UNION ALL将是一个更快的选项。
+
+# Query: EA50643B01E139A8
+
+★ ★ ☆ ☆ ☆ 45分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  (
+SELECT  
+  * 
+FROM  
+  actor  
+WHERE  
+  last_update= '2006-02-15 04:34:33' 
+  AND  last_name= 'CHASE'
+) t  
+WHERE  
+  last_update= '2006-02-15 04:34:33' 
+  AND  last_name= 'CHASE' 
+GROUP BY  
+  first_name
+```
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 非确定性的 GROUP BY
+
+* **Item:**  RES.001
+
+* **Severity:**  L4
+
+* **Content:**  SQL返回的列既不在聚合函数中也不是 GROUP BY 表达式的列中，因此这些值的结果将是非确定性的。如：select a, b, c from tbl where foo="bar" group by a，该 SQL 返回的结果就是不确定的。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+# Query: 7598A4EDE6CFA6BE
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  city  i  
+  LEFT JOIN  country  o  ON  i. city_id= o. country_id  
+WHERE  
+  o. country_id  is  null  
+UNION  
+SELECT  
+  * 
+FROM  
+  city  i  
+  RIGHT JOIN  country  o  ON  i. city_id= o. country_id  
+WHERE  
+  i. city_id  is  null
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 如果您不在乎重复的话，建议使用 UNION ALL 替代 UNION
+
+* **Item:**  SUB.002
+
+* **Severity:**  L2
+
+* **Content:**  与去除重复的UNION不同，UNION ALL允许重复元组。如果您不关心重复元组，那么使用UNION ALL将是一个更快的选项。
+
+# Query: 1E8B70E30062FD13
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  first_name, last_name, email  
+FROM  
+  customer  STRAIGHT_JOIN  address  ON  customer. address_id= address. address_id
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: E48A20D0413512DA
+
+★ ☆ ☆ ☆ ☆ 30分
+
+```sql
+
+SELECT  
+  ID, name  
+FROM  
+  (
+SELECT  
+  address  
+FROM  
+  customer_list  
+WHERE  
+  SID= 1  
+ORDER BY  
+  phone  
+LIMIT  
+  50, 10) a  
+  JOIN  customer_list  l  ON  (a. address= l. address) 
+  JOIN  city  c  ON  (c. city= l. city) 
+ORDER BY  
+  phone  desc
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
+
+* **Item:**  CLA.007
+
+* **Severity:**  L2
+
+* **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
+
+## 同一张表被连接两次
+
+* **Item:**  JOI.002
+
+* **Severity:**  L4
+
+* **Content:**  相同的表在 FROM 子句中至少出现两次，可以简化为对该表的单次访问。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+# Query: B0BA5A7079EA16B3
+
+★ ★ ★ ★ ☆ 85分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  film  
+WHERE  
+  DATE( last_update) = '2006-02-15'
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+## 避免在 WHERE 条件中使用函数或其他运算符
+
+* **Item:**  FUN.001
+
+* **Severity:**  L2
+
+* **Content:**  虽然在 SQL 中使用函数可以简化很多复杂的查询，但使用了函数的查询无法利用表中已经建立的索引，该查询将会是全表扫描，性能较差。通常建议将列名写在比较运算符左侧，将查询过滤条件放在比较运算符右侧。也不建议在查询比较条件两侧书写多余的括号，这会对阅读产生比较大的困扰。
+
+# Query: 18A2AD1395A58EAE
+
+★ ★ ★ ☆ ☆ 60分
+
+```sql
+
+SELECT  
+  last_update  
+FROM  
+  film  
+GROUP BY  
+  DATE( last_update)
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+## GROUP BY 的条件为表达式
+
+* **Item:**  CLA.010
+
+* **Severity:**  L2
+
+* **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+# Query: 60F234BA33AAC132
+
+★ ★ ★ ☆ ☆ 70分
+
+```sql
+
+SELECT  
+  last_update  
+FROM  
+  film  
+ORDER BY  
+  DATE( last_update)
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## ORDER BY 的条件为表达式
+
+* **Item:**  CLA.009
+
+* **Severity:**  L2
+
+* **Content:**  当 ORDER BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+# Query: 1ED2B7ECBA4215E1
+
+★ ★ ★ ★ ☆ 90分
+
+```sql
+
+SELECT  
+  description  
+FROM  
+  film  
+WHERE  
+  description  IN( 'NEWS', 
+  'asd'
+) 
+GROUP BY  
+  description
+```
+
+## 请为 GROUP BY 显示添加 ORDER BY 条件
+
+* **Item:**  CLA.008
+
+* **Severity:**  L2
+
+* **Content:**  默认 MySQL 会对 'GROUP BY col1, col2, ...' 请求按如下顺序排序 'ORDER BY col1, col2, ...'。如果 GROUP BY 语句不指定 ORDER BY 条件会导致无谓的排序产生，如果不需要排序建议添加 'ORDER BY NULL'。
+
+# Query: 255BAC03F56CDBC7
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+ALTER TABLE  
+  address  
+ADD  
+  index  idx_city_id( city_id)
+```
+
+## OK
+
+# Query: C315BC4EE0F4E523
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+ALTER TABLE  
+  inventory  
+ADD  
+  index  `idx_store_film` (
+    `store_id`, `film_id`)
+```
+
+## 提醒：请将索引属性顺序与查询对齐
+
+* **Item:**  KEY.004
+
+* **Severity:**  L0
+
+* **Content:**  如果为列创建复合索引，请确保查询属性与索引属性的顺序相同，以便DBMS在处理查询时使用索引。如果查询和索引属性订单没有对齐，那么DBMS可能无法在查询处理期间使用索引。
+
+# Query: 9BB74D074BA0727C
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+ALTER TABLE  
+  inventory  
+ADD  
+  index  `idx_store_film` (
+    `store_id`, `film_id`), 
+      ADD  
+      index  `idx_store_film` (
+        `store_id`, `film_id`), 
+              ADD  
+          index  `idx_store_film` (
+            `store_id`, `film_id`)
+```
+
+## 提醒：请将索引属性顺序与查询对齐
+
+* **Item:**  KEY.004
+
+* **Severity:**  L0
+
+* **Content:**  如果为列创建复合索引，请确保查询属性与索引属性的顺序相同，以便DBMS在处理查询时使用索引。如果查询和索引属性订单没有对齐，那么DBMS可能无法在查询处理期间使用索引。
+
+# Query: C95B5C028C8FFF95
+
+★ ★ ☆ ☆ ☆ 40分
+
+```sql
+
+SELECT  
+  DATE_FORMAT( t. last_update, '%Y-%m-%d'
+), 
+COUNT( DISTINCT  (
+  t. city)) 
+  FROM  
+    city  t  
+  WHERE  
+    t. last_update  > '2018-10-22 00:00:00' 
+    AND  t. city  LIKE  '%Chrome%' 
+    AND  t. city  = 'eip' 
+  GROUP BY  
+    DATE_FORMAT( t. last_update, '%Y-%m-%d'
+) 
+ORDER BY  
+  DATE_FORMAT( t. last_update, '%Y-%m-%d'
+)
+```
+
+## 建议使用 AS 关键字显示声明一个别名
+
+* **Item:**  ALI.001
+
+* **Severity:**  L0
+
+* **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
+
+## 不建议使用前项通配符查找
+
+* **Item:**  ARG.001
+
+* **Severity:**  L4
+
+* **Content:**  例如 "％foo"，查询参数有一个前项通配符的情况无法使用已有索引。
+
+## ORDER BY 的条件为表达式
+
+* **Item:**  CLA.009
+
+* **Severity:**  L2
+
+* **Content:**  当 ORDER BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+## GROUP BY 的条件为表达式
+
+* **Item:**  CLA.010
+
+* **Severity:**  L2
+
+* **Content:**  当 GROUP BY 条件为表达式或函数时会使用到临时表，如果在未指定 WHERE 或 WHERE 条件返回的结果集较大时性能会很差。
+
+## ORDER BY 多个列但排序方向不同时可能无法使用索引
+
+* **Item:**  KEY.008
+
+* **Severity:**  L4
+
+* **Content:**  在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
+
+# Query: C11ECE7AE5F80CE5
+
+★ ★ ☆ ☆ ☆ 45分
+
+```sql
+create  table  hello. t  (id  int  unsigned)
+```
+
+## 建议为表添加注释
+
+* **Item:**  CLA.011
+
+* **Severity:**  L1
+
+* **Content:**  为表添加注释能够使得表的意义更明确，从而为日后的维护带来极大的便利。
+
+## 请为列添加默认值
+
+* **Item:**  COL.004
+
+* **Severity:**  L1
+
+* **Content:**  请为列添加默认值，如果是 ALTER 操作，请不要忘记将原字段的默认值写上。字段无默认值，当表较大时无法在线变更表结构。
+
+## 列未添加注释
+
+* **Item:**  COL.005
+
+* **Severity:**  L1
+
+* **Content:**  建议对表中每个列添加注释，来明确每个列在表中的含义及作用。
+
+## 未指定主键或主键非 int 或 bigint
+
+* **Item:**  KEY.007
+
+* **Severity:**  L4
+
+* **Content:**  未指定主键或主键非 int 或 bigint，建议将主键设置为 int unsigned 或 bigint unsigned。
+
+## 请为表选择合适的存储引擎
+
+* **Item:**  TBL.002
+
+* **Severity:**  L4
+
+* **Content:**  建表或修改表的存储引擎时建议使用推荐的存储引擎，如：innodb
+
+# Query: 291F95B7DCB74C21
+
+★ ★ ★ ★ ☆ 95分
+
+```sql
+
+SELECT  
+  * 
+FROM  
+  tb  
+WHERE  
+  data  >= ''
+```
+
+## 不建议使用 SELECT * 类型查询
+
+* **Item:**  COL.001
+
+* **Severity:**  L1
+
+* **Content:**  当表结构变更时，使用 \* 通配符选择所有列将导致查询的含义和行为会发生更改，可能导致查询返回更多的数据。
+
+# Query: 084DA3E3EE38DD85
+
+★ ★ ★ ★ ★ 100分
+
+```sql
+
+ALTER TABLE  
+  tb  alter  column  id  
+DROP  
+  DEFAULT
+```
+
+## OK
+

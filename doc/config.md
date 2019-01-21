@@ -27,8 +27,8 @@ allow-online-as-test: true
 drop-test-temporary: true
 # 语法检查小工具
 only-syntax-check: false
-sampling-data-factor: 100
-sampling: true
+sampling-statistic-target: 100
+sampling: false
 # 日志级别，[0:Emergency, 1:Alert, 2:Critical, 3:Error, 4:Warning, 5:Notice, 6:Informational, 7:Debug]
 log-level: 7
 log-output: ${your_log_dir}/soar.log
@@ -77,6 +77,10 @@ soar -h
 ```
 
 ### 命令行参数配置DSN
+
+SOAR 最新版本已经使用`go-sql-driver`替代了`mymysql`，DSN将使用`go-sql-driver`格式并且保持向前兼容，请参考[go-sql-driver](https://github.com/go-sql-driver/mysql#dsn-data-source-name)文档。
+
+**以下DSN格式不再推荐使用**
 
 > 账号密码中如包含特殊符号(如：'@',':','/'等)可在配置文件中设置，存在特殊字符的情况不适合在命令行中使用。目前`soar`只支持 tcp 协议的 MySQL 数据库连接方式，如需要配置本机MySQL环境建议将`localhost`修改为'127.0.0.1'，并检查对应的 'user'@'127.0.0.1' 账号是否存在。
 

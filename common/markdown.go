@@ -44,40 +44,37 @@ func MarkdownEscape(str string) string {
 	return str
 }
 
-//
+// loadExternalResource load js/css resource from http[s] url
 func loadExternalResource(resource string) string {
 	var content string
 	var body []byte
 	if strings.HasPrefix(resource, "http") {
 		resp, err := http.Get(resource)
-		if err == nil {
-			body, err = ioutil.ReadAll(resp.Body)
-			if err == nil {
-				content = string(body)
-			} else {
-				Log.Debug("ioutil.ReadAll %s Error: %v", resource, err)
-			}
-		} else {
-			Log.Debug("http.Get %s Error: %v", resource, err)
+		if err != nil {
+			Log.Error("http.Get %s Error: %v", resource, err)
+			return content
 		}
 		defer resp.Body.Close()
+
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			Log.Error("ioutil.ReadAll %s Error: %v", resource, err)
+		} else {
+			content = string(body)
+		}
 	} else {
 		fd, err := os.Open(resource)
-		defer func() {
-			err = fd.Close()
-			if err != nil {
-				Log.Error("loadExternalResource(%s) fd.Close failed: %s", resource, err.Error())
-			}
-		}()
-		if err == nil {
-			body, err = ioutil.ReadAll(fd)
-			if err != nil {
-				Log.Debug("ioutil.ReadAll %s Error: %v", resource, err)
-			} else {
-				content = string(body)
-			}
+		if err != nil {
+			Log.Error("os.Open %s Error: %v", resource, err)
+			return content
+		}
+		defer fd.Close()
+
+		body, err = ioutil.ReadAll(fd)
+		if err != nil {
+			Log.Error("ioutil.ReadAll %s Error: %v", resource, err)
 		} else {
-			Log.Debug("os.Open %s Error: %v", resource, err)
+			content = string(body)
 		}
 	}
 	return content
