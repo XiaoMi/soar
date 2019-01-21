@@ -3,10 +3,13 @@
 ## 2019-01
 
 - DOING: english translation
+- add mysql environment verbose info
 - add JSONFind function, which support JSON iterate
 - add new test database `world_x`
 - SplitStatement support optimizer hint `/*+xxx */`
 - include [bats](https://github.com/bats-core/bats-core) bash auto test framework
+- fix #173 with JSONFind `WHERE col = col = '' and col1 = 'xx'`
+- fix #184 table status field datatype overflow
 - fix explain result with multi rows error
 - fix #178 JSON datatype only support utf8mb4
 
