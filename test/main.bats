@@ -77,8 +77,6 @@ load test_helper
 @test "Check soar report for html" {
   ${SOAR_BIN} -query "select * from film" \
     -report-title "soar report check" \
-    -report-javascript "https://cdn.bootcss.com/twitter-bootstrap/3.4.0/js/npm.js" \
-    -report-css "https://cdn.bootcss.com/twitter-bootstrap/3.4.0/css/bootstrap-theme.css"  \
     -report-type html > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
   [ $status -eq 0 ]
