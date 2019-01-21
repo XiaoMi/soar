@@ -44,7 +44,7 @@ func MarkdownEscape(str string) string {
 	return str
 }
 
-//
+// loadExternalResource load js/css resource from http[s] url
 func loadExternalResource(resource string) string {
 	var content string
 	var body []byte
@@ -59,6 +59,7 @@ func loadExternalResource(resource string) string {
 			}
 		} else {
 			Log.Debug("http.Get %s Error: %v", resource, err)
+			return ""
 		}
 		defer resp.Body.Close()
 	} else {
