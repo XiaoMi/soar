@@ -56,3 +56,17 @@ func TestStmtNode2JSON(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestSchemaMetaInfo(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	err := common.GoldenDiff(func() {
+		for _, sql := range common.TestSQLs {
+			fmt.Println(sql)
+			fmt.Println(SchemaMetaInfo(sql, "sakila"))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

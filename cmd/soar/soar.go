@@ -42,6 +42,7 @@ func main() {
 	var alterSQLs []string                                    // 待评审的 SQL 中所有 ALTER 请求
 	alterTableTimes := make(map[string]int)                   // 待评审的 SQL 中同一经表 ALTER 请求计数器
 	suggestMerged := make(map[string]map[string]advisor.Rule) // 优化建议去重, key 为 sql 的 fingerprint.ID
+	tables := make(map[string][]string)                       // SQL 使用的库表名
 
 	// 配置文件&命令行参数解析
 	initConfig()
@@ -196,8 +197,14 @@ func main() {
 		if common.Config.OnlySyntaxCheck {
 			continue
 		}
-
 		// +++++++++++++++++++++语法检查[结束]+++++++++++++++++++++++}
+
+		switch common.Config.ReportType {
+		case "tables":
+			env.ChangeDB(vEnv.Connector, q.Query)
+			tables[id] = ast.SchemaMetaInfo(sql, vEnv.Database)
+			continue
+		}
 
 		// +++++++++++++++++++++启发式规则建议[开始]+++++++++++++++++++++++{
 		common.Log.Debug("start of heuristic advisor Query: %s", q.Query)
@@ -377,6 +384,7 @@ func main() {
 		suggestMerged[id] = sug
 		switch common.Config.ReportType {
 		case "json":
+		case "tables":
 		case "duplicate-key-checker":
 		case "rewrite":
 		case "lint":
@@ -417,6 +425,17 @@ func main() {
 	// 以 JSON 格式化输出
 	if common.Config.ReportType == "json" {
 		js, err := json.MarshalIndent(suggestMerged, "", "  ")
+		if err == nil {
+			fmt.Println(string(js))
+		} else {
+			common.Log.Error("FormatSuggest json.Marshal Error: %v", err)
+		}
+		return
+	}
+
+	// 以 JSON 格式输出 SQL 影响的库表名
+	if common.Config.ReportType == "tables" {
+		js, err := json.MarshalIndent(tables, "", "  ")
 		if err == nil {
 			fmt.Println(string(js))
 		} else {

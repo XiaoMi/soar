@@ -17,13 +17,15 @@
 package ast
 
 import (
+	"fmt"
+
 	"github.com/XiaoMi/soar/common"
 
+	json "github.com/CorgiMan/json2"
 	"github.com/kr/pretty"
 	"github.com/pingcap/parser"
 	"github.com/pingcap/parser/ast"
-
-	json "github.com/CorgiMan/json2"
+	"github.com/tidwall/gjson"
 
 	// for pingcap parser
 	_ "github.com/pingcap/tidb/types/parser_driver"
@@ -66,4 +68,70 @@ func StmtNode2JSON(sql, charset, collation string) string {
 		}
 	}
 	return str
+}
+
+// SchemaMetaInfo get used database, table name from SQL
+func SchemaMetaInfo(sql string, defaultDatabase string) []string {
+	var tables []string
+	tree, err := TiParse(sql, "", "")
+	if err != nil {
+		return tables
+	}
+
+	jsonString := StmtNode2JSON(sql, "", "")
+
+	for _, node := range tree {
+		switch n := node.(type) {
+		case *ast.UseStmt:
+			tables = append(tables, fmt.Sprintf("`%s`.`dual`", n.DBName))
+		case *ast.InsertStmt, *ast.SelectStmt, *ast.UnionStmt, *ast.UpdateStmt, *ast.DeleteStmt:
+			// DML/DQL: INSERT, SELECT, UPDATE, DELETE
+			tableRefs := common.JSONFind(jsonString, "TableRefs")
+			for _, table := range tableRefs {
+				leftDatabase := gjson.Get(table, "Left.Source.Schema.O")
+				leftTable := gjson.Get(table, "Left.Source.Name.O")
+				if leftDatabase.String() == "" {
+					if leftTable.String() != "" {
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, leftTable))
+					}
+				} else {
+					if leftTable.String() != "" {
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", leftDatabase, leftTable))
+					} else {
+						tables = append(tables, fmt.Sprintf("`%s`.`dual`", leftDatabase))
+					}
+				}
+				rightDatabase := gjson.Get(table, "Right.Source.Schema.O")
+				rightTable := gjson.Get(table, "Right.Source.Name.O")
+				if rightDatabase.String() == "" {
+					if rightTable.String() != "" {
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, rightTable))
+					}
+				} else {
+					if rightTable.String() != "" {
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", rightDatabase, rightTable))
+					} else {
+						tables = append(tables, fmt.Sprintf("`%s`.`dual`", rightDatabase))
+					}
+				}
+			}
+		default:
+			// DDL: CREATE TABLE|DATABASE|INDEX|VIEW
+			schemas := common.JSONFind(jsonString, "Table")
+			for _, table := range schemas {
+				db := gjson.Get(table, "Schema.O")
+				tb := gjson.Get(table, "Name.O")
+				if db.String() == "" {
+					if tb.String() != "" {
+						tables = append(tables, fmt.Sprintf("`%s`.%s`", defaultDatabase, tb))
+					}
+				} else {
+					if tb.String() != "" {
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", db, tb))
+					}
+				}
+			}
+		}
+	}
+	return common.RemoveDuplicatesItem(tables)
 }

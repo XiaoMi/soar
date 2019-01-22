@@ -194,6 +194,21 @@ func (vEnv *VirtualEnv) CleanupTestDatabase() {
 	common.Log.Debug("CleanupTestDatabase done")
 }
 
+// ChangeDB use db change dsn Database
+func ChangeDB(env *database.Connector, sql string) {
+	stmt, err := sqlparser.Parse(sql)
+	if err != nil {
+		return
+	}
+
+	switch stmt := stmt.(type) {
+	case *sqlparser.Use:
+		if stmt.DBName.String() != "" {
+			env.Database = stmt.DBName.String()
+		}
+	}
+}
+
 // BuildVirtualEnv rEnv 为 SQL 源环境，DB 使用的信息从接口获取
 // 注意：如果是 USE, DDL 等语句，执行完第一条就会返回，后面的 SQL 不会执行
 func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) bool {

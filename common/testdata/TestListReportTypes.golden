@@ -34,6 +34,14 @@ echo "select * from film" | soar -rewrite-rules star2columns,delimiter -report-t
 ```bash
 echo "select * from film" | soar -report-type ast
 ```
+## ast-json
+* **Description**:以 JSON 格式输出 SQL 的抽象语法树，主要用于测试
+
+* **Example**:
+
+```bash
+echo "select * from film" | soar -report-type ast-json
+```
 ## tiast
 * **Description**:输出 SQL 的 TiDB抽象语法树，主要用于测试
 
@@ -41,6 +49,22 @@ echo "select * from film" | soar -report-type ast
 
 ```bash
 echo "select * from film" | soar -report-type tiast
+```
+## tiast-json
+* **Description**:以 JSON 格式输出 SQL 的 TiDB抽象语法树，主要用于测试
+
+* **Example**:
+
+```bash
+echo "select * from film" | soar -report-type tiast-json
+```
+## meta
+* **Description**:以 JSON 格式输出 SQL 使用的库表名
+
+* **Example**:
+
+```bash
+echo "select * from film" | soar -report-type meta
 ```
 ## fingerprint
 * **Description**:输出SQL的指纹

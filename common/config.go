@@ -32,7 +32,7 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 var (
@@ -669,6 +669,9 @@ func readCmdFlags() error {
 	}
 
 	Config.ReportType = strings.ToLower(*reportType)
+	if Config.ReportType == "tables" && Config.TestDSN.Schema == "information_schema" {
+		Config.TestDSN.Schema = "unknown"
+	}
 	Config.ReportCSS = *reportCSS
 	Config.ReportJavascript = *reportJavascript
 	Config.ReportTitle = *reportTitle
@@ -843,9 +846,24 @@ var ReportTypes = []ReportType{
 		Example:     `echo "select * from film" | soar -report-type ast`,
 	},
 	{
+		Name:        "ast-json",
+		Description: "以 JSON 格式输出 SQL 的抽象语法树，主要用于测试",
+		Example:     `echo "select * from film" | soar -report-type ast-json`,
+	},
+	{
 		Name:        "tiast",
 		Description: "输出 SQL 的 TiDB抽象语法树，主要用于测试",
 		Example:     `echo "select * from film" | soar -report-type tiast`,
+	},
+	{
+		Name:        "tiast-json",
+		Description: "以 JSON 格式输出 SQL 的 TiDB抽象语法树，主要用于测试",
+		Example:     `echo "select * from film" | soar -report-type tiast-json`,
+	},
+	{
+		Name:        "tables",
+		Description: "以 JSON 格式输出 SQL 使用的库表名",
+		Example:     `echo "select * from film" | soar -report-type meta`,
 	},
 	{
 		Name:        "fingerprint",

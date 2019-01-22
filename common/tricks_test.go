@@ -55,6 +55,17 @@ func TestCaptureOutput(t *testing.T) {
 func TestJSONFind(t *testing.T) {
 	Log.Debug("Entering function: %s", GetFunctionName())
 	jsons := []string{
+		`
+	{
+		"Collate":{
+			"Collate":{
+				"Collate":{
+					"key":"value"
+				}
+			}
+		}
+	}
+`,
 		`{
   "programmers": [
     {
@@ -386,6 +397,15 @@ func TestJSONFind(t *testing.T) {
 	}, t.Name(), update)
 	if err != nil {
 		t.Error(err)
+	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
+}
+
+func TestRemoveDuplicatesItem(t *testing.T) {
+	Log.Debug("Entering function: %s", GetFunctionName())
+	unique := RemoveDuplicatesItem([]string{"a", "a", "b", "c"})
+	if len(unique) != 3 {
+		t.Error("string list length should 3", unique)
 	}
 	Log.Debug("Exiting function: %s", GetFunctionName())
 }

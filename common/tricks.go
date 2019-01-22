@@ -113,12 +113,12 @@ func jsonFind(json string, name string, find *[]string) (next []string) {
 	res.ForEach(func(key, value gjson.Result) bool {
 		if key.String() == name {
 			*find = append(*find, value.String())
-		} else {
-			switch value.Type {
-			case gjson.Number, gjson.True, gjson.False, gjson.Null:
-			default:
-				next = append(next, value.String())
-			}
+		}
+		switch value.Type {
+		case gjson.Number, gjson.True, gjson.False, gjson.Null:
+		default:
+			// String, JSON
+			next = append(next, value.String())
 		}
 		return true // keep iterating
 	})
@@ -137,4 +137,20 @@ func JSONFind(json string, name string) []string {
 		next = tmpNext
 	}
 	return find
+}
+
+// RemoveDuplicatesItem remove duplicate item from list
+func RemoveDuplicatesItem(duplicate []string) []string {
+	m := make(map[string]bool)
+	for _, item := range duplicate {
+		if _, ok := m[item]; !ok {
+			m[item] = true
+		}
+	}
+
+	var unique []string
+	for item := range m {
+		unique = append(unique, item)
+	}
+	return unique
 }
