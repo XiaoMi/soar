@@ -9,5 +9,5 @@ setup() {
 
 # golden_diff like gofmt golden file check method, use this function check output different with template
 golden_diff() {
-  diff "${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden" "${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden" >/dev/null
+  diff "${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden" "${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden"
 }
