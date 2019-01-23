@@ -204,7 +204,9 @@
     "`hello`.`t`"
   ],
   "C15BDF2C73B5B7ED": [
-    "`unknown`.`address`"
+    "`unknown`.`address`",
+    "`unknown`.`city`",
+    "`unknown`.`country`"
   ],
   "C315BC4EE0F4E523": [
     "`unknown`.inventory`"
@@ -262,6 +264,7 @@
     "`unknown`.`country`"
   ],
   "FCD1ABF36F8CDAD7": [
+    "`unknown`.`city`",
     "`unknown`.`country`"
   ],
   "FE409EB794EE91CF": [
@@ -474,7 +477,9 @@
     "`hello`.`t`"
   ],
   "C15BDF2C73B5B7ED": [
-    "`sakila`.`address`"
+    "`sakila`.`address`",
+    "`sakila`.`city`",
+    "`sakila`.`country`"
   ],
   "C315BC4EE0F4E523": [
     "`sakila`.inventory`"
@@ -532,6 +537,7 @@
     "`sakila`.`country`"
   ],
   "FCD1ABF36F8CDAD7": [
+    "`sakila`.`city`",
     "`sakila`.`country`"
   ],
   "FE409EB794EE91CF": [

@@ -64,6 +64,7 @@ func TestSchemaMetaInfo(t *testing.T) {
 		"select 1;",
 		"syntax error case",
 		"select * from ta join tb using (id)",
+		"select * from ta, tb limit 1",
 	}
 	err := common.GoldenDiff(func() {
 		for _, sql := range append(sqls, common.TestSQLs...) {

@@ -6,6 +6,8 @@ syntax error case
 []
 select * from ta join tb using (id)
 [`sakila`.`ta` `sakila`.`tb`]
+select * from ta, tb limit 1
+[`sakila`.`ta` `sakila`.`tb`]
 SELECT * FROM film WHERE length = 86;
 [`sakila`.`film`]
 SELECT * FROM film WHERE length IS NULL;
@@ -117,9 +119,9 @@ DELETE FROM film WHERE length > 100;
 UPDATE city INNER JOIN country USING(country_id) SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
 [`sakila`.`city` `sakila`.`country`]
 UPDATE city INNER JOIN country ON city.country_id = country.country_id INNER JOIN address ON city.city_id = address.city_id SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
-[`sakila`.`address`]
+[`sakila`.`address` `sakila`.`city` `sakila`.`country`]
 UPDATE city, country SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.country_id = country.country_id AND city.city_id=10;
-[`sakila`.`country`]
+[`sakila`.`city` `sakila`.`country`]
 UPDATE film SET length = 10 WHERE language_id = 20;
 [`sakila`.`film`]
 INSERT INTO city (country_id) SELECT country_id FROM country;

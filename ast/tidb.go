@@ -86,32 +86,20 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 			tables = append(tables, fmt.Sprintf("`%s`.`dual`", n.DBName))
 		case *ast.InsertStmt, *ast.SelectStmt, *ast.UnionStmt, *ast.UpdateStmt, *ast.DeleteStmt:
 			// DML/DQL: INSERT, SELECT, UPDATE, DELETE
-			tableRefs := common.JSONFind(jsonString, "TableRefs")
-			for _, table := range tableRefs {
-				leftDatabase := gjson.Get(table, "Left.Source.Schema.O")
-				leftTable := gjson.Get(table, "Left.Source.Name.O")
-				if leftDatabase.String() == "" {
-					if leftTable.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, leftTable))
-					}
-				} else {
-					if leftTable.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.`%s`", leftDatabase, leftTable))
+			for _, tableRef := range common.JSONFind(jsonString, "TableRefs") {
+				for _, source := range common.JSONFind(tableRef, "Source") {
+					database := gjson.Get(source, "Schema.O")
+					table := gjson.Get(source, "Name.O")
+					if database.String() == "" {
+						if table.String() != "" {
+							tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, table))
+						}
 					} else {
-						tables = append(tables, fmt.Sprintf("`%s`.`dual`", leftDatabase))
-					}
-				}
-				rightDatabase := gjson.Get(table, "Right.Source.Schema.O")
-				rightTable := gjson.Get(table, "Right.Source.Name.O")
-				if rightDatabase.String() == "" {
-					if rightTable.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, rightTable))
-					}
-				} else {
-					if rightTable.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.`%s`", rightDatabase, rightTable))
-					} else {
-						tables = append(tables, fmt.Sprintf("`%s`.`dual`", rightDatabase))
+						if table.String() != "" {
+							tables = append(tables, fmt.Sprintf("`%s`.`%s`", database, table))
+						} else {
+							tables = append(tables, fmt.Sprintf("`%s`.`dual`", database))
+						}
 					}
 				}
 			}
