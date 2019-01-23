@@ -24,6 +24,7 @@ load test_helper
 @test "Run default printconfig cases" {
   ${SOAR_BIN} -print-config -log-output=/dev/null  > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
@@ -41,6 +42,7 @@ load test_helper
 @test "Check the default config of the changes" {
   ${SOAR_BIN} -config ${BATS_FIXTURE_DIRNAME}/${BATS_TEST_NAME}.golden -print-config  -log-output=/dev/null > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
@@ -48,6 +50,7 @@ load test_helper
 @test "Check soar query for input file" {
   ${SOAR_BIN} -query <(${SOAR_BIN} -list-test-sqls) > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
@@ -55,6 +58,7 @@ load test_helper
 @test "Check soar for pipe input" {
   ${SOAR_BIN} -list-test-sqls |${SOAR_BIN} > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 # 10.	report 为 json 格式是否正常
@@ -62,6 +66,7 @@ load test_helper
   ${SOAR_BIN} -query "select * from film" \
     -report-type json > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
@@ -70,6 +75,7 @@ load test_helper
   ${SOAR_BIN} -query "select * from film" \
     -report-type markdown > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
@@ -79,6 +85,7 @@ load test_helper
     -report-title "soar report check" \
     -report-type html > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
@@ -118,7 +125,7 @@ load test_helper
 
 # 17.	dsn 检查
 @test "Check soar test dsn root:passwd@host:port/db" {
-run ${SOAR_BIN} -online-dsn="root:pase@D@192.168.12.11:3306/testDB" -print-config
+  run ${SOAR_BIN} -online-dsn="root:pase@D@192.168.12.11:3306/testDB" -print-config
   [ $(expr "$output" : ".*user: root") -ne 0 ]
   [ $(expr "$output" : ".*addr: 192.168.12.11:3306") -ne 0 ]
   [ $(expr "$output" : ".*schema: testDB") -ne 0 ]
@@ -127,14 +134,22 @@ run ${SOAR_BIN} -online-dsn="root:pase@D@192.168.12.11:3306/testDB" -print-confi
 
 # 18. 日志中是否含有密码
 @test "Check log has password" {
-    ${SOAR_BIN_ENV} -query "select * from film" -log-level=7
-    run grep "1tIsB1g3rt" ${SOAR_BIN}.log
-    [ ${status} -eq 1 ]
+  ${SOAR_BIN_ENV} -query "select * from film" -log-level=7
+  run grep "1tIsB1g3rt" ${SOAR_BIN}.log
+  [ ${status} -eq 1 ]
 }
 
 # 18. 输出中是否含有密码
 @test "Check stdout has password" {
-    run ${SOAR_BIN_ENV} -query "select * from film" -log-level=7
-    [ $(expr "$output" : ".*1tIsB1g3rt.*") -eq 0 ]
-    [ ${status} -eq 0 ]
+  run ${SOAR_BIN_ENV} -query "select * from film" -log-level=7
+  [ $(expr "$output" : ".*1tIsB1g3rt.*") -eq 0 ]
+  [ ${status} -eq 0 ]
+}
+
+#
+@test "Check -report-type rewrite -rewrite-rules mergealter" {
+  ${SOAR_BIN} -list-test-sqls |${SOAR_BIN} -report-type rewrite -rewrite-rules mergealter | sort > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  echo "${output}"
+  [ $status -eq 0 ]
 }

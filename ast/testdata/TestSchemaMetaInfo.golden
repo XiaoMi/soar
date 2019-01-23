@@ -1,3 +1,11 @@
+use world_x;
+[`world_x`.`dual`]
+select 1;
+[]
+syntax error case
+[]
+select * from ta join tb using (id)
+[`sakila`.`ta` `sakila`.`tb`]
 SELECT * FROM film WHERE length = 86;
 [`sakila`.`film`]
 SELECT * FROM film WHERE length IS NULL;
@@ -71,7 +79,7 @@ SELECT * FROM film WHERE length > 100 and title = 'xyz' ORDER BY release_year;
 SELECT * FROM film WHERE length > 100 ORDER BY release_year;
 [`sakila`.`film`]
 SELECT * FROM city a INNER JOIN country b ON a.country_id=b.country_id;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id;
 [`sakila`.`city` `sakila`.`country`]
 SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
@@ -79,17 +87,17 @@ SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
 SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id WHERE b.last_update IS NULL;
 [`sakila`.`city` `sakila`.`country`]
 SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id WHERE a.last_update IS NULL;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id UNION SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 SELECT * FROM city a RIGHT JOIN country b ON a.country_id=b.country_id WHERE a.last_update IS NULL UNION SELECT * FROM city a LEFT JOIN country b ON a.country_id=b.country_id WHERE b.last_update IS NULL;
 [`sakila`.`city` `sakila`.`country`]
 SELECT country_id, last_update FROM city NATURAL JOIN country;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 SELECT country_id, last_update FROM city NATURAL LEFT JOIN country;
 [`sakila`.`city` `sakila`.`country`]
 SELECT country_id, last_update FROM city NATURAL RIGHT JOIN country;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 SELECT a.country_id, a.last_update FROM city a STRAIGHT_JOIN country b ON a.country_id=b.country_id;
 [`sakila`.`city` `sakila`.`country`]
 SELECT a.address, a.postal_code FROM sakila.address a WHERE a.city_id IN  (SELECT c.city_id FROM sakila.city c);
@@ -97,7 +105,7 @@ SELECT a.address, a.postal_code FROM sakila.address a WHERE a.city_id IN  (SELEC
 SELECT city FROM( SELECT city_id FROM city WHERE city = "A Corua (La Corua)" ORDER BY last_update DESC LIMIT 50, 10) I JOIN city ON (I.city_id = city.city_id) JOIN country ON (country.country_id = city.country_id) ORDER BY city DESC;
 [`sakila`.`city` `sakila`.`country`]
 DELETE city, country FROM city INNER JOIN country using (country_id) WHERE city.city_id = 1;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 DELETE city FROM city LEFT JOIN country ON city.country_id = country.country_id WHERE country.country IS NULL;
 [`sakila`.`city` `sakila`.`country`]
 DELETE a1, a2 FROM city AS a1 INNER JOIN country AS a2 WHERE a1.country_id=a2.country_id;
@@ -107,7 +115,7 @@ DELETE FROM a1, a2 USING city AS a1 INNER JOIN country AS a2 WHERE a1.country_id
 DELETE FROM film WHERE length > 100;
 [`sakila`.`film`]
 UPDATE city INNER JOIN country USING(country_id) SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
-[`sakila`.`country` `sakila`.`city`]
+[`sakila`.`city` `sakila`.`country`]
 UPDATE city INNER JOIN country ON city.country_id = country.country_id INNER JOIN address ON city.city_id = address.city_id SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.city_id=10;
 [`sakila`.`address`]
 UPDATE city, country SET city.city = 'Abha', city.last_update = '2006-02-15 04:45:25', country.country = 'Afghanistan' WHERE city.country_id = country.country_id AND city.city_id=10;
@@ -143,7 +151,7 @@ SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id union SELECT 
 SELECT * FROM city i left JOIN country o ON i.city_id=o.country_id WHERE o.country_id is null union SELECT * FROM city i right JOIN country o ON i.city_id=o.country_id WHERE i.city_id is null;
 [`sakila`.`city` `sakila`.`country`]
 SELECT first_name,last_name,email FROM customer STRAIGHT_JOIN address ON customer.address_id=address.address_id;
-[`sakila`.`customer` `sakila`.`address`]
+[`sakila`.`address` `sakila`.`customer`]
 SELECT ID,name FROM (SELECT address FROM customer_list WHERE SID=1 order by phone limit 50,10) a JOIN customer_list l ON (a.address=l.address) JOIN city c ON (c.city=l.city) order by phone desc;
 [`sakila`.`city` `sakila`.`customer_list`]
 SELECT * FROM film WHERE date(last_update)='2006-02-15';

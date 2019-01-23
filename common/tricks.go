@@ -152,5 +152,6 @@ func RemoveDuplicatesItem(duplicate []string) []string {
 	for item := range m {
 		unique = append(unique, item)
 	}
+	sort.Strings(unique)
 	return unique
 }

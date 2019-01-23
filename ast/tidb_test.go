@@ -59,8 +59,14 @@ func TestStmtNode2JSON(t *testing.T) {
 
 func TestSchemaMetaInfo(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		"use world_x;",
+		"select 1;",
+		"syntax error case",
+		"select * from ta join tb using (id)",
+	}
 	err := common.GoldenDiff(func() {
-		for _, sql := range common.TestSQLs {
+		for _, sql := range append(sqls, common.TestSQLs...) {
 			fmt.Println(sql)
 			fmt.Println(SchemaMetaInfo(sql, "sakila"))
 		}
