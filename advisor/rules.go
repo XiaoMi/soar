@@ -1005,6 +1005,14 @@ func init() {
 			Case:     "delete from table where col = 'condition'",
 			Func:     (*Query4Audit).RuleDataDrop,
 		},
+		"SEC.004": {
+			Item:     "SEC.004",
+			Severity: "L0",
+			Summary:  "发现常见 SQL 注入函数",
+			Content:  `SLEEP(), BENCHMARK(), GET_LOCK(), RELEASE_LOCK() 等函数通常出现在 SQL 注入语句中，会严重影响数据库性能。`,
+			Case:     "SELECT BENCHMARK(10, RAND())",
+			Func:     (*Query4Audit).RuleInjection,
+		},
 		"STA.001": {
 			Item:     "STA.001",
 			Severity: "L0",

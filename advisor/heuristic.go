@@ -2291,6 +2291,24 @@ func (q *Query4Audit) RuleDataDrop() Rule {
 	return rule
 }
 
+// RuleInjection SEC.004
+func (q *Query4Audit) RuleInjection() Rule {
+	var rule = q.RuleOK()
+	if q.TiStmt != nil {
+		json := ast.StmtNode2JSON(q.Query, "", "")
+		fs := common.JSONFind(json, "FnName")
+		for _, f := range fs {
+			functionName := gjson.Get(f, "L")
+			switch functionName.String() {
+			case "sleep", "benchmark", "get_lock", "release_lock":
+				// Ref: https://www.k0rz3n.com/2019/02/01/一篇文章带你深入理解%20SQL%20盲注/
+				rule = HeuristicRules["SEC.004"]
+			}
+		}
+	}
+	return rule
+}
+
 // RuleCompareWithFunction FUN.001
 func (q *Query4Audit) RuleCompareWithFunction() Rule {
 	var rule = q.RuleOK()

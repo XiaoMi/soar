@@ -1072,6 +1072,16 @@ create table test(id int,name varchar(20) not null,password varchar(200)not null
 ```sql
 delete from table where col = 'condition'
 ```
+## 发现常见 SQL 注入函数
+
+* **Item**:SEC.004
+* **Severity**:L0
+* **Content**:SLEEP(), BENCHMARK(), GET\_LOCK(), RELEASE\_LOCK() 等函数通常出现在 SQL 注入语句中，会严重影响数据库性能。
+* **Case**:
+
+```sql
+SELECT BENCHMARK(10, RAND())
+```
 ## '!=' 运算符是非标准的
 
 * **Item**:STA.001

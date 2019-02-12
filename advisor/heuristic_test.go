@@ -2174,6 +2174,45 @@ func TestRuleDataDrop(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// SEC.004
+func TestRuleInjection(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`select benchmark(10, rand())`,
+			`select sleep(1)`,
+			`select get_lock('lock_name', 1)`,
+			`select release_lock('lock_name')`,
+		},
+		{
+			"select * from `sleep`",
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleInjection()
+			if rule.Item != "SEC.004" {
+				t.Error("Rule not match:", rule.Item, "Expect : SEC.004")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleInjection()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // FUN.001
 func TestCompareWithFunction(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
