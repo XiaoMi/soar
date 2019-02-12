@@ -188,6 +188,7 @@ import (
 	nvarcharType		"NVARCHAR"
 	on			"ON"
 	option			"OPTION"
+	optionally		"OPTIONALLY"
 	or			"OR"
 	order			"ORDER"
 	outer			"OUTER"
@@ -4363,6 +4364,10 @@ TableName:
 	{
 		$$ = &ast.TableName{Schema:model.NewCIStr($1),	Name:model.NewCIStr($3)}
 	}
+|	Identifier '.' '*'
+	{
+		$$ = &ast.TableName{Name:model.NewCIStr($1)}
+	}
 
 TableNameList:
 	TableName
@@ -5799,7 +5804,7 @@ AdminStmt:
 		$$ = &ast.AdminStmt{
 			Tp: ast.AdminRestoreTable,
 			Tables: []*ast.TableName{$4.(*ast.TableName)},
-		        JobNumber: $5.(int64),
+			JobNumber: $5.(int64),
 		}
 	}
 |	"ADMIN" "CLEANUP" "INDEX" TableName Identifier
@@ -7546,11 +7551,11 @@ PrivType:
 	}
 |	"CREATE" "VIEW"
 	{
-		$$ = mysql.PrivilegeType(0)
+		$$ = mysql.CreateViewPriv
 	}
 |	"SHOW" "VIEW"
 	{
-		$$ = mysql.PrivilegeType(0)
+		$$ = mysql.ShowViewPriv
 	}
 |	"CREATE" "ROUTINE"
 	{
@@ -7719,6 +7724,10 @@ FieldsTerminated:
 Enclosed:
 	{
 		$$ = ""
+	}
+|	"OPTIONALLY" "ENCLOSED" "BY" stringLit
+	{
+		$$ = $4
 	}
 |	"ENCLOSED" "BY" stringLit
 	{

@@ -1408,7 +1408,80 @@ type DeleteStmt struct {
 
 // Restore implements Node interface.
 func (n *DeleteStmt) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WriteKeyWord("DELETE ")
+
+	if n.TableHints != nil && len(n.TableHints) != 0 {
+		ctx.WritePlain("/*+ ")
+		for i, tableHint := range n.TableHints {
+			if err := tableHint.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore UpdateStmt.TableHints[%d]", i)
+			}
+		}
+		ctx.WritePlain("*/ ")
+	}
+
+	switch n.Priority {
+	case mysql.LowPriority:
+		ctx.WriteKeyWord("LOW_PRIORITY ")
+	}
+	if n.Quick {
+		ctx.WriteKeyWord("QUICK ")
+	}
+	if n.IgnoreErr {
+		ctx.WriteKeyWord("IGNORE ")
+	}
+
+	if n.IsMultiTable { // Multiple-Table Syntax
+		if n.BeforeFrom {
+			if err := n.Tables.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore DeleteStmt.Tables")
+			}
+
+			ctx.WriteKeyWord(" FROM ")
+			if err := n.TableRefs.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore DeleteStmt.TableRefs")
+			}
+		} else {
+			ctx.WriteKeyWord("FROM ")
+			if err := n.Tables.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore DeleteStmt.Tables")
+			}
+
+			ctx.WriteKeyWord(" USING ")
+			if err := n.TableRefs.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore DeleteStmt.TableRefs")
+			}
+		}
+	} else { // Single-Table Syntax
+		ctx.WriteKeyWord("FROM ")
+
+		if err := n.TableRefs.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore DeleteStmt.TableRefs")
+		}
+	}
+
+	if n.Where != nil {
+		ctx.WriteKeyWord(" WHERE ")
+		if err := n.Where.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore DeleteStmt.Where")
+		}
+	}
+
+	if n.Order != nil {
+		ctx.WritePlain(" ")
+		if err := n.Order.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore DeleteStmt.Order")
+		}
+	}
+
+	if n.Limit != nil {
+		ctx.WritePlain(" ")
+		if err := n.Limit.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore DeleteStmt.Limit")
+		}
+	}
+
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -1425,11 +1498,13 @@ func (n *DeleteStmt) Accept(v Visitor) (Node, bool) {
 	}
 	n.TableRefs = node.(*TableRefsClause)
 
-	node, ok = n.Tables.Accept(v)
-	if !ok {
-		return n, false
+	if n.Tables != nil {
+		node, ok = n.Tables.Accept(v)
+		if !ok {
+			return n, false
+		}
+		n.Tables = node.(*DeleteTableList)
 	}
-	n.Tables = node.(*DeleteTableList)
 
 	if n.Where != nil {
 		node, ok = n.Where.Accept(v)
@@ -1473,7 +1548,69 @@ type UpdateStmt struct {
 
 // Restore implements Node interface.
 func (n *UpdateStmt) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WriteKeyWord("UPDATE ")
+
+	if n.TableHints != nil && len(n.TableHints) != 0 {
+		ctx.WritePlain("/*+ ")
+		for i, tableHint := range n.TableHints {
+			if err := tableHint.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore UpdateStmt.TableHints[%d]", i)
+			}
+		}
+		ctx.WritePlain("*/ ")
+	}
+
+	switch n.Priority {
+	case mysql.LowPriority:
+		ctx.WriteKeyWord("LOW_PRIORITY ")
+	}
+	if n.IgnoreErr {
+		ctx.WriteKeyWord("IGNORE ")
+	}
+
+	if err := n.TableRefs.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occur while restore UpdateStmt.TableRefs")
+	}
+
+	ctx.WriteKeyWord(" SET ")
+	for i, assignment := range n.List {
+		if i != 0 {
+			ctx.WritePlain(", ")
+		}
+
+		if err := assignment.Column.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occur while restore UpdateStmt.List[%d].Column", i)
+		}
+
+		ctx.WritePlain("=")
+
+		if err := assignment.Expr.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occur while restore UpdateStmt.List[%d].Expr", i)
+		}
+	}
+
+	if n.Where != nil {
+		ctx.WriteKeyWord(" WHERE ")
+		if err := n.Where.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occur while restore UpdateStmt.Where")
+		}
+	}
+
+	if n.Order != nil {
+		ctx.WritePlain(" ")
+		if err := n.Order.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occur while restore UpdateStmt.Order")
+		}
+	}
+
+	if n.Limit != nil {
+		ctx.WritePlain(" ")
+		if err := n.Limit.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occur while restore UpdateStmt.Limit")
+		}
+	}
+
+	return nil
 }
 
 // Accept implements Node Accept interface.
@@ -1661,18 +1798,6 @@ func (n *ShowStmt) Restore(ctx *RestoreCtx) error {
 		}
 		return nil
 	}
-	restoreUserName := func() error {
-		if n.User.CurrentUser {
-			ctx.WriteKeyWord("CURRENT_USER")
-		} else {
-			ctx.WriteString(n.User.Username)
-			if n.User.Hostname != "" {
-				ctx.WritePlain("@")
-				ctx.WriteString(n.User.Hostname)
-			}
-		}
-		return nil
-	}
 
 	ctx.WriteKeyWord("SHOW ")
 	switch n.Tp {
@@ -1694,12 +1819,16 @@ func (n *ShowStmt) Restore(ctx *RestoreCtx) error {
 		ctx.WriteName(n.DBName)
 	case ShowCreateUser:
 		ctx.WriteKeyWord("CREATE USER ")
-		restoreUserName()
+		if err := n.User.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while restore ShowStmt.User")
+		}
 	case ShowGrants:
 		ctx.WriteKeyWord("GRANTS")
 		if n.User != nil {
 			ctx.WriteKeyWord(" FOR ")
-			restoreUserName()
+			if err := n.User.Restore(ctx); err != nil {
+				return errors.Annotate(err, "An error occurred while restore ShowStmt.User")
+			}
 		}
 	case ShowMasterStatus:
 		ctx.WriteKeyWord("MASTER STATUS")
