@@ -12,9 +12,9 @@ online-dsn:
   maxallowedpacket: 419437
   params:
     charset: utf8mb4
-  timeout: 60
-  read-timeout: 70
-  write-timeout: 80
+  timeout: 60s
+  read-timeout: 70s
+  write-timeout: 80s
   allow-native-passwords: false
   allow-old-passwords: true
   disable: false
@@ -32,9 +32,9 @@ test-dsn:
   maxallowedpacket: 4194309
   params:
     charset: utf8mb4
-  timeout: 50
-  read-timeout: 40
-  write-timeout: 30
+  timeout: 50s
+  read-timeout: 40s
+  write-timeout: 30s
   allow-native-passwords: false
   allow-old-passwords: true
   disable: false

@@ -238,9 +238,9 @@ type Dsn struct {
 	ServerPubKey     string            `yaml:"server-public-key"`  // Server public key name
 	MaxAllowedPacket int               `ymal:"max-allowed-packet"` // Max packet size allowed
 	Params           map[string]string `yaml:"params"`             // Other Connection parameters, `SET param=val`, `SET NAMES charset`
-	Timeout          int               `yaml:"timeout"`            // Dial timeout
-	ReadTimeout      int               `yaml:"read-timeout"`       // I/O read timeout
-	WriteTimeout     int               `yaml:"write-timeout"`      // I/O write timeout
+	Timeout          string            `yaml:"timeout"`            // Dial timeout
+	ReadTimeout      string            `yaml:"read-timeout"`       // I/O read timeout
+	WriteTimeout     string            `yaml:"write-timeout"`      // I/O write timeout
 
 	AllowNativePasswords bool `yaml:"allow-native-passwords"` // Allows the native password authentication method
 	AllowOldPasswords    bool `yaml:"allow-old-passwords"`    // Allows the old insecure password method
@@ -255,6 +255,7 @@ func newDSN(cfg *mysql.Config) *Dsn {
 		Net:                  "tcp",
 		Schema:               "information_schema",
 		Charset:              "utf8",
+		Timeout:              "3s",
 		AllowNativePasswords: true,
 		Params:               make(map[string]string),
 		MaxAllowedPacket:     4 << 20, // 4 MiB
@@ -282,16 +283,16 @@ func newDSN(cfg *mysql.Config) *Dsn {
 	dsn.MaxAllowedPacket = cfg.MaxAllowedPacket
 	dsn.ServerPubKey = cfg.ServerPubKey
 	dsn.TLS = cfg.TLSConfig
-	dsn.Timeout = int(cfg.Timeout / time.Second)
-	dsn.ReadTimeout = int(cfg.ReadTimeout / time.Second)
-	dsn.WriteTimeout = int(cfg.WriteTimeout / time.Second)
+	dsn.Timeout = cfg.Timeout.String()
+	dsn.ReadTimeout = cfg.ReadTimeout.String()
+	dsn.WriteTimeout = cfg.WriteTimeout.String()
 	dsn.AllowNativePasswords = cfg.AllowNativePasswords
 	dsn.AllowOldPasswords = cfg.AllowOldPasswords
 	return dsn
 }
 
 // newMySQLConfig convert Dsn to go-sql-drive Config
-func (env *Dsn) newMySQLConifg() (*mysql.Config, error) {
+func (env *Dsn) newMySQLConfig() (*mysql.Config, error) {
 	var err error
 	dsn := mysql.NewConfig()
 
@@ -313,9 +314,18 @@ func (env *Dsn) newMySQLConifg() (*mysql.Config, error) {
 	dsn.MaxAllowedPacket = env.MaxAllowedPacket
 	dsn.ServerPubKey = env.ServerPubKey
 	dsn.TLSConfig = env.TLS
-	dsn.Timeout = time.Duration(env.Timeout) * time.Second
-	dsn.ReadTimeout = time.Duration(env.ReadTimeout) * time.Second
-	dsn.WriteTimeout = time.Duration(env.WriteTimeout) * time.Second
+	if env.Timeout != "" {
+		dsn.Timeout, err = time.ParseDuration(env.Timeout)
+		LogIfError(err, "timeout: '%s'", env.Timeout)
+	}
+	if env.WriteTimeout != "" {
+		dsn.WriteTimeout, err = time.ParseDuration(env.WriteTimeout)
+		LogIfError(err, "writeTimeout: '%s'", env.WriteTimeout)
+	}
+	if env.ReadTimeout != "" {
+		dsn.ReadTimeout, err = time.ParseDuration(env.ReadTimeout)
+		LogIfError(err, "readTimeout: '%s'", env.ReadTimeout)
+	}
 	dsn.AllowNativePasswords = env.AllowNativePasswords
 	dsn.AllowOldPasswords = env.AllowOldPasswords
 	return dsn, err
@@ -324,7 +334,7 @@ func (env *Dsn) newMySQLConifg() (*mysql.Config, error) {
 // 解析命令行DSN输入
 func parseDSN(odbc string, d *Dsn) *Dsn {
 	dsn := newDSN(nil)
-	var addr, user, password, schema, charset string
+	var addr, user, password, schema, charset, timeout string
 	if odbc == FormatDSN(d) {
 		return d
 	}
@@ -336,6 +346,7 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 		password = d.Password
 		schema = d.Schema
 		charset = d.Charset
+		timeout = d.Timeout
 	}
 
 	// 设置为空表示禁用环境
@@ -398,6 +409,8 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 				switch arg {
 				case "charset":
 					charset = val
+				case "timeout":
+					timeout = val
 				default:
 				}
 			}
@@ -414,11 +427,17 @@ func parseDSN(odbc string, d *Dsn) *Dsn {
 		charset = "utf8"
 	}
 
+	// 默认连接数据库超时时间 3s
+	if timeout == "" {
+		timeout = "3s"
+	}
+
 	dsn.Addr = addr
 	dsn.User = user
 	dsn.Password = password
 	dsn.Schema = schema
 	dsn.Charset = charset
+	dsn.Timeout = timeout
 	return dsn
 }
 
@@ -437,7 +456,7 @@ func FormatDSN(env *Dsn) string {
 	if env == nil || env.Disable {
 		return ""
 	}
-	dsn, err := env.newMySQLConifg()
+	dsn, err := env.newMySQLConfig()
 	if err != nil {
 		return ""
 	}
