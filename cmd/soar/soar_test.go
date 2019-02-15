@@ -63,7 +63,7 @@ func Test_Main_More(_ *testing.T) {
 	orgRerportType := common.Config.ReportType
 	for _, typ := range []string{
 		"json", "html", "markdown", "fingerprint", "compress", "pretty", "rewrite",
-		"ast", "tiast", "ast-json", "tiast-json", "tokenize", "lint", "tables",
+		"ast", "tiast", "ast-json", "tiast-json", "tokenize", "lint", "tables", "query-type",
 	} {
 		common.Config.ReportType = typ
 		main()

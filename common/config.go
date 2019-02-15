@@ -885,6 +885,11 @@ var ReportTypes = []ReportType{
 		Example:     `echo "select * from film" | soar -report-type meta`,
 	},
 	{
+		Name:        "query-type",
+		Description: "SQL 语句的请求类型",
+		Example:     `echo "select * from film" | soar -report-type query-type`,
+	},
+	{
 		Name:        "fingerprint",
 		Description: "输出SQL的指纹",
 		Example:     `echo "select * from film where language_id=1" | soar -report-type fingerprint`,

@@ -237,3 +237,19 @@ func TestNewLines(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestQueryType(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	var testSQLs = []string{
+		`(select 1)`,
+	}
+	err := common.GoldenDiff(func() {
+		for _, buf := range append(testSQLs, common.TestSQLs...) {
+			fmt.Println(QueryType(buf))
+		}
+	}, t.Name(), update)
+	if nil != err {
+		t.Fatal(err)
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

@@ -163,6 +163,10 @@ func main() {
 			_, err = pretty.Println(ast.Tokenize(sql))
 			common.LogIfWarn(err, "")
 			continue
+		case "query-type":
+			// query type by first key word
+			fmt.Println(ast.QueryType(sql))
+			continue
 		default:
 			// SQL 签名
 			id = query.Id(fingerprint)

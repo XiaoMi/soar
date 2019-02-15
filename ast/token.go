@@ -986,3 +986,16 @@ func NewLines(buf []byte) int {
 	}
 	return newLines
 }
+
+// QueryType get query type such as SELECT/INSERT/DELETE/CREATE/ALTER
+func QueryType(sql string) string {
+	var typ string
+	tokens := Tokenizer(sql)
+	for _, token := range tokens {
+		if val, ok := mySQLKeywords[token.Val]; ok {
+			typ = val
+			break
+		}
+	}
+	return typ
+}
