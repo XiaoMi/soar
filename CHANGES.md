@@ -1,8 +1,13 @@
 # CHANGELOG
 
+## 2019-02
+- add go.mod for go1.11
+- add new -report-type query-type
+- add new heuristic rule SEC.004
+- fix #196 wrong ip/password will cause soar -check-config hangup
+
 ## 2019-01
 
-- DOING: english translation
 - add mysql environment verbose info
 - add JSONFind function, which support JSON iterate
 - add new test database `world_x`

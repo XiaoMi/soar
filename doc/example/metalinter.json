@@ -17,7 +17,9 @@
         "vet"
     ],
     "Exclude": [
-        "MagicWordSZjYPIDgod1M8XqYEwhsdlzv2SyAtjy8"
+        "MagicWordSZjYPIDgod1M8XqYEwhsdlzv2SyAtjy8",
+        "src/internal",
+        "src/runtime"
     ],
     "Deadline": "5m"
 }

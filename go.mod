@@ -1,0 +1,38 @@
+module github.com/XiaoMi/soar
+
+require (
+	github.com/StackExchange/wmi v0.0.0-20180725035823-b12b22c5341f
+	github.com/astaxie/beego v1.10.1
+	github.com/cznic/mathutil v0.0.0-20181021201202-eba54fb065b7
+	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
+	github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813
+	github.com/go-ole/go-ole v0.0.0-20181122093336-ae2e2a20879a
+	github.com/go-sql-driver/mysql v0.0.0-20181218123637-c45f530f8e7f
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/golang/protobuf v0.0.0-20181005181728-ddf22928ea3c
+	github.com/kr/pretty v0.1.0
+	github.com/kr/text v0.1.0
+	github.com/percona/go-mysql v0.0.0-20180919090124-fcc026629575
+	github.com/pingcap/errors v0.11.0
+	github.com/pingcap/parser v0.0.0-20190219020213-64957c596663
+	github.com/pingcap/tidb v0.0.0-20190219020246-ed7bb0041703
+	github.com/pingcap/tipb v0.0.0-20181012112600-11e33c750323
+	github.com/pkg/errors v0.0.0-20190217225212-856c240a51a2
+	github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446
+	github.com/russross/blackfriday v1.5.2
+	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
+	github.com/shirou/gopsutil v0.0.0-20181121111905-852c7686b5e5
+	github.com/sirupsen/logrus v0.0.0-20180908091816-f3df9aeffda7
+	github.com/tidwall/gjson v1.1.3
+	github.com/tidwall/match v1.0.0
+	github.com/ziutek/mymysql v0.0.0-20180827085628-6b05b0cf718f
+	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16
+	golang.org/x/net v0.0.0-20181101160248-e11730110bbd
+	golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33
+	golang.org/x/text v0.0.0-20181030141323-6f44c5a2ea40
+	google.golang.org/appengine v1.4.0
+	google.golang.org/genproto v0.0.0-20181101192439-c830210a61df
+	google.golang.org/grpc v0.0.0-20181101224342-59a2cfbdf927
+	gopkg.in/yaml.v2 v2.2.1
+	vitess.io/vitess v0.0.0-20190218033422-092479406b27
+)

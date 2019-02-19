@@ -92,13 +92,13 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 					table := gjson.Get(source, "Name.O")
 					if database.String() == "" {
 						if table.String() != "" {
-							tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, table))
+							tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, table.String()))
 						}
 					} else {
 						if table.String() != "" {
-							tables = append(tables, fmt.Sprintf("`%s`.`%s`", database, table))
+							tables = append(tables, fmt.Sprintf("`%s`.`%s`", database.String(), table.String()))
 						} else {
-							tables = append(tables, fmt.Sprintf("`%s`.`dual`", database))
+							tables = append(tables, fmt.Sprintf("`%s`.`dual`", database.String()))
 						}
 					}
 				}
@@ -111,11 +111,11 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 				tb := gjson.Get(table, "Name.O")
 				if db.String() == "" {
 					if tb.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.%s`", defaultDatabase, tb))
+						tables = append(tables, fmt.Sprintf("`%s`.%s`", defaultDatabase, tb.String()))
 					}
 				} else {
 					if tb.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.`%s`", db, tb))
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", db.String(), tb.String()))
 					}
 				}
 			}
