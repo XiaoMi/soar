@@ -241,6 +241,7 @@ func TestNewLines(t *testing.T) {
 func TestQueryType(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	var testSQLs = []string{
+		` select 1`,
 		`/*comment*/ select 1`,
 		`(select 1)`,
 		`grant select on *.* to user@'localhost'`,

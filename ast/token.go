@@ -1000,5 +1000,5 @@ func QueryType(sql string) string {
 			}
 		}
 	}
-	return ""
+	return "UNKNOWN"
 }

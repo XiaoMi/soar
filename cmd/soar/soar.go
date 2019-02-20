@@ -163,10 +163,6 @@ func main() {
 			_, err = pretty.Println(ast.Tokenize(sql))
 			common.LogIfWarn(err, "")
 			continue
-		case "query-type":
-			// query type by first key word
-			fmt.Println(ast.QueryType(sql))
-			continue
 		default:
 			// SQL 签名
 			id = query.Id(fingerprint)
@@ -190,7 +186,8 @@ func main() {
 		if syntaxErr != nil {
 			errContent := fmt.Sprintf("At SQL %d : %v", sqlCounter, syntaxErr)
 			common.Log.Warning(errContent)
-			if common.Config.OnlySyntaxCheck || common.Config.ReportType == "rewrite" {
+			if common.Config.OnlySyntaxCheck || common.Config.ReportType == "rewrite" ||
+				common.Config.ReportType == "query-type" {
 				fmt.Println(errContent)
 				os.Exit(1)
 			}
@@ -207,6 +204,11 @@ func main() {
 		case "tables":
 			env.ChangeDB(vEnv.Connector, q.Query)
 			tables[id] = ast.SchemaMetaInfo(sql, vEnv.Database)
+			continue
+		case "query-type":
+			fmt.Println(syntaxErr)
+			// query type by first key word
+			fmt.Println(ast.QueryType(sql))
 			continue
 		}
 
