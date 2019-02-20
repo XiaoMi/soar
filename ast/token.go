@@ -446,6 +446,7 @@ var mySQLKeywords = map[string]string{
 	"geometry":           "GEOMETRY",
 	"geometrycollection": "GEOMETRYCOLLECTION",
 	"global":             "GLOBAL",
+	"grant":              "GRANT",
 	"group":              "GROUP",
 	"group_concat":       "GROUP_CONCAT",
 	"having":             "HAVING",
@@ -512,6 +513,7 @@ var mySQLKeywords = map[string]string{
 	"reorganize":         "REORGANIZE",
 	"repair":             "REPAIR",
 	"replace":            "REPLACE",
+	"revoke":             "REVOKE",
 	"right":              "RIGHT",
 	"rlike":              "REGEXP",
 	"rollback":           "ROLLBACK",
@@ -989,13 +991,14 @@ func NewLines(buf []byte) int {
 
 // QueryType get query type such as SELECT/INSERT/DELETE/CREATE/ALTER
 func QueryType(sql string) string {
-	var typ string
-	tokens := Tokenizer(sql)
+	tokens := Tokenize(sql)
 	for _, token := range tokens {
-		if val, ok := mySQLKeywords[token.Val]; ok {
-			typ = val
-			break
+		// use strings.Fields for 'ALTER TABLE' token split
+		for _, tk := range strings.Fields(strings.TrimSpace(token.Val)) {
+			if val, ok := mySQLKeywords[strings.ToLower(tk)]; ok {
+				return val
+			}
 		}
 	}
-	return typ
+	return ""
 }

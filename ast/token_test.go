@@ -241,8 +241,14 @@ func TestNewLines(t *testing.T) {
 func TestQueryType(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	var testSQLs = []string{
+		`/*comment*/ select 1`,
 		`(select 1)`,
+		`grant select on *.* to user@'localhost'`,
+		`REVOKE INSERT ON *.* FROM 'jeffrey'@'localhost';`,
 	}
+	// fmt.Println(testSQLs[len(testSQLs)-1])
+	// fmt.Println(QueryType(testSQLs[len(testSQLs)-1]))
+	// return
 	err := common.GoldenDiff(func() {
 		for _, buf := range append(testSQLs, common.TestSQLs...) {
 			fmt.Println(QueryType(buf))
