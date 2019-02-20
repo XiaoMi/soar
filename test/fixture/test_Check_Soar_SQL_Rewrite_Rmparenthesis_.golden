@@ -1,0 +1,1 @@
+select col from a where col = 1

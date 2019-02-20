@@ -1,0 +1,1 @@
+select sum(col1) from tbl group by 1

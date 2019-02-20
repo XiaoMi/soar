@@ -1,0 +1,1 @@
+select state, COUNT(*) from Drivers where state in ('GA', 'TX') group by state order by state asc
