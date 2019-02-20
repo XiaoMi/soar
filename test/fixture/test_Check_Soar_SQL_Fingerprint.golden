@@ -1,0 +1,85 @@
+select * from film where length = ?
+select * from film where length is null
+select * from film having title = ?
+select * from sakila.film where length >= ?
+select * from sakila.film where length >= ?
+select * from film where length between ? and ?
+select * from film where title like ?
+select * from film where title is not null
+select * from film where length = ? and title = ?
+select * from film where length > ? and title = ?
+select * from film where length > ? and language_id < ? and title = ?
+select * from film where length > ? and language_id < ?
+select release_year, sum(length) from film where length = ? and language_id = ? group by release_year
+select release_year, sum(length) from film where length >= ? group by release_year
+select release_year, language_id, sum(length) from film group by release_year, language_id
+select release_year, sum(length) from film where length = ? group by language_id)
+select release_year, sum(film_id) from film group by release_year
+select * from address group by address,district
+select title from film where abs(language_id) = ? group by title
+select language_id from film where length = ? group by release_year order by language_id
+select release_year from film where length = ? group by release_year order by release_year
+select * from film where length = ? order by release_year, language_id desc
+select release_year from film where length = ? group by release_year order by release_year limit ?
+select * from film where length = ? order by release_year limit ?
+select * from film order by release_year limit ?
+select film_id from film order by release_year limit ?
+select * from film where length > ? order by length limit ?
+select * from film where length < ? order by length limit ?
+select * from customer where address_id in(?+) order by last_name
+select * from film where release_year = ? and length != ? order by title
+select title from film where release_year = ?
+select title, replacement_cost from film where language_id = ? and length = ?
+select title from film where language_id > ? and length > ?
+select * from film where length = ? and title = ? order by release_year
+select * from film where length > ? and title = ? order by release_year
+select * from film where length > ? order by release_year
+select * from city a inner join country b on a.country_id=b.country_id
+select * from city a left join country b on a.country_id=b.country_id
+select * from city a right join country b on a.country_id=b.country_id
+select * from city a left join country b on a.country_id=b.country_id where b.last_update is null
+select * from city a right join country b on a.country_id=b.country_id where a.last_update is null
+select * from city a left join country b on a.country_id=b.country_id union select * from city a right join country b on a.country_id=b.country_id
+select * from city a right join country b on a.country_id=b.country_id where a.last_update is null union select * from city a left join country b on a.country_id=b.country_id where b.last_update is null
+select country_id, last_update from city natural join country
+select country_id, last_update from city natural left join country
+select country_id, last_update from city natural right join country
+select a.country_id, a.last_update from city a straight_join country b on a.country_id=b.country_id
+select a.address, a.postal_code from sakila.address a where a.city_id in(?+)
+select city from( select city_id from city where city = ? order by last_update desc limit ?, ?) i join city on (i.city_id = city.city_id) join country on (country.country_id = city.country_id) order by city desc
+delete city, country from city inner join country using (country_id) where city.city_id = ?
+delete city from city left join country on city.country_id = country.country_id where country.country is null
+delete a1, a2 from city as a1 inner join country as a2 where a1.country_id=a2.country_id
+delete from a1, a2 using city as a1 inner join country as a2 where a1.country_id=a2.country_id
+delete from film where length > ?
+update city inner join country using(country_id) set city.city = ?, city.last_update = ?, country.country = ? where city.city_id=?
+update city inner join country on city.country_id = country.country_id inner join address on city.city_id = address.city_id set city.city = ?, city.last_update = ?, country.country = ? where city.city_id=?
+update city, country set city.city = ?, city.last_update = ?, country.country = ? where city.country_id = country.country_id and city.city_id=?
+update film set length = ? where language_id = ?
+insert into city (country_id) select country_id from country
+insert into city (country_id) values(?+)
+insert into city (country_id) values(?+)
+insert into city (country_id) select ? from dual
+replace into city (country_id) select country_id from country
+replace into city (country_id) values(?+)
+replace into city (country_id) values(?+)
+replace into city (country_id) select ? from dual
+select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from ( select film_id from film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film ) film
+select * from film where language_id = (select language_id from language limit ?)
+select * from city i left join country o on i.city_id=o.country_id union select * from city i right join country o on i.city_id=o.country_id
+select * from (select * from actor where last_update=? and last_name=?) t where last_update=? and last_name=? group by first_name
+select * from city i left join country o on i.city_id=o.country_id union select * from city i right join country o on i.city_id=o.country_id
+select * from city i left join country o on i.city_id=o.country_id where o.country_id is null union select * from city i right join country o on i.city_id=o.country_id where i.city_id is null
+select first_name,last_name,email from customer straight_join address on customer.address_id=address.address_id
+select id,name from (select address from customer_list where sid=? order by phone limit ?,?) a join customer_list l on (a.address=l.address) join city c on (c.city=l.city) order by phone desc
+select * from film where date(last_update)=?
+select last_update from film group by date(last_update)
+select last_update from film order by date(last_update)
+select description from film where description in(?+) group by description
+alter table address add index idx_city_id(city_id)
+alter table inventory add index `idx_store_film` (`store_id`,`film_id`)
+alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`)
+select date_format(t.last_update, ?), count(distinct (t.city)) from city t where t.last_update > ? and t.city like ? and t.city = ? group by date_format(t.last_update, ?) order by date_format(t.last_update, ?)
+create table hello.t (id int unsigned)
+select * from tb where data >= ?
+alter table tb alter column id drop default

@@ -1,0 +1,56 @@
+# Query: 7EC60923DD614DF2
+
+★ ☆ ☆ ☆ ☆ 30分
+
+```sql
+create  table  a  (a  int, b  int, c  int, d  int)
+```
+
+## 建议为表添加注释
+
+* **Item:**  CLA.011
+
+* **Severity:**  L1
+
+* **Content:**  为表添加注释能够使得表的意义更明确，从而为日后的维护带来极大的便利。
+
+## 请为列添加默认值
+
+* **Item:**  COL.004
+
+* **Severity:**  L1
+
+* **Content:**  请为列添加默认值，如果是 ALTER 操作，请不要忘记将原字段的默认值写上。字段无默认值，当表较大时无法在线变更表结构。
+
+## 列未添加注释
+
+* **Item:**  COL.005
+
+* **Severity:**  L1
+
+* **Content:**  建议对表中每个列添加注释，来明确每个列在表中的含义及作用。
+
+## 表中包含有太多的列
+
+* **Item:**  COL.006
+
+* **Severity:**  L3
+
+* **Content:**  表中包含有太多的列
+
+## 未指定主键或主键非 int 或 bigint
+
+* **Item:**  KEY.007
+
+* **Severity:**  L4
+
+* **Content:**  未指定主键或主键非 int 或 bigint，建议将主键设置为 int unsigned 或 bigint unsigned。
+
+## 请为表选择合适的存储引擎
+
+* **Item:**  TBL.002
+
+* **Severity:**  L4
+
+* **Content:**  建表或修改表的存储引擎时建议使用推荐的存储引擎，如：innodb
+

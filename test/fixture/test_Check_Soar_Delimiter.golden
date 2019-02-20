@@ -1,0 +1,40 @@
+# Query: 8093354EDF76BFDA
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  b  
+FROM  
+  c
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+# Query: DD1A4C78C3479C1E
+
+★ ★ ★ ★ ☆ 80分
+
+```sql
+
+SELECT  
+  a  
+FROM  
+  b
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+

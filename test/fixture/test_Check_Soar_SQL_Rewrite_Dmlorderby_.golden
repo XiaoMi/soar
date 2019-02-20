@@ -1,0 +1,1 @@
+delete from tbl where col1 = 1

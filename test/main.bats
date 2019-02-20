@@ -29,7 +29,7 @@ load test_helper
 }
 
 # 5. soar 使用 config 配置文件路径是否正确
-# 13.	soar -check-config 数据库连接配置检查 *
+# 13. soar -check-config 数据库连接配置检查 *
 # soar 数据库测试（线上、线下、-allow-online-as-test）
 @test "Check config cases" {
   run ${SOAR_BIN_ENV} -check-config
@@ -61,7 +61,7 @@ load test_helper
   echo "${output}"
   [ $status -eq 0 ]
 }
-# 10.	report 为 json 格式是否正常
+# 10. report 为 json 格式是否正常
 @test "Check soar report for json" {
   ${SOAR_BIN} -query "select * from film" \
     -report-type json > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
@@ -70,7 +70,7 @@ load test_helper
   [ $status -eq 0 ]
 }
 
-# 10.	report 为 markdown 格式是否正常 
+# 10. report 为 markdown 格式是否正常
 @test "Check soar report for markdown" {
   ${SOAR_BIN} -query "select * from film" \
     -report-type markdown > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
@@ -89,7 +89,7 @@ load test_helper
   [ $status -eq 0 ]
 }
 
-# 12.	黑名单功能是否正常
+# 12. 黑名单功能是否正常
 # soar 的日志和黑名单的相对路径都相对于 soar 的二进制文件路径说的
 @test "Check soar blacklist" {
   run ${SOAR_BIN} -blacklist ../etc/soar.blacklist -query "show processlist;"
@@ -97,17 +97,17 @@ load test_helper
   [ -z ${output} ]
 }
 
-# 13.	soar -check-config 数据库连接配置检查 *
+# 13. soar -check-config 数据库连接配置检查 *
 # 参见 5
 
-# 14.	soar -help 检查
+# 14. soar -help 检查
 @test "Check soar help" {
   run ${SOAR_BIN} -help
   [ $status -eq 2 ]
   [ "${#lines[@]}" -gt 30 ]
 }
 
-# 15.	soar 数据库测试（线上、线下、-allow-online-as-test）
+# 15. soar 数据库测试（线上、线下、-allow-online-as-test）
 # 参见 5
 
 # 16. 语法检查（正确）
@@ -123,7 +123,7 @@ load test_helper
   [ -n $ouput ]
 }
 
-# 17.	dsn 检查
+# 17. dsn 检查
 @test "Check soar test dsn root:passwd@host:port/db" {
   run ${SOAR_BIN} -online-dsn="root:pase@D@192.168.12.11:3306/testDB" -print-config
   [ $(expr "$output" : ".*user: root") -ne 0 ]

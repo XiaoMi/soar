@@ -1,0 +1,1 @@
+select sum(col1) from tbl group by col order by null
