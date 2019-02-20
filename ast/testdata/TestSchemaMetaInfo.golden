@@ -8,6 +8,18 @@ select * from ta join tb using (id)
 [`sakila`.`ta` `sakila`.`tb`]
 select * from ta, tb limit 1
 [`sakila`.`ta` `sakila`.`tb`]
+drop table tb
+[`sakila`.tb`]
+drop table db.tb
+[`db`.`tb`]
+drop database db
+[`db`.`dual`]
+create database db
+[`db`.`dual`]
+create index idx_col on tbl (col)
+[`sakila`.tbl`]
+DROP INDEX idx_col on tbl
+[`sakila`.tbl`]
 SELECT * FROM film WHERE length = 86;
 [`sakila`.`film`]
 SELECT * FROM film WHERE length IS NULL;

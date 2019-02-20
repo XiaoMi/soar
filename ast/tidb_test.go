@@ -65,7 +65,16 @@ func TestSchemaMetaInfo(t *testing.T) {
 		"syntax error case",
 		"select * from ta join tb using (id)",
 		"select * from ta, tb limit 1",
+		"drop table tb",
+		"drop table db.tb",
+		"drop database db",
+		"create database db",
+		"create index idx_col on tbl (col)",
+		"DROP INDEX idx_col on tbl",
 	}
+	// fmt.Println(sqls[len(sqls)-1])
+	// fmt.Println(SchemaMetaInfo(sqls[len(sqls)-1], "sakila"))
+	// return
 	err := common.GoldenDiff(func() {
 		for _, sql := range append(sqls, common.TestSQLs...) {
 			fmt.Println(sql)

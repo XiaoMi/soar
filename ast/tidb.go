@@ -103,8 +103,32 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 					}
 				}
 			}
+		case *ast.DropTableStmt:
+			// DDL: DROP TABLE|VIEW
+			schemas := common.JSONFind(jsonString, "Tables")
+			for _, tabs := range schemas {
+				for _, table := range gjson.Parse(tabs).Array() {
+					db := gjson.Get(table.String(), "Schema.O")
+					tb := gjson.Get(table.String(), "Name.O")
+					if db.String() == "" {
+						if tb.String() != "" {
+							tables = append(tables, fmt.Sprintf("`%s`.%s`", defaultDatabase, tb.String()))
+						}
+					} else {
+						if tb.String() != "" {
+							tables = append(tables, fmt.Sprintf("`%s`.`%s`", db.String(), tb.String()))
+						}
+					}
+				}
+			}
+		case *ast.DropDatabaseStmt, *ast.CreateDatabaseStmt:
+			// DDL: DROP|CREATE DATABASE
+			schemas := common.JSONFind(jsonString, "Name")
+			for _, schema := range schemas {
+				tables = append(tables, fmt.Sprintf("`%s`.`dual`", schema))
+			}
 		default:
-			// DDL: CREATE TABLE|DATABASE|INDEX|VIEW
+			// DDL: CREATE TABLE|DATABASE|INDEX|VIEW, DROP INDEX
 			schemas := common.JSONFind(jsonString, "Table")
 			for _, table := range schemas {
 				db := gjson.Get(table, "Schema.O")
