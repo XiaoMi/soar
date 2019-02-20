@@ -162,8 +162,8 @@ vendor: vitess pingcap-parser
 lint: build
 	@echo "$(CGREEN)Run linter check ...$(CEND)"
 	CGO_ENABLED=0 GOMODULE111=off retool do gometalinter.v2 -j 1 --config doc/example/metalinter.json ./...
-	retool do revive -formatter friendly --exclude vendor/... -config doc/example/revive.toml ./...
-	retool do golangci-lint --tests=false run
+	GOMODULE111=off retool do revive -formatter friendly --exclude vendor/... -config doc/example/revive.toml ./...
+	GOMODULE111=off retool do golangci-lint --tests=false run
 	@echo "gometalinter check your code is pretty good"
 
 .PHONY: release

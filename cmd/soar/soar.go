@@ -262,9 +262,7 @@ func main() {
 							}
 						default:
 							// vEnv.VEnvBuild 阶段给出的 ERROR 是 ERR.001
-							if _, ok := mysqlSuggest["ERR.000"]; ok {
-								delete(mysqlSuggest, "ERR.000")
-							}
+							delete(mysqlSuggest, "ERR.000")
 							mysqlSuggest["ERR.001"] = advisor.RuleMySQLError("ERR.001", vEnv.Error)
 							common.Log.Error("BuildVirtualEnv DDL Execute Error : %v", vEnv.Error)
 						}

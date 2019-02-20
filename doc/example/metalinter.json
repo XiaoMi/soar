@@ -13,7 +13,6 @@
         "deadcode",
         "ineffassign",
         "varcheck",
-        "gas",
         "vet"
     ],
     "Exclude": [
