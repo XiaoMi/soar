@@ -10,18 +10,18 @@
 
 ## SOAR
 
-SOAR(SQL Optimizer And Rewriter)是一个对SQL进行优化和改写的自动化工具。 由小米人工智能与云平台的数据库团队开发与维护。
+SOAR(SQL Optimizer And Rewriter) 是一个对 SQL 进行优化和改写的自动化工具。 由小米人工智能与云平台的数据库团队开发与维护。
 
 ## 功能特点
 
-* 跨平台支持（支持Linux, Mac环境，Windows环境理论上也支持，不过未全面测试）
-* 目前只支持 MySQL 语法族协议的SQL优化
+* 跨平台支持（支持 Linux, Mac 环境，Windows 环境理论上也支持，不过未全面测试）
+* 目前只支持 MySQL 语法族协议的 SQL 优化
 * 支持基于启发式算法的语句优化
 * 支持复杂查询的多列索引优化（UPDATE, INSERT, DELETE, SELECT）
-* 支持EXPLAIN信息丰富解读
-* 支持SQL指纹、压缩和美化
-* 支持同一张表多条ALTER请求合并
-* 支持自定义规则的SQL改写
+* 支持 EXPLAIN 信息丰富解读
+* 支持 SQL 指纹、压缩和美化
+* 支持同一张表多条 ALTER 请求合并
+* 支持自定义规则的 SQL 改写
 
 ## 快速入门
 
@@ -34,8 +34,8 @@ SOAR(SQL Optimizer And Rewriter)是一个对SQL进行优化和改写的自动化
 
 ## 交流与反馈
 
-* 欢迎通过Github Issues提交问题报告与建议
-* QQ群: 779359816(满) 758940447(新)
+* 欢迎通过 Github Issues 提交问题报告与建议
+* QQ 群：779359816（满） 758940447（新）
 * [Gitter](https://gitter.im/xiaomi-dba/soar) 推荐
 
  ![xiaomi_sa](https://raw.githubusercontent.com/XiaoMi/soar/master/doc/images/xiaomi_sa.png)
