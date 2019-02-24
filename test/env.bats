@@ -18,5 +18,14 @@ load test_helper
 
 @test "Check dial timeout" {
   run timeout 1 ${SOAR_BIN} -test-dsn "1.1.1.1" -check-config
+  echo "$output"
   [ $status -eq 124 ]
+}
+
+# 12. 带数据库连接时黑名单功能是否正常
+# soar 的日志和黑名单的相对路径都相对于 soar 的二进制文件路径说的
+@test "Check Soar With Mysql Connect Blacklist" {
+  run ${SOAR_BIN_ENV} -blacklist ../etc/soar.blacklist -query "show processlist;"
+  [ $status -eq 0 ]
+  [ -z ${output} ]
 }

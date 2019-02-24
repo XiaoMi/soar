@@ -146,9 +146,17 @@ load test_helper
   [ ${status} -eq 0 ]
 }
 
-#
-@test "Check -report-type rewrite -rewrite-rules mergealter" {
-  ${SOAR_BIN} -list-test-sqls |${SOAR_BIN} -report-type rewrite -rewrite-rules mergealter | sort > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+# 20. 单条 SQL 中 JOIN 表的最大数量超过 2
+@test "Check Max Join Table Count Overflow" {
+  ${SOAR_BIN}  -max-join-table-count 2 -query="select a from b join c join d" > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  run golden_diff
+  echo "${output}"
+  [ $status -eq 0 ]
+}
+
+# 21. 单条 SQL 中 JOIN 表未超过时是否正常默认为 5
+@test "Check Max Join Table Count Default" {
+  ${SOAR_BIN} -query="select a from b join c join d" > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
   echo "${output}"
   [ $status -eq 0 ]
