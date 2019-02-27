@@ -124,10 +124,11 @@ load test_helper
 }
 
 # 10. 检查 SQL 改写 mergealter
+# Linux macOS sort 排序不一致 https://unix.stackexchange.com/questions/362728/why-does-gnu-sort-sort-differently-on-my-osx-machine-and-linux-machine
 @test "Check Soar SQL Rewrite Mergealter " {
-  ${SOAR_BIN} -report-type "rewrite" -rewrite-rules "mergealter" \
-  -query "ALTER TABLE t2 DROP COLUMN c;ALTER TABLE t2 DROP COLUMN d;" > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
+  ${SOAR_BIN} -list-test-sqls |${SOAR_BIN} -report-type rewrite -rewrite-rules mergealter | sort -bdfi > ${BATS_TMP_DIRNAME}/${BATS_TEST_NAME}.golden
   run golden_diff
+  echo "${output}"
   [ $status -eq 0 ]
 }
 
