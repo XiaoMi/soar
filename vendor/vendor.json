@@ -111,106 +111,106 @@
 			"revisionTime": "2018-10-24T15:10:47Z"
 		},
 		{
-			"checksumSHA1": "SEiIj/X95cyoI8/a0z2XBpzE+CI=",
+			"checksumSHA1": "w2ovuDiVpyUmQcUbj2YxcsTpXvQ=",
 			"path": "github.com/pingcap/parser",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
-			"checksumSHA1": "saYDWHgFCkZAYZeOGfowg2TEAss=",
+			"checksumSHA1": "6zdPzVXS7qRwXub201Wry93H350=",
 			"path": "github.com/pingcap/parser/ast",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "40q2uTuOqgcdXxoauVNVO+FCxe8=",
 			"path": "github.com/pingcap/parser/auth",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "t4UHo966WzU9Z0IJkyGHRp0loOk=",
 			"path": "github.com/pingcap/parser/charset",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "ohLJW2u9NJEzYIJL/AjOqcuKfMY=",
 			"path": "github.com/pingcap/parser/format",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "AqNgtzIGY8g7Ojd9ofE8EtKW2mk=",
 			"path": "github.com/pingcap/parser/model",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
-			"checksumSHA1": "SrliCbNvJrQExC1gULpw7FAiE6s=",
+			"checksumSHA1": "VTENSvegjPoIFuTjrha5taOkElk=",
 			"path": "github.com/pingcap/parser/mysql",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "olapD16WCMBU9vrA5PtlERGFfXw=",
 			"path": "github.com/pingcap/parser/opcode",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "TF2rMYy9ewgZpFsJb+jaGXXqZqc=",
 			"path": "github.com/pingcap/parser/terror",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "dxjAHfRcmXkQdf0HeueDrUO+BcM=",
 			"path": "github.com/pingcap/parser/types",
-			"revision": "f7d75264dcc6bc53a720eeffeb47ab8db9fb3801",
-			"revisionTime": "2019-02-21T06:24:14Z"
+			"revision": "9aec15dc380e02d431959b4d6ecc9ea6a7857929",
+			"revisionTime": "2019-02-27T06:31:08Z"
 		},
 		{
 			"checksumSHA1": "uOrWw9c47zwN6COxonFJ0t2IMcM=",
 			"path": "github.com/pingcap/tidb/sessionctx/stmtctx",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "IJSv0YocnSmIZRpgQJ1pLtHL8vY=",
 			"path": "github.com/pingcap/tidb/types",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "fPdBwAtPVKOr7YAyOMnRxyHixoM=",
 			"path": "github.com/pingcap/tidb/types/json",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "tY4KSNzuTGm+dgV6ByZEGa6mv5E=",
 			"path": "github.com/pingcap/tidb/types/parser_driver",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "oSpVUrmVZl6RPxrpwtKgeNodckQ=",
 			"path": "github.com/pingcap/tidb/util/execdetails",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "RdbHgQWMHjRtKjqPcTX81k1V3sw=",
 			"path": "github.com/pingcap/tidb/util/hack",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "xSyepiuqsoaaeDch7cXeumvVHKM=",
 			"path": "github.com/pingcap/tidb/util/memory",
-			"revision": "38a453d29c8cb6644c6bfd28be4efe243e10c161",
-			"revisionTime": "2019-02-21T13:18:03Z"
+			"revision": "839772b528a01c5e9ba1a9a48a02434efb6485c6",
+			"revisionTime": "2019-02-27T06:33:03Z"
 		},
 		{
 			"checksumSHA1": "QPIBwDNUFF5Whrnd41S3mkKa4gQ=",
@@ -413,62 +413,62 @@
 		{
 			"checksumSHA1": "aKn1oKcY74N8TRLm3Ayt7Q4bbI4=",
 			"path": "vitess.io/vitess/go/bytes2",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "bhE6CGQgZTIgLPp9lnvlKW/47xc=",
 			"path": "vitess.io/vitess/go/hack",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "w4BH8HL/CgT6aBWojJeZHOj5DZg=",
 			"path": "vitess.io/vitess/go/sqltypes",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "vAIRxI6MHsq3x1hLQwIyw5AvqtI=",
 			"path": "vitess.io/vitess/go/vt/log",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
-			"checksumSHA1": "nRmynSAD/uvTjH0/Ftr9Iz/VsN4=",
+			"checksumSHA1": "1LYIGRrGbMt8LrzFEzH1iUQ5u5M=",
 			"path": "vitess.io/vitess/go/vt/proto/query",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "YLWTmL+rvz0htn0niRMrIUI6rKc=",
 			"path": "vitess.io/vitess/go/vt/proto/topodata",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "1gA4wbQ2DiVjeLJauYSQiuBJiE0=",
 			"path": "vitess.io/vitess/go/vt/proto/vtgate",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "qz32abYdmm9NfKTc++K0l1EvXXM=",
 			"path": "vitess.io/vitess/go/vt/proto/vtrpc",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "lpx8L51nDqrhQis64dEBk7RI32k=",
 			"path": "vitess.io/vitess/go/vt/sqlparser",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		},
 		{
 			"checksumSHA1": "Jx+gOh/kiBDSZxEIWHyYn9brjdo=",
 			"path": "vitess.io/vitess/go/vt/vterrors",
-			"revision": "b7e5a982740b1bc49dc8129605b9f037370829ae",
-			"revisionTime": "2019-02-20T22:32:46Z"
+			"revision": "667eb19a2d4d50c973732ff3b8199c06df35db92",
+			"revisionTime": "2019-02-26T20:54:22Z"
 		}
 	],
 	"rootPath": "github.com/XiaoMi/soar"
