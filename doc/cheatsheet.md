@@ -39,6 +39,12 @@ test-dsn:
 ```
 
 ```bash
+echo "select title from sakila.film" | ./soar -config soar.yaml
+```
+
+以上命令等价于：
+
+```bash
 echo "select title from sakila.film" | ./soar -test-dsn="root:1t'sB1g3rt@127.0.0.1:3306/sakila" -allow-online-as-test -log-output=soar.log
 ```
 
