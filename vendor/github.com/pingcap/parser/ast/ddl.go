@@ -351,6 +351,7 @@ const (
 	ColumnOptionComment
 	ColumnOptionGenerated
 	ColumnOptionReference
+	ColumnOptionCollate
 )
 
 // ColumnOption is used for parsing column constraint info from SQL.
@@ -365,7 +366,8 @@ type ColumnOption struct {
 	// Stored is only for ColumnOptionGenerated, default is false.
 	Stored bool
 	// Refer is used for foreign key.
-	Refer *ReferenceDef
+	Refer    *ReferenceDef
+	StrValue string
 }
 
 // Restore implements Node interface.
@@ -416,6 +418,12 @@ func (n *ColumnOption) Restore(ctx *RestoreCtx) error {
 		if err := n.Refer.Restore(ctx); err != nil {
 			return errors.Annotate(err, "An error occurred while splicing ColumnOption ReferenceDef")
 		}
+	case ColumnOptionCollate:
+		if n.StrValue == "" {
+			return errors.New("Empty ColumnOption COLLATE")
+		}
+		ctx.WriteKeyWord("COLLATE ")
+		ctx.WritePlain(n.StrValue)
 	default:
 		return errors.New("An error occurred while splicing ColumnOption")
 	}
@@ -1183,6 +1191,14 @@ const (
 	RowFormatCompressed
 	RowFormatRedundant
 	RowFormatCompact
+	TokuDBRowFormatDefault
+	TokuDBRowFormatFast
+	TokuDBRowFormatSmall
+	TokuDBRowFormatZlib
+	TokuDBRowFormatQuickLZ
+	TokuDBRowFormatLzma
+	TokuDBRowFormatSnappy
+	TokuDBRowFormatUncompressed
 )
 
 // OnDuplicateCreateTableSelectType is the option that handle unique key values in 'CREATE TABLE ... SELECT'.
@@ -1281,6 +1297,22 @@ func (n *TableOption) Restore(ctx *RestoreCtx) error {
 			ctx.WriteKeyWord("REDUNDANT")
 		case RowFormatCompact:
 			ctx.WriteKeyWord("COMPACT")
+		case TokuDBRowFormatDefault:
+			ctx.WriteKeyWord("TOKUDB_DEFAULT")
+		case TokuDBRowFormatFast:
+			ctx.WriteKeyWord("TOKUDB_FAST")
+		case TokuDBRowFormatSmall:
+			ctx.WriteKeyWord("TOKUDB_SMALL")
+		case TokuDBRowFormatZlib:
+			ctx.WriteKeyWord("TOKUDB_ZLIB")
+		case TokuDBRowFormatQuickLZ:
+			ctx.WriteKeyWord("TOKUDB_QUICKLZ")
+		case TokuDBRowFormatLzma:
+			ctx.WriteKeyWord("TOKUDB_LZMA")
+		case TokuDBRowFormatSnappy:
+			ctx.WriteKeyWord("TOKUDB_SNAPPY")
+		case TokuDBRowFormatUncompressed:
+			ctx.WriteKeyWord("TOKUDB_UNCOMPRESSED")
 		default:
 			return errors.Errorf("invalid TableOption: TableOptionRowFormat: %d", n.UintValue)
 		}
@@ -1766,6 +1798,9 @@ func (n *PartitionDefinition) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord(" VALUES LESS THAN ")
 		ctx.WritePlain("(")
 		for k, less := range n.LessThan {
+			if k != 0 {
+				ctx.WritePlain(", ")
+			}
 			if err := less.Restore(ctx); err != nil {
 				return errors.Annotatef(err, "An error occurred while restore PartitionDefinition.LessThan[%d]", k)
 			}
@@ -1841,4 +1876,48 @@ func (n *PartitionOptions) Restore(ctx *RestoreCtx) error {
 	}
 
 	return nil
+}
+
+// RecoverTableStmt is a statement to recover dropped table.
+type RecoverTableStmt struct {
+	ddlNode
+
+	JobID  int64
+	Table  *TableName
+	JobNum int64
+}
+
+// Restore implements Node interface.
+func (n *RecoverTableStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("RECOVER TABLE ")
+	if n.JobID != 0 {
+		ctx.WriteKeyWord("BY JOB ")
+		ctx.WritePlainf("%d", n.JobID)
+	} else {
+		if err := n.Table.Restore(ctx); err != nil {
+			return errors.Annotate(err, "An error occurred while splicing RecoverTableStmt Table")
+		}
+		if n.JobNum > 0 {
+			ctx.WritePlainf(" %d", n.JobNum)
+		}
+	}
+	return nil
+}
+
+// Accept implements Node Accept interface.
+func (n *RecoverTableStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+
+	n = newNode.(*RecoverTableStmt)
+	if n.Table != nil {
+		node, ok := n.Table.Accept(v)
+		if !ok {
+			return n, false
+		}
+		n.Table = node.(*TableName)
+	}
+	return v.Leave(n)
 }

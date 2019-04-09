@@ -155,6 +155,8 @@ func (ft *FieldType) CompactStr() string {
 	case mysql.TypeBit, mysql.TypeShort, mysql.TypeTiny, mysql.TypeInt24, mysql.TypeLong, mysql.TypeLonglong, mysql.TypeVarchar, mysql.TypeString, mysql.TypeVarString:
 		// Flen is always shown.
 		suffix = fmt.Sprintf("(%d)", displayFlen)
+	case mysql.TypeYear:
+		suffix = fmt.Sprintf("(%d)", ft.Flen)
 	}
 	return ts + suffix
 }
@@ -316,4 +318,17 @@ func (ft *FieldType) StorageLength() int {
 	default:
 		return VarStorageLen
 	}
+}
+
+// HasCharset indicates if a COLUMN has an associated charset. Returning false here prevents some information
+// statements(like `SHOW CREATE TABLE`) from attaching a CHARACTER SET clause to the column.
+func HasCharset(ft *FieldType) bool {
+	switch ft.Tp {
+	case mysql.TypeVarchar, mysql.TypeString, mysql.TypeVarString, mysql.TypeBlob,
+		mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+		return !mysql.HasBinaryFlag(ft.Flag)
+	case mysql.TypeEnum, mysql.TypeSet:
+		return true
+	}
+	return false
 }

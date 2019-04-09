@@ -67,6 +67,15 @@ const (
 	ColumnInfoVersion0 = uint64(0)
 	// ColumnInfoVersion1 means the column info version is 1.
 	ColumnInfoVersion1 = uint64(1)
+	// ColumnInfoVersion2 means the column info version is 2.
+	// This is for v2.1.7 to Compatible with older versions charset problem.
+	// Old version such as v2.0.8 treat utf8 as utf8mb4, because there is no UTF8 check in v2.0.8.
+	// After version V2.1.2 (PR#8738) , TiDB add UTF8 check, then the user upgrade from v2.0.8 insert some UTF8MB4 characters will got error.
+	// This is not compatibility for user. Then we try to fix this in PR #9820, and increase the version number.
+	ColumnInfoVersion2 = uint64(2)
+
+	// CurrLatestColumnInfoVersion means the latest column info in the current TiDB.
+	CurrLatestColumnInfoVersion = ColumnInfoVersion2
 )
 
 // ColumnInfo provides meta data describing of a table column.
@@ -147,6 +156,30 @@ func FindColumnInfo(cols []*ColumnInfo, name string) *ColumnInfo {
 // for use of execution phase.
 const ExtraHandleID = -1
 
+const (
+	// TableInfoVersion0 means the table info version is 0.
+	// Upgrade from v2.1.1 or v2.1.2 to v2.1.3 and later, and then execute a "change/modify column" statement
+	// that does not specify a charset value for column. Then the following error may be reported:
+	// ERROR 1105 (HY000): unsupported modify charset from utf8mb4 to utf8.
+	// To eliminate this error, we will not modify the charset of this column
+	// when executing a change/modify column statement that does not specify a charset value for column.
+	// This behavior is not compatible with MySQL.
+	TableInfoVersion0 = uint16(0)
+	// TableInfoVersion1 means the table info version is 1.
+	// When we execute a change/modify column statement that does not specify a charset value for column,
+	// we set the charset of this column to the charset of table. This behavior is compatible with MySQL.
+	TableInfoVersion1 = uint16(1)
+	// TableInfoVersion2 means the table info version is 2.
+	// This is for v2.1.7 to Compatible with older versions charset problem.
+	// Old version such as v2.0.8 treat utf8 as utf8mb4, because there is no UTF8 check in v2.0.8.
+	// After version V2.1.2 (PR#8738) , TiDB add UTF8 check, then the user upgrade from v2.0.8 insert some UTF8MB4 characters will got error.
+	// This is not compatibility for user. Then we try to fix this in PR #9820, and increase the version number.
+	TableInfoVersion2 = uint16(2)
+
+	// CurrLatestTableInfoVersion means the latest table info in the current TiDB.
+	CurrLatestTableInfoVersion = TableInfoVersion2
+)
+
 // ExtraHandleName is the name of ExtraHandle Column.
 var ExtraHandleName = NewCIStr("_tidb_rowid")
 
@@ -179,12 +212,17 @@ type TableInfo struct {
 
 	// ShardRowIDBits specify if the implicit row ID is sharded.
 	ShardRowIDBits uint64
+	// MaxShardRowIDBits uses to record the max ShardRowIDBits be used so far.
+	MaxShardRowIDBits uint64 `json:"max_shard_row_id_bits"`
 
 	Partition *PartitionInfo `json:"partition"`
 
 	Compression string `json:"compression"`
 
 	View *ViewInfo `json:"view"`
+
+	// Version means the version of the table info.
+	Version uint16 `json:"version"`
 }
 
 // GetPartitionInfo returns the partition information.
@@ -285,6 +323,16 @@ func (t *TableInfo) Cols() []*ColumnInfo {
 		}
 	}
 	return publicColumns[0 : maxOffset+1]
+}
+
+// FindIndexByName finds index by name.
+func (t *TableInfo) FindIndexByName(idxName string) *IndexInfo {
+	for _, idx := range t.Indices {
+		if idx.Name.L == idxName {
+			return idx
+		}
+	}
+	return nil
 }
 
 // NewExtraHandleColInfo mocks a column info for extra handle column.
