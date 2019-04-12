@@ -928,13 +928,18 @@ func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 		}
 
 		// quoted string
-		if b == '`' || b == '\'' || b == '"' {
+		switch b {
+		case '`', '\'', '"':
 			if i > 1 && buf[i-1] != '\\' {
 				if quoted && b == quoteRune {
 					quoted = false
+					quoteRune = '0'
 				} else {
-					quoted = true
-					quoteRune = b
+					// check if first time found quote
+					if quoteRune == 0 {
+						quoted = true
+						quoteRune = b
+					}
 				}
 			}
 		}

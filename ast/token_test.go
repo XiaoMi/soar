@@ -51,6 +51,7 @@ func TestTokenizer(t *testing.T) {
 		"SELECT * FROM tb WHERE id is not null;",
 		"SELECT * FROM tb WHERE id between 1 and 3;",
 		"alter table inventory add index idx_store_film` (`store_id`,`film_id`);",
+		`UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;`,
 	}
 	err := common.GoldenDiff(func() {
 		for _, sql := range sqls {
@@ -78,6 +79,7 @@ func TestGetQuotedString(t *testing.T) {
 		"``",
 		`'hello 'world'`,
 		`"hello "world"`,
+		`' LOGGER.error(""); }'`,
 	}
 	err := common.GoldenDiff(func() {
 		for _, s := range str {
@@ -121,72 +123,75 @@ func TestFormat(t *testing.T) {
 func TestSplitStatement(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	bufs := [][]byte{
-		[]byte("select * from test;hello"),
-		[]byte("select 'asd;fas', col from test;hello"),
-		[]byte("-- select * from test;hello"),
-		[]byte("#select * from test;hello"),
-		[]byte("select * /*comment*/from test;hello"),
-		[]byte("select * /*comment;*/from test;hello"),
+		[]byte("select * from test;hello"),              // 0
+		[]byte("select 'asd;fas', col from test;hello"), // 1
+		[]byte("-- select * from test;hello"),           // 2
+		[]byte("#select * from test;hello"),             // 3
+		[]byte("select * /*comment*/from test;hello"),   // 4
+		[]byte("select * /*comment;*/from test;hello"),  // 5
 		[]byte(`select * /*comment
 		;*/
-		from test;hello`),
-		[]byte(`select * from test`),
+		from test;hello`), // 6
+		[]byte(`select * from test`), // 7
 		// https://github.com/XiaoMi/soar/issues/66
-		[]byte(`/*comment*/`),
-		[]byte(`/*comment*/;`),
-		[]byte(`--`),
-		[]byte(`-- comment`),
-		[]byte(`# comment`),
+		[]byte(`/*comment*/`),  // 8
+		[]byte(`/*comment*/;`), // 9
+		[]byte(`--`),           // 10
+		[]byte(`-- comment`),   // 11
+		[]byte(`# comment`),    // 12
 		// https://github.com/XiaoMi/soar/issues/116
 		[]byte(`select
 *
 -- comment
 from tb
-where col = 1`),
+where col = 1`), // 13
 		[]byte(`select
 * --
 from tb
-where col = 1`),
+where col = 1`), // 14
 		[]byte(`select
 * #
 from tb
-where col = 1`),
+where col = 1`), // 15
 		[]byte(`select
 *
 --
 from tb
-where col = 1`),
+where col = 1`), // 16
 		[]byte(`select * from
 -- comment
 tb;
-select col from tb where col = 1;`),
+select col from tb where col = 1;`), // 17
 		// https://github.com/XiaoMi/soar/issues/120
 		[]byte(`
 -- comment
 select col from tb;
 select col from tb;
-`),
-		[]byte(`INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);`),
-		[]byte(`select /*!50000 1,*/ 1;`),
+`), // 18
+		[]byte(`INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);`), // 19
+		[]byte(`select /*!50000 1,*/ 1;`),                                          // 20
+		[]byte(`UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;`),          // 21
 	}
+	// \G 分隔符
 	buf2s := [][]byte{
-		[]byte("select * from test\\Ghello"),
-		[]byte("select 'hello\\Gworld', col from test\\Ghello"),
-		[]byte("-- select * from test\\Ghello"),
-		[]byte("#select * from test\\Ghello"),
-		[]byte("select * /*comment*/from test\\Ghello"),
-		[]byte("select * /*comment;*/from test\\Ghello"),
+		[]byte("select * from test\\Ghello"),                    // 0
+		[]byte("select 'hello\\Gworld', col from test\\Ghello"), // 1
+		[]byte("-- select * from test\\Ghello"),                 // 2
+		[]byte("#select * from test\\Ghello"),                   // 3
+		[]byte("select * /*comment*/from test\\Ghello"),         // 4
+		[]byte("select * /*comment;*/from test\\Ghello"),        // 5
 		[]byte(`select * /*comment
         \\G*/
-        from test\\Ghello`),
+        from test\\Ghello`), // 6
 	}
 	err := common.GoldenDiff(func() {
 		for i, buf := range bufs {
-			sql, _, _ := SplitStatement(buf, []byte(common.Config.Delimiter))
+			sql, _, _ := SplitStatement(buf, []byte(";"))
 			fmt.Println(i, sql)
 		}
+
 		for i, buf := range buf2s {
-			sql, _, _ := SplitStatement(buf, []byte(common.Config.Delimiter))
+			sql, _, _ := SplitStatement(buf, []byte("\\G"))
 			fmt.Println(i, sql)
 		}
 	}, t.Name(), update)

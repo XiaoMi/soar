@@ -210,7 +210,7 @@
 }
 []ast.Token{
     {Type:57348, Val:"select", i:0},
-    {Type:57590, Val:"sql_calc_found_rows", i:0},
+    {Type:57592, Val:"sql_calc_found_rows", i:0},
     {Type:57396, Val:"col", i:0},
     {Type:57353, Val:"from", i:0},
     {Type:57396, Val:"tbl", i:0},
@@ -278,4 +278,17 @@
     {Type:57396, Val:",", i:0},
     {Type:57396, Val:"film_id", i:0},
     {Type:57346, Val:");", i:0},
+}
+[]ast.Token{
+    {Type:57351, Val:"update", i:0},
+    {Type:57396, Val:"xxx", i:0},
+    {Type:57372, Val:"set", i:0},
+    {Type:57396, Val:"c1", i:0},
+    {Type:61, Val:"=", i:0},
+    {Type:57398, Val:" LOGGER.error(\"\"); }", i:0},
+    {Type:57354, Val:"where", i:0},
+    {Type:57396, Val:"id", i:0},
+    {Type:61, Val:"=", i:0},
+    {Type:57399, Val:"2", i:0},
+    {Type:59, Val:";", i:0},
 }

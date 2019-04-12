@@ -38,12 +38,13 @@ tb;
 -- comment
 19 INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);
 20 select /*!50000 1,*/ 1;
-0 select * from test\Ghello
-1 select 'hello\Gworld', col from test\Ghello
+21 UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;
+0 select * from test\G
+1 select 'hello\Gworld', col from test\G
 2 -- select * from test\Ghello
 3 #select * from test\Ghello
-4 select * /*comment*/from test\Ghello
-5 select * /*comment;*/from test\Ghello
+4 select * /*comment*/from test\G
+5 select * /*comment;*/from test\G
 6 select * /*comment
         \\G*/
-        from test\\Ghello
+        from test\\G

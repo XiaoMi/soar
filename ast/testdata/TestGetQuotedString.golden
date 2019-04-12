@@ -22,3 +22,5 @@ orignal: 'hello 'world'
 quoted: 'hello '
 orignal: "hello "world"
 quoted: "hello "
+orignal: ' LOGGER.error(""); }'
+quoted: ' LOGGER.error(""); }'
