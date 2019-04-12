@@ -2116,8 +2116,24 @@ func (q *Query4Audit) RuleORUsage() Rule {
 	switch q.Stmt.(type) {
 	case *sqlparser.Select:
 		err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
-			switch node.(type) {
+			switch n := node.(type) {
 			case *sqlparser.OrExpr:
+				switch n.Left.(type) {
+				case *sqlparser.IsExpr:
+					// IS TRUE|FALSE|NULL eg. a = 1 or a IS NULL 这种情况也需要考虑
+					return true, nil
+				}
+				switch n.Right.(type) {
+				case *sqlparser.IsExpr:
+					// IS TRUE|FALSE|NULL eg. a = 1 or a IS NULL 这种情况也需要考虑
+					return true, nil
+				}
+
+				if strings.Fields(sqlparser.String(n.Left))[0] != strings.Fields(sqlparser.String(n.Right))[0] {
+					// 不同字段需要区分开，不同字段的 OR 不能改写为 IN
+					return true, nil
+				}
+
 				rule = HeuristicRules["ARG.008"]
 				return false, nil
 			}

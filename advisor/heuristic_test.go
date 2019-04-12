@@ -1840,15 +1840,32 @@ func TestRuleMultiDBJoin(t *testing.T) {
 // ARG.008
 func TestRuleORUsage(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		`SELECT c1,c2,c3 FROM tab WHERE c1 = 14 OR c2 = 17;`,
+	sqls := [][]string{
+		{
+			`SELECT c1,c2,c3 FROM tab WHERE c1 = 14 OR c1 = 14;`,
+		},
+		{
+			`SELECT c1,c2,c3 FROM tab WHERE c1 = 14 OR c2 = 17;`,
+			`SELECT c1,c2,c3 FROM tab WHERE c1 = 14 OR c1 IS NULL;`,
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleORUsage()
 			if rule.Item != "ARG.008" {
 				t.Error("Rule not match:", rule.Item, "Expect : ARG.008")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleORUsage()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)
