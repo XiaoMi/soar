@@ -84,7 +84,7 @@ type ExplainRow struct {
 	Key          string
 	KeyLen       string // 索引长度，如果发生了index_merge， KeyLen 格式为 N,N，所以不能定义为整型
 	Ref          []string
-	Rows         int
+	Rows         int64
 	Filtered     float64 // 5.6 JSON, 5.7+, 5.5 EXTENDED
 	Scalability  string  // O(1), O(n), O(log n), O(log n)+
 	Extra        string
@@ -131,7 +131,7 @@ type ExplainJSONTable struct {
 	UsedKeyParts             []string                            `json:"used_key_parts"`
 	KeyLength                string                              `json:"key_length"`
 	Ref                      []string                            `json:"ref"`
-	RowsExaminedPerScan      int                                 `json:"rows_examined_per_scan"`
+	RowsExaminedPerScan      int64                               `json:"rows_examined_per_scan"`
 	RowsProducedPerJoin      int                                 `json:"rows_produced_per_join"`
 	Filtered                 string                              `json:"filtered"`
 	UsingIndex               bool                                `json:"using_index"`
@@ -318,6 +318,7 @@ var ExplainAccessType = map[string]string{
 
 // ExplainScalability ACCESS TYPE对应的运算复杂度 [AccessType]scalability map
 var ExplainScalability = map[string]string{
+	"NULL":            "NULL",
 	"ALL":             "O(n)",
 	"index":           "O(n)",
 	"range":           "O(log n)+",
@@ -784,7 +785,7 @@ func parseTraditionalExplainText(content string) (explainRows []ExplainRow, err 
 	colsMap := make(map[string]string)
 	for _, l := range lines[3:] {
 		var keylen string
-		var rows int
+		var rows int64
 		var filtered float64
 		var partitions string
 		// 跳过分割线
@@ -816,7 +817,7 @@ func parseTraditionalExplainText(content string) (explainRows []ExplainRow, err 
 
 		keylen = colsMap["key_len"]
 
-		rows, err = strconv.Atoi(colsMap["Rows"])
+		rows, err = strconv.ParseInt(colsMap["Rows"], 10, 64)
 		if err != nil {
 			rows = 0
 		}
@@ -908,7 +909,7 @@ func parseVerticalExplainText(content string) (explainRows []ExplainRow, err err
 		}
 		if strings.HasPrefix(l, "Rows:") {
 			rows := strings.TrimPrefix(l, "Rows: ")
-			explainRow.Rows, err = strconv.Atoi(rows)
+			explainRow.Rows, err = strconv.ParseInt(rows, 10, 64)
 			if err != nil {
 				explainRow.Rows = 0
 			}
@@ -957,15 +958,21 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 	}
 
 	/*
-		+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
-		| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
-		+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
-		|  1 | SIMPLE      | film  | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 1000 |   100.00 | NULL  |
-		+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+				+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+				| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
+				+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+				|  1 | SIMPLE      | film  | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 1000 |   100.00 | NULL  |
+				+----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+
+		        +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+--------------------------------+
+		        | id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                          |
+		        +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+--------------------------------+
+		        |  1 | SIMPLE      | NULL  | NULL       | NULL | NULL          | NULL | NULL    | NULL | NULL |     NULL | no matching row in const table |
+		        +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+--------------------------------+
 	*/
 
 	// Different MySQL version has different columns define
-	var selectType, table, partitions, accessType, possibleKeys, key, keyLen, ref, extra []byte
+	var selectType, table, partitions, accessType, possibleKeys, key, keyLen, ref, extra, rows, filtered []byte
 	expRow := ExplainRow{}
 	explainFields := make([]interface{}, 0)
 	fields := map[string]interface{}{
@@ -978,8 +985,8 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 		"key":           &key,
 		"key_len":       &keyLen,
 		"ref":           &ref,
-		"rows":          &expRow.Rows,
-		"filtered":      &expRow.Filtered,
+		"rows":          &rows,
+		"filtered":      &filtered,
 		"Extra":         &extra,
 	}
 	cols, err := res.Rows.Columns()
@@ -1009,6 +1016,8 @@ func ParseExplainResult(res QueryResult, formatType int) (exp *ExplainInfo, err 
 		expRow.Key = NullString(key)
 		expRow.KeyLen = NullString(keyLen)
 		expRow.Ref = strings.Split(NullString(ref), ",")
+		expRow.Rows = NullInt(rows)
+		expRow.Filtered = NullFloat(filtered)
 		expRow.Extra = NullString(extra)
 
 		// MySQL bug: https://bugs.mysql.com/bug.php?id=34124
@@ -1115,7 +1124,9 @@ func PrintMarkdownExplainTable(exp *ExplainInfo) string {
 			}
 			scalability := row.Scalability
 			for _, s := range common.Config.ExplainWarnScalability {
-				scalability = "☠️ **" + s + "**"
+				if s == scalability {
+					scalability = "☠️ **" + s + "**"
+				}
 			}
 			buf = append(buf, fmt.Sprintln("|", row.ID, " |",
 				common.MarkdownEscape(row.SelectType),

@@ -42,13 +42,16 @@ func ExampleIsColsPart() {
 	b := []*Column{{Name: "1"}, {Name: "2"}}
 	c := []*Column{{Name: "1"}, {Name: "3"}}
 	d := []*Column{{Name: "1"}, {Name: "2"}, {Name: "3"}, {Name: "4"}}
+	id := []*Column{{Name: "id"}}
+	iD := []*Column{{Name: "iD"}}
 
 	ab := IsColsPart(a, b)
 	ac := IsColsPart(a, c)
 	ad := IsColsPart(a, d)
+	idiD := IsColsPart(id, iD) // 大小写对比
 
-	fmt.Println(ab, ac, ad)
-	// Output: true false true
+	fmt.Println(ab, ac, ad, idiD)
+	// Output: true false true true
 	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 

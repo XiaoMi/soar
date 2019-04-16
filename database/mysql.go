@@ -319,6 +319,24 @@ func NullString(buf []byte) string {
 	return string(buf)
 }
 
+// NullFloat null able float
+func NullFloat(buf []byte) float64 {
+	if buf == nil {
+		return 0
+	}
+	f, _ := strconv.ParseFloat(string(buf), 64)
+	return f
+}
+
+// NullInt null able int
+func NullInt(buf []byte) int64 {
+	if buf == nil {
+		return 0
+	}
+	i, _ := strconv.ParseInt(string(buf), 10, 64)
+	return i
+}
+
 // quoteEscape sql_mode=no_backslash_escapes
 func quoteEscape(source string) string {
 	var buf bytes.Buffer

@@ -93,7 +93,9 @@ func IsColsPart(a, b []*Column) bool {
 	}
 
 	for i := 0; i < times; i++ {
-		if a[i].DB != b[i].DB || a[i].Table != b[i].Table || a[i].Name != b[i].Name {
+		if strings.ToLower(a[i].DB) != strings.ToLower(b[i].DB) ||
+			strings.ToLower(a[i].Table) != strings.ToLower(b[i].Table) ||
+			strings.ToLower(a[i].Name) != strings.ToLower(b[i].Name) {
 			return false
 		}
 	}
