@@ -306,7 +306,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | range | idx\_title | idx\_title | 767 | NULL | 2 | ☠️ **100.00%** | ☠️ **O(n)** | Using index condition |
+| 1  | SIMPLE | *film* | NULL | range | idx\_title | idx\_title | 767 | NULL | 2 | ☠️ **100.00%** | O(log n)+ | Using index condition |
 
 
 
@@ -405,7 +405,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 10.00% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 10.00% | O(log n) | Using where |
 
 
 
@@ -462,7 +462,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 33.33% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 33.33% | O(log n) | Using where |
 
 
 
@@ -520,7 +520,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title,<br>idx\_fk\_language\_id | idx\_title | 767 | const | 1 | 33.33% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *film* | NULL | ref | idx\_title,<br>idx\_fk\_language\_id | idx\_title | 767 | const | 1 | 33.33% | O(log n) | Using where |
 
 
 
@@ -1611,7 +1611,7 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *customer* | NULL | range | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | NULL | 2 | ☠️ **100.00%** | ☠️ **O(n)** | Using index condition; Using filesort |
+| 1  | SIMPLE | *customer* | NULL | range | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | NULL | 2 | ☠️ **100.00%** | O(log n)+ | Using index condition; Using filesort |
 
 
 
@@ -1787,7 +1787,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | const | 1 | 10.00% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *film* | NULL | ref | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | const | 1 | 10.00% | O(log n) | Using where |
 
 
 
@@ -1836,7 +1836,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | range | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | NULL | 1 | 33.33% | ☠️ **O(n)** | Using index condition; Using where |
+| 1  | SIMPLE | *film* | NULL | range | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | NULL | 1 | 33.33% | O(log n)+ | Using index condition; Using where |
 
 
 
@@ -1889,7 +1889,7 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
+| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 10.00% | O(log n) | Using where; Using filesort |
 
 
 
@@ -1950,7 +1950,7 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 33.33% | ☠️ **O(n)** | Using where; Using filesort |
+| 1  | SIMPLE | *film* | NULL | ref | idx\_title | idx\_title | 767 | const | 1 | 33.33% | O(log n) | Using where; Using filesort |
 
 
 
@@ -2068,7 +2068,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *b* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -2127,7 +2127,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -2186,7 +2186,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -2247,7 +2247,7 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | O(log n) | Using where; Not exists |
 
 
 
@@ -2325,7 +2325,7 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | O(log n) | Using where; Not exists |
 
 
 
@@ -2407,10 +2407,10 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 | 2  | UNION | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
+| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -2491,10 +2491,10 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | PRIMARY | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | 10.00% | O(log n) | Using where; Not exists |
 | 2  | UNION | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | O(log n) | Using where; Not exists |
+| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | 10.00% | O(log n) | Using where; Not exists |
 
 
 
@@ -2585,7 +2585,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *country* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | 10.00% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | 10.00% | O(log n) | Using where |
 
 
 
@@ -2632,7 +2632,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using where |
 
 
 
@@ -2679,7 +2679,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *country* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | O(log n) | Using where |
 
 
 
@@ -2725,7 +2725,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *a* | NULL | ALL | idx\_fk\_country\_id | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | SIMPLE | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using index |
 
 
 
@@ -2785,7 +2785,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *c* | NULL | index | PRIMARY | idx\_fk\_country\_id | 2 | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
-| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.c.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *a* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.c.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -2860,8 +2860,8 @@ ORDER BY
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *<derived2>* | NULL | ALL | NULL | NULL | NULL | NULL | 60 | ☠️ **100.00%** | ☠️ **O(n)** | Using temporary; Using filesort |
-| 1  | PRIMARY | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | I.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | PRIMARY | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | I.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
+| 1  | PRIMARY | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using index |
 | 2  | DERIVED | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using filesort |
 
 
@@ -2943,8 +2943,8 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | DELETE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | DELETE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | DELETE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 1  | DELETE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
 
 
 
@@ -2989,7 +2989,7 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | DELETE | *city* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | 10.00% | ☠️ **O(n)** | Using where; Not exists |
+| 1  | SIMPLE | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | 10.00% | O(log n) | Using where; Not exists |
 
 
 
@@ -3057,7 +3057,7 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | DELETE | *a2* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -3104,7 +3104,7 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | DELETE | *a2* | NULL | ALL | PRIMARY | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | DELETE | *a1* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.a2.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -3204,8 +3204,8 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
 
 
 
@@ -3246,9 +3246,9 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *address* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 1  | SIMPLE | *address* | NULL | ref | idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | const | 1 | ☠️ **100.00%** | O(log n) | Using index |
 
 
 
@@ -3298,8 +3298,8 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | UPDATE | *city* | NULL | const | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 1  | UPDATE | *country* | NULL | const | PRIMARY | PRIMARY | 2 | const | 1 | ☠️ **100.00%** | O(1) | NULL |
 
 
 
@@ -3328,7 +3328,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | UPDATE | *film* | NULL | range | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | const | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where |
+| 1  | UPDATE | *film* | NULL | range | idx\_fk\_language\_id | idx\_fk\_language\_id | 1 | const | 1 | ☠️ **100.00%** | O(log n)+ | Using where |
 
 
 
@@ -3812,10 +3812,10 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *i* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 | 2  | UNION | *o* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
+| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -3962,10 +3962,10 @@ WHERE
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *i* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
+| 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | O(log n) | Using where; Not exists |
 | 2  | UNION | *o* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
-| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using where; Not exists |
+| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using where; Not exists |
+| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using where; Not exists |
 
 
 
@@ -4031,7 +4031,7 @@ FROM
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *customer* | NULL | ALL | idx\_fk\_address\_id | NULL | NULL | NULL | 599 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | SIMPLE | *address* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.customer.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | SIMPLE | *address* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.customer.address\_id | 1 | ☠️ **100.00%** | O(log n) | Using index |
 
 
 
@@ -4091,15 +4091,15 @@ ORDER BY
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *country* | NULL | index | PRIMARY | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index; Using temporary; Using filesort |
-| 1  | PRIMARY | *city* | NULL | ref | PRIMARY,<br>idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
+| 1  | PRIMARY | *city* | NULL | ref | PRIMARY,<br>idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 | 1  | PRIMARY | *c* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | 10.00% | ☠️ **O(n)** | Using where; Using join buffer (Block Nested Loop) |
-| 1  | PRIMARY | *a* | NULL | ref | PRIMARY,<br>idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.city.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *cu* | NULL | ref | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 1  | PRIMARY | *<derived2>* | NULL | ref | <auto\_key0> | <auto\_key0> | 152 | sakila.a.address | 6 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 1  | PRIMARY | *a* | NULL | ref | PRIMARY,<br>idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.city.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
+| 1  | PRIMARY | *cu* | NULL | ref | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
+| 1  | PRIMARY | *<derived2>* | NULL | ref | <auto\_key0> | <auto\_key0> | 152 | sakila.a.address | 6 | ☠️ **100.00%** | O(log n) | Using index |
 | 2  | DERIVED | *a* | NULL | ALL | PRIMARY,<br>idx\_fk\_city\_id | NULL | NULL | NULL | 603 | ☠️ **100.00%** | ☠️ **O(n)** | Using filesort |
-| 2  | DERIVED | *cu* | NULL | ref | idx\_fk\_store\_id,<br>idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | 54.42% | ☠️ **O(n)** | Using where |
-| 2  | DERIVED | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | sakila.a.city\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
-| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | ☠️ **O(n)** | Using index |
+| 2  | DERIVED | *cu* | NULL | ref | idx\_fk\_store\_id,<br>idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | 54.42% | O(log n) | Using where |
+| 2  | DERIVED | *city* | NULL | eq\_ref | PRIMARY,<br>idx\_fk\_country\_id | PRIMARY | 2 | sakila.a.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
+| 2  | DERIVED | *country* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.city.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using index |
 
 
 
@@ -4493,7 +4493,7 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *NULL* | NULL | NULL | NULL | NULL | NULL | NULL | 0 | 0.00% | ☠️ **O(n)** | NULL |
+| 1  | SIMPLE | *NULL* | NULL | NULL | NULL | NULL | NULL | NULL | 0 | 0.00% | NULL | Impossible WHERE |
 
 
 
@@ -4502,6 +4502,10 @@ ORDER BY
 #### SelectType信息解读
 
 * **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Extra信息解读
+
+* **Impossible WHERE**: WHERE条件过滤没有效果, 最终是全表扫描.
 
 
 ##  为sakila库的city表添加索引
