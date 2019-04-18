@@ -2,7 +2,7 @@
  {
   "ID": "687D590364E29465",
   "Fingerprint": "select * from film",
-  "Score": 0,
+  "Score": 75,
   "Sample": "select * from film",
   "Explain": null,
   "HeuristicRules": [

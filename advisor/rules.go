@@ -1460,11 +1460,25 @@ func formatJSON(sql string, db string, suggest map[string]Rule) string {
 	fingerprint = query.Fingerprint(sql)
 	id = query.Id(fingerprint)
 
+	// Score
+	score := 100
+	for item := range suggest {
+		l, err := strconv.Atoi(strings.TrimLeft(suggest[item].Severity, "L"))
+		if err != nil {
+			common.Log.Error("formatJSON strconv.Atoi error: %s, item: %s, serverity: %s", err.Error(), item, suggest[item].Severity)
+		}
+		score = score - l*5
+	}
+	if score < 0 {
+		score = 0
+	}
+
 	sug := JSONSuggest{
 		ID:          id,
 		Fingerprint: fingerprint,
 		Sample:      sql,
 		Tables:      ast.SchemaMetaInfo(sql, db),
+		Score:       score,
 	}
 
 	// Explain info
