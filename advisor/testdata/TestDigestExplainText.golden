@@ -3,7 +3,7 @@
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | SIMPLE | *country* | NULL | index | PRIMARY,<br>country\_id | country | 152 | NULL | 0 | 0.00% | ☠️ **O(n)** | Using index |
-| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id,<br>idx\_country\_id\_city,<br>idx\_all,<br>idx\_other | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 0 | 0.00% | ☠️ **O(n)** | Using index |
+| 1  | SIMPLE | *city* | NULL | ref | idx\_fk\_country\_id,<br>idx\_country\_id\_city,<br>idx\_all,<br>idx\_other | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 0 | 0.00% | O(log n) | Using index |
 
 
 
@@ -105,7 +105,7 @@ a:link,a:visited{text-decoration:none}h3,h4{margin-top:2em}h5,h6{margin-top:20px
 <td>sakila.country.country_id</td>
 <td>0</td>
 <td>0.00%</td>
-<td>☠️ <strong>O(n)</strong></td>
+<td>O(log n)</td>
 <td>Using index</td>
 </tr>
 </tbody>

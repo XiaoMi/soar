@@ -222,7 +222,7 @@ func DigestExplainText(text string) {
 			return
 		}
 		expSuggest := ExplainAdvisor(explainInfo)
-		_, output := FormatSuggest("", common.Config.ReportType, expSuggest)
+		_, output := FormatSuggest("", "", common.Config.ReportType, expSuggest)
 		if common.Config.ReportType == "html" {
 			fmt.Println(common.MarkdownHTMLHeader())
 			fmt.Println(common.Markdown2HTML(output))

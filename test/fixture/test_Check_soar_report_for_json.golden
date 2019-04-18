@@ -1,6 +1,12 @@
-{
-  "687D590364E29465": {
-    "CLA.001": {
+[
+ {
+  "ID": "687D590364E29465",
+  "Fingerprint": "select * from film",
+  "Score": 0,
+  "Sample": "select * from film",
+  "Explain": null,
+  "HeuristicRules": [
+    {
       "Item": "CLA.001",
       "Severity": "L4",
       "Summary": "最外层 SELECT 未指定 WHERE 条件",
@@ -8,7 +14,7 @@
       "Case": "select id from tbl",
       "Position": 0
     },
-    "COL.001": {
+    {
       "Item": "COL.001",
       "Severity": "L1",
       "Summary": "不建议使用 SELECT * 类型查询",
@@ -16,5 +22,10 @@
       "Case": "select * from tbl where id=1",
       "Position": 0
     }
-  }
-}
+  ],
+  "IndexRules": null,
+  "Tables": [
+    "`information_schema`.`film`"
+  ]
+} 
+]

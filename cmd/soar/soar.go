@@ -37,11 +37,13 @@ func main() {
 	// 全局变量
 	var err error
 	var sql string                                            // 单条评审指定的 sql 或 explain
+	var currentDB string                                      // 当前 SQL 使用的 database
 	sqlCounter := 1                                           // SQL 计数器
 	lineCounter := 1                                          // 行计数器
 	var alterSQLs []string                                    // 待评审的 SQL 中所有 ALTER 请求
 	alterTableTimes := make(map[string]int)                   // 待评审的 SQL 中同一经表 ALTER 请求计数器
 	suggestMerged := make(map[string]map[string]advisor.Rule) // 优化建议去重, key 为 sql 的 fingerprint.ID
+	var suggestStr []string                                   // string 形式格式化之后的优化建议，用于 -report-type json
 	tables := make(map[string][]string)                       // SQL 使用的库表名
 
 	// 配置文件&命令行参数解析
@@ -74,7 +76,7 @@ func main() {
 	// 对指定的库表进行索引重复检查
 	if common.Config.ReportType == "duplicate-key-checker" {
 		dupKeySuggest := advisor.DuplicateKeyChecker(rEnv)
-		_, str := advisor.FormatSuggest("", common.Config.ReportType, dupKeySuggest)
+		_, str := advisor.FormatSuggest("", currentDB, common.Config.ReportType, dupKeySuggest)
 		if str == "" {
 			fmt.Printf("%s/%s 未发现重复索引\n", common.Config.OnlineDSN.Addr, common.Config.OnlineDSN.Schema)
 		} else {
@@ -129,6 +131,7 @@ func main() {
 
 		// +++++++++++++++++++++小工具集[开始]+++++++++++++++++++++++{
 		fingerprint := strings.TrimSpace(query.Fingerprint(sql))
+		currentDB = env.CurrentDB(sql, currentDB)
 		switch common.Config.ReportType {
 		case "fingerprint":
 			// SQL 指纹
@@ -176,6 +179,7 @@ func main() {
 				continue
 			}
 		}
+		tables[id] = ast.SchemaMetaInfo(sql, currentDB)
 		// +++++++++++++++++++++小工具集[结束]+++++++++++++++++++++++}
 
 		// +++++++++++++++++++++语法检查[开始]+++++++++++++++++++++++{
@@ -202,8 +206,6 @@ func main() {
 
 		switch common.Config.ReportType {
 		case "tables":
-			env.ChangeDB(vEnv.Connector, q.Query)
-			tables[id] = ast.SchemaMetaInfo(sql, vEnv.Database)
 			continue
 		case "query-type":
 			fmt.Println(syntaxErr)
@@ -384,10 +386,11 @@ func main() {
 
 		// +++++++++++++++++++++打印单条 SQL 优化建议[开始]++++++++++++++++++++++++++{
 		common.Log.Debug("start of print suggestions, Query: %s", q.Query)
-		sug, str := advisor.FormatSuggest(q.Query, common.Config.ReportType, heuristicSuggest, idxSuggest, expSuggest, proSuggest, traceSuggest, mysqlSuggest)
+		sug, str := advisor.FormatSuggest(q.Query, currentDB, common.Config.ReportType, heuristicSuggest, idxSuggest, expSuggest, proSuggest, traceSuggest, mysqlSuggest)
 		suggestMerged[id] = sug
 		switch common.Config.ReportType {
 		case "json":
+			suggestStr = append(suggestStr, str)
 		case "tables":
 		case "duplicate-key-checker":
 		case "rewrite":
@@ -428,13 +431,7 @@ func main() {
 
 	// 以 JSON 格式化输出
 	if common.Config.ReportType == "json" {
-		js, err := json.MarshalIndent(suggestMerged, "", "  ")
-		if err == nil {
-			fmt.Println(string(js))
-		} else {
-			common.Log.Error("FormatSuggest json.Marshal Error: %v", err)
-		}
-		return
+		fmt.Println("[\n", strings.Join(suggestStr, ",\n"), "\n]")
 	}
 
 	// 以 JSON 格式输出 SQL 影响的库表名

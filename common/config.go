@@ -882,7 +882,7 @@ var ReportTypes = []ReportType{
 	{
 		Name:        "tables",
 		Description: "以 JSON 格式输出 SQL 使用的库表名",
-		Example:     `echo "select * from film" | soar -report-type meta`,
+		Example:     `echo "select * from film" | soar -report-type tables`,
 	},
 	{
 		Name:        "query-type",

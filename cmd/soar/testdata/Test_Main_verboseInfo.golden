@@ -1,5 +1,7 @@
 Syntax check OK!
 MySQL environment verbose info
 * test-dsn: 127.0.0.1:3306 is disable, please check log.
+* online-dsn: 127.0.0.1:3306 is disable, please check log.
 MySQL environment verbose info
+* test-dsn: 127.0.0.1:3306 is disable, please check log.
 * online-dsn: 127.0.0.1:3306 is disable, please check log.

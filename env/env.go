@@ -209,6 +209,24 @@ func ChangeDB(env *database.Connector, sql string) {
 	}
 }
 
+func CurrentDB(sql, db string) string {
+	stmt, err := sqlparser.Parse(sql)
+	if err != nil {
+		return common.Config.TestDSN.Schema
+	}
+
+	switch stmt := stmt.(type) {
+	case *sqlparser.Use:
+		if stmt.DBName.String() != "" {
+			db = stmt.DBName.String()
+		}
+	}
+	if db == "" {
+		db = common.Config.TestDSN.Schema
+	}
+	return db
+}
+
 // BuildVirtualEnv rEnv 为 SQL 源环境，DB 使用的信息从接口获取
 // 注意：如果是 USE, DDL 等语句，执行完第一条就会返回，后面的 SQL 不会执行
 func (vEnv *VirtualEnv) BuildVirtualEnv(rEnv *database.Connector, SQLs ...string) bool {

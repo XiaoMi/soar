@@ -64,7 +64,7 @@ echo "select * from film" | soar -report-type tiast-json
 * **Example**:
 
 ```bash
-echo "select * from film" | soar -report-type meta
+echo "select * from film" | soar -report-type tables
 ```
 ## query-type
 * **Description**:SQL 语句的请求类型

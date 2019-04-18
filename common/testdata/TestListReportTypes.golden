@@ -58,13 +58,21 @@ echo "select * from film" | soar -report-type tiast
 ```bash
 echo "select * from film" | soar -report-type tiast-json
 ```
-## meta
+## tables
 * **Description**:以 JSON 格式输出 SQL 使用的库表名
 
 * **Example**:
 
 ```bash
-echo "select * from film" | soar -report-type meta
+echo "select * from film" | soar -report-type tables
+```
+## query-type
+* **Description**:SQL 语句的请求类型
+
+* **Example**:
+
+```bash
+echo "select * from film" | soar -report-type query-type
 ```
 ## fingerprint
 * **Description**:输出SQL的指纹
