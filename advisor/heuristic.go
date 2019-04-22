@@ -2149,14 +2149,16 @@ func (q *Query4Audit) RuleSpaceWithQuote() Rule {
 	var rule = q.RuleOK()
 	for _, tk := range ast.Tokenize(q.Query) {
 		if tk.Type == ast.TokenTypeQuote {
-			// 序列化的Val是带引号，所以要取第2个最倒数第二个，这样也就不用担心len<2了。
-			switch tk.Val[1] {
-			case ' ':
-				rule = HeuristicRules["ARG.009"]
-			}
-			switch tk.Val[len(tk.Val)-2] {
-			case ' ':
-				rule = HeuristicRules["ARG.009"]
+			if len(tk.Val) >= 2 {
+				// 序列化的Val是带引号，所以要取第2个和倒数第二个，这样也就不用担心len<2了。
+				switch tk.Val[1] {
+				case ' ':
+					rule = HeuristicRules["ARG.009"]
+				}
+				switch tk.Val[len(tk.Val)-2] {
+				case ' ':
+					rule = HeuristicRules["ARG.009"]
+				}
 			}
 		}
 	}
