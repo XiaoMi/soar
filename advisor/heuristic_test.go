@@ -3465,6 +3465,7 @@ func TestRuleStandardName(t *testing.T) {
 			"CREATE TABLE `tbl-name` (a int);",
 			"CREATE TABLE `tbl `(a int)",
 			"CREATE TABLE t__bl (a int);",
+			"SELECT `dataType` FROM tb;",
 		},
 		{
 			"CREATE TABLE tbl (a int)",
