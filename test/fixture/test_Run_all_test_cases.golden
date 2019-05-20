@@ -351,7 +351,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL | idx\_title | NULL | NULL | NULL | 1000 | 90.00% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 
 
 
@@ -364,10 +364,6 @@ WHERE
 #### Type信息解读
 
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
 ## 应尽量避免在 WHERE 子句中对字段进行 NULL 值判断
