@@ -8,3 +8,5 @@
 
 `t3` : ALTER TABLE `t3` add index `idx_a`(a), drop index`idx_b`(b) ;
 
+`test_bb` : ALTER TABLE `test_bb` ADD INDEX idx_test_cca (test_cc) ;
+

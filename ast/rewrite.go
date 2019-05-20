@@ -1688,7 +1688,6 @@ func MergeAlterTables(sqls ...string) map[string]string {
 	// CREATE [UNIQUE|FULLTEXT|SPATIAL|PRIMARY] [KEY|INDEX] idx_name ON tbl_name
 	createIndexExp := regexp.MustCompile(`(?i)create((unique)|(fulltext)|(spatial)|(primary)|(\s*)\s*)((index)|(key))\s*`)
 	indexNameExp := regexp.MustCompile(`(?i)(` + backTicks + `|([^\s]*))\s*`)
-	indexColsExp := regexp.MustCompile(`(?i)(` + backTicks + `|([^\s]*))\s*on\s*(` + backTicks + `|([^\s]*))\s*`)
 
 	for _, sql := range sqls {
 		sql = strings.Trim(sql, common.Config.Delimiter)
@@ -1719,7 +1718,8 @@ func MergeAlterTables(sqls ...string) map[string]string {
 				} else if createIndexExp.MatchString(sql) {
 					buf := createIndexExp.ReplaceAllString(sql, "")
 					idxName := strings.TrimSpace(indexNameExp.FindString(buf))
-					buf = indexColsExp.ReplaceAllString(buf, "")
+					buf = string([]byte(buf)[strings.Index(buf, "("):])
+					common.Log.Error(buf)
 					common.Log.Debug("alter createIndexExp: ALTER %v ADD INDEX %v %v", tableName, "ADD INDEX", idxName, buf)
 					alterSQL = fmt.Sprint("ADD INDEX", " "+idxName+" ", buf)
 				}

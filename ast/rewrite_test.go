@@ -631,6 +631,7 @@ func TestMergeAlterTables(t *testing.T) {
 		// ADD|DROP INDEX
 		// TODO: PRIMARY KEY, [UNIQUE|FULLTEXT|SPATIAL] INDEX
 		"CREATE INDEX part_of_name ON customer (name(10));",
+		"create index idx_test_cca on test_bb(test_cc);", // https://github.com/XiaoMi/soar/issues/205
 		"alter table `sakila`.`t1` add index `idx_col`(`col`)",
 		"alter table `sakila`.`t1` add UNIQUE index `idx_col`(`col`)",
 		"alter table `sakila`.`t1` add index `idx_ID`(`ID`)",
