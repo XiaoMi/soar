@@ -175,9 +175,15 @@ const (
 	// After version V2.1.2 (PR#8738) , TiDB add UTF8 check, then the user upgrade from v2.0.8 insert some UTF8MB4 characters will got error.
 	// This is not compatibility for user. Then we try to fix this in PR #9820, and increase the version number.
 	TableInfoVersion2 = uint16(2)
+	// TableInfoVersion3 means the table info version is 3.
+	// This version aims to deal with upper-cased charset name in TableInfo stored by versions prior to TiDB v2.1.9:
+	// TiDB always suppose all charsets / collations as lower-cased and try to convert them if they're not.
+	// However, the convert is missed in some scenarios before v2.1.9, so for all those tables prior to TableInfoVersion3, their
+	// charsets / collations will be converted to lower-case while loading from the storage.
+	TableInfoVersion3 = uint16(3)
 
 	// CurrLatestTableInfoVersion means the latest table info in the current TiDB.
-	CurrLatestTableInfoVersion = TableInfoVersion2
+	CurrLatestTableInfoVersion = TableInfoVersion3
 )
 
 // ExtraHandleName is the name of ExtraHandle Column.
@@ -214,6 +220,10 @@ type TableInfo struct {
 	ShardRowIDBits uint64
 	// MaxShardRowIDBits uses to record the max ShardRowIDBits be used so far.
 	MaxShardRowIDBits uint64 `json:"max_shard_row_id_bits"`
+	// PreSplitRegions specify the pre-split region when create table.
+	// The pre-split region num is 2^(PreSplitRegions-1).
+	// And the PreSplitRegions should less than or equal to ShardRowIDBits.
+	PreSplitRegions uint64 `json:"pre_split_regions"`
 
 	Partition *PartitionInfo `json:"partition"`
 
@@ -716,8 +726,8 @@ func ColumnToProto(c *ColumnInfo) *tipb.ColumnInfo {
 // TODO: update it when more collate is supported.
 func collationToProto(c string) int32 {
 	v := mysql.CollationNames[c]
-	if v == mysql.BinaryCollationID {
-		return int32(mysql.BinaryCollationID)
+	if v == mysql.BinaryDefaultCollationID {
+		return int32(mysql.BinaryDefaultCollationID)
 	}
 	// We only support binary and utf8_bin collation.
 	// Setting other collations to utf8_bin for old data compatibility.

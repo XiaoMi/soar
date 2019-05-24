@@ -181,7 +181,7 @@ func skipToEnd(yylex interface{}) {
 %token <bytes> NULLX AUTO_INCREMENT APPROXNUM SIGNED UNSIGNED ZEROFILL
 
 // Supported SHOW tokens
-%token <bytes> COLLATION DATABASES TABLES VITESS_KEYSPACES VITESS_SHARDS VITESS_TABLETS VSCHEMA VSCHEMA_TABLES VITESS_TARGET FULL PROCESSLIST COLUMNS FIELDS ENGINES PLUGINS
+%token <bytes> COLLATION DATABASES SCHEMAS TABLES VITESS_KEYSPACES VITESS_SHARDS VITESS_TABLETS VSCHEMA VSCHEMA_TABLES VITESS_TARGET FULL PROCESSLIST COLUMNS FIELDS ENGINES PLUGINS
 
 // SET tokens
 %token <bytes> NAMES CHARSET GLOBAL SESSION ISOLATION LEVEL READ WRITE ONLY REPEATABLE COMMITTED UNCOMMITTED SERIALIZABLE
@@ -1485,6 +1485,10 @@ show_statement:
   {
     $$ = &Show{Type: string($2)}
   }
+| SHOW SCHEMAS ddl_skip_to_end
+  {
+    $$ = &Show{Type: string($2)}
+  }
 | SHOW ENGINES
   {
     $$ = &Show{Type: string($2)}
@@ -2450,23 +2454,7 @@ function_call_keyword:
   {
     $$ = &ConvertUsingExpr{Expr: $3, Type: $5}
   }
-| SUBSTR openb column_name ',' value_expression closeb
-  {
-    $$ = &SubstrExpr{Name: $3, From: $5, To: nil}
-  }
-| SUBSTR openb column_name ',' value_expression ',' value_expression closeb
-  {
-    $$ = &SubstrExpr{Name: $3, From: $5, To: $7}
-  }
 | SUBSTR openb column_name FROM value_expression FOR value_expression closeb
-  {
-    $$ = &SubstrExpr{Name: $3, From: $5, To: $7}
-  }
-| SUBSTRING openb column_name ',' value_expression closeb
-  {
-    $$ = &SubstrExpr{Name: $3, From: $5, To: nil}
-  }
-| SUBSTRING openb column_name ',' value_expression ',' value_expression closeb
   {
     $$ = &SubstrExpr{Name: $3, From: $5, To: $7}
   }
@@ -2474,23 +2462,7 @@ function_call_keyword:
   {
     $$ = &SubstrExpr{Name: $3, From: $5, To: $7}
   }
-| SUBSTR openb STRING ',' value_expression closeb
-  {
-    $$ = &SubstrExpr{StrVal: NewStrVal($3), From: $5, To: nil}
-  }
-| SUBSTR openb STRING ',' value_expression ',' value_expression closeb
-  {
-    $$ = &SubstrExpr{StrVal: NewStrVal($3), From: $5, To: $7}
-  }
 | SUBSTR openb STRING FROM value_expression FOR value_expression closeb
-  {
-    $$ = &SubstrExpr{StrVal: NewStrVal($3), From: $5, To: $7}
-  }
-| SUBSTRING openb STRING ',' value_expression closeb
-  {
-    $$ = &SubstrExpr{StrVal: NewStrVal($3), From: $5, To: nil}
-  }
-| SUBSTRING openb STRING ',' value_expression ',' value_expression closeb
   {
     $$ = &SubstrExpr{StrVal: NewStrVal($3), From: $5, To: $7}
   }
@@ -2625,6 +2597,14 @@ function_call_conflict:
 | REPLACE openb select_expression_list closeb
   {
     $$ = &FuncExpr{Name: NewColIdent("replace"), Exprs: $3}
+  }
+| SUBSTR openb select_expression_list closeb
+  {
+    $$ = &FuncExpr{Name: NewColIdent("substr"), Exprs: $3}
+  }
+| SUBSTRING openb select_expression_list closeb
+  {
+    $$ = &FuncExpr{Name: NewColIdent("substr"), Exprs: $3}
   }
 
 match_option:
@@ -3364,6 +3344,7 @@ non_reserved_keyword:
 | REPEATABLE
 | RESTRICT
 | ROLLBACK
+| SCHEMAS
 | SESSION
 | SERIALIZABLE
 | SHARE

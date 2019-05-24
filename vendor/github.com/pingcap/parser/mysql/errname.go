@@ -885,9 +885,10 @@ var MySQLErrName = map[uint16]string{
 	ErrDependentByGeneratedColumn:                            "Column '%s' has a generated column dependency.",
 	ErrGeneratedColumnFunctionIsNotAllowed:                   "Expression of generated column '%s' contains a disallowed function.",
 	ErrGeneratedColumnRefAutoInc:                             "Generated column '%s' cannot refer to auto-increment column.",
+	ErrInvalidJSONData:                                       "Invalid JSON data provided to function %s: %s",
 	ErrInvalidJSONText:                                       "Invalid JSON text: %-.192s",
 	ErrInvalidJSONPath:                                       "Invalid JSON path expression %s.",
-	ErrInvalidJSONData:                                       "Invalid data type for JSON data",
+	ErrInvalidTypeForJSON:                                    "Invalid data type for JSON data in argument %d to function %s; a JSON string or JSON type is required.",
 	ErrInvalidJSONPathWildcard:                               "In this situation, path expressions may not contain the * and ** tokens.",
 	ErrInvalidJSONContainsPathType:                           "The second argument can only be either 'one' or 'all'.",
 	ErrJSONUsedAsKey:                                         "JSON column '%-.192s' cannot be used in key specification.",
@@ -915,10 +916,11 @@ var MySQLErrName = map[uint16]string{
 	ErrRoleNotGranted:                                        "%s is is not granted to %s",
 
 	// TiDB errors.
-	ErrMemExceedThreshold: "%s holds %dB memory, exceeds threshold %dB.%s",
-	ErrForUpdateCantRetry: "[%d] can not retry select for update statement",
-	ErrAdminCheckTable:    "TiDB admin check table failed.",
-
+	ErrMemExceedThreshold:         "%s holds %dB memory, exceeds threshold %dB.%s",
+	ErrForUpdateCantRetry:         "[%d] can not retry select for update statement",
+	ErrAdminCheckTable:            "TiDB admin check table failed.",
+	ErrTxnTooLarge:                "Transaction is too large",
+	ErrWriteConflictInTiDB:        "Write conflict, txnStartTS %d is stale",
 	ErrInvalidPluginID:            "Wrong plugin id: %s, valid plugin id is [name]-[version], both name and version should not contain '-'",
 	ErrInvalidPluginManifest:      "Cannot read plugin %s's manifest",
 	ErrInvalidPluginName:          "Plugin load with %s but got wrong name %s",
@@ -936,6 +938,5 @@ var MySQLErrName = map[uint16]string{
 	ErrResolveLockTimeout: "Resolve lock timeout",
 	ErrRegionUnavailable:  "Region is unavailable",
 	ErrGCTooEarly:         "GC life time is shorter than transaction duration, transaction starts at %v, GC safe point is %v",
-
-	ErrTxnTooLarge: "Transaction is too large",
+	ErrWriteConflict:      "Write conflict, txnStartTS=%d, conflictStartTS=%d, conflictCommitTS=%d, key=%s",
 }

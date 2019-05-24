@@ -18,6 +18,17 @@ import (
 
 	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/mysql"
+	"github.com/pingcap/parser/terror"
+)
+
+const (
+	codeCollationCharsetMismatch = terror.ErrCode(mysql.ErrCollationCharsetMismatch)
+	codeUnknownCollation         = terror.ErrCode(mysql.ErrUnknownCollation)
+)
+
+var (
+	ErrUnknownCollation         = terror.ClassDDL.New(codeUnknownCollation, mysql.MySQLErrName[mysql.ErrUnknownCollation])
+	ErrCollationCharsetMismatch = terror.ClassDDL.New(codeCollationCharsetMismatch, mysql.MySQLErrName[mysql.ErrCollationCharsetMismatch])
 )
 
 // Charset is a charset.
@@ -40,8 +51,10 @@ type Collation struct {
 }
 
 var charsets = make(map[string]*Charset)
-var collationsMap = make(map[int]*Collation)
+var collationsIDMap = make(map[int]*Collation)
+var collationsNameMap = make(map[string]*Collation)
 var descs = make([]*Desc, 0, len(charsetInfos))
+var supportedCollations = make([]*Collation, 0, len(supportedCollationNames))
 
 // All the supported charsets should be in the following table.
 var charsetInfos = []*Charset{
@@ -52,6 +65,15 @@ var charsetInfos = []*Charset{
 	{CharsetBin, CollationBin, make(map[string]*Collation), "binary", 1},
 }
 
+// All the names supported collations should be in the following table.
+var supportedCollationNames = map[string]struct{}{
+	CollationUTF8:    {},
+	CollationUTF8MB4: {},
+	CollationASCII:   {},
+	CollationLatin1:  {},
+	CollationBin:     {},
+}
+
 // Desc is a charset description.
 type Desc struct {
 	Name             string
@@ -60,9 +82,14 @@ type Desc struct {
 	Maxlen           int
 }
 
-// GetAllCharsets gets all charset descriptions in the local charsets.
-func GetAllCharsets() []*Desc {
+// GetSupportedCharsets gets descriptions for all charsets supported so far.
+func GetSupportedCharsets() []*Desc {
 	return descs
+}
+
+// GetSupportedCollations gets information for all collations supported so far.
+func GetSupportedCollations() []*Collation {
+	return supportedCollations
 }
 
 // ValidCharsetAndCollation checks the charset and the collation validity
@@ -119,17 +146,20 @@ func GetCharsetInfo(cs string) (string, string, error) {
 
 // GetCharsetDesc gets charset descriptions in the local charsets.
 func GetCharsetDesc(cs string) (*Desc, error) {
-	c, ok := charsets[strings.ToLower(cs)]
-	if !ok {
+	switch strings.ToLower(cs) {
+	case CharsetUTF8:
+		return descs[0], nil
+	case CharsetUTF8MB4:
+		return descs[1], nil
+	case CharsetASCII:
+		return descs[2], nil
+	case CharsetLatin1:
+		return descs[3], nil
+	case CharsetBin:
+		return descs[4], nil
+	default:
 		return nil, errors.Errorf("Unknown charset %s", cs)
 	}
-	desc := &Desc{
-		Name:             c.Name,
-		DefaultCollation: c.DefaultCollation,
-		Desc:             c.Desc,
-		Maxlen:           c.Maxlen,
-	}
-	return desc, nil
 }
 
 // GetCharsetInfoByID returns charset and collation for id as cs_number.
@@ -137,7 +167,7 @@ func GetCharsetInfoByID(coID int) (string, string, error) {
 	if coID == mysql.DefaultCollationID {
 		return mysql.DefaultCharset, mysql.DefaultCollationName, nil
 	}
-	if collation, ok := collationsMap[coID]; ok {
+	if collation, ok := collationsIDMap[coID]; ok {
 		return collation.CharsetName, collation.Name, nil
 	}
 	return "", "", errors.Errorf("Unknown charset id %d", coID)
@@ -146,6 +176,14 @@ func GetCharsetInfoByID(coID int) (string, string, error) {
 // GetCollations returns a list for all collations.
 func GetCollations() []*Collation {
 	return collations
+}
+
+func GetCollationByName(name string) (*Collation, error) {
+	collation, ok := collationsNameMap[strings.ToLower(name)]
+	if !ok {
+		return nil, ErrUnknownCollation.GenWithStackByArgs(name)
+	}
+	return collation, nil
 }
 
 const (
@@ -179,10 +217,10 @@ var collations = []*Collation{
 	{5, "latin1", "latin1_german1_ci", false},
 	{6, "hp8", "hp8_english_ci", true},
 	{7, "koi8r", "koi8r_general_ci", true},
-	{8, "latin1", "latin1_swedish_ci", true},
+	{8, "latin1", "latin1_swedish_ci", false},
 	{9, "latin2", "latin2_general_ci", true},
 	{10, "swe7", "swe7_swedish_ci", true},
-	{11, "ascii", "ascii_general_ci", true},
+	{11, "ascii", "ascii_general_ci", false},
 	{12, "ujis", "ujis_japanese_ci", true},
 	{13, "sjis", "sjis_japanese_ci", true},
 	{14, "cp1251", "cp1251_bulgarian_ci", false},
@@ -203,7 +241,7 @@ var collations = []*Collation{
 	{30, "latin5", "latin5_turkish_ci", true},
 	{31, "latin1", "latin1_german2_ci", false},
 	{32, "armscii8", "armscii8_general_ci", true},
-	{33, "utf8", "utf8_general_ci", true},
+	{33, "utf8", "utf8_general_ci", false},
 	{34, "cp1250", "cp1250_czech_cs", false},
 	{35, "ucs2", "ucs2_general_ci", true},
 	{36, "cp866", "cp866_general_ci", true},
@@ -215,9 +253,9 @@ var collations = []*Collation{
 	{42, "latin7", "latin7_general_cs", false},
 	{43, "macce", "macce_bin", false},
 	{44, "cp1250", "cp1250_croatian_ci", false},
-	{45, "utf8mb4", "utf8mb4_general_ci", true},
-	{46, "utf8mb4", "utf8mb4_bin", false},
-	{47, "latin1", "latin1_bin", false},
+	{45, "utf8mb4", "utf8mb4_general_ci", false},
+	{46, "utf8mb4", "utf8mb4_bin", true},
+	{47, "latin1", "latin1_bin", true},
 	{48, "latin1", "latin1_general_ci", false},
 	{49, "latin1", "latin1_general_cs", false},
 	{50, "cp1251", "cp1251_bin", false},
@@ -235,7 +273,7 @@ var collations = []*Collation{
 	{62, "utf16le", "utf16le_bin", false},
 	{63, "binary", "binary", true},
 	{64, "armscii8", "armscii8_bin", false},
-	{65, "ascii", "ascii_bin", false},
+	{65, "ascii", "ascii_bin", true},
 	{66, "cp1250", "cp1250_bin", false},
 	{67, "cp1256", "cp1256_bin", false},
 	{68, "cp866", "cp866_bin", false},
@@ -252,7 +290,7 @@ var collations = []*Collation{
 	{80, "cp850", "cp850_bin", false},
 	{81, "cp852", "cp852_bin", false},
 	{82, "swe7", "swe7_bin", false},
-	{83, "utf8", "utf8_bin", false},
+	{83, "utf8", "utf8_bin", true},
 	{84, "big5", "big5_bin", false},
 	{85, "euckr", "euckr_bin", false},
 	{86, "gb2312", "gb2312_bin", false},
@@ -391,6 +429,7 @@ var collations = []*Collation{
 	{245, "utf8mb4", "utf8mb4_croatian_ci", false},
 	{246, "utf8mb4", "utf8mb4_unicode_520_ci", false},
 	{247, "utf8mb4", "utf8mb4_vietnamese_ci", false},
+	{255, "utf8mb4", "utf8mb4_0900_ai_ci", false},
 }
 
 // init method always puts to the end of file.
@@ -407,11 +446,18 @@ func init() {
 	}
 
 	for _, c := range collations {
-		collationsMap[c.ID] = c
-		charset, ok := charsets[c.CharsetName]
-		if !ok {
-			continue
+		collationsIDMap[c.ID] = c
+
+		if _, ok := supportedCollationNames[c.Name]; ok {
+			supportedCollations = append(supportedCollations, c)
 		}
-		charset.Collations[c.Name] = c
+
+		if charset, ok := charsets[c.CharsetName]; ok {
+			charset.Collations[c.Name] = c
+		}
+	}
+
+	for id, name := range mysql.Collations {
+		collationsNameMap[name] = collationsIDMap[int(id)]
 	}
 }

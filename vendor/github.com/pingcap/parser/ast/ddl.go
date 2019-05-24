@@ -98,11 +98,11 @@ func (n *CreateDatabaseStmt) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("IF NOT EXISTS ")
 	}
 	ctx.WriteName(n.Name)
-	for _, option := range n.Options {
+	for i, option := range n.Options {
 		ctx.WritePlain(" ")
 		err := option.Restore(ctx)
 		if err != nil {
-			return errors.Trace(err)
+			return errors.Annotatef(err, "An error occurred while splicing CreateDatabaseStmt DatabaseOption: [%v]", i)
 		}
 	}
 	return nil
@@ -115,6 +115,43 @@ func (n *CreateDatabaseStmt) Accept(v Visitor) (Node, bool) {
 		return v.Leave(newNode)
 	}
 	n = newNode.(*CreateDatabaseStmt)
+	return v.Leave(n)
+}
+
+// AlterDatabaseStmt is a statement to change the structure of a database.
+// See https://dev.mysql.com/doc/refman/5.7/en/alter-database.html
+type AlterDatabaseStmt struct {
+	ddlNode
+
+	Name                 string
+	AlterDefaultDatabase bool
+	Options              []*DatabaseOption
+}
+
+// Restore implements Node interface.
+func (n *AlterDatabaseStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("ALTER DATABASE")
+	if !n.AlterDefaultDatabase {
+		ctx.WritePlain(" ")
+		ctx.WriteName(n.Name)
+	}
+	for i, option := range n.Options {
+		ctx.WritePlain(" ")
+		err := option.Restore(ctx)
+		if err != nil {
+			return errors.Annotatef(err, "An error occurred while splicing AlterDatabaseStmt DatabaseOption: [%v]", i)
+		}
+	}
+	return nil
+}
+
+// Accept implements Node Accept interface.
+func (n *AlterDatabaseStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*AlterDatabaseStmt)
 	return v.Leave(n)
 }
 
@@ -352,6 +389,14 @@ const (
 	ColumnOptionGenerated
 	ColumnOptionReference
 	ColumnOptionCollate
+)
+
+var (
+	invalidOptionForGeneratedColumn = map[ColumnOptionType]struct{}{
+		ColumnOptionAutoIncrement: {},
+		ColumnOptionOnUpdate:      {},
+		ColumnOptionDefaultValue:  {},
+	}
 )
 
 // ColumnOption is used for parsing column constraint info from SQL.
@@ -672,6 +717,23 @@ func (n *ColumnDef) Accept(v Visitor) (Node, bool) {
 	return v.Leave(n)
 }
 
+// Validate checks if a column definition is legal.
+// For example, generated column definitions that contain such
+// column options as `ON UPDATE`, `AUTO_INCREMENT`, `DEFAULT`
+// are illegal.
+func (n *ColumnDef) Validate() bool {
+	generatedCol := false
+	illegalOpt4gc := false
+	for _, opt := range n.Options {
+		if opt.Tp == ColumnOptionGenerated {
+			generatedCol = true
+		}
+		_, found := invalidOptionForGeneratedColumn[opt.Tp]
+		illegalOpt4gc = illegalOpt4gc || found
+	}
+	return !(generatedCol && illegalOpt4gc)
+}
+
 // CreateTableStmt is a statement to create a table.
 // See https://dev.mysql.com/doc/refman/5.7/en/create-table.html
 type CreateTableStmt struct {
@@ -684,7 +746,7 @@ type CreateTableStmt struct {
 	Constraints []*Constraint
 	Options     []*TableOption
 	Partition   *PartitionOptions
-	OnDuplicate OnDuplicateCreateTableSelectType
+	OnDuplicate OnDuplicateKeyHandlingType
 	Select      ResultSetNode
 }
 
@@ -744,11 +806,11 @@ func (n *CreateTableStmt) Restore(ctx *RestoreCtx) error {
 
 	if n.Select != nil {
 		switch n.OnDuplicate {
-		case OnDuplicateCreateTableSelectError:
+		case OnDuplicateKeyHandlingError:
 			ctx.WriteKeyWord(" AS ")
-		case OnDuplicateCreateTableSelectIgnore:
+		case OnDuplicateKeyHandlingIgnore:
 			ctx.WriteKeyWord(" IGNORE AS ")
-		case OnDuplicateCreateTableSelectReplace:
+		case OnDuplicateKeyHandlingReplace:
 			ctx.WriteKeyWord(" REPLACE AS ")
 		}
 
@@ -1180,6 +1242,7 @@ const (
 	TableOptionRowFormat
 	TableOptionStatsPersistent
 	TableOptionShardRowID
+	TableOptionPreSplitRegion
 	TableOptionPackKeys
 )
 
@@ -1201,15 +1264,16 @@ const (
 	TokuDBRowFormatUncompressed
 )
 
-// OnDuplicateCreateTableSelectType is the option that handle unique key values in 'CREATE TABLE ... SELECT'.
+// OnDuplicateKeyHandlingType is the option that handle unique key values in 'CREATE TABLE ... SELECT' or `LOAD DATA`.
 // See https://dev.mysql.com/doc/refman/5.7/en/create-table-select.html
-type OnDuplicateCreateTableSelectType int
+// See https://dev.mysql.com/doc/refman/5.7/en/load-data.html
+type OnDuplicateKeyHandlingType int
 
-// OnDuplicateCreateTableSelect types
+// OnDuplicateKeyHandling types
 const (
-	OnDuplicateCreateTableSelectError OnDuplicateCreateTableSelectType = iota
-	OnDuplicateCreateTableSelectIgnore
-	OnDuplicateCreateTableSelectReplace
+	OnDuplicateKeyHandlingError OnDuplicateKeyHandlingType = iota
+	OnDuplicateKeyHandlingIgnore
+	OnDuplicateKeyHandlingReplace
 )
 
 // TableOption is used for parsing table option from SQL.
@@ -1324,8 +1388,10 @@ func (n *TableOption) Restore(ctx *RestoreCtx) error {
 		ctx.WritePlain(" /* TableOptionStatsPersistent is not supported */ ")
 	case TableOptionShardRowID:
 		ctx.WriteKeyWord("SHARD_ROW_ID_BITS ")
-		ctx.WritePlain("= ")
-		ctx.WritePlainf("%d", n.UintValue)
+		ctx.WritePlainf("= %d", n.UintValue)
+	case TableOptionPreSplitRegion:
+		ctx.WriteKeyWord("PRE_SPLIT_REGIONS ")
+		ctx.WritePlainf("= %d", n.UintValue)
 	case TableOptionPackKeys:
 		// TODO: not support
 		ctx.WriteKeyWord("PACK_KEYS ")
