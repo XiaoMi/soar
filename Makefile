@@ -191,7 +191,8 @@ docker:
 	-e MYSQL_DATABASE=sakila \
 	-p 3306:3306 \
 	-v `pwd`/test/sql/init.sql.gz:/docker-entrypoint-initdb.d/init.sql.gz \
-	$(MYSQL_RELEASE):$(MYSQL_VERSION)
+	$(MYSQL_RELEASE):$(MYSQL_VERSION) \
+	--sql-mode ""
 
 	@echo "waiting for sakila database initializing "
 	@timeout=180; while [ $${timeout} -gt 0 ] ; do \

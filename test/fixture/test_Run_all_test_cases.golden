@@ -974,6 +974,29 @@ GROUP BY
   address, district
 ```
 
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *address* | NULL | ALL | NULL | NULL | NULL | NULL | 603 | ☠️ **100.00%** | ☠️ **O(n)** | Using temporary |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Type信息解读
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
+#### Extra信息解读
+
+* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
+
+
 ##  为sakila库的address表添加索引
 
 * **Item:**  IDX.001
@@ -1089,6 +1112,33 @@ GROUP BY
 ORDER BY  
   language_id
 ```
+
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | 10.00% | ☠️ **O(n)** | Using where; Using temporary; Using filesort |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Type信息解读
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
+#### Extra信息解读
+
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
+
+* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
+
+* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
+
 
 ##  为sakila库的film表添加索引
 
@@ -3887,6 +3937,31 @@ GROUP BY
   first_name
 ```
 
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *actor* | NULL | ref | idx\_actor\_last\_name | idx\_actor\_last\_name | 137 | const | 2 | 14.29% | O(log n) | Using where; Using temporary |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Type信息解读
+
+* **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
+
+#### Extra信息解读
+
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
+
+* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
+
+
 ##  为sakila库的actor表添加索引
 
 * **Item:**  IDX.001
@@ -4247,6 +4322,29 @@ FROM
 GROUP BY  
   DATE( last_update)
 ```
+
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | ☠️ **100.00%** | ☠️ **O(n)** | Using temporary |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
+
+#### Type信息解读
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
+#### Extra信息解读
+
+* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
+
 
 ## 最外层 SELECT 未指定 WHERE 条件
 

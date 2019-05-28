@@ -3763,9 +3763,14 @@ func RuleMySQLError(item string, err error) Rule {
 		}
 	}
 
-	// Received #1146 error from MySQL server: "table xxx doesn't exist"
-	errReg := regexp.MustCompile(`(?i)Received #([0-9]+) error from MySQL server: ['"](.*)['"]`)
 	errStr := err.Error()
+	// Error 1071: Specified key was too long; max key length is 3072 bytes
+	errReg := regexp.MustCompile(`(?i)Error ([0-9]+): (.*)`)
+	if strings.HasPrefix(errStr, "Received") {
+		// Received #1146 error from MySQL server: "table xxx doesn't exist"
+		errReg = regexp.MustCompile(`(?i)Received #([0-9]+) error from MySQL server: ['"](.*)['"]`)
+	}
+
 	msg := errReg.FindStringSubmatch(errStr)
 	var mysqlError MySQLError
 
@@ -3798,7 +3803,7 @@ func RuleMySQLError(item string, err error) Rule {
 	default:
 		return Rule{
 			Item:     item,
-			Summary:  "MySQL execute failed: " + mysqlError.ErrString,
+			Summary:  "MySQL execute failed",
 			Severity: "L8",
 			Content:  mysqlError.ErrString,
 		}

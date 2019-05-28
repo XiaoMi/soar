@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2019-05
+- Fix issue #208 14c19f4 regression bug
+- Add max_execution_time hint for explain query
+- Fix #205 create index rewrite error
+
+## 2019-04
+- Add test case for STA.004
+- RuleSpaceWithQuote add list range check
+- Fix #199 -report-type=json add score
+- Fix #98 JSON result format
+- Fix index col compare case sensitive bug
+- Fix ARG.008 cases: col = 1 OR col IS NULL
+- Fix tokenize bug with multi type of quote
+
 ## 2019-02
 - add go.mod for go1.11
 - add new -report-type query-type
