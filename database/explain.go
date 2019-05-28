@@ -564,6 +564,11 @@ func (db *Connector) explainQuery(sql string, explainType int, formatType int) s
 	sql, err = db.explainAbleSQL(sql)
 	if sql == "" || err != nil {
 		return sql
+	} else {
+		// MySQL 5.7 support MAX_EXECUTION_TIME hint
+		// ref: https://dev.mysql.com/doc/refman/5.7/en/optimizer-hints.html
+		re := regexp.MustCompile(`(?i)(^select)(.*)`)
+		sql = re.ReplaceAllString(sql, "SELECT /*+ MAX_EXECUTION_TIME(1000) */${2}")
 	}
 
 	// 5.6以上支持 FORMAT=JSON
