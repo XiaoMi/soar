@@ -171,6 +171,7 @@ select col from tb;
 		[]byte(`INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);`), // 19
 		[]byte(`select /*!50000 1,*/ 1;`),                                          // 20
 		[]byte(`UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;`),          // 21
+		[]byte("UPDATE `xxx` SET aaa='a;' WHERE `id` = 15;"),                       // 22
 	}
 	// \G 分隔符
 	buf2s := [][]byte{
@@ -184,6 +185,9 @@ select col from tb;
         \\G*/
         from test\\Ghello`), // 6
 	}
+	// single sql test
+	// SplitStatement(bufs[22], []byte(";"))
+	// return
 	err := common.GoldenDiff(func() {
 		for i, buf := range bufs {
 			sql, _, _ := SplitStatement(buf, []byte(";"))

@@ -933,7 +933,7 @@ func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 			if i > 1 && buf[i-1] != '\\' {
 				if quoted && b == quoteRune {
 					quoted = false
-					quoteRune = '0'
+					quoteRune = 0
 				} else {
 					// check if first time found quote
 					if quoteRune == 0 {
