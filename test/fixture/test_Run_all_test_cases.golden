@@ -4637,3 +4637,151 @@ DROP
   DEFAULT
 ```
 
+# Query: B48292EDB9D0E010
+
+★ ★ ☆ ☆ ☆ 40分
+
+```sql
+
+SELECT  
+  maxId, minId  
+FROM  
+  (
+SELECT  
+  MAX( film_id) maxId, MIN( film_id) minId  
+FROM  
+  film  
+WHERE  
+  last_update  > '2016-03-27 02:01:01'
+) as  d
+```
+
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | PRIMARY | *<derived2>* | NULL | system | NULL | NULL | NULL | NULL | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 2  | DERIVED | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | 33.33% | ☠️ **O(n)** | Using where |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **DERIVED**: 用于from子句里有子查询的情况. MySQL会递归执行这些子查询, 把结果放在临时表里.
+
+* **PRIMARY**: 最外层的select.
+
+#### Type信息解读
+
+* **system**: 这是const连接类型的一种特例, 该表仅有一行数据(=系统表).
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
+#### Extra信息解读
+
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
+
+
+##  为sakila库的film表添加索引
+
+* **Item:**  IDX.001
+
+* **Severity:**  L2
+
+
+* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_last\_update\` (\`last\_update\`) ;
+
+
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+## 不建议在子查询中使用函数
+
+* **Item:**  SUB.006
+
+* **Severity:**  L2
+
+* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询，如果在子查询中使用函数，即使是semi-join也很难进行高效的查询。可以将子查询重写为OUTER JOIN语句并用连接条件对数据进行过滤。
+
+# Query: 4A39009B402BAD9B
+
+★ ★ ☆ ☆ ☆ 50分
+
+```sql
+
+SELECT  
+  maxId, minId  
+FROM  
+  (
+SELECT  
+  MAX( film_id) maxId, MIN( film_id) minId  
+FROM  
+  film) as  d
+```
+
+##  Explain信息
+
+| id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1  | PRIMARY | *<derived2>* | NULL | system | NULL | NULL | NULL | NULL | 1 | ☠️ **100.00%** | O(1) | NULL |
+| 2  | DERIVED | *NULL* | NULL | NULL | NULL | NULL | NULL | NULL | 0 | 0.00% | NULL | Select tables optimized away |
+
+
+
+### Explain信息解读
+
+#### SelectType信息解读
+
+* **DERIVED**: 用于from子句里有子查询的情况. MySQL会递归执行这些子查询, 把结果放在临时表里.
+
+* **PRIMARY**: 最外层的select.
+
+#### Type信息解读
+
+* **system**: 这是const连接类型的一种特例, 该表仅有一行数据(=系统表).
+
+#### Extra信息解读
+
+* **Select tables optimized away**: 仅通过使用索引，优化器可能仅从聚合函数结果中返回一行。如：在没有 GROUP BY 子句的情况下，基于索引优化 MIN/MAX 操作，或者对于 MyISAM 存储引擎优化 COUNT(*) 操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化。
+
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+## 不建议在子查询中使用函数
+
+* **Item:**  SUB.006
+
+* **Severity:**  L2
+
+* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询，如果在子查询中使用函数，即使是semi-join也很难进行高效的查询。可以将子查询重写为OUTER JOIN语句并用连接条件对数据进行过滤。
+

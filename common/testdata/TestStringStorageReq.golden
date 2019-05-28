@@ -1,203 +1,3 @@
-char(10) hebrew 10
-char(256) hebrew 255
-binary(10) hebrew 10
-binary(256) hebrew 255
-varchar(10) hebrew 11
-varbinary(10) hebrew 11
-enum('G','PG','PG-13','R','NC-17') hebrew 1
-set('one', 'two') hebrew 1
-not_exist hebrew 0
-char(-1) hebrew 0
-char(10) latin2 10
-char(256) latin2 255
-binary(10) latin2 10
-binary(256) latin2 255
-varchar(10) latin2 11
-varbinary(10) latin2 11
-enum('G','PG','PG-13','R','NC-17') latin2 1
-set('one', 'two') latin2 1
-not_exist latin2 0
-char(-1) latin2 0
-char(10) big5 20
-char(256) big5 510
-binary(10) big5 10
-binary(256) big5 255
-varchar(10) big5 21
-varbinary(10) big5 21
-enum('G','PG','PG-13','R','NC-17') big5 1
-set('one', 'two') big5 1
-not_exist big5 0
-char(-1) big5 0
-char(10) cp1250 10
-char(256) cp1250 255
-binary(10) cp1250 10
-binary(256) cp1250 255
-varchar(10) cp1250 11
-varbinary(10) cp1250 11
-enum('G','PG','PG-13','R','NC-17') cp1250 1
-set('one', 'two') cp1250 1
-not_exist cp1250 0
-char(-1) cp1250 0
-char(10) eucjpms 30
-char(256) eucjpms 765
-binary(10) eucjpms 10
-binary(256) eucjpms 255
-varchar(10) eucjpms 31
-varbinary(10) eucjpms 31
-enum('G','PG','PG-13','R','NC-17') eucjpms 1
-set('one', 'two') eucjpms 1
-not_exist eucjpms 0
-char(-1) eucjpms 0
-char(10) latin1 10
-char(256) latin1 255
-binary(10) latin1 10
-binary(256) latin1 255
-varchar(10) latin1 11
-varbinary(10) latin1 11
-enum('G','PG','PG-13','R','NC-17') latin1 1
-set('one', 'two') latin1 1
-not_exist latin1 0
-char(-1) latin1 0
-char(10) macce 10
-char(256) macce 255
-binary(10) macce 10
-binary(256) macce 255
-varchar(10) macce 11
-varbinary(10) macce 11
-enum('G','PG','PG-13','R','NC-17') macce 1
-set('one', 'two') macce 1
-not_exist macce 0
-char(-1) macce 0
-char(10) tis620 10
-char(256) tis620 255
-binary(10) tis620 10
-binary(256) tis620 255
-varchar(10) tis620 11
-varbinary(10) tis620 11
-enum('G','PG','PG-13','R','NC-17') tis620 1
-set('one', 'two') tis620 1
-not_exist tis620 0
-char(-1) tis620 0
-char(10) utf16 40
-char(256) utf16 1020
-binary(10) utf16 10
-binary(256) utf16 255
-varchar(10) utf16 41
-varbinary(10) utf16 41
-enum('G','PG','PG-13','R','NC-17') utf16 1
-set('one', 'two') utf16 1
-not_exist utf16 0
-char(-1) utf16 0
-char(10) utf16le 40
-char(256) utf16le 1020
-binary(10) utf16le 10
-binary(256) utf16le 255
-varchar(10) utf16le 41
-varbinary(10) utf16le 41
-enum('G','PG','PG-13','R','NC-17') utf16le 1
-set('one', 'two') utf16le 1
-not_exist utf16le 0
-char(-1) utf16le 0
-char(10) binary 10
-char(256) binary 255
-binary(10) binary 10
-binary(256) binary 255
-varchar(10) binary 11
-varbinary(10) binary 11
-enum('G','PG','PG-13','R','NC-17') binary 1
-set('one', 'two') binary 1
-not_exist binary 0
-char(-1) binary 0
-char(10) cp852 10
-char(256) cp852 255
-binary(10) cp852 10
-binary(256) cp852 255
-varchar(10) cp852 11
-varbinary(10) cp852 11
-enum('G','PG','PG-13','R','NC-17') cp852 1
-set('one', 'two') cp852 1
-not_exist cp852 0
-char(-1) cp852 0
-char(10) cp932 20
-char(256) cp932 510
-binary(10) cp932 10
-binary(256) cp932 255
-varchar(10) cp932 21
-varbinary(10) cp932 21
-enum('G','PG','PG-13','R','NC-17') cp932 1
-set('one', 'two') cp932 1
-not_exist cp932 0
-char(-1) cp932 0
-char(10) gbk 20
-char(256) gbk 510
-binary(10) gbk 10
-binary(256) gbk 255
-varchar(10) gbk 21
-varbinary(10) gbk 21
-enum('G','PG','PG-13','R','NC-17') gbk 1
-set('one', 'two') gbk 1
-not_exist gbk 0
-char(-1) gbk 0
-char(10) hp8 10
-char(256) hp8 255
-binary(10) hp8 10
-binary(256) hp8 255
-varchar(10) hp8 11
-varbinary(10) hp8 11
-enum('G','PG','PG-13','R','NC-17') hp8 1
-set('one', 'two') hp8 1
-not_exist hp8 0
-char(-1) hp8 0
-char(10) ucs2 20
-char(256) ucs2 510
-binary(10) ucs2 10
-binary(256) ucs2 255
-varchar(10) ucs2 21
-varbinary(10) ucs2 21
-enum('G','PG','PG-13','R','NC-17') ucs2 1
-set('one', 'two') ucs2 1
-not_exist ucs2 0
-char(-1) ucs2 0
-char(10) cp1251 10
-char(256) cp1251 255
-binary(10) cp1251 10
-binary(256) cp1251 255
-varchar(10) cp1251 11
-varbinary(10) cp1251 11
-enum('G','PG','PG-13','R','NC-17') cp1251 1
-set('one', 'two') cp1251 1
-not_exist cp1251 0
-char(-1) cp1251 0
-char(10) cp1256 10
-char(256) cp1256 255
-binary(10) cp1256 10
-binary(256) cp1256 255
-varchar(10) cp1256 11
-varbinary(10) cp1256 11
-enum('G','PG','PG-13','R','NC-17') cp1256 1
-set('one', 'two') cp1256 1
-not_exist cp1256 0
-char(-1) cp1256 0
-char(10) dec8 10
-char(256) dec8 255
-binary(10) dec8 10
-binary(256) dec8 255
-varchar(10) dec8 11
-varbinary(10) dec8 11
-enum('G','PG','PG-13','R','NC-17') dec8 1
-set('one', 'two') dec8 1
-not_exist dec8 0
-char(-1) dec8 0
-char(10) euckr 20
-char(256) euckr 510
-binary(10) euckr 10
-binary(256) euckr 255
-varchar(10) euckr 21
-varbinary(10) euckr 21
-enum('G','PG','PG-13','R','NC-17') euckr 1
-set('one', 'two') euckr 1
-not_exist euckr 0
-char(-1) euckr 0
 char(10) geostd8 10
 char(256) geostd8 255
 binary(10) geostd8 10
@@ -208,176 +8,36 @@ enum('G','PG','PG-13','R','NC-17') geostd8 1
 set('one', 'two') geostd8 1
 not_exist geostd8 0
 char(-1) geostd8 0
-char(10) greek 10
-char(256) greek 255
-binary(10) greek 10
-binary(256) greek 255
-varchar(10) greek 11
-varbinary(10) greek 11
-enum('G','PG','PG-13','R','NC-17') greek 1
-set('one', 'two') greek 1
-not_exist greek 0
-char(-1) greek 0
-char(10) macroman 10
-char(256) macroman 255
-binary(10) macroman 10
-binary(256) macroman 255
-varchar(10) macroman 11
-varbinary(10) macroman 11
-enum('G','PG','PG-13','R','NC-17') macroman 1
-set('one', 'two') macroman 1
-not_exist macroman 0
-char(-1) macroman 0
-char(10) armscii8 10
-char(256) armscii8 255
-binary(10) armscii8 10
-binary(256) armscii8 255
-varchar(10) armscii8 11
-varbinary(10) armscii8 11
-enum('G','PG','PG-13','R','NC-17') armscii8 1
-set('one', 'two') armscii8 1
-not_exist armscii8 0
-char(-1) armscii8 0
-char(10) cp850 10
-char(256) cp850 255
-binary(10) cp850 10
-binary(256) cp850 255
-varchar(10) cp850 11
-varbinary(10) cp850 11
-enum('G','PG','PG-13','R','NC-17') cp850 1
-set('one', 'two') cp850 1
-not_exist cp850 0
-char(-1) cp850 0
-char(10) koi8u 10
-char(256) koi8u 255
-binary(10) koi8u 10
-binary(256) koi8u 255
-varchar(10) koi8u 11
-varbinary(10) koi8u 11
-enum('G','PG','PG-13','R','NC-17') koi8u 1
-set('one', 'two') koi8u 1
-not_exist koi8u 0
-char(-1) koi8u 0
-char(10) ujis 30
-char(256) ujis 765
-binary(10) ujis 10
-binary(256) ujis 255
-varchar(10) ujis 31
-varbinary(10) ujis 31
-enum('G','PG','PG-13','R','NC-17') ujis 1
-set('one', 'two') ujis 1
-not_exist ujis 0
-char(-1) ujis 0
-char(10) utf32 40
-char(256) utf32 1020
-binary(10) utf32 10
-binary(256) utf32 255
-varchar(10) utf32 41
-varbinary(10) utf32 41
-enum('G','PG','PG-13','R','NC-17') utf32 1
-set('one', 'two') utf32 1
-not_exist utf32 0
-char(-1) utf32 0
-char(10) cp866 10
-char(256) cp866 255
-binary(10) cp866 10
-binary(256) cp866 255
-varchar(10) cp866 11
-varbinary(10) cp866 11
-enum('G','PG','PG-13','R','NC-17') cp866 1
-set('one', 'two') cp866 1
-not_exist cp866 0
-char(-1) cp866 0
-char(10) gb2312 20
-char(256) gb2312 510
-binary(10) gb2312 10
-binary(256) gb2312 255
-varchar(10) gb2312 21
-varbinary(10) gb2312 21
-enum('G','PG','PG-13','R','NC-17') gb2312 1
-set('one', 'two') gb2312 1
-not_exist gb2312 0
-char(-1) gb2312 0
-char(10) swe7 10
-char(256) swe7 255
-binary(10) swe7 10
-binary(256) swe7 255
-varchar(10) swe7 11
-varbinary(10) swe7 11
-enum('G','PG','PG-13','R','NC-17') swe7 1
-set('one', 'two') swe7 1
-not_exist swe7 0
-char(-1) swe7 0
-char(10) utf8mb4 40
-char(256) utf8mb4 1020
-binary(10) utf8mb4 10
-binary(256) utf8mb4 255
-varchar(10) utf8mb4 41
-varbinary(10) utf8mb4 41
-enum('G','PG','PG-13','R','NC-17') utf8mb4 1
-set('one', 'two') utf8mb4 1
-not_exist utf8mb4 0
-char(-1) utf8mb4 0
-char(10) ascii 10
-char(256) ascii 255
-binary(10) ascii 10
-binary(256) ascii 255
-varchar(10) ascii 11
-varbinary(10) ascii 11
-enum('G','PG','PG-13','R','NC-17') ascii 1
-set('one', 'two') ascii 1
-not_exist ascii 0
-char(-1) ascii 0
-char(10) latin5 10
-char(256) latin5 255
-binary(10) latin5 10
-binary(256) latin5 255
-varchar(10) latin5 11
-varbinary(10) latin5 11
-enum('G','PG','PG-13','R','NC-17') latin5 1
-set('one', 'two') latin5 1
-not_exist latin5 0
-char(-1) latin5 0
-char(10) koi8r 10
-char(256) koi8r 255
-binary(10) koi8r 10
-binary(256) koi8r 255
-varchar(10) koi8r 11
-varbinary(10) koi8r 11
-enum('G','PG','PG-13','R','NC-17') koi8r 1
-set('one', 'two') koi8r 1
-not_exist koi8r 0
-char(-1) koi8r 0
-char(10) latin7 10
-char(256) latin7 255
-binary(10) latin7 10
-binary(256) latin7 255
-varchar(10) latin7 11
-varbinary(10) latin7 11
-enum('G','PG','PG-13','R','NC-17') latin7 1
-set('one', 'two') latin7 1
-not_exist latin7 0
-char(-1) latin7 0
-char(10) sjis 20
-char(256) sjis 510
-binary(10) sjis 10
-binary(256) sjis 255
-varchar(10) sjis 21
-varbinary(10) sjis 21
-enum('G','PG','PG-13','R','NC-17') sjis 1
-set('one', 'two') sjis 1
-not_exist sjis 0
-char(-1) sjis 0
-char(10) utf8 30
-char(256) utf8 765
-binary(10) utf8 10
-binary(256) utf8 255
-varchar(10) utf8 31
-varbinary(10) utf8 31
-enum('G','PG','PG-13','R','NC-17') utf8 1
-set('one', 'two') utf8 1
-not_exist utf8 0
-char(-1) utf8 0
+char(10) hebrew 10
+char(256) hebrew 255
+binary(10) hebrew 10
+binary(256) hebrew 255
+varchar(10) hebrew 11
+varbinary(10) hebrew 11
+enum('G','PG','PG-13','R','NC-17') hebrew 1
+set('one', 'two') hebrew 1
+not_exist hebrew 0
+char(-1) hebrew 0
+char(10) hp8 10
+char(256) hp8 255
+binary(10) hp8 10
+binary(256) hp8 255
+varchar(10) hp8 11
+varbinary(10) hp8 11
+enum('G','PG','PG-13','R','NC-17') hp8 1
+set('one', 'two') hp8 1
+not_exist hp8 0
+char(-1) hp8 0
+char(10) cp1250 10
+char(256) cp1250 255
+binary(10) cp1250 10
+binary(256) cp1250 255
+varchar(10) cp1250 11
+varbinary(10) cp1250 11
+enum('G','PG','PG-13','R','NC-17') cp1250 1
+set('one', 'two') cp1250 1
+not_exist cp1250 0
+char(-1) cp1250 0
 char(10) cp1257 10
 char(256) cp1257 255
 binary(10) cp1257 10
@@ -388,6 +48,76 @@ enum('G','PG','PG-13','R','NC-17') cp1257 1
 set('one', 'two') cp1257 1
 not_exist cp1257 0
 char(-1) cp1257 0
+char(10) cp932 20
+char(256) cp932 510
+binary(10) cp932 10
+binary(256) cp932 255
+varchar(10) cp932 21
+varbinary(10) cp932 21
+enum('G','PG','PG-13','R','NC-17') cp932 1
+set('one', 'two') cp932 1
+not_exist cp932 0
+char(-1) cp932 0
+char(10) eucjpms 30
+char(256) eucjpms 765
+binary(10) eucjpms 10
+binary(256) eucjpms 255
+varchar(10) eucjpms 31
+varbinary(10) eucjpms 31
+enum('G','PG','PG-13','R','NC-17') eucjpms 1
+set('one', 'two') eucjpms 1
+not_exist eucjpms 0
+char(-1) eucjpms 0
+char(10) euckr 20
+char(256) euckr 510
+binary(10) euckr 10
+binary(256) euckr 255
+varchar(10) euckr 21
+varbinary(10) euckr 21
+enum('G','PG','PG-13','R','NC-17') euckr 1
+set('one', 'two') euckr 1
+not_exist euckr 0
+char(-1) euckr 0
+char(10) macroman 10
+char(256) macroman 255
+binary(10) macroman 10
+binary(256) macroman 255
+varchar(10) macroman 11
+varbinary(10) macroman 11
+enum('G','PG','PG-13','R','NC-17') macroman 1
+set('one', 'two') macroman 1
+not_exist macroman 0
+char(-1) macroman 0
+char(10) ucs2 20
+char(256) ucs2 510
+binary(10) ucs2 10
+binary(256) ucs2 255
+varchar(10) ucs2 21
+varbinary(10) ucs2 21
+enum('G','PG','PG-13','R','NC-17') ucs2 1
+set('one', 'two') ucs2 1
+not_exist ucs2 0
+char(-1) ucs2 0
+char(10) utf32 40
+char(256) utf32 1020
+binary(10) utf32 10
+binary(256) utf32 255
+varchar(10) utf32 41
+varbinary(10) utf32 41
+enum('G','PG','PG-13','R','NC-17') utf32 1
+set('one', 'two') utf32 1
+not_exist utf32 0
+char(-1) utf32 0
+char(10) utf8 30
+char(256) utf8 765
+binary(10) utf8 10
+binary(256) utf8 255
+varchar(10) utf8 31
+varbinary(10) utf8 31
+enum('G','PG','PG-13','R','NC-17') utf8 1
+set('one', 'two') utf8 1
+not_exist utf8 0
+char(-1) utf8 0
 char(10) gb18030 40
 char(256) gb18030 1020
 binary(10) gb18030 10
@@ -398,6 +128,56 @@ enum('G','PG','PG-13','R','NC-17') gb18030 1
 set('one', 'two') gb18030 1
 not_exist gb18030 0
 char(-1) gb18030 0
+char(10) koi8r 10
+char(256) koi8r 255
+binary(10) koi8r 10
+binary(256) koi8r 255
+varchar(10) koi8r 11
+varbinary(10) koi8r 11
+enum('G','PG','PG-13','R','NC-17') koi8r 1
+set('one', 'two') koi8r 1
+not_exist koi8r 0
+char(-1) koi8r 0
+char(10) koi8u 10
+char(256) koi8u 255
+binary(10) koi8u 10
+binary(256) koi8u 255
+varchar(10) koi8u 11
+varbinary(10) koi8u 11
+enum('G','PG','PG-13','R','NC-17') koi8u 1
+set('one', 'two') koi8u 1
+not_exist koi8u 0
+char(-1) koi8u 0
+char(10) latin1 10
+char(256) latin1 255
+binary(10) latin1 10
+binary(256) latin1 255
+varchar(10) latin1 11
+varbinary(10) latin1 11
+enum('G','PG','PG-13','R','NC-17') latin1 1
+set('one', 'two') latin1 1
+not_exist latin1 0
+char(-1) latin1 0
+char(10) swe7 10
+char(256) swe7 255
+binary(10) swe7 10
+binary(256) swe7 255
+varchar(10) swe7 11
+varbinary(10) swe7 11
+enum('G','PG','PG-13','R','NC-17') swe7 1
+set('one', 'two') swe7 1
+not_exist swe7 0
+char(-1) swe7 0
+char(10) binary 10
+char(256) binary 255
+binary(10) binary 10
+binary(256) binary 255
+varchar(10) binary 11
+varbinary(10) binary 11
+enum('G','PG','PG-13','R','NC-17') binary 1
+set('one', 'two') binary 1
+not_exist binary 0
+char(-1) binary 0
 char(10) keybcs2 10
 char(256) keybcs2 255
 binary(10) keybcs2 10
@@ -408,3 +188,223 @@ enum('G','PG','PG-13','R','NC-17') keybcs2 1
 set('one', 'two') keybcs2 1
 not_exist keybcs2 0
 char(-1) keybcs2 0
+char(10) macce 10
+char(256) macce 255
+binary(10) macce 10
+binary(256) macce 255
+varchar(10) macce 11
+varbinary(10) macce 11
+enum('G','PG','PG-13','R','NC-17') macce 1
+set('one', 'two') macce 1
+not_exist macce 0
+char(-1) macce 0
+char(10) ujis 30
+char(256) ujis 765
+binary(10) ujis 10
+binary(256) ujis 255
+varchar(10) ujis 31
+varbinary(10) ujis 31
+enum('G','PG','PG-13','R','NC-17') ujis 1
+set('one', 'two') ujis 1
+not_exist ujis 0
+char(-1) ujis 0
+char(10) utf16le 40
+char(256) utf16le 1020
+binary(10) utf16le 10
+binary(256) utf16le 255
+varchar(10) utf16le 41
+varbinary(10) utf16le 41
+enum('G','PG','PG-13','R','NC-17') utf16le 1
+set('one', 'two') utf16le 1
+not_exist utf16le 0
+char(-1) utf16le 0
+char(10) cp1256 10
+char(256) cp1256 255
+binary(10) cp1256 10
+binary(256) cp1256 255
+varchar(10) cp1256 11
+varbinary(10) cp1256 11
+enum('G','PG','PG-13','R','NC-17') cp1256 1
+set('one', 'two') cp1256 1
+not_exist cp1256 0
+char(-1) cp1256 0
+char(10) gb2312 20
+char(256) gb2312 510
+binary(10) gb2312 10
+binary(256) gb2312 255
+varchar(10) gb2312 21
+varbinary(10) gb2312 21
+enum('G','PG','PG-13','R','NC-17') gb2312 1
+set('one', 'two') gb2312 1
+not_exist gb2312 0
+char(-1) gb2312 0
+char(10) gbk 20
+char(256) gbk 510
+binary(10) gbk 10
+binary(256) gbk 255
+varchar(10) gbk 21
+varbinary(10) gbk 21
+enum('G','PG','PG-13','R','NC-17') gbk 1
+set('one', 'two') gbk 1
+not_exist gbk 0
+char(-1) gbk 0
+char(10) greek 10
+char(256) greek 255
+binary(10) greek 10
+binary(256) greek 255
+varchar(10) greek 11
+varbinary(10) greek 11
+enum('G','PG','PG-13','R','NC-17') greek 1
+set('one', 'two') greek 1
+not_exist greek 0
+char(-1) greek 0
+char(10) big5 20
+char(256) big5 510
+binary(10) big5 10
+binary(256) big5 255
+varchar(10) big5 21
+varbinary(10) big5 21
+enum('G','PG','PG-13','R','NC-17') big5 1
+set('one', 'two') big5 1
+not_exist big5 0
+char(-1) big5 0
+char(10) utf16 40
+char(256) utf16 1020
+binary(10) utf16 10
+binary(256) utf16 255
+varchar(10) utf16 41
+varbinary(10) utf16 41
+enum('G','PG','PG-13','R','NC-17') utf16 1
+set('one', 'two') utf16 1
+not_exist utf16 0
+char(-1) utf16 0
+char(10) latin5 10
+char(256) latin5 255
+binary(10) latin5 10
+binary(256) latin5 255
+varchar(10) latin5 11
+varbinary(10) latin5 11
+enum('G','PG','PG-13','R','NC-17') latin5 1
+set('one', 'two') latin5 1
+not_exist latin5 0
+char(-1) latin5 0
+char(10) latin7 10
+char(256) latin7 255
+binary(10) latin7 10
+binary(256) latin7 255
+varchar(10) latin7 11
+varbinary(10) latin7 11
+enum('G','PG','PG-13','R','NC-17') latin7 1
+set('one', 'two') latin7 1
+not_exist latin7 0
+char(-1) latin7 0
+char(10) cp1251 10
+char(256) cp1251 255
+binary(10) cp1251 10
+binary(256) cp1251 255
+varchar(10) cp1251 11
+varbinary(10) cp1251 11
+enum('G','PG','PG-13','R','NC-17') cp1251 1
+set('one', 'two') cp1251 1
+not_exist cp1251 0
+char(-1) cp1251 0
+char(10) cp850 10
+char(256) cp850 255
+binary(10) cp850 10
+binary(256) cp850 255
+varchar(10) cp850 11
+varbinary(10) cp850 11
+enum('G','PG','PG-13','R','NC-17') cp850 1
+set('one', 'two') cp850 1
+not_exist cp850 0
+char(-1) cp850 0
+char(10) cp852 10
+char(256) cp852 255
+binary(10) cp852 10
+binary(256) cp852 255
+varchar(10) cp852 11
+varbinary(10) cp852 11
+enum('G','PG','PG-13','R','NC-17') cp852 1
+set('one', 'two') cp852 1
+not_exist cp852 0
+char(-1) cp852 0
+char(10) dec8 10
+char(256) dec8 255
+binary(10) dec8 10
+binary(256) dec8 255
+varchar(10) dec8 11
+varbinary(10) dec8 11
+enum('G','PG','PG-13','R','NC-17') dec8 1
+set('one', 'two') dec8 1
+not_exist dec8 0
+char(-1) dec8 0
+char(10) latin2 10
+char(256) latin2 255
+binary(10) latin2 10
+binary(256) latin2 255
+varchar(10) latin2 11
+varbinary(10) latin2 11
+enum('G','PG','PG-13','R','NC-17') latin2 1
+set('one', 'two') latin2 1
+not_exist latin2 0
+char(-1) latin2 0
+char(10) cp866 10
+char(256) cp866 255
+binary(10) cp866 10
+binary(256) cp866 255
+varchar(10) cp866 11
+varbinary(10) cp866 11
+enum('G','PG','PG-13','R','NC-17') cp866 1
+set('one', 'two') cp866 1
+not_exist cp866 0
+char(-1) cp866 0
+char(10) armscii8 10
+char(256) armscii8 255
+binary(10) armscii8 10
+binary(256) armscii8 255
+varchar(10) armscii8 11
+varbinary(10) armscii8 11
+enum('G','PG','PG-13','R','NC-17') armscii8 1
+set('one', 'two') armscii8 1
+not_exist armscii8 0
+char(-1) armscii8 0
+char(10) ascii 10
+char(256) ascii 255
+binary(10) ascii 10
+binary(256) ascii 255
+varchar(10) ascii 11
+varbinary(10) ascii 11
+enum('G','PG','PG-13','R','NC-17') ascii 1
+set('one', 'two') ascii 1
+not_exist ascii 0
+char(-1) ascii 0
+char(10) sjis 20
+char(256) sjis 510
+binary(10) sjis 10
+binary(256) sjis 255
+varchar(10) sjis 21
+varbinary(10) sjis 21
+enum('G','PG','PG-13','R','NC-17') sjis 1
+set('one', 'two') sjis 1
+not_exist sjis 0
+char(-1) sjis 0
+char(10) tis620 10
+char(256) tis620 255
+binary(10) tis620 10
+binary(256) tis620 255
+varchar(10) tis620 11
+varbinary(10) tis620 11
+enum('G','PG','PG-13','R','NC-17') tis620 1
+set('one', 'two') tis620 1
+not_exist tis620 0
+char(-1) tis620 0
+char(10) utf8mb4 40
+char(256) utf8mb4 1020
+binary(10) utf8mb4 10
+binary(256) utf8mb4 255
+varchar(10) utf8mb4 41
+varbinary(10) utf8mb4 41
+enum('G','PG','PG-13','R','NC-17') utf8mb4 1
+set('one', 'two') utf8mb4 1
+not_exist utf8mb4 0
+char(-1) utf8mb4 0

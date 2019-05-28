@@ -2503,3 +2503,86 @@ DROP
 
 ## OK
 
+# Query: B48292EDB9D0E010
+
+★ ★ ☆ ☆ ☆ 50分
+
+```sql
+
+SELECT  
+  maxId, minId  
+FROM  
+  (
+SELECT  
+  MAX( film_id) maxId, MIN( film_id) minId  
+FROM  
+  film  
+WHERE  
+  last_update  > '2016-03-27 02:01:01'
+) as  d
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+## 不建议在子查询中使用函数
+
+* **Item:**  SUB.006
+
+* **Severity:**  L2
+
+* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询，如果在子查询中使用函数，即使是semi-join也很难进行高效的查询。可以将子查询重写为OUTER JOIN语句并用连接条件对数据进行过滤。
+
+# Query: 4A39009B402BAD9B
+
+★ ★ ☆ ☆ ☆ 50分
+
+```sql
+
+SELECT  
+  maxId, minId  
+FROM  
+  (
+SELECT  
+  MAX( film_id) maxId, MIN( film_id) minId  
+FROM  
+  film) as  d
+```
+
+## 最外层 SELECT 未指定 WHERE 条件
+
+* **Item:**  CLA.001
+
+* **Severity:**  L4
+
+* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+
+## MySQL 对子查询的优化效果不佳
+
+* **Item:**  SUB.001
+
+* **Severity:**  L4
+
+* **Content:**  MySQL 将外部查询中的每一行作为依赖子查询执行子查询。 这是导致严重性能问题的常见原因。这可能会在 MySQL 5.6 版本中得到改善, 但对于5.1及更早版本, 建议将该类查询分别重写为 JOIN 或 LEFT OUTER JOIN。
+
+## 不建议在子查询中使用函数
+
+* **Item:**  SUB.006
+
+* **Severity:**  L2
+
+* **Content:**  MySQL将外部查询中的每一行作为依赖子查询执行子查询，如果在子查询中使用函数，即使是semi-join也很难进行高效的查询。可以将子查询重写为OUTER JOIN语句并用连接条件对数据进行过滤。
+

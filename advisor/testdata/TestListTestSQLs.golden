@@ -83,3 +83,5 @@ SELECT	DATE_FORMAT(t.last_update, '%Y-%m-%d'),	COUNT(DISTINCT (t.city))	FROM cit
 create table hello.t (id int unsigned);
 select * from tb where data >= '';
 alter table tb alter column id drop default;
+select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film where last_update > '2016-03-27 02:01:01') as d;
+select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film) as d;

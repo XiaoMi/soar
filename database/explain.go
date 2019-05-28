@@ -378,6 +378,7 @@ var ExplainExtra = map[string]string{
 	"No tables used":                           "查询没有FROM子句, 或者有一个 FROM DUAL子句.",
 	"Not exists":                               "MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.",
 	"Plan isn't ready yet":                     "This value occurs with EXPLAIN FOR CONNECTION when the optimizer has not finished creating the execution plan for the statement executing in the named connection. If execution plan output comprises multiple lines, any or all of them could have this Extra value, depending on the progress of the optimizer in determining the full execution plan.",
+	"Select tables optimized away":             "仅通过使用索引，优化器可能仅从聚合函数结果中返回一行。如：在没有 GROUP BY 子句的情况下，基于索引优化 MIN/MAX 操作，或者对于 MyISAM 存储引擎优化 COUNT(*) 操作，不必等到执行阶段再进行计算，查询执行计划生成的阶段即完成优化。",
 	"Using intersect":                          "开启了index merge，即：对多个索引分别进行条件扫描，然后将它们各自的结果进行合并，使用的算法为：index_merge_intersection",
 	"Using union":                              "开启了index merge，即：对多个索引分别进行条件扫描，然后将它们各自的结果进行合并，使用的算法为：index_merge_union",
 	"Using sort_union":                         "开启了index merge，即：对多个索引分别进行条件扫描，然后将它们各自的结果进行合并，使用的算法为：index_merge_sort_union",

@@ -168,3 +168,7 @@ select * from tb where data >= '';
 [{5 SELECT  0} {7 * 0} {0   0} {5 FROM  0} {1 tb  0} {5 WHERE  0} {1 data  0} {7 >= 0} {0   0} {2 '' 0} {7 ; 0}]
 alter table tb alter column id drop default;
 [{5 ALTER TABLE  0} {1 tb  0} {1 alter  0} {1 column  0} {1 id  0} {5 DROP  0} {4 DEFAULT; 0}]
+select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film where last_update > '2016-03-27 02:01:01') as d;
+[{5 SELECT  0} {1 maxId, 0} {0   0} {1 minId  0} {5 FROM  0} {7 ( 0} {5 SELECT  0} {4 MAX( 0} {1 film_id) 0} {0   0} {1 maxId, 0} {0   0} {4 MIN( 0} {1 film_id) 0} {0   0} {1 minId  0} {5 FROM  0} {1 film  0} {5 WHERE  0} {1 last_update  0} {7 > 0} {0   0} {2 '2016-03-27 02:01:01' 0} {7 ) 0} {0   0} {1 as  0} {1 d; 0}]
+select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film) as d;
+[{5 SELECT  0} {1 maxId, 0} {0   0} {1 minId  0} {5 FROM  0} {7 ( 0} {5 SELECT  0} {4 MAX( 0} {1 film_id) 0} {0   0} {1 maxId, 0} {0   0} {4 MIN( 0} {1 film_id) 0} {0   0} {1 minId  0} {5 FROM  0} {1 film) 0} {0   0} {1 as  0} {1 d; 0}]

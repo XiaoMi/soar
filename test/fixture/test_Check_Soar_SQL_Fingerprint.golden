@@ -83,3 +83,5 @@ select date_format(t.last_update, ?), count(distinct (t.city)) from city t where
 create table hello.t (id int unsigned)
 select * from tb where data >= ?
 alter table tb alter column id drop default
+select maxid, minid from (select max(film_id) maxid, min(film_id) minid from film where last_update > ?) as d
+select maxid, minid from (select max(film_id) maxid, min(film_id) minid from film) as d

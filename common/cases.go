@@ -205,5 +205,9 @@ func init() {
 
 		// https://github.com/XiaoMi/soar/issues/163
 		"alter table tb alter column id drop default;",
+
+		// explain extra info "Select tables optimized away"
+		"select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film where last_update > '2016-03-27 02:01:01') as d;",
+		"select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film) as d;",
 	}
 }

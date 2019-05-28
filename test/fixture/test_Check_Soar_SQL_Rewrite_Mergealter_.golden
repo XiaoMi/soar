@@ -62,6 +62,8 @@ SELECT ID,name FROM (SELECT address FROM customer_list WHERE SID=1 order by phon
 SELECT language_id FROM film WHERE length = 123 GROUP BY release_year ORDER BY language_id
 SELECT last_update FROM film GROUP BY date(last_update)
 SELECT last_update FROM film order by date(last_update)
+select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film) as d
+select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film where last_update > '2016-03-27 02:01:01') as d
 SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year
 SELECT release_year FROM film WHERE length = 123 GROUP BY release_year ORDER BY release_year LIMIT 10
 SELECT release_year, language_id, sum(length) FROM film GROUP BY release_year, language_id
