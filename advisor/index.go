@@ -986,6 +986,9 @@ func (idxAdvs IndexAdvises) Format() map[string]Rule {
 				rules[advKey].Content += fmt.Sprintf("为列%s添加索引;", col.Name)
 			}
 		}
+		if !common.Config.Sampling && len(rules[advKey].Content) > 5 {
+			rules[advKey].Content += " 由于未开启数据采样，各列在索引中的顺序需要自行调整。"
+		}
 		// 清理多余的标点
 		rules[advKey].Content = strings.Trim(rules[advKey].Content, common.Config.Delimiter)
 	}
