@@ -892,6 +892,7 @@ var MySQLErrName = map[uint16]string{
 	ErrInvalidJSONPathWildcard:                               "In this situation, path expressions may not contain the * and ** tokens.",
 	ErrInvalidJSONContainsPathType:                           "The second argument can only be either 'one' or 'all'.",
 	ErrJSONUsedAsKey:                                         "JSON column '%-.192s' cannot be used in key specification.",
+	ErrInvalidJSONPathArrayCell:                              "A path expression is not a path to a cell in an array.",
 	ErrWindowNoSuchWindow:                                    "Window name '%s' is not defined.",
 	ErrWindowCircularityInWindowGraph:                        "There is a circularity in the window dependency graph.",
 	ErrWindowNoChildPartitioning:                             "A window which depends on another cannot define partitioning.",
@@ -914,6 +915,12 @@ var MySQLErrName = map[uint16]string{
 	ErrWindowExplainJson:                                     "To get information about window functions use EXPLAIN FORMAT=JSON",
 	ErrWindowFunctionIgnoresFrame:                            "Window function '%s' ignores the frame clause of window '%s' and aggregates over the whole partition",
 	ErrRoleNotGranted:                                        "%s is is not granted to %s",
+	ErrMaxExecTimeExceeded:                                   "Query execution was interrupted, max_execution_time exceeded.",
+
+	// MariaDB errors.
+	ErrOnlyOneDefaultPartionAllowed:         "Only one DEFAULT partition allowed",
+	ErrWrongPartitionTypeExpectedSystemTime: "Wrong partitioning type, expected type: `SYSTEM_TIME`",
+	ErrSystemVersioningWrongPartitions:      "Wrong Partitions: must have at least one HISTORY and exactly one last CURRENT",
 
 	// TiDB errors.
 	ErrMemExceedThreshold:         "%s holds %dB memory, exceeds threshold %dB.%s",
@@ -930,6 +937,7 @@ var MySQLErrName = map[uint16]string{
 	ErrRequireVersionCheckFail:    "Plugin %s require %s be %v but got %v",
 	ErrUnsupportedReloadPlugin:    "Plugin %s isn't loaded so cannot be reloaded",
 	ErrUnsupportedReloadPluginVar: "Reload plugin with different sysVar is unsupported %v",
+	ErrTableLocked:                "Table '%s' was locked in %s by %v",
 
 	// TiKV/PD errors.
 	ErrPDServerTimeout:    "PD server timeout",

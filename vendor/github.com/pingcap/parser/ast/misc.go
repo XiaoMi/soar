@@ -1379,6 +1379,7 @@ const (
 	AdminChecksumTable
 	AdminShowSlow
 	AdminShowNextRowID
+	AdminReloadExprPushdownBlacklist
 )
 
 // HandleRange represents a range where handle value >= Begin and < End.
@@ -1547,6 +1548,8 @@ func (n *AdminStmt) Restore(ctx *RestoreCtx) error {
 		if err := n.ShowSlow.Restore(ctx); err != nil {
 			return errors.Annotate(err, "An error occurred while restore AdminStmt.ShowSlow")
 		}
+	case AdminReloadExprPushdownBlacklist:
+		ctx.WriteKeyWord("RELOAD EXPR_PUSHDOWN_BLACKLIST")
 	default:
 		return errors.New("Unsupported AdminStmt type")
 	}
@@ -1974,12 +1977,15 @@ func (i Ident) String() string {
 
 // SelectStmtOpts wrap around select hints and switches
 type SelectStmtOpts struct {
-	Distinct      bool
-	SQLCache      bool
-	CalcFoundRows bool
-	StraightJoin  bool
-	Priority      mysql.PriorityEnum
-	TableHints    []*TableOptimizerHint
+	Distinct        bool
+	SQLBigResult    bool
+	SQLBufferResult bool
+	SQLCache        bool
+	SQLSmallResult  bool
+	CalcFoundRows   bool
+	StraightJoin    bool
+	Priority        mysql.PriorityEnum
+	TableHints      []*TableOptimizerHint
 }
 
 // TableOptimizerHint is Table level optimizer hint

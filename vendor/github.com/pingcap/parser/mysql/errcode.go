@@ -882,6 +882,7 @@ const (
 	ErrMustChangePasswordLogin                                      = 1862
 	ErrRowInWrongPartition                                          = 1863
 	ErrErrorLast                                                    = 1863
+	ErrMaxExecTimeExceeded                                          = 1907
 	ErrInvalidJSONData                                              = 3069
 	ErrGeneratedColumnFunctionIsNotAllowed                          = 3102
 	ErrBadGeneratedColumn                                           = 3105
@@ -895,6 +896,7 @@ const (
 	ErrInvalidJSONPathWildcard                                      = 3149
 	ErrInvalidJSONContainsPathType                                  = 3150
 	ErrJSONUsedAsKey                                                = 3152
+	ErrInvalidJSONPathArrayCell                                     = 3165
 	ErrBadUser                                                      = 3162
 	ErrRoleNotGranted                                               = 3530
 	ErrWindowNoSuchWindow                                           = 3579
@@ -919,6 +921,11 @@ const (
 	ErrWindowExplainJson                                            = 3598
 	ErrWindowFunctionIgnoresFrame                                   = 3599
 
+	// MariaDB errors.
+	ErrOnlyOneDefaultPartionAllowed         = 4030
+	ErrWrongPartitionTypeExpectedSystemTime = 4113
+	ErrSystemVersioningWrongPartitions      = 4128
+
 	// TiDB self-defined errors.
 	ErrMemExceedThreshold         = 8001
 	ErrForUpdateCantRetry         = 8002
@@ -934,6 +941,7 @@ const (
 	ErrRequireVersionCheckFail    = 8107
 	ErrUnsupportedReloadPlugin    = 8018
 	ErrUnsupportedReloadPluginVar = 8019
+	ErrTableLocked                = 8020
 
 	// TiKV/PD errors.
 	ErrPDServerTimeout    = 9001
