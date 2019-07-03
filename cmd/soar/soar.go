@@ -131,10 +131,15 @@ func main() {
 
 		// +++++++++++++++++++++小工具集[开始]+++++++++++++++++++++++{
 		fingerprint := strings.TrimSpace(query.Fingerprint(sql))
+		// SQL 签名
+		id = query.Id(fingerprint)
 		currentDB = env.CurrentDB(sql, currentDB)
 		switch common.Config.ReportType {
 		case "fingerprint":
 			// SQL 指纹
+			if common.Config.Verbose {
+				fmt.Printf("-- ID: %s\n", id)
+			}
 			fmt.Println(fingerprint)
 			continue
 		case "pretty":
@@ -167,8 +172,6 @@ func main() {
 			common.LogIfWarn(err, "")
 			continue
 		default:
-			// SQL 签名
-			id = query.Id(fingerprint)
 			// 建议去重，减少评审整个文件耗时
 			// TODO: 由于 a = 11 和 a = '11' 的 fingerprint 相同，这里一旦跳过即无法检查有些建议了，如： ARG.003
 			if _, ok := suggestMerged[id]; ok {
