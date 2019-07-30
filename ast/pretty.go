@@ -41,7 +41,7 @@ func Pretty(sql string, method string) (output string) {
 
 	switch method {
 	case "builtin", "markdown":
-		return format(sql)
+		return PrettyFormat(sql)
 	default:
 		return sql
 	}
@@ -50,7 +50,7 @@ func Pretty(sql string, method string) (output string) {
 // format the whitespace in a SQL string to make it easier to read.
 // @param string  $query    The SQL string
 // @return String The SQL string with HTML styles and formatting wrapped in a <pre> tag
-func format(query string) string {
+func PrettyFormat(query string) string {
 	// This variable will be populated with formatted html
 	result := ""
 	// Use an actual tab while formatting and then switch out with self::$tab at the end
