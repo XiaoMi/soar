@@ -23,9 +23,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
-
 	"github.com/XiaoMi/soar/common"
-
 	"github.com/kr/pretty"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
@@ -1696,23 +1694,15 @@ func MergeAlterTables(sqls ...string) map[string]string {
 		alterSQL := ""
 		dbName := ""
 		tableName := ""
-		switch n := stmt.(type) {
-		case *sqlparser.DDL:
-			// 注意: 表名和库名不区分大小写
-			tableName = strings.ToLower(n.Table.Name.String())
-			dbName = strings.ToLower(n.Table.Qualifier.String())
-			switch n.Action {
-			case "rename":
-				if alterExp.MatchString(sql) {
-					common.Log.Debug("rename alterExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
-					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
-				} else if renameExp.MatchString(sql) {
-					common.Log.Debug("rename renameExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
-					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
-				} else {
-					common.Log.Warn("rename not match: ALTER %v %v", tableName, sql)
-				}
-			case "alter":
+		s, err := TiParse(sql, "", "")
+		if err != nil {
+			common.Log.Warn(err.Error())
+		}
+		for _, idx := range s {
+			switch n := idx.(type) {
+			case *ast.AlterTableStmt:
+				tableName = n.Table.Name.O
+				dbName = n.Table.Schema.O
 				if alterExp.MatchString(sql) {
 					common.Log.Debug("rename alterExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
 					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
@@ -1722,6 +1712,18 @@ func MergeAlterTables(sqls ...string) map[string]string {
 					buf = indexColsExp.ReplaceAllString(buf, "")
 					common.Log.Debug("alter createIndexExp: ALTER %v ADD INDEX %v %v", tableName, "ADD INDEX", idxName, buf)
 					alterSQL = fmt.Sprint("ADD INDEX", " "+idxName+" ", buf)
+				}
+			case *ast.RenameTableStmt:
+				tableName = n.Table.Name.O
+				dbName = n.Table.Schema.O
+				if alterExp.MatchString(sql) {
+					common.Log.Debug("rename alterExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
+					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
+				} else if renameExp.MatchString(sql) {
+					common.Log.Debug("rename renameExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
+					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))
+				} else {
+					common.Log.Warn("rename not match: ALTER %v %v", tableName, sql)
 				}
 			default:
 
