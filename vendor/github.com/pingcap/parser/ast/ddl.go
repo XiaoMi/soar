@@ -222,6 +222,17 @@ func (n *IndexColName) Accept(v Visitor) (Node, bool) {
 	return v.Leave(n)
 }
 
+// MatchType is the type for reference match type.
+type MatchType int
+
+// match type
+const (
+	MatchNone MatchType = iota
+	MatchFull
+	MatchPartial
+	MatchSimple
+)
+
 // ReferenceDef is used for parsing foreign key reference option from SQL.
 // See http://dev.mysql.com/doc/refman/5.7/en/create-table-foreign-keys.html
 type ReferenceDef struct {
@@ -231,6 +242,7 @@ type ReferenceDef struct {
 	IndexColNames []*IndexColName
 	OnDelete      *OnDeleteOpt
 	OnUpdate      *OnUpdateOpt
+	Match         MatchType
 }
 
 // Restore implements Node interface.
@@ -251,6 +263,17 @@ func (n *ReferenceDef) Restore(ctx *RestoreCtx) error {
 		}
 	}
 	ctx.WritePlain(")")
+	if n.Match != MatchNone {
+		ctx.WriteKeyWord(" MATCH ")
+		switch n.Match {
+		case MatchFull:
+			ctx.WriteKeyWord("FULL")
+		case MatchPartial:
+			ctx.WriteKeyWord("PARTIAL")
+		case MatchSimple:
+			ctx.WriteKeyWord("SIMPLE")
+		}
+	}
 	if n.OnDelete.ReferOpt != ReferOptionNoOption {
 		ctx.WritePlain(" ")
 		if err := n.OnDelete.Restore(ctx); err != nil {
@@ -308,6 +331,7 @@ const (
 	ReferOptionCascade
 	ReferOptionSetNull
 	ReferOptionNoAction
+	ReferOptionSetDefault
 )
 
 // String implements fmt.Stringer interface.
@@ -321,6 +345,8 @@ func (r ReferOptionType) String() string {
 		return "SET NULL"
 	case ReferOptionNoAction:
 		return "NO ACTION"
+	case ReferOptionSetDefault:
+		return "SET DEFAULT"
 	}
 	return ""
 }
@@ -393,6 +419,7 @@ const (
 	ColumnOptionGenerated
 	ColumnOptionReference
 	ColumnOptionCollate
+	ColumnOptionCheck
 )
 
 var (
@@ -417,6 +444,8 @@ type ColumnOption struct {
 	// Refer is used for foreign key.
 	Refer    *ReferenceDef
 	StrValue string
+	// Enforced is only for Check, default is true.
+	Enforced bool
 }
 
 // Restore implements Node interface.
@@ -473,6 +502,18 @@ func (n *ColumnOption) Restore(ctx *RestoreCtx) error {
 		}
 		ctx.WriteKeyWord("COLLATE ")
 		ctx.WritePlain(n.StrValue)
+	case ColumnOptionCheck:
+		ctx.WriteKeyWord("CHECK")
+		ctx.WritePlain("(")
+		if err := n.Expr.Restore(ctx); err != nil {
+			return errors.Trace(err)
+		}
+		ctx.WritePlain(")")
+		if n.Enforced {
+			ctx.WriteKeyWord(" ENFORCED")
+		} else {
+			ctx.WriteKeyWord(" NOT ENFORCED")
+		}
 	default:
 		return errors.New("An error occurred while splicing ColumnOption")
 	}
@@ -562,11 +603,16 @@ const (
 	ConstraintUniqIndex
 	ConstraintForeignKey
 	ConstraintFulltext
+	ConstraintCheck
 )
 
 // Constraint is constraint for table definition.
 type Constraint struct {
 	node
+
+	// only supported by MariaDB 10.0.2+ (ADD {INDEX|KEY}, ADD FOREIGN KEY),
+	// see https://mariadb.com/kb/en/library/alter-table/
+	IfNotExists bool
 
 	Tp   ConstraintType
 	Name string
@@ -576,6 +622,10 @@ type Constraint struct {
 	Refer *ReferenceDef // Used for foreign key.
 
 	Option *IndexOption // Index Options
+
+	Expr ExprNode // Used for Check
+
+	Enforced bool // Used for Check
 }
 
 // Restore implements Node interface.
@@ -587,8 +637,14 @@ func (n *Constraint) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("PRIMARY KEY")
 	case ConstraintKey:
 		ctx.WriteKeyWord("KEY")
+		if n.IfNotExists {
+			ctx.WriteKeyWord(" IF NOT EXISTS")
+		}
 	case ConstraintIndex:
 		ctx.WriteKeyWord("INDEX")
+		if n.IfNotExists {
+			ctx.WriteKeyWord(" IF NOT EXISTS")
+		}
 	case ConstraintUniq:
 		ctx.WriteKeyWord("UNIQUE")
 	case ConstraintUniqKey:
@@ -597,6 +653,24 @@ func (n *Constraint) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("UNIQUE INDEX")
 	case ConstraintFulltext:
 		ctx.WriteKeyWord("FULLTEXT")
+	case ConstraintCheck:
+		if n.Name != "" {
+			ctx.WriteKeyWord("CONSTRAINT ")
+			ctx.WriteName(n.Name)
+			ctx.WritePlain(" ")
+		}
+		ctx.WriteKeyWord("CHECK")
+		ctx.WritePlain("(")
+		if err := n.Expr.Restore(ctx); err != nil {
+			return errors.Trace(err)
+		}
+		ctx.WritePlain(") ")
+		if n.Enforced {
+			ctx.WriteKeyWord("ENFORCED")
+		} else {
+			ctx.WriteKeyWord("NOT ENFORCED")
+		}
+		return nil
 	}
 
 	if n.Tp == ConstraintForeignKey {
@@ -606,6 +680,9 @@ func (n *Constraint) Restore(ctx *RestoreCtx) error {
 			ctx.WritePlain(" ")
 		}
 		ctx.WriteKeyWord("FOREIGN KEY ")
+		if n.IfNotExists {
+			ctx.WriteKeyWord("IF NOT EXISTS ")
+		}
 	} else if n.Name != "" {
 		ctx.WritePlain(" ")
 		ctx.WriteName(n.Name)
@@ -882,9 +959,10 @@ func (n *CreateTableStmt) Accept(v Visitor) (Node, bool) {
 type DropTableStmt struct {
 	ddlNode
 
-	IfExists bool
-	Tables   []*TableName
-	IsView   bool
+	IfExists    bool
+	Tables      []*TableName
+	IsView      bool
+	IsTemporary bool // make sense ONLY if/when IsView == false
 }
 
 // Restore implements Node interface.
@@ -892,7 +970,11 @@ func (n *DropTableStmt) Restore(ctx *RestoreCtx) error {
 	if n.IsView {
 		ctx.WriteKeyWord("DROP VIEW ")
 	} else {
-		ctx.WriteKeyWord("DROP TABLE ")
+		if n.IsTemporary {
+			ctx.WriteKeyWord("DROP TEMPORARY TABLE ")
+		} else {
+			ctx.WriteKeyWord("DROP TABLE ")
+		}
 	}
 	if n.IfExists {
 		ctx.WriteKeyWord("IF EXISTS ")
@@ -1120,6 +1202,10 @@ func (n *CreateViewStmt) Accept(v Visitor) (Node, bool) {
 type CreateIndexStmt struct {
 	ddlNode
 
+	// only supported by MariaDB 10.0.2+,
+	// see https://mariadb.com/kb/en/library/create-index/
+	IfNotExists bool
+
 	IndexName     string
 	Table         *TableName
 	Unique        bool
@@ -1134,6 +1220,9 @@ func (n *CreateIndexStmt) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("UNIQUE ")
 	}
 	ctx.WriteKeyWord("INDEX ")
+	if n.IfNotExists {
+		ctx.WriteKeyWord("IF NOT EXISTS ")
+	}
 	ctx.WriteName(n.IndexName)
 	ctx.WriteKeyWord(" ON ")
 	if err := n.Table.Restore(ctx); err != nil {
@@ -1293,6 +1382,44 @@ func (n *UnlockTablesStmt) Restore(ctx *RestoreCtx) error {
 	return nil
 }
 
+// CleanupTableLockStmt is a statement to cleanup table lock.
+type CleanupTableLockStmt struct {
+	ddlNode
+
+	Tables []*TableName
+}
+
+// Accept implements Node Accept interface.
+func (n *CleanupTableLockStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*CleanupTableLockStmt)
+	for i := range n.Tables {
+		node, ok := n.Tables[i].Accept(v)
+		if !ok {
+			return n, false
+		}
+		n.Tables[i] = node.(*TableName)
+	}
+	return v.Leave(n)
+}
+
+// Restore implements Node interface.
+func (n *CleanupTableLockStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("ADMIN CLEANUP TABLE LOCK ")
+	for i, v := range n.Tables {
+		if i != 0 {
+			ctx.WritePlain(", ")
+		}
+		if err := v.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore CleanupTableLockStmt.Tables[%d]", i)
+		}
+	}
+	return nil
+}
+
 // TableOptionType is the type for TableOption
 type TableOptionType int
 
@@ -1322,6 +1449,8 @@ const (
 	TableOptionNodegroup
 	TableOptionDataDirectory
 	TableOptionIndexDirectory
+	TableOptionStorageMedia
+	TableOptionStatsSamplePages
 )
 
 // RowFormat types
@@ -1491,6 +1620,17 @@ func (n *TableOption) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("INDEX DIRECTORY ")
 		ctx.WritePlain("= ")
 		ctx.WriteString(n.StrValue)
+	case TableOptionStorageMedia:
+		ctx.WriteKeyWord("STORAGE ")
+		ctx.WriteKeyWord(n.StrValue)
+	case TableOptionStatsSamplePages:
+		ctx.WriteKeyWord("STATS_SAMPLE_PAGES ")
+		ctx.WritePlain("= ")
+		if n.UintValue == 0 {
+			ctx.WriteKeyWord("DEFAULT")
+		} else {
+			ctx.WritePlainf("%d", n.UintValue)
+		}
 	default:
 		return errors.Errorf("invalid TableOption: %d", n.Tp)
 	}
@@ -1578,6 +1718,7 @@ const (
 	AlterTablePartition
 	AlterTableEnableKeys
 	AlterTableDisableKeys
+	AlterTableRemovePartitioning
 
 	// TODO: Add more actions
 )
@@ -1641,6 +1782,14 @@ func (a AlterAlgorithm) String() string {
 type AlterTableSpec struct {
 	node
 
+	// only supported by MariaDB 10.0.2+ (DROP COLUMN, CHANGE COLUMN, MODIFY COLUMN, DROP INDEX, DROP FOREIGN KEY, DROP PARTITION)
+	// see https://mariadb.com/kb/en/library/alter-table/
+	IfExists bool
+
+	// only supported by MariaDB 10.0.2+ (ADD COLUMN, ADD PARTITION)
+	// see https://mariadb.com/kb/en/library/alter-table/
+	IfNotExists bool
+
 	Tp              AlterTableType
 	Name            string
 	Constraint      *Constraint
@@ -1684,6 +1833,9 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		}
 	case AlterTableAddColumns:
 		ctx.WriteKeyWord("ADD COLUMN ")
+		if n.IfNotExists {
+			ctx.WriteKeyWord("IF NOT EXISTS ")
+		}
 		if n.Position != nil && len(n.NewColumns) == 1 {
 			if err := n.NewColumns[0].Restore(ctx); err != nil {
 				return errors.Annotatef(err, "An error occurred while restore AlterTableSpec.NewColumns[%d]", 0)
@@ -1713,6 +1865,9 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		}
 	case AlterTableDropColumn:
 		ctx.WriteKeyWord("DROP COLUMN ")
+		if n.IfExists {
+			ctx.WriteKeyWord("IF EXISTS ")
+		}
 		if err := n.OldColumnName.Restore(ctx); err != nil {
 			return errors.Annotate(err, "An error occurred while restore AlterTableSpec.OldColumnName")
 		}
@@ -1721,12 +1876,21 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("DROP PRIMARY KEY")
 	case AlterTableDropIndex:
 		ctx.WriteKeyWord("DROP INDEX ")
+		if n.IfExists {
+			ctx.WriteKeyWord("IF EXISTS ")
+		}
 		ctx.WriteName(n.Name)
 	case AlterTableDropForeignKey:
 		ctx.WriteKeyWord("DROP FOREIGN KEY ")
+		if n.IfExists {
+			ctx.WriteKeyWord("IF EXISTS ")
+		}
 		ctx.WriteName(n.Name)
 	case AlterTableModifyColumn:
 		ctx.WriteKeyWord("MODIFY COLUMN ")
+		if n.IfExists {
+			ctx.WriteKeyWord("IF EXISTS ")
+		}
 		if err := n.NewColumns[0].Restore(ctx); err != nil {
 			return errors.Annotate(err, "An error occurred while restore AlterTableSpec.NewColumns[0]")
 		}
@@ -1738,6 +1902,9 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		}
 	case AlterTableChangeColumn:
 		ctx.WriteKeyWord("CHANGE COLUMN ")
+		if n.IfExists {
+			ctx.WriteKeyWord("IF EXISTS ")
+		}
 		if err := n.OldColumnName.Restore(ctx); err != nil {
 			return errors.Annotate(err, "An error occurred while restore AlterTableSpec.OldColumnName")
 		}
@@ -1763,8 +1930,17 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		}
 		if len(n.NewColumns[0].Options) == 1 {
 			ctx.WriteKeyWord("SET DEFAULT ")
-			if err := n.NewColumns[0].Options[0].Expr.Restore(ctx); err != nil {
-				return errors.Annotate(err, "An error occurred while restore AlterTableSpec.NewColumns[0].Options[0].Expr")
+			expr := n.NewColumns[0].Options[0].Expr
+			if valueExpr, ok := expr.(ValueExpr); ok {
+				if err := valueExpr.Restore(ctx); err != nil {
+					return errors.Annotate(err, "An error occurred while restore AlterTableSpec.NewColumns[0].Options[0].Expr")
+				}
+			} else {
+				ctx.WritePlain("(")
+				if err := expr.Restore(ctx); err != nil {
+					return errors.Annotate(err, "An error occurred while restore AlterTableSpec.NewColumns[0].Options[0].Expr")
+				}
+				ctx.WritePlain(")")
 			}
 		} else {
 			ctx.WriteKeyWord(" DROP DEFAULT")
@@ -1788,6 +1964,9 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		ctx.WritePlain(" /* AlterTableForce is not supported */ ")
 	case AlterTableAddPartitions:
 		ctx.WriteKeyWord("ADD PARTITION")
+		if n.IfNotExists {
+			ctx.WriteKeyWord(" IF NOT EXISTS")
+		}
 		if n.PartDefinitions != nil {
 			ctx.WritePlain(" (")
 			for i, def := range n.PartDefinitions {
@@ -1808,6 +1987,9 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		ctx.WritePlainf("%d", n.Num)
 	case AlterTableDropPartition:
 		ctx.WriteKeyWord("DROP PARTITION ")
+		if n.IfExists {
+			ctx.WriteKeyWord("IF EXISTS ")
+		}
 		for i, name := range n.PartitionNames {
 			if i != 0 {
 				ctx.WritePlain(",")
@@ -1830,6 +2012,8 @@ func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("ENABLE KEYS")
 	case AlterTableDisableKeys:
 		ctx.WriteKeyWord("DISABLE KEYS")
+	case AlterTableRemovePartitioning:
+		ctx.WriteKeyWord("REMOVE PARTITIONING")
 	default:
 		// TODO: not support
 		ctx.WritePlainf(" /* AlterTableType(%d) is not supported */ ", n.Tp)
@@ -1898,7 +2082,7 @@ func (n *AlterTableStmt) Restore(ctx *RestoreCtx) error {
 		return errors.Annotate(err, "An error occurred while restore AlterTableStmt.Table")
 	}
 	for i, spec := range n.Specs {
-		if i == 0 || spec.Tp == AlterTablePartition {
+		if i == 0 || spec.Tp == AlterTablePartition || spec.Tp == AlterTableRemovePartitioning {
 			ctx.WritePlain(" ")
 		} else {
 			ctx.WritePlain(", ")
