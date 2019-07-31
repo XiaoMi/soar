@@ -283,31 +283,31 @@ func (idxAdv *IndexAdvisor) IndexAdvise() IndexAdvises {
 		// 有Where条件的先分析 等值条件
 		for _, index := range idxAdv.whereEQ {
 			// 对应列在前面已经按散粒度由大到小排序好了
-			mergeIndex(indexList, index)
+			idxAdv.mergeIndex(indexList, index)
 		}
 		// 若存在非等值查询条件，可以给第一个非等值条件添加索引
 		if len(idxAdv.whereINEQ) > 0 {
-			mergeIndex(indexList, idxAdv.whereINEQ[0])
+			idxAdv.mergeIndex(indexList, idxAdv.whereINEQ[0])
 		}
 		// 有WHERE条件，但 WHERE 条件未能给出索引建议就不能再加 GROUP BY 和 ORDER BY 建议了
 		if len(ignore) == 0 {
 			// 没有非等值查询条件时可以再为 GroupBy 和 OrderBy 添加索引
 			for _, index := range idxAdv.groupBy {
-				mergeIndex(indexList, index)
+				idxAdv.mergeIndex(indexList, index)
 			}
 
 			// OrderBy
 			// 没有 GroupBy 时可以为 OrderBy 加索引
 			if len(idxAdv.groupBy) == 0 {
 				for _, index := range idxAdv.orderBy {
-					mergeIndex(indexList, index)
+					idxAdv.mergeIndex(indexList, index)
 				}
 			}
 		}
 	} else {
 		// 未指定 Where 条件的，只需要 GroupBy 和 OrderBy 的索引建议
 		for _, index := range idxAdv.groupBy {
-			mergeIndex(indexList, index)
+			idxAdv.mergeIndex(indexList, index)
 		}
 
 		// OrderBy
@@ -628,7 +628,7 @@ func (idxAdv *IndexAdvisor) buildJoinIndex(meta common.Meta) []IndexInfo {
 		// 如果该列的库表为join condition中需要添加索引的库表
 		indexColsList := make(map[string]map[string][]*common.Column)
 		for _, col := range IndexCols {
-			mergeIndex(indexColsList, col)
+			idxAdv.mergeIndex(indexColsList, col)
 		}
 
 		if common.Config.TestDSN.Disable || common.Config.OnlineDSN.Disable {
@@ -722,7 +722,7 @@ func (idxAdv *IndexAdvisor) buildIndexWithNoEnv(indexList map[string]map[string]
 }
 
 // mergeIndex 将索引用到的列去重后合并到一起
-func mergeIndex(idxList map[string]map[string][]*common.Column, column *common.Column) {
+func (idxAdv *IndexAdvisor) mergeIndex(idxList map[string]map[string][]*common.Column, column *common.Column) {
 	// 散粒度低于阈值将不会添加索引
 	if common.Config.MinCardinality/100 > column.Cardinality {
 		return
@@ -744,6 +744,21 @@ func mergeIndex(idxList map[string]map[string][]*common.Column, column *common.C
 			exist = true
 		}
 	}
+
+	// 将 DB 替换成 vEnv 中的数据库名称
+	dbInVEnv := db
+	if _, ok := idxAdv.vEnv.DBRef[db]; ok {
+		dbInVEnv = idxAdv.vEnv.DBRef[db]
+	}
+	indexMeta := idxAdv.IndexMeta[dbInVEnv][tb]
+	// 主键列不需要追加
+	pr := indexMeta.FindIndex(database.IndexKeyName, "PRIMARY")
+	for _, c := range pr {
+		if c.ColumnName == column.Name {
+			exist = true
+		}
+	}
+
 	if !exist {
 		idxList[db][tb] = append(idxList[db][tb], column)
 	}

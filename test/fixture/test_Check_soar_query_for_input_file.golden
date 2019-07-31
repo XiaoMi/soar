@@ -954,7 +954,7 @@ ORDER BY
 
 # Query: 4ECCA9568BE69E68
 
-★ ★ ★ ☆ ☆ 75分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -973,14 +973,6 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 ## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
@@ -991,7 +983,7 @@ FROM
 
 # Query: 485D56FC88BBBDB9
 
-★ ★ ★ ☆ ☆ 75分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1010,14 +1002,6 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 ## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
@@ -1028,7 +1012,7 @@ FROM
 
 # Query: 0D0DABACEDFF5765
 
-★ ★ ★ ☆ ☆ 75分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -1046,14 +1030,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -1143,7 +1119,7 @@ WHERE
 
 # Query: 17D5BCF21DC2364C
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ★ ☆ 85分
 
 ```sql
 
@@ -1167,14 +1143,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -1241,7 +1209,7 @@ WHERE
 
 # Query: 3FF20E28EC9CBEF9
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1252,17 +1220,11 @@ FROM
   JOIN  country
 ```
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+## OK
 
 # Query: 5C547F08EADBB131
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1273,17 +1235,11 @@ FROM
   LEFT JOIN  country
 ```
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+## OK
 
 # Query: AF0C1EB58B23D2FA
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1294,17 +1250,11 @@ FROM
   RIGHT JOIN  country
 ```
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+## OK
 
 # Query: 626571EAE84E2C8A
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -1321,14 +1271,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: 50F2AB4243CE2071
 
@@ -1374,7 +1316,7 @@ FROM
 
 # Query: 584CCEC8069B6947
 
-★ ★ ☆ ☆ ☆ 40分
+★ ★ ★ ☆ ☆ 60分
 
 ```sql
 
@@ -1396,14 +1338,6 @@ LIMIT
 ORDER BY  
   city  DESC
 ```
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 同一张表被连接两次
 
@@ -1929,7 +1863,7 @@ LIMIT
 
 # Query: 16CB4628D2597D40
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ★ ☆ 85分
 
 ```sql
 
@@ -1953,14 +1887,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -2084,7 +2010,7 @@ WHERE
 
 # Query: 1E8B70E30062FD13
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -2094,17 +2020,11 @@ FROM
   customer  STRAIGHT_JOIN  address  ON  customer. address_id= address. address_id
 ```
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
+## OK
 
 # Query: E48A20D0413512DA
 
-★ ☆ ☆ ☆ ☆ 30分
+★ ★ ☆ ☆ ☆ 50分
 
 ```sql
 
@@ -2135,14 +2055,6 @@ ORDER BY
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
 

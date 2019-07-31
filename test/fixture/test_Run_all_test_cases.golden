@@ -2098,7 +2098,7 @@ ORDER BY
 
 # Query: 4ECCA9568BE69E68
 
-★ ★ ★ ☆ ☆ 75分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -2139,14 +2139,6 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 ## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
@@ -2157,7 +2149,7 @@ FROM
 
 # Query: 485D56FC88BBBDB9
 
-★ ★ ★ ☆ ☆ 75分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -2198,14 +2190,6 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 ## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
@@ -2216,7 +2200,7 @@ FROM
 
 # Query: 0D0DABACEDFF5765
 
-★ ★ ★ ☆ ☆ 75分
+★ ★ ★ ★ ☆ 95分
 
 ```sql
 
@@ -2256,14 +2240,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -2431,7 +2407,7 @@ WHERE
 
 # Query: 17D5BCF21DC2364C
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ★ ☆ 85分
 
 ```sql
 
@@ -2484,14 +2460,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -2615,7 +2583,7 @@ WHERE
 
 # Query: 3FF20E28EC9CBEF9
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -2652,17 +2620,9 @@ FROM
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 # Query: 5C547F08EADBB131
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -2699,17 +2659,9 @@ FROM
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 # Query: AF0C1EB58B23D2FA
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -2746,17 +2698,9 @@ FROM
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
 
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 # Query: 626571EAE84E2C8A
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -2799,14 +2743,6 @@ FROM
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 # Query: 50F2AB4243CE2071
 
@@ -2878,7 +2814,7 @@ FROM
 
 # Query: 584CCEC8069B6947
 
-★ ☆ ☆ ☆ ☆ 30分
+★ ★ ☆ ☆ ☆ 50分
 
 ```sql
 
@@ -2947,14 +2883,6 @@ ORDER BY
 * **Case:** ALTER TABLE \`sakila\`.\`city\` add index \`idx\_city\_last\_update\` (\`city\`,\`last\_update\`) ;
 
 
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## 同一张表被连接两次
 
@@ -3836,7 +3764,7 @@ LIMIT
 
 # Query: 16CB4628D2597D40
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ★ ☆ 85分
 
 ```sql
 
@@ -3888,14 +3816,6 @@ FROM
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 ## 不建议使用 SELECT * 类型查询
 
 * **Item:**  COL.001
@@ -3941,7 +3861,7 @@ GROUP BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *actor* | NULL | ref | idx\_actor\_last\_name | idx\_actor\_last\_name | 137 | const | 2 | 14.29% | O(log n) | Using where; Using temporary |
+| 1  | SIMPLE | *actor* | NULL | ref | idx\_actor\_last\_name | idx\_actor\_last\_name | 137 | const | 2 | 25.00% | O(log n) | Using where; Using temporary |
 
 
 
@@ -4087,7 +4007,7 @@ WHERE
 
 # Query: 1E8B70E30062FD13
 
-★ ★ ★ ★ ☆ 80分
+★ ★ ★ ★ ★ 100分
 
 ```sql
 
@@ -4123,17 +4043,9 @@ FROM
 * **Using index**: 只需通过索引就可以从表中获取列的信息, 无需额外去读取真实的行数据. 如果查询使用的列值仅仅是一个简单索引的部分值, 则会使用这种策略来优化查询.
 
 
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
-
 # Query: E48A20D0413512DA
 
-★ ☆ ☆ ☆ ☆ 20分
+★ ★ ☆ ☆ ☆ 40分
 
 ```sql
 
@@ -4223,14 +4135,6 @@ ORDER BY
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## 最外层 SELECT 未指定 WHERE 条件
-
-* **Item:**  CLA.001
-
-* **Severity:**  L4
-
-* **Content:**  SELECT 语句没有 WHERE 子句，可能检查比预期更多的行(全表扫描)。对于 SELECT COUNT(\*) 类型的请求如果不要求精度，建议使用 SHOW TABLE STATUS 或 EXPLAIN 替代。
 
 ## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
 
@@ -4703,7 +4607,7 @@ create  table  hello. t  (id  int  unsigned)
 
 # Query: 291F95B7DCB74C21
 
-★ ★ ★ ★ ☆ 95分
+☆ ☆ ☆ ☆ ☆ 0分
 
 ```sql
 
@@ -4714,6 +4618,10 @@ FROM
 WHERE  
   data  >= ''
 ```
+
+## MySQL execute failed
+
+Unknown column 'data' in 'where clause'
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -4734,6 +4642,8 @@ ALTER TABLE
 DROP  
   DEFAULT
 ```
+
+## OK
 
 # Query: B48292EDB9D0E010
 

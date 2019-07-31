@@ -329,7 +329,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 						continue
 					}
 
-					c := fmt.Sprintf("%s表中列%s的定义是 %s 而不是 %s",
+					c := fmt.Sprintf("%s表中列%s的定义是 %s 而不是 %s。",
 						colList[0].Table, colList[0].Name, colList[0].DataType, typNameMap[val.Type])
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
@@ -356,6 +356,12 @@ func (q *Query4Audit) RuleNoWhere() Rule {
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
 		case *sqlparser.Select:
+			for _, f := range n.From {
+				switch f.(type) {
+				case *sqlparser.JoinTableExpr:
+					return false, nil
+				}
+			}
 			if n.Where == nil && sqlparser.String(n.From) != "dual" {
 				rule = HeuristicRules["CLA.001"]
 				return false, nil
