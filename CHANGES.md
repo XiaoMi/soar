@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2019-08
+- Fix RuleImplicitConversion(ARG.003) with INT and DECIMAL
+- Fix RuleImplicitConversion duplicate suggest when use IN () operator
+
+## 2019-07
+- Fix #213 CLA.001 NO WHERE CONDITION
+- Fix PRIMARY key append to multi column index
+- fingerprint verbose mode add id
+
 ## 2019-05
 - Fix issue #208 14c19f4 regression bug
 - Add max_execution_time hint for explain query

@@ -169,7 +169,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 		return rule
 	}
 
-	var content string
+	var content []string
 	conditions := ast.FindAllCondition(idxAdv.Ast)
 	for _, cond := range conditions {
 		var colList []*common.Column
@@ -258,9 +258,9 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					colList[0].Table, colList[0].Name, type1,
 					colList[1].Table, colList[1].Name, type2)
 				if strings.ToLower(type1) != strings.ToLower(type2) {
-					content += fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) datatype not match",
+					content = append(content, fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) datatype not match",
 						colList[0].Table, colList[0].Name, type1,
-						colList[1].Table, colList[1].Name, type2)
+						colList[1].Table, colList[1].Name, type2))
 					continue
 				}
 
@@ -269,9 +269,9 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					colList[0].Table, colList[0].Name, colList[0].Character,
 					colList[1].Table, colList[1].Name, colList[1].Character)
 				if colList[0].Character != colList[1].Character {
-					content += fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) charset not match",
+					content = append(content, fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) charset not match",
 						colList[0].Table, colList[0].Name, colList[0].Character,
-						colList[1].Table, colList[1].Name, colList[1].Character)
+						colList[1].Table, colList[1].Name, colList[1].Character))
 					continue
 				}
 
@@ -280,9 +280,9 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					colList[0].Table, colList[0].Name, colList[0].Collation,
 					colList[1].Table, colList[1].Name, colList[1].Collation)
 				if colList[0].Collation != colList[1].Collation {
-					content += fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) collation not match",
+					content = append(content, fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) collation not match",
 						colList[0].Table, colList[0].Name, colList[0].Collation,
-						colList[1].Table, colList[1].Name, colList[1].Collation)
+						colList[1].Table, colList[1].Name, colList[1].Collation))
 					continue
 				}
 			}
@@ -294,7 +294,8 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					"date", "time", "datetime", "timestamp", "year",
 				},
 				sqlparser.IntVal: {
-					"tinyint", "smallint", "mediumint", "int", "integer", "bigint", "timestamp", "year", "bit",
+					"tinyint", "smallint", "mediumint", "int", "integer", "bigint",
+					"timestamp", "year", "bit", "decimal",
 				},
 				sqlparser.FloatVal: {
 					"float", "double", "real", "decimal",
@@ -333,7 +334,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 						colList[0].Table, colList[0].Name, colList[0].DataType, typNameMap[val.Type])
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
-					content += c
+					content = append(content, c)
 				}
 			}
 
@@ -343,9 +344,9 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 			// TODO
 		}
 	}
-	if content != "" {
+	if len(content) > 0 {
 		rule = HeuristicRules["ARG.003"]
-		rule.Content = content
+		rule.Content = strings.Join(common.RemoveDuplicatesItem(content), " ")
 	}
 	return rule
 }
