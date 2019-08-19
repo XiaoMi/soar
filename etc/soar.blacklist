@@ -1,6 +1,5 @@
 # 这是一个黑名单例子
 ## 不评审常见的SET， SHOW， SELECT CONST等完美请求
-^use \?$
 ^set.*
 ^show.*
 ^select \?$

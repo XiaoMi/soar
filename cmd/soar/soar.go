@@ -175,11 +175,17 @@ func main() {
 			// 建议去重，减少评审整个文件耗时
 			// TODO: 由于 a = 11 和 a = '11' 的 fingerprint 相同，这里一旦跳过即无法检查有些建议了，如： ARG.003
 			if _, ok := suggestMerged[id]; ok {
-				continue
+				// `use ?` 不可以去重，去重后将导致无法切换数据库
+				if !strings.HasPrefix(fingerprint, "use") {
+					continue
+				}
 			}
 			// 黑名单中的SQL不给建议
 			if advisor.InBlackList(fingerprint) {
-				continue
+				// `use ?` 不可以出现在黑名单中
+				if !strings.HasPrefix(fingerprint, "use") {
+					continue
+				}
 			}
 		}
 		tables[id] = ast.SchemaMetaInfo(sql, currentDB)
@@ -389,6 +395,9 @@ func main() {
 
 		// +++++++++++++++++++++打印单条 SQL 优化建议[开始]++++++++++++++++++++++++++{
 		common.Log.Debug("start of print suggestions, Query: %s", q.Query)
+		if strings.HasPrefix(fingerprint, "use") {
+			continue
+		}
 		sug, str := advisor.FormatSuggest(q.Query, currentDB, common.Config.ReportType, heuristicSuggest, idxSuggest, expSuggest, proSuggest, traceSuggest, mysqlSuggest)
 		suggestMerged[id] = sug
 		switch common.Config.ReportType {
