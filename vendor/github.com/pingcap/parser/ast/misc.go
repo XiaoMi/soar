@@ -317,6 +317,7 @@ func (n *DeallocateStmt) Accept(v Visitor) (Node, bool) {
 // Prepared represents a prepared statement.
 type Prepared struct {
 	Stmt          StmtNode
+	StmtType      string
 	Params        []ParamMarkerExpr
 	SchemaVersion int64
 	UseCache      bool
@@ -1055,7 +1056,7 @@ func (p *PasswordOrLockOption) Restore(ctx *RestoreCtx) error {
 	case PasswordExpireNever:
 		ctx.WriteKeyWord("PASSWORD EXPIRE NEVER")
 	case PasswordExpireInterval:
-		ctx.WriteKeyWord("PASSWORD EXPIRE NEVER")
+		ctx.WriteKeyWord("PASSWORD EXPIRE INTERVAL")
 		ctx.WritePlainf(" %d", p.Count)
 		ctx.WriteKeyWord(" DAY")
 	case Lock:
@@ -1162,9 +1163,12 @@ func (n *CreateUserStmt) SecureText() string {
 type AlterUserStmt struct {
 	stmtNode
 
-	IfExists    bool
-	CurrentAuth *AuthOption
-	Specs       []*UserSpec
+	IfExists              bool
+	CurrentAuth           *AuthOption
+	Specs                 []*UserSpec
+	TslOptions            []*TslOption
+	ResourceOptions       []*ResourceOption
+	PasswordOrLockOptions []*PasswordOrLockOption
 }
 
 // Restore implements Node interface.
@@ -1186,6 +1190,40 @@ func (n *AlterUserStmt) Restore(ctx *RestoreCtx) error {
 		}
 		if err := v.Restore(ctx); err != nil {
 			return errors.Annotatef(err, "An error occurred while restore AlterUserStmt.Specs[%d]", i)
+		}
+	}
+
+	tslOptionLen := len(n.TslOptions)
+
+	if tslOptionLen != 0 {
+		ctx.WriteKeyWord(" REQUIRE ")
+	}
+
+	// Restore `tslOptions` reversely to keep order the same with original sql
+	for i := tslOptionLen; i > 0; i-- {
+		if i != tslOptionLen {
+			ctx.WriteKeyWord(" AND ")
+		}
+		if err := n.TslOptions[i-1].Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore AlterUserStmt.TslOptions[%d]", i)
+		}
+	}
+
+	if len(n.ResourceOptions) != 0 {
+		ctx.WriteKeyWord(" WITH")
+	}
+
+	for i, v := range n.ResourceOptions {
+		ctx.WritePlain(" ")
+		if err := v.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore AlterUserStmt.ResourceOptions[%d]", i)
+		}
+	}
+
+	for i, v := range n.PasswordOrLockOptions {
+		ctx.WritePlain(" ")
+		if err := v.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore AlterUserStmt.PasswordOrLockOptions[%d]", i)
 		}
 	}
 	return nil
@@ -1988,26 +2026,81 @@ type TableOptimizerHint struct {
 	// Table hints has no schema info
 	// It allows only table name or alias (if table has an alias)
 	HintName model.CIStr
-	Tables   []model.CIStr
+	// QBName is the default effective query block of this hint.
+	QBName  model.CIStr
+	Tables  []HintTable
+	Indexes []model.CIStr
 	// Statement Execution Time Optimizer Hints
 	// See https://dev.mysql.com/doc/refman/5.7/en/optimizer-hints.html#optimizer-hints-execution-time
 	MaxExecutionTime uint64
+	MemoryQuota      uint64
+	QueryType        model.CIStr
+	HintFlag         bool
+}
+
+// HintTable is table in the hint. It may have query block info.
+type HintTable struct {
+	TableName model.CIStr
+	QBName    model.CIStr
+}
+
+func (ht *HintTable) Restore(ctx *RestoreCtx) {
+	ctx.WriteName(ht.TableName.String())
+	if ht.QBName.L != "" {
+		ctx.WriteKeyWord("@")
+		ctx.WriteName(ht.QBName.String())
+	}
 }
 
 // Restore implements Node interface.
 func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
 	ctx.WriteKeyWord(n.HintName.String())
 	ctx.WritePlain("(")
+	if n.QBName.L != "" {
+		if n.HintName.L != "qb_name" {
+			ctx.WriteKeyWord("@")
+		}
+		ctx.WriteName(n.QBName.String())
+	}
+	// Hints without args except query block.
+	switch n.HintName.L {
+	case "hash_agg", "stream_agg", "read_consistent_replica", "no_index_merge", "qb_name":
+		ctx.WritePlain(")")
+		return nil
+	}
+	if n.QBName.L != "" {
+		ctx.WritePlain(" ")
+	}
+	// Hints with args except query block.
 	switch n.HintName.L {
 	case "max_execution_time":
 		ctx.WritePlainf("%d", n.MaxExecutionTime)
-	case "tidb_hj", "tidb_smj", "tidb_inlj":
+	case "tidb_hj", "tidb_smj", "tidb_inlj", "hash_join", "sm_join", "inl_join":
 		for i, table := range n.Tables {
 			if i != 0 {
 				ctx.WritePlain(", ")
 			}
-			ctx.WriteName(table.String())
+			table.Restore(ctx)
 		}
+	case "index", "use_index_merge":
+		n.Tables[0].Restore(ctx)
+		ctx.WritePlain(" ")
+		for i, index := range n.Indexes {
+			if i != 0 {
+				ctx.WritePlain(", ")
+			}
+			ctx.WriteName(index.String())
+		}
+	case "use_toja", "enable_plan_cache":
+		if n.HintFlag {
+			ctx.WritePlain("TRUE")
+		} else {
+			ctx.WritePlain("FALSE")
+		}
+	case "query_type":
+		ctx.WriteKeyWord(n.QueryType.String())
+	case "memory_quota":
+		ctx.WritePlainf("%d M", n.MemoryQuota)
 	}
 	ctx.WritePlain(")")
 	return nil

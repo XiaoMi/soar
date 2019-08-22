@@ -2792,7 +2792,7 @@ func (q *Query4Audit) RuleUniqueKeyDup() Rule {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateIndexStmt:
 				// create index
-				if node.Unique {
+				if node.KeyType == tidb.IndexKeyTypeUnique {
 					re := regexp.MustCompile(`(?i)(create\s+(unique)\s)`)
 					rule = HeuristicRules["KEY.009"]
 					if position := re.FindIndex([]byte(q.Query)); len(position) > 0 {
