@@ -18,6 +18,8 @@ package ast
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/XiaoMi/soar/common"
 
@@ -34,12 +36,44 @@ import (
 // TiParse TiDB 语法解析
 func TiParse(sql, charset, collation string) ([]ast.StmtNode, error) {
 	p := parser.New()
+	sql = removeIncompatibleWords(sql)
 	stmt, warn, err := p.Parse(sql, charset, collation)
 	// TODO: bypass warning info
 	for _, w := range warn {
 		common.Log.Warn(w.Error())
 	}
 	return stmt, err
+}
+
+// removeIncompatibleWords remove pingcap/parser not support words from schema
+func removeIncompatibleWords(sql string) string {
+	fields := strings.Fields(strings.TrimSpace(sql))
+	if len(fields) == 0 {
+		return sql
+	}
+	switch strings.ToLower(fields[0]) {
+	case "create", "alter":
+	default:
+		return sql
+	}
+	// CONSTRAINT col_fk FOREIGN KEY (col) REFERENCES tb (id) ON UPDATE CASCADE
+	re := regexp.MustCompile(`(?i) ON UPDATE CASCADE`)
+	sql = re.ReplaceAllString(sql, "")
+
+	// FULLTEXT KEY col_fk (col) /*!50100 WITH PARSER `ngram` */
+	// /*!50100 PARTITION BY LIST (col)
+	re = regexp.MustCompile(`/\*!5`)
+	sql = re.ReplaceAllString(sql, "/* 5")
+
+	// col varchar(10) CHARACTER SET gbk DEFAULT NULL
+	re = regexp.MustCompile(`(?i)CHARACTER SET [a-z_0-9]* `)
+	sql = re.ReplaceAllString(sql, "")
+
+	// CREATE TEMPORARY TABLE IF NOT EXISTS t_film AS (SELECT * FROM film);
+	re = regexp.MustCompile(`(?i)CREATE TEMPORARY TABLE`)
+	sql = re.ReplaceAllString(sql, "CREATE TABLE")
+
+	return sql
 }
 
 // PrintPrettyStmtNode 打印TiParse语法树

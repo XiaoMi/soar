@@ -86,3 +86,31 @@ func TestSchemaMetaInfo(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestRemoveIncompatibleWords(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`CREATE TEMPORARY TABLE IF NOT EXISTS t_film AS (SELECT * FROM film)`,
+			`CREATE CONSTRAINT col_fk FOREIGN KEY (col) REFERENCES tb (id) ON UPDATE CASCADE`,
+			"CREATE FULLTEXT KEY col_fk (col) /*!50100 WITH PARSER `ngram` */",
+			`CREATE /*!50100 PARTITION BY LIST (col)`,
+			`CREATE col varchar(10) CHARACTER SET gbk DEFAULT NULL`,
+		},
+		{
+			`CREATE TABLE IF NOT EXISTS t_film AS (SELECT * FROM film)`,
+			`CREATE CONSTRAINT col_fk FOREIGN KEY (col) REFERENCES tb (id)`,
+			"CREATE FULLTEXT KEY col_fk (col) /* 50100 WITH PARSER `ngram` */",
+			`CREATE /* 50100 PARTITION BY LIST (col)`,
+			`CREATE col varchar(10) DEFAULT NULL`,
+		},
+	}
+	for k, sql := range sqls[0] {
+		sql = removeIncompatibleWords(sql)
+		if sqls[1][k] != sql {
+			fmt.Println(sql)
+			t.Fatal(sql)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

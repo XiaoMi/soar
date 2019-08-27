@@ -8,12 +8,7 @@ sudo: required
 
 go_import_path: github.com/XiaoMi/soar
 
-addons:
-  apt:
-   sources:
-    - mysql-5.7-trusty
-   packages:
-    - mysql-client
+dist: xenial
 
 services:
   - docker
