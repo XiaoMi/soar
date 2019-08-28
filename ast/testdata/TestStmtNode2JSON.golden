@@ -2,7 +2,10 @@
   {
     "text": "select 1",
     "resultFields": null,
+    "SQLBigResult": false,
+    "SQLBufferResult": false,
     "SQLCache": true,
+    "SQLSmallResult": false,
     "CalcFoundRows": false,
     "StraightJoin": false,
     "Priority": 0,

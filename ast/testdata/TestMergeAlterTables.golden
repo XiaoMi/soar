@@ -1,12 +1,16 @@
 `customer` : ALTER TABLE `customer` ADD INDEX part_of_name (name(10)) ;
 
+`db`.`old_table` : ALTER TABLE `db`.`old_table` RENAME new_table ;
+
+`old_table` : ALTER TABLE `old_table` RENAME TO new_table, RENAME AS new_table ;
+
 `sakila`.`t1` : ALTER TABLE `sakila`.`t1` add index `idx_col`(`col`), add UNIQUE index `idx_col`(`col`), add index `idx_ID`(`ID`) ;
 
-`t1` : ALTER TABLE `t1` RENAME INDEX idx_a TO idx_b, RENAME KEY idx_a TO idx_b, MODIFY col1 BIGINT UNSIGNED DEFAULT 1 COMMENT 'my column', CHANGE b a INT NOT NULL ;
+`t1` : ALTER TABLE `t1` RENAME COLUMN a TO b, RENAME INDEX idx_a TO idx_b, RENAME KEY idx_a TO idx_b, MODIFY col1 BIGINT UNSIGNED DEFAULT 1 COMMENT 'my column', CHANGE b a INT NOT NULL ;
 
 `t2` : ALTER TABLE `t2` DROP COLUMN c, DROP COLUMN d, ADD COLUMN C int, ADD COLUMN D int FIRST, ADD COLUMN E int AFTER D ;
 
-`t3` : ALTER TABLE `t3` add index `idx_a`(a), drop index`idx_b`(b) ;
+`t3` : ALTER TABLE `t3` add index `idx_a`(a), drop index`idx_b` ;
 
 `test_bb` : ALTER TABLE `test_bb` ADD INDEX idx_test_cca (test_cc) ;
 

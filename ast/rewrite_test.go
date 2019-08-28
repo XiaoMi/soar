@@ -660,7 +660,7 @@ func TestMergeAlterTables(t *testing.T) {
 
 		// table name quote in back ticks
 		"alter table `t3`add index `idx_a`(a)",
-		"alter table`t3`drop index`idx_b`(b)",
+		"alter table`t3`drop index`idx_b`",
 	}
 
 	alterSQLs := MergeAlterTables(sqls...)
