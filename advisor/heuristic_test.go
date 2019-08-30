@@ -2769,6 +2769,9 @@ func TestRuleTimestampDefault(t *testing.T) {
 		{
 			"CREATE TABLE tbl( `id` bigint not null, `create_time` timestamp) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 			"ALTER TABLE t1 MODIFY b timestamp NOT NULL;",
+			`ALTER TABLE t1 ADD c_time timestamp NOT NULL default "0000-00-00"`,
+			`ALTER TABLE t1 ADD c_time timestamp NOT NULL default 0`,
+			`ALTER TABLE t1 ADD c_time datetime NOT NULL default 0`,
 		},
 		{
 			"CREATE TABLE tbl (`id` bigint not null, `update_time` timestamp default current_timestamp)",
@@ -2850,6 +2853,8 @@ func TestRuleColumnWithCharset(t *testing.T) {
 		{
 			"CREATE TABLE `tb2` ( `id` int(11) DEFAULT NULL, `col` char(10) CHARACTER SET utf8 DEFAULT NULL)",
 			"alter table tb2 change col col char(10) CHARACTER SET utf8 DEFAULT NULL;",
+			"CREATE TABLE tb (a nvarchar(10))",
+			"CREATE TABLE tb (a nchar(10))",
 		},
 		// 反面的例子
 		{

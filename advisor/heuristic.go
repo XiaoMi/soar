@@ -27,9 +27,11 @@ import (
 	"github.com/XiaoMi/soar/ast"
 	"github.com/XiaoMi/soar/common"
 	"github.com/XiaoMi/soar/database"
+
 	"github.com/gedex/inflector"
 	"github.com/percona/go-mysql/query"
 	tidb "github.com/pingcap/parser/ast"
+	"github.com/pingcap/parser/format"
 	"github.com/pingcap/parser/mysql"
 	"github.com/tidwall/gjson"
 	"vitess.io/vitess/go/vt/sqlparser"
@@ -2870,11 +2872,20 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 					if col.Tp == nil {
 						continue
 					}
-					if col.Tp.Tp == mysql.TypeTimestamp {
+					switch col.Tp.Tp {
+					case mysql.TypeTimestamp, mysql.TypeDate, mysql.TypeDatetime, mysql.TypeNewDate:
 						hasDefault := false
+						var sb strings.Builder
+						ctx := format.NewRestoreCtx(format.DefaultRestoreFlags, &sb)
 						for _, option := range col.Options {
 							if option.Tp == tidb.ColumnOptionDefaultValue {
 								hasDefault = true
+								if err := option.Restore(ctx); err == nil {
+									if strings.HasPrefix(sb.String(), `DEFAULT '0`) ||
+										strings.HasPrefix(sb.String(), `DEFAULT 0`) {
+										hasDefault = false
+									}
+								}
 							}
 						}
 						if !hasDefault {
@@ -2894,11 +2905,20 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 							if col.Tp == nil {
 								continue
 							}
-							if col.Tp.Tp == mysql.TypeTimestamp {
+							var sb strings.Builder
+							ctx := format.NewRestoreCtx(format.DefaultRestoreFlags, &sb)
+							switch col.Tp.Tp {
+							case mysql.TypeTimestamp, mysql.TypeDate, mysql.TypeDatetime, mysql.TypeNewDate:
 								hasDefault := false
 								for _, option := range col.Options {
 									if option.Tp == tidb.ColumnOptionDefaultValue {
 										hasDefault = true
+										if err := option.Restore(ctx); err == nil {
+											if strings.HasPrefix(sb.String(), `DEFAULT '0`) ||
+												strings.HasPrefix(sb.String(), `DEFAULT 0`) {
+												hasDefault = false
+											}
+										}
 									}
 								}
 								if !hasDefault {
@@ -2938,6 +2958,16 @@ func (q *Query4Audit) RuleAutoIncrementInitNotZero() Rule {
 // RuleColumnWithCharset COL.014
 func (q *Query4Audit) RuleColumnWithCharset() Rule {
 	var rule = q.RuleOK()
+	tks := ast.Tokenize(q.Query)
+	for _, tk := range tks {
+		if tk.Type == ast.TokenTypeWord {
+			switch strings.TrimSpace(strings.ToLower(tk.Val)) {
+			case "national", "nvarchar", "nchar", "nvarchar(", "nchar(", "character":
+				rule = HeuristicRules["COL.014"]
+				return rule
+			}
+		}
+	}
 	switch q.Stmt.(type) {
 	case *sqlparser.DDL:
 		for _, tiStmt := range q.TiStmt {

@@ -472,11 +472,11 @@ select c1,c2,c3 from tbl where c4 is null or c4 <> 1
 ```sql
 CREATE TABLE `tb`(`c` longblob NOT NULL);
 ```
-## TIMESTAMP 类型未设置默认值
+## TIMESTAMP 类型默认值检查异常
 
 * **Item**:COL.013
 * **Severity**:L4
-* **Content**:TIMESTAMP 类型未设置默认值
+* **Content**:TIMESTAMP 类型建议设置默认值，且不建议使用 0 或 0000-00-00 00:00:00 作为默认值。可以考虑使用 1970-08-02 01:01:01
 * **Case**:
 
 ```sql

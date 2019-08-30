@@ -523,8 +523,8 @@ func init() {
 		"COL.013": {
 			Item:     "COL.013",
 			Severity: "L4",
-			Summary:  "TIMESTAMP 类型未设置默认值",
-			Content:  `TIMESTAMP 类型未设置默认值`,
+			Summary:  "TIMESTAMP 类型默认值检查异常",
+			Content:  `TIMESTAMP 类型建议设置默认值，且不建议使用 0 或 0000-00-00 00:00:00 作为默认值。可以考虑使用 1970-08-02 01:01:01`,
 			Case:     "CREATE TABLE tbl( `id` bigint not null, `create_time` timestamp);",
 			Func:     (*Query4Audit).RuleTimestampDefault,
 		},
