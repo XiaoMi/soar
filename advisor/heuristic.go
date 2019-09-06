@@ -1161,8 +1161,14 @@ func (q *Query4Audit) RuleUpdateSetAnd() Rule {
 	var rule = q.RuleOK()
 	switch s := q.Stmt.(type) {
 	case *sqlparser.Update:
-		if strings.Contains(sqlparser.String(s.Exprs), " and ") {
-			rule = HeuristicRules["RES.005"]
+		for _, c := range s.Exprs {
+			switch c.Expr.(type) {
+			case *sqlparser.Subquery:
+			default:
+				if strings.Contains(sqlparser.String(c), " and ") {
+					rule = HeuristicRules["RES.005"]
+				}
+			}
 		}
 	}
 	return rule

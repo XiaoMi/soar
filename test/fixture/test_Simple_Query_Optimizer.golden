@@ -16,7 +16,7 @@ WHERE
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | 33.33% | ☠️ **O(n)** | Using where |
+| 1  | SIMPLE | *film* | NULL | ALL | NULL | NULL | NULL | NULL | 1000 | n% | ☠️ **O(n)** | Using where |
 
 
 
@@ -41,6 +41,7 @@ WHERE
 
 * **Severity:**  L2
 
+* **Content:**  为列length添加索引，散粒度为: n%; 
 
 * **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_length\` (\`length\`) ;
 

@@ -792,10 +792,13 @@ func TestRuleUpdateSetAnd(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
-			"update tbl set col = 1 and cl = 2 where col=3;",
+			"update tbl set col = 1 AND cl = 2 where col=3;",
+			"update table1 set a = ( select a from table2 where b=1 and c=2) and b=1 where d=2",
 		},
 		{
 			"update tbl set col = 1 ,cl = 2 where col=3;",
+			// https://github.com/XiaoMi/soar/issues/226
+			"update table1 set a = ( select a from table2 where b=1 and c=2), b=1, c=2 where d=2",
 		},
 	}
 	for _, sql := range sqls[0] {
