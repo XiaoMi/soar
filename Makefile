@@ -5,6 +5,8 @@
 #
 BINARY=soar
 GOPATH ?= $(shell go env GOPATH)
+GO111MODULE:=off
+export GO111MODULE
 # Ensure GOPATH is set before running build process.
 ifeq "$(GOPATH)" ""
   $(error Please set the environment variable GOPATH before running `make`)

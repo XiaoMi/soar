@@ -24,4 +24,4 @@
 
 ## 注意
 * 测试环境 MySQL 版本必须高于或等于线上环境
-* 测试环境需要所有权限(建议通过[docker](https://hub.docker.com/_/mysql/)启动)，线上环境至少需要只读权限
+* 测试环境需要所有权限(建议通过[docker](https://hub.docker.com/_/mysql/)启动)，线上环境需要只读(SELECT)权限。
