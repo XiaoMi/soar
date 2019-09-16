@@ -549,7 +549,7 @@ func init() {
 			Item:     "COL.016",
 			Severity: "L1",
 			Summary:  "整型定义建议采用 INT(10) 或 BIGINT(20)",
-			Content:  `INT(M) 在 integer 数据类型中，M 表示最大显示宽度。 在 INT(M) 中，M 的值跟 INT(M) 所占多少存储空间并无任何关系。 INT(3)、INT(4)、INT(8) 在磁盘上都是占用 4 bytes 的存储空间。`,
+			Content:  `INT(M) 在 integer 数据类型中，M 表示最大显示宽度。 在 INT(M) 中，M 的值跟 INT(M) 所占多少存储空间并无任何关系。 INT(3)、INT(4)、INT(8) 在磁盘上都是占用 4 bytes 的存储空间。高版本 MySQL 已经不推荐设置整数显示宽度。`,
 			Case:     "CREATE TABLE tab (a INT(1));",
 			Func:     (*Query4Audit).RuleIntPrecision,
 		},

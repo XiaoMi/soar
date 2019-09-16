@@ -1,7 +1,6 @@
 bin/
 release/
 test/tmp/
-common/version.go
 doc/blueprint/
 *.iml
 *.swp

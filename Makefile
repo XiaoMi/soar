@@ -11,7 +11,13 @@ ifeq "$(GOPATH)" ""
 endif
 PATH := ${GOPATH}/bin:$(PATH)
 GCFLAGS=-gcflags "all=-trimpath=${GOPATH}"
-LDFLAGS=-ldflags="-s -w"
+VERSION_TAG := $(shell git describe --tags --always)
+VERSION_VERSION := $(shell git log --date=iso --pretty=format:"%cd" -1) $(VERSION_TAG)
+VERSION_COMPILE := $(shell date +"%F %T %z") by $(shell go version)
+VERSION_BRANCH  := $(shell git rev-parse --abbrev-ref HEAD)
+VERSION_GIT_DIRTY := $(shell git diff --no-ext-diff 2>/dev/null | wc -l)
+VERSION_DEV_PATH:= $(shell pwd)
+LDFLAGS=-ldflags="-s -w -X 'github.com/XiaoMi/soar/common.Version=$(VERSION_VERSION)' -X 'github.com/XiaoMi/soar/common.Compile=$(VERSION_COMPILE)' -X 'github.com/XiaoMi/soar/common.Branch=$(VERSION_BRANCH)' -X github.com/XiaoMi/soar/common.GitDirty=$(VERSION_GIT_DIRTY) -X github.com/XiaoMi/soar/common.DevPath=$(VERSION_DEV_PATH)"
 
 # These are the values we want to pass for VERSION  and BUILD
 BUILD_TIME=`date +%Y%m%d%H%M`
@@ -69,14 +75,14 @@ fmt: go_version_check
 .PHONY: test
 test:
 	@echo "$(CGREEN)Run all test cases ...$(CEND)"
-	go test -timeout 10m -race ./...
+	@go test $(LDFLAGS) -timeout 10m -race ./...
 	@echo "test Success!"
 
 # Rule golang test cases with `-update` flag
 .PHONY: test-update
 test-update:
 	@echo "$(CGREEN)Run all test cases with -update flag ...$(CEND)"
-	go test ./... -update
+	@go test $(LDFLAGS) ./... -update
 	@echo "test-update Success!"
 
 # Using bats test framework run all cli test cases
@@ -92,9 +98,9 @@ test-cli: build
 .PHONY: cover
 cover: test
 	@echo "$(CGREEN)Run test cover check ...$(CEND)"
-	go test -coverpkg=./... -coverprofile=coverage.data ./... | column -t
-	go tool cover -html=coverage.data -o coverage.html
-	go tool cover -func=coverage.data -o coverage.txt
+	@go test $(LDFLAGS) -coverpkg=./... -coverprofile=coverage.data ./... | column -t
+	@go tool cover -html=coverage.data -o coverage.html
+	@go tool cover -func=coverage.data -o coverage.txt
 	@tail -n 1 coverage.txt | awk '{sub(/%/, "", $$NF); \
 		if($$NF < 80) \
 			{print "$(CRED)"$$0"%$(CEND)"} \
@@ -107,10 +113,9 @@ cover: test
 build: fmt
 	@echo "$(CGREEN)Building ...$(CEND)"
 	@mkdir -p bin
-	@bash ./genver.sh
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
-		go build ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
+		go build ${LDFLAGS} ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
 	done ; exit $$ret
 	@echo "build Success!"
 
