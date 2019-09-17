@@ -321,6 +321,7 @@ type Prepared struct {
 	Params        []ParamMarkerExpr
 	SchemaVersion int64
 	UseCache      bool
+	CachedPlan    interface{}
 }
 
 // ExecuteStmt is a statement to execute PreparedStmt.
@@ -2083,7 +2084,7 @@ func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
 			}
 			table.Restore(ctx)
 		}
-	case "index", "use_index_merge":
+	case "use_index", "ignore_index", "use_index_merge":
 		n.Tables[0].Restore(ctx)
 		ctx.WritePlain(" ")
 		for i, index := range n.Indexes {
