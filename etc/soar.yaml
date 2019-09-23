@@ -13,6 +13,7 @@ test-dsn:
     password: "1tIsB1g3rt"
     disable:  false
 
+# 高危，仅测试时使用，线上环境禁止配置为 true
 allow-online-as-test: true
 
 log-level:  7
