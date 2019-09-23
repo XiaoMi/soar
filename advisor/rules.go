@@ -272,6 +272,14 @@ func init() {
 			Case:     "INSERT INTO tb (a) VALUES (1), (2)",
 			Func:     (*Query4Audit).RuleInsertValues,
 		},
+		"ARG.013": {
+			Item:     "ARG.013",
+			Severity: "L0",
+			Summary:  "DDL 语句中使用了中文全角引号",
+			Content:  "DDL 语句中使用了中文全角引号“”或‘’，这可能是书写错误，请确认是否符合预期。",
+			Case:     "CREATE TABLE tb (a varchar(10) default '“”'",
+			Func:     (*Query4Audit).RuleFullWidthQuote,
+		},
 		"CLA.001": {
 			Item:     "CLA.001",
 			Severity: "L4",

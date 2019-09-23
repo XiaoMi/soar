@@ -192,6 +192,16 @@ select id from t where num not in(1,2,3);
 ```sql
 INSERT INTO tb (a) VALUES (1), (2)
 ```
+## DDL 语句中使用了中文全角引号
+
+* **Item**:ARG.013
+* **Severity**:L0
+* **Content**:DDL 语句中使用了中文全角引号“”或‘’，这可能是书写错误，请确认是否符合预期。
+* **Case**:
+
+```sql
+CREATE TABLE tb (a varchar(10) default '“”'
+```
 ## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item**:CLA.001

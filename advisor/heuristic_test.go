@@ -1886,6 +1886,7 @@ func TestRuleSpaceWithQuote(t *testing.T) {
 			`SELECT ' a';`,
 			`SELECT "a ";`,
 			`SELECT " a";`,
+			`create table tb ( a varchar(10) default ' ');`,
 		},
 		{
 			`select ''`,
@@ -2033,6 +2034,44 @@ func TestRuleInsertValues(t *testing.T) {
 		}
 	}
 	common.Config.MaxValueCount = oldMaxValueCount
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// ARG.013
+func TestRuleFullWidthQuote(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`CREATE TABLE tb (a varchar(10) default '“”')`,
+			`CREATE TABLE tb (a varchar(10) default '‘’')`,
+			`ALTER TABLE tb ADD COLUMN a VARCHAR(10) DEFAULT "“”"`,
+		},
+		{
+			`CREATE TABLE tb (a varchar(10) default '""')`,
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleFullWidthQuote()
+			if rule.Item != "ARG.013" {
+				t.Error("Rule not match:", rule.Item, "Expect : ARG.013")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleFullWidthQuote()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 

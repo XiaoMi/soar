@@ -418,7 +418,7 @@ func (q *Query4Audit) RuleOffsetLimit() Rule {
 				switch v := n.Offset.(type) {
 				case *sqlparser.SQLVal:
 					offset, err := strconv.Atoi(string(v.Val))
-					// 检查一下Offset阈值，太小了给这个建议也没什么用，阈值写死了没加配置
+					// TODO: 检查一下Offset阈值，太小了给这个建议也没什么用，阈值写死了没加配置
 					if err == nil && offset > 1000 {
 						rule = HeuristicRules["CLA.003"]
 						return false, nil
@@ -2224,6 +2224,24 @@ func (q *Query4Audit) RuleInsertValues() Rule {
 		case sqlparser.Values:
 			if len(val) > common.Config.MaxValueCount {
 				rule = HeuristicRules["ARG.012"]
+			}
+		}
+	}
+	return rule
+}
+
+// RuleFullWidthQuote ARG.013
+func (q *Query4Audit) RuleFullWidthQuote() Rule {
+	var rule = q.RuleOK()
+	for _, node := range q.TiStmt {
+		switch n := node.(type) {
+		case *tidb.CreateTableStmt, *tidb.AlterTableStmt:
+			var sb strings.Builder
+			ctx := format.NewRestoreCtx(format.DefaultRestoreFlags, &sb)
+			if err := n.Restore(ctx); err == nil {
+				if strings.Contains(sb.String(), `“”`) || strings.Contains(sb.String(), `‘’`) {
+					rule = HeuristicRules["ARG.013"]
+				}
 			}
 		}
 	}
