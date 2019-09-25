@@ -20,6 +20,7 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/kr/pretty"
@@ -29,6 +30,10 @@ var update = flag.Bool("update", false, "update .golden files")
 
 func TestMain(m *testing.M) {
 	// 初始化 init
+	if DevPath == "" {
+		_, file, _, _ := runtime.Caller(0)
+		DevPath, _ = filepath.Abs(filepath.Dir(filepath.Join(file, ".."+string(filepath.Separator))))
+	}
 	BaseDir = DevPath
 	err := ParseConfig("")
 	LogIfError(err, "init ParseConfig")
