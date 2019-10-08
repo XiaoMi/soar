@@ -60,14 +60,28 @@ func TestRuleImplicitAlias(t *testing.T) {
 // ALI.002
 func TestRuleStarAlias(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"select tbl.* as c1,c2,c3 from tbl where id < 1000",
+	sqls := [][]string{
+		{
+			"select tbl.* AS c1,c2,c3 from tbl where id < 1000",
+			"SELECT * as",
+		},
+		{
+			`SELECT c1, c2, c3, FROM tb WHERE id < 1000 AND content="mytest* as test"`,
+			`select *`,
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, _ := NewQuery4Audit(sql)
 		rule := q.RuleStarAlias()
 		if rule.Item != "ALI.002" {
 			t.Error("Rule not match:", rule.Item, "Expect : ALI.002")
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, _ := NewQuery4Audit(sql)
+		rule := q.RuleStarAlias()
+		if rule.Item != "OK" {
+			t.Error("Rule not match:", rule.Item, "Expect : OK")
 		}
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())

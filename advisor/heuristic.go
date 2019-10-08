@@ -64,9 +64,11 @@ func (q *Query4Audit) RuleImplicitAlias() Rule {
 // RuleStarAlias ALI.002
 func (q *Query4Audit) RuleStarAlias() Rule {
 	var rule = q.RuleOK()
-	re := regexp.MustCompile(`(?i)(\*\s+as\b)`)
-	if re.FindString(q.Query) != "" {
-		rule = HeuristicRules["ALI.002"]
+	tkns := ast.Tokenizer(q.Query)
+	for i, tkn := range tkns {
+		if tkn.Val == "*" && i+1 < len(tkns) && tkns[i+1].Val == "as" {
+			rule = HeuristicRules["ALI.002"]
+		}
 	}
 	return rule
 }
