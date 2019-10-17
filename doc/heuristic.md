@@ -606,7 +606,7 @@ SELECT c3, COUNT(*) AS accounts FROM tab where c2 < 10000 GROUP BY c3 ORDER BY n
 
 * **Item**:FUN.003
 * **Severity**:L3
-* **Content**:在一些查询请求中，您需要强制让某一列或者某个表达式返回非 NULL 的值，从而让查询逻辑变得更简单，担忧不想将这个值存下来。使用 COALESCE() 函数来构造连接的表达式，这样即使是空值列也不会使整表达式变为 NULL。
+* **Content**:在一些查询请求中，您需要强制让某一列或者某个表达式返回非 NULL 的值，从而让查询逻辑变得更简单，但又不想将这个值存下来。可以使用 COALESCE() 函数来构造连接的表达式，这样即使是空值列也不会使整表达式变为 NULL。
 * **Case**:
 
 ```sql
