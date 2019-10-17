@@ -85,7 +85,10 @@ func TestGetParseTableWithStmt(t *testing.T) {
 
 func TestFindCondition(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	for _, sql := range common.TestSQLs {
+	sqls := []string{
+		`SELECT * FROM film WHERE length % 20 = 4;`,
+	}
+	for _, sql := range append(sqls, common.TestSQLs...) {
 		fmt.Println(sql)
 		stmt, err := sqlparser.Parse(sql)
 		// pretty.Println(stmt)
