@@ -217,7 +217,6 @@ func main() {
 		case "tables":
 			continue
 		case "query-type":
-			fmt.Println(syntaxErr)
 			// query type by first key word
 			fmt.Println(ast.QueryType(sql))
 			continue
