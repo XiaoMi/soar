@@ -429,7 +429,7 @@ func init() {
 			Summary:  "不要 UPDATE 主键",
 			Content:  `主键是数据表中记录的唯一标识符，不建议频繁更新主键列，这将影响元数据统计信息进而影响正常的查询。`,
 			Case:     "update tbl set col=1",
-			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给
+			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给 RuleUpdatePrimaryKey
 		},
 		"COL.001": {
 			Item:     "COL.001",
@@ -689,7 +689,7 @@ func init() {
 			Summary:  "不建议对等值查询列使用 GROUP BY",
 			Content:  `GROUP BY 中的列在前面的 WHERE 条件中使用了等值查询，对这样的列进行 GROUP BY 意义不大。`,
 			Case:     "select film_id, title from film where release_year='2006' group by release_year",
-			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给
+			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给 RuleGroupByConst
 		},
 		"JOI.001": {
 			Item:     "JOI.001",
@@ -988,6 +988,22 @@ func init() {
 			Content:  "类似这样的 SELECT * FROM tbl WHERE col = col = 'abc' 语句可能是书写错误，您可能想表达的含义是 col = 'abc'。如果确实是业务需求建议修改为 col = col and col = 'abc'。",
 			Case:     "SELECT * FROM tbl WHERE col = col = 'abc'",
 			Func:     (*Query4Audit).RuleMultiCompare,
+		},
+		"RES.010": {
+			Item:     "RES.010",
+			Severity: "L2",
+			Summary:  "建表语句中定义为 ON UPDATE CURRENT_TIMESTAMP 的字段不建议包含业务逻辑",
+			Content:  "定义为 ON UPDATE CURRENT_TIMESTAMP 的字段在该表其他字段更新时会联动修改，如果包含业务逻辑用户可见会埋下隐患。后续如有批量修改数据却又不想修改该字段时会导致数据错误。",
+			Case: `CREATE TABLE category (category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,	name VARCHAR(25) NOT NULL, last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY  (category_id)`,
+			Func: (*Query4Audit).RuleCreateOnUpdate,
+		},
+		"RES.011": {
+			Item:     "RES.011",
+			Severity: "L2",
+			Summary:  "更新请求操作的表包含 ON UPDATE CURRENT_TIMESTAMP 字段",
+			Content:  "定义为 ON UPDATE CURRENT_TIMESTAMP 的字段在该表其他字段更新时会联动修改，请注意检查。如不想修改字段的更新时间可以使用如下方法：UPDATE category SET name='ActioN', last_update=last_update WHERE category_id=1",
+			Case:     "UPDATE category SET name='ActioN', last_update=last_update WHERE category_id=1",
+			Func:     (*Query4Audit).RuleOK, // 该建议在indexAdvisor中给 RuleUpdateOnUpdate
 		},
 		"SEC.001": {
 			Item:     "SEC.001",

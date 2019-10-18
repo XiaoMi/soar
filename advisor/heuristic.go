@@ -1347,6 +1347,83 @@ func (q *Query4Audit) RuleMultiCompare() Rule {
 	return rule
 }
 
+// RuleCreateOnUpdate RES.010
+func (q *Query4Audit) RuleCreateOnUpdate() Rule {
+	var rule = q.RuleOK()
+	switch q.Stmt.(type) {
+	case *sqlparser.DDL:
+		for _, tiStmt := range q.TiStmt {
+			switch node := tiStmt.(type) {
+			case *tidb.CreateTableStmt:
+				for _, col := range node.Cols {
+					if col.Tp == nil {
+						continue
+					}
+					for _, op := range col.Options {
+						if op.Tp == tidb.ColumnOptionOnUpdate {
+							rule = HeuristicRules["RES.010"]
+							return rule
+						}
+					}
+				}
+
+			case *tidb.AlterTableStmt:
+				for _, spec := range node.Specs {
+					switch spec.Tp {
+					case tidb.AlterTableAddColumns, tidb.AlterTableModifyColumn, tidb.AlterTableChangeColumn:
+						for _, col := range spec.NewColumns {
+							if col.Tp == nil {
+								continue
+							}
+							for _, op := range col.Options {
+								if op.Tp == tidb.ColumnOptionOnUpdate {
+									rule = HeuristicRules["RES.010"]
+									return rule
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return rule
+}
+
+// RuleUpdateOnUpdate RES.011
+func (idxAdv *IndexAdvisor) RuleUpdateOnUpdate() Rule {
+	rule := HeuristicRules["OK"]
+	// 未开启测试环境不进行检查
+	if common.Config.TestDSN.Disable {
+		return rule
+	}
+	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+		switch stmt := node.(type) {
+		case *sqlparser.Update:
+			for _, tbExpr := range stmt.TableExprs {
+				ddl, err := idxAdv.vEnv.ShowCreateTable(sqlparser.String(tbExpr))
+				if err != nil {
+					common.Log.Error("RuleMaxTextColsCount create statement got failed: %s", err.Error())
+					return false, err
+				}
+				if strings.Contains(ddl, "ON UPDATE") {
+					rule = HeuristicRules["RES.011"]
+					break
+				}
+			}
+			for _, setExpr := range stmt.Exprs {
+				tup := strings.Split(sqlparser.String(setExpr), " = ")
+				if len(tup) == 2 && tup[0] == tup[1] {
+					rule = HeuristicRules["OK"]
+				}
+			}
+		}
+		return true, nil
+	}, idxAdv.Ast)
+	common.LogIfError(err, "")
+	return rule
+}
+
 // RuleStandardINEQ STA.001
 func (q *Query4Audit) RuleStandardINEQ() Rule {
 	var rule = q.RuleOK()

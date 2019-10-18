@@ -1004,6 +1004,111 @@ func TestRuleMultiCompare(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// RES.010
+func TestRuleCreateOnUpdate(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`CREATE TABLE category (
+  category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(25) NOT NULL,
+  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (category_id)
+)`,
+		},
+		{
+			`CREATE TABLE category (
+  category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(25) NOT NULL,
+  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY  (category_id)
+)`,
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleCreateOnUpdate()
+			if rule.Item != "RES.010" {
+				t.Error("Rule not match:", rule.Item, "Expect : RES.010, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleCreateOnUpdate()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK, SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
+// RES.011
+func TestRuleUpdateOnUpdate(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := [][]string{
+		{
+			`UPDATE category SET name='ActioN' WHERE category_id=1`,
+		},
+		{
+			`select * from film limit 1`,
+			"UPDATE category SET name='ActioN', last_update=last_update WHERE category_id=1",
+		},
+	}
+
+	for _, sql := range sqls[0] {
+		vEnv.BuildVirtualEnv(rEnv, sql)
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			t.Error(syntaxErr)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleUpdateOnUpdate()
+			if rule.Item != "RES.011" {
+				t.Error("Rule not match:", rule.Item, "Expect : RES.011, SQL:", sql)
+			}
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		vEnv.BuildVirtualEnv(rEnv, sql)
+		stmt, syntaxErr := sqlparser.Parse(sql)
+		if syntaxErr != nil {
+			t.Error(syntaxErr)
+		}
+
+		q := &Query4Audit{Query: sql, Stmt: stmt}
+		idxAdvisor, err := NewAdvisor(vEnv, *rEnv, *q)
+		if err != nil {
+			t.Error("NewAdvisor Error: ", err, "SQL: ", sql)
+		}
+
+		if idxAdvisor != nil {
+			rule := idxAdvisor.RuleUpdateOnUpdate()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK, SQL:", sql)
+			}
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // STA.001
 func TestRuleStandardINEQ(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())

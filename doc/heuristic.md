@@ -1052,6 +1052,26 @@ LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;
 ```sql
 SELECT * FROM tbl WHERE col = col = 'abc'
 ```
+## 建表语句中定义为 ON UPDATE CURRENT\_TIMESTAMP 的字段不建议包含业务逻辑
+
+* **Item**:RES.010
+* **Severity**:L2
+* **Content**:定义为 ON UPDATE CURRENT\_TIMESTAMP 的字段在该表其他字段更新时会联动修改，如果包含业务逻辑用户可见会埋下隐患。后续如有批量修改数据却又不想修改该字段时会导致数据错误。
+* **Case**:
+
+```sql
+CREATE TABLE category (category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,	name VARCHAR(25) NOT NULL, last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY  (category_id)
+```
+## 更新请求操作的表包含 ON UPDATE CURRENT\_TIMESTAMP 字段
+
+* **Item**:RES.011
+* **Severity**:L2
+* **Content**:定义为 ON UPDATE CURRENT\_TIMESTAMP 的字段在该表其他字段更新时会联动修改，请注意检查。如不想修改字段的更新时间可以使用如下方法：UPDATE category SET name='ActioN', last\_update=last\_update WHERE category\_id=1
+* **Case**:
+
+```sql
+UPDATE category SET name='ActioN', last_update=last_update WHERE category_id=1
+```
 ## 请谨慎使用TRUNCATE操作
 
 * **Item**:SEC.001
