@@ -1121,6 +1121,14 @@ func init() {
 			Case:     "SELECT * FROM staff WHERE name IN (SELECT max(NAME) FROM customer)",
 			Func:     (*Query4Audit).RuleSubQueryFunctions,
 		},
+		"SUB.007": {
+			Item:     "SUB.007",
+			Severity: "L2",
+			Summary:  "外层带有 LIMIT 输出限制的 UNION 联合查询，其内层查询建议也添加 LIMIT 输出限制",
+			Content:  `有时 MySQL 无法将限制条件从外层“下推”到内层，这会使得原本可以限制能够限制部分返回结果的条件无法应用到内层查询的优化上。比如：(SELECT * FROM tb1 ORDER BY name) UNION ALL (SELECT * FROM tb2 ORDER BY name) LIMIT 20;  MySQL 会将两个子查询的结果放在一个临时表中，然后取出 20 条结果，可以通过在两个子查询中添加 LIMIT 20 来减少临时表中的数据。(SELECT * FROM tb1 ORDER BY name LIMIT 20) UNION ALL (SELECT * FROM tb2 ORDER BY name LIMIT 20) LIMIT 20;`,
+			Case:     "(SELECT * FROM tb1 ORDER BY name LIMIT 20) UNION ALL (SELECT * FROM tb2 ORDER BY name LIMIT 20) LIMIT 20;",
+			Func:     (*Query4Audit).RuleUNIONLimit,
+		},
 		"TBL.001": {
 			Item:     "TBL.001",
 			Severity: "L4",

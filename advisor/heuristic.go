@@ -1638,6 +1638,24 @@ func (q *Query4Audit) RuleSubQueryFunctions() Rule {
 	return rule
 }
 
+// RuleUNIONLimit SUB.007
+func (q *Query4Audit) RuleUNIONLimit() Rule {
+	var rule = q.RuleOK()
+	for _, tiStmtNode := range q.TiStmt {
+		switch stmt := tiStmtNode.(type) {
+		case *tidb.UnionStmt:
+			if stmt.Limit != nil {
+				for _, sel := range stmt.SelectList.Selects {
+					if sel.Limit == nil {
+						rule = HeuristicRules["SUB.007"]
+					}
+				}
+			}
+		}
+	}
+	return rule
+}
+
 // RuleMultiValueAttribute LIT.003
 func (q *Query4Audit) RuleMultiValueAttribute() Rule {
 	var rule = q.RuleOK()
