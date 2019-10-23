@@ -34,6 +34,7 @@ var (
 	_ DDLNode = &DropTableStmt{}
 	_ DDLNode = &RenameTableStmt{}
 	_ DDLNode = &TruncateTableStmt{}
+	_ DDLNode = &RepairTableStmt{}
 
 	_ Node = &AlterTableSpec{}
 	_ Node = &ColumnDef{}
@@ -1247,7 +1248,7 @@ func (n *CreateViewStmt) Accept(v Visitor) (Node, bool) {
 	if !ok {
 		return n, false
 	}
-	n.Select = selnode.(*SelectStmt)
+	n.Select = selnode.(StmtNode)
 	return v.Leave(n)
 }
 
@@ -1555,6 +1556,46 @@ func (n *CleanupTableLockStmt) Restore(ctx *RestoreCtx) error {
 		if err := v.Restore(ctx); err != nil {
 			return errors.Annotatef(err, "An error occurred while restore CleanupTableLockStmt.Tables[%d]", i)
 		}
+	}
+	return nil
+}
+
+// RepairTableStmt is a statement to repair tableInfo.
+type RepairTableStmt struct {
+	ddlNode
+	Table      *TableName
+	CreateStmt *CreateTableStmt
+}
+
+// Accept implements Node Accept interface.
+func (n *RepairTableStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*RepairTableStmt)
+	node, ok := n.Table.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.Table = node.(*TableName)
+	node, ok = n.CreateStmt.Accept(v)
+	if !ok {
+		return n, false
+	}
+	n.CreateStmt = node.(*CreateTableStmt)
+	return v.Leave(n)
+}
+
+// Restore implements Node interface.
+func (n *RepairTableStmt) Restore(ctx *RestoreCtx) error {
+	ctx.WriteKeyWord("ADMIN REPAIR TABLE ")
+	if err := n.Table.Restore(ctx); err != nil {
+		return errors.Annotatef(err, "An error occurred while restore RepairTableStmt.table : [%v]", n.Table)
+	}
+	ctx.WritePlain(" ")
+	if err := n.CreateStmt.Restore(ctx); err != nil {
+		return errors.Annotatef(err, "An error occurred while restore RepairTableStmt.createStmt : [%v]", n.CreateStmt)
 	}
 	return nil
 }
@@ -1925,6 +1966,8 @@ const (
 	AlterTableIndexInvisible
 	// TODO: Add more actions
 	AlterTableOrderByColumns
+	// AlterTableSetTiFlashReplica uses to set the table TiFlash replica.
+	AlterTableSetTiFlashReplica
 )
 
 // LockType is the type for AlterTableSpec.
@@ -2019,6 +2062,12 @@ type AlterTableSpec struct {
 	WithValidation  bool
 	Num             uint64
 	Visibility      IndexVisibility
+	TiFlashReplica  *TiFlashReplicaSpec
+}
+
+type TiFlashReplicaSpec struct {
+	Count  uint64
+	Labels []string
 }
 
 // AlterOrderItem represents an item in order by at alter table stmt.
@@ -2042,6 +2091,19 @@ func (n *AlterOrderItem) Restore(ctx *RestoreCtx) error {
 // Restore implements Node interface.
 func (n *AlterTableSpec) Restore(ctx *RestoreCtx) error {
 	switch n.Tp {
+	case AlterTableSetTiFlashReplica:
+		ctx.WriteKeyWord("SET TIFLASH REPLICA ")
+		ctx.WritePlainf("%d", n.TiFlashReplica.Count)
+		if len(n.TiFlashReplica.Labels) == 0 {
+			break
+		}
+		ctx.WriteKeyWord(" LOCATION LABELS ")
+		for i, v := range n.TiFlashReplica.Labels {
+			if i > 0 {
+				ctx.WritePlain(", ")
+			}
+			ctx.WriteString(v)
+		}
 	case AlterTableOption:
 		switch {
 		case len(n.Options) == 2 &&

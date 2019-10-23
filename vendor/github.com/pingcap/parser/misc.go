@@ -351,6 +351,7 @@ var tokenMap = map[string]int{
 	"KEY_BLOCK_SIZE":           keyBlockSize,
 	"KEYS":                     keys,
 	"KILL":                     kill,
+	"LABELS":                   labels,
 	"LAST":                     last,
 	"LEADING":                  leading,
 	"LEFT":                     left,
@@ -365,6 +366,7 @@ var tokenMap = map[string]int{
 	"LOCAL":                    local,
 	"LOCALTIME":                localTime,
 	"LOCALTIMESTAMP":           localTs,
+	"LOCATION":                 location,
 	"LOCK":                     lock,
 	"LONG":                     long,
 	"LONGBLOB":                 longblobType,
@@ -469,6 +471,7 @@ var tokenMap = map[string]int{
 	"REFERENCES":               references,
 	"REGEXP":                   regexpKwd,
 	"REGIONS":                  regions,
+	"REGION":                   region,
 	"RELOAD":                   reload,
 	"REMOVE":                   remove,
 	"RENAME":                   rename,
@@ -478,6 +481,7 @@ var tokenMap = map[string]int{
 	"REPEATABLE":               repeatable,
 	"REPLACE":                  replace,
 	"RESPECT":                  respect,
+	"REPLICA":                  replica,
 	"REPLICATION":              replication,
 	"REQUIRE":                  require,
 	"RESTRICT":                 restrict,
@@ -510,6 +514,7 @@ var tokenMap = map[string]int{
 	"SHARE":                    share,
 	"SHARED":                   shared,
 	"SHOW":                     show,
+	"SHUTDOWN":                 shutdown,
 	"SIGNED":                   signed,
 	"SIMPLE":                   simple,
 	"SLAVE":                    slave,
@@ -665,6 +670,7 @@ var tokenMap = map[string]int{
 	"BINDINGS":                 bindings,
 	"EXPR_PUSHDOWN_BLACKLIST":  exprPushdownBlacklist,
 	"OPT_RULE_BLACKLIST":       optRuleBlacklist,
+	"NOWAIT":                   nowait,
 }
 
 // See https://dev.mysql.com/doc/refman/5.7/en/function-resolution.html for details
