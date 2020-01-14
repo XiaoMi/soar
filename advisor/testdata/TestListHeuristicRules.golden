@@ -192,6 +192,16 @@ select id from t where num not in(1,2,3);
 ```sql
 INSERT INTO tb (a) VALUES (1), (2)
 ```
+## DDL 语句中使用了中文全角引号
+
+* **Item**:ARG.013
+* **Severity**:L0
+* **Content**:DDL 语句中使用了中文全角引号“”或‘’，这可能是书写错误，请确认是否符合预期。
+* **Case**:
+
+```sql
+CREATE TABLE tb (a varchar(10) default '“”'
+```
 ## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item**:CLA.001
@@ -472,11 +482,11 @@ select c1,c2,c3 from tbl where c4 is null or c4 <> 1
 ```sql
 CREATE TABLE `tb`(`c` longblob NOT NULL);
 ```
-## TIMESTAMP 类型未设置默认值
+## TIMESTAMP 类型默认值检查异常
 
 * **Item**:COL.013
 * **Severity**:L4
-* **Content**:TIMESTAMP 类型未设置默认值
+* **Content**:TIMESTAMP 类型建议设置默认值，且不建议使用 0 或 0000-00-00 00:00:00 作为默认值。可以考虑使用 1970-08-02 01:01:01
 * **Case**:
 
 ```sql
@@ -506,7 +516,7 @@ CREATE TABLE `tbl` (`c` blob DEFAULT NULL);
 
 * **Item**:COL.016
 * **Severity**:L1
-* **Content**:INT(M) 在 integer 数据类型中，M 表示最大显示宽度。 在 INT(M) 中，M 的值跟 INT(M) 所占多少存储空间并无任何关系。 INT(3)、INT(4)、INT(8) 在磁盘上都是占用 4 bytes 的存储空间。
+* **Content**:INT(M) 在 integer 数据类型中，M 表示最大显示宽度。 在 INT(M) 中，M 的值跟 INT(M) 所占多少存储空间并无任何关系。 INT(3)、INT(4)、INT(8) 在磁盘上都是占用 4 bytes 的存储空间。高版本 MySQL 已经不推荐设置整数显示宽度。
 * **Case**:
 
 ```sql
@@ -596,7 +606,7 @@ SELECT c3, COUNT(*) AS accounts FROM tab where c2 < 10000 GROUP BY c3 ORDER BY n
 
 * **Item**:FUN.003
 * **Severity**:L3
-* **Content**:在一些查询请求中，您需要强制让某一列或者某个表达式返回非 NULL 的值，从而让查询逻辑变得更简单，担忧不想将这个值存下来。使用 COALESCE() 函数来构造连接的表达式，这样即使是空值列也不会使整表达式变为 NULL。
+* **Content**:在一些查询请求中，您需要强制让某一列或者某个表达式返回非 NULL 的值，从而让查询逻辑变得更简单，但又不想将这个值存下来。可以使用 COALESCE() 函数来构造连接的表达式，这样即使是空值列也不会使整表达式变为 NULL。
 * **Case**:
 
 ```sql
@@ -1042,6 +1052,26 @@ LOAD DATA INFILE 'data.txt' INTO TABLE db2.my_table;
 ```sql
 SELECT * FROM tbl WHERE col = col = 'abc'
 ```
+## 建表语句中定义为 ON UPDATE CURRENT\_TIMESTAMP 的字段不建议包含业务逻辑
+
+* **Item**:RES.010
+* **Severity**:L2
+* **Content**:定义为 ON UPDATE CURRENT\_TIMESTAMP 的字段在该表其他字段更新时会联动修改，如果包含业务逻辑用户可见会埋下隐患。后续如有批量修改数据却又不想修改该字段时会导致数据错误。
+* **Case**:
+
+```sql
+CREATE TABLE category (category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,	name VARCHAR(25) NOT NULL, last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY  (category_id)
+```
+## 更新请求操作的表包含 ON UPDATE CURRENT\_TIMESTAMP 字段
+
+* **Item**:RES.011
+* **Severity**:L2
+* **Content**:定义为 ON UPDATE CURRENT\_TIMESTAMP 的字段在该表其他字段更新时会联动修改，请注意检查。如不想修改字段的更新时间可以使用如下方法：UPDATE category SET name='ActioN', last\_update=last\_update WHERE category\_id=1
+* **Case**:
+
+```sql
+UPDATE category SET name='ActioN', last_update=last_update WHERE category_id=1
+```
 ## 请谨慎使用TRUNCATE操作
 
 * **Item**:SEC.001
@@ -1181,6 +1211,16 @@ SELECT * FROM staff WHERE name IN (SELECT NAME FROM customer ORDER BY name LIMIT
 
 ```sql
 SELECT * FROM staff WHERE name IN (SELECT max(NAME) FROM customer)
+```
+## 外层带有 LIMIT 输出限制的 UNION 联合查询，其内层查询建议也添加 LIMIT 输出限制
+
+* **Item**:SUB.007
+* **Severity**:L2
+* **Content**:有时 MySQL 无法将限制条件从外层“下推”到内层，这会使得原本可以限制能够限制部分返回结果的条件无法应用到内层查询的优化上。比如：(SELECT \* FROM tb1 ORDER BY name) UNION ALL (SELECT \* FROM tb2 ORDER BY name) LIMIT 20;  MySQL 会将两个子查询的结果放在一个临时表中，然后取出 20 条结果，可以通过在两个子查询中添加 LIMIT 20 来减少临时表中的数据。(SELECT \* FROM tb1 ORDER BY name LIMIT 20) UNION ALL (SELECT \* FROM tb2 ORDER BY name LIMIT 20) LIMIT 20;
+* **Case**:
+
+```sql
+(SELECT * FROM tb1 ORDER BY name LIMIT 20) UNION ALL (SELECT * FROM tb2 ORDER BY name LIMIT 20) LIMIT 20;
 ```
 ## 不建议使用分区表
 

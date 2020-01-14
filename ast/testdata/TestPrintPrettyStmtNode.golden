@@ -66,5 +66,6 @@
         TableHints:           nil,
         IsAfterUnionDistinct: false,
         IsInBraces:           false,
+        QueryBlockOffset:     0,
     },
 }

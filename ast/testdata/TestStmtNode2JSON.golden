@@ -56,7 +56,8 @@
     "LockTp": 0,
     "TableHints": null,
     "IsAfterUnionDistinct": false,
-    "IsInBraces": false
+    "IsInBraces": false,
+    "QueryBlockOffset": 0
   }
 ]
 
