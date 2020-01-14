@@ -38,6 +38,14 @@ func TiParse(sql, charset, collation string) ([]ast.StmtNode, error) {
 	p := parser.New()
 	sql = removeIncompatibleWords(sql)
 	stmt, warn, err := p.Parse(sql, charset, collation)
+	if err != nil {
+		// issue: https://github.com/XiaoMi/soar/issues/235
+		// TODO: bypass charset error, pingcap/parser not support so much charsets
+		if strings.Contains(err.Error(), "Unknown character set") {
+			err = nil
+		}
+	}
+
 	// TODO: bypass warning info
 	for _, w := range warn {
 		common.Log.Warn(w.Error())

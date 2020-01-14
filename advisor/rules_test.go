@@ -69,3 +69,18 @@ func TestIsIgnoreRule(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
+
+func TestNewQuery4Audit(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	sqls := []string{
+		`SELECT CONVERT("abc" using gbk)`,
+		`SET NAMES gbk`,
+	}
+	for _, sql := range sqls {
+		_, err := NewQuery4Audit(sql)
+		if err != nil {
+			t.Errorf("SQL: %s, Error: %s", sql, err.Error())
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}

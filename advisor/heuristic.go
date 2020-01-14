@@ -1827,7 +1827,7 @@ func (q *Query4Audit) RuleIndexAttributeOrder() Rule {
 		for _, tiStmt := range q.TiStmt {
 			switch node := tiStmt.(type) {
 			case *tidb.CreateIndexStmt:
-				if len(node.IndexColNames) > 1 {
+				if len(node.IndexPartSpecifications) > 1 {
 					rule = HeuristicRules["KEY.004"]
 					break
 				}
@@ -2808,7 +2808,7 @@ func (q *Query4Audit) RuleTooManyKeyParts() Rule {
 						return HeuristicRules["KEY.006"]
 					}
 
-					if constraint.Refer != nil && len(constraint.Refer.IndexColNames) > common.Config.MaxIdxColsCount {
+					if constraint.Refer != nil && len(constraint.Refer.IndexPartSpecifications) > common.Config.MaxIdxColsCount {
 						return HeuristicRules["KEY.006"]
 					}
 				}
@@ -2823,7 +2823,7 @@ func (q *Query4Audit) RuleTooManyKeyParts() Rule {
 							}
 
 							if spec.Constraint.Refer != nil {
-								if len(spec.Constraint.Refer.IndexColNames) > common.Config.MaxIdxColsCount {
+								if len(spec.Constraint.Refer.IndexPartSpecifications) > common.Config.MaxIdxColsCount {
 									return HeuristicRules["KEY.006"]
 								}
 							}

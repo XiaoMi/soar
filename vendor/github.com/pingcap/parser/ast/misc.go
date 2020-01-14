@@ -63,10 +63,11 @@ const (
 	RepeatableRead  = "REPEATABLE-READ"
 
 	// Valid formats for explain statement.
-	ExplainFormatROW = "row"
-	ExplainFormatDOT = "dot"
-	PumpType         = "PUMP"
-	DrainerType      = "DRAINER"
+	ExplainFormatROW  = "row"
+	ExplainFormatDOT  = "dot"
+	ExplainFormatHint = "hint"
+	PumpType          = "PUMP"
+	DrainerType       = "DRAINER"
 )
 
 // Transaction mode constants.
@@ -80,6 +81,7 @@ var (
 	ExplainFormats = []string{
 		ExplainFormatROW,
 		ExplainFormatDOT,
+		ExplainFormatHint,
 	}
 )
 
@@ -323,6 +325,7 @@ type Prepared struct {
 	SchemaVersion int64
 	UseCache      bool
 	CachedPlan    interface{}
+	CachedNames   interface{}
 }
 
 // ExecuteStmt is a statement to execute PreparedStmt.
@@ -376,13 +379,37 @@ func (n *ExecuteStmt) Accept(v Visitor) (Node, bool) {
 // See https://dev.mysql.com/doc/refman/5.7/en/commit.html
 type BeginStmt struct {
 	stmtNode
-	Mode string
+	Mode     string
+	ReadOnly bool
+	Bound    *TimestampBound
 }
 
 // Restore implements Node interface.
 func (n *BeginStmt) Restore(ctx *RestoreCtx) error {
 	if n.Mode == "" {
-		ctx.WriteKeyWord("START TRANSACTION")
+		if n.ReadOnly {
+			ctx.WriteKeyWord("START TRANSACTION READ ONLY")
+			if n.Bound != nil {
+				switch n.Bound.Mode {
+				case TimestampBoundStrong:
+					ctx.WriteKeyWord(" WITH TIMESTAMP BOUND STRONG")
+				case TimestampBoundMaxStaleness:
+					ctx.WriteKeyWord(" WITH TIMESTAMP BOUND MAX STALENESS ")
+					return n.Bound.Timestamp.Restore(ctx)
+				case TimestampBoundExactStaleness:
+					ctx.WriteKeyWord(" WITH TIMESTAMP BOUND EXACT STALENESS ")
+					return n.Bound.Timestamp.Restore(ctx)
+				case TimestampBoundReadTimestamp:
+					ctx.WriteKeyWord(" WITH TIMESTAMP BOUND READ TIMESTAMP ")
+					return n.Bound.Timestamp.Restore(ctx)
+				case TimestampBoundMinReadTimestamp:
+					ctx.WriteKeyWord(" WITH TIMESTAMP BOUND MIN READ TIMESTAMP ")
+					return n.Bound.Timestamp.Restore(ctx)
+				}
+			}
+		} else {
+			ctx.WriteKeyWord("START TRANSACTION")
+		}
 	} else {
 		ctx.WriteKeyWord("BEGIN ")
 		ctx.WriteKeyWord(n.Mode)
@@ -397,6 +424,13 @@ func (n *BeginStmt) Accept(v Visitor) (Node, bool) {
 		return v.Leave(newNode)
 	}
 	n = newNode.(*BeginStmt)
+	if n.Bound != nil && n.Bound.Timestamp != nil {
+		newTimestamp, ok := n.Bound.Timestamp.Accept(v)
+		if !ok {
+			return n, false
+		}
+		n.Bound.Timestamp = newTimestamp.(ExprNode)
+	}
 	return v.Leave(n)
 }
 
@@ -571,6 +605,20 @@ const (
 	FlushPrivileges
 	FlushStatus
 	FlushTiDBPlugin
+	FlushHosts
+	FlushLogs
+)
+
+// LogType is the log type used in FLUSH statement.
+type LogType int8
+
+const (
+	LogTypeDefault LogType = iota
+	LogTypeBinary
+	LogTypeEngine
+	LogTypeError
+	LogTypeGeneral
+	LogTypeSlow
 )
 
 // FlushStmt is a statement to flush tables/privileges/optimizer costs and so on.
@@ -579,6 +627,7 @@ type FlushStmt struct {
 
 	Tp              FlushStmtType // Privileges/Tables/...
 	NoWriteToBinLog bool
+	LogType         LogType
 	Tables          []*TableName // For FlushTableStmt, if Tables is empty, it means flush all tables.
 	ReadLock        bool
 	Plugins         []string
@@ -620,8 +669,27 @@ func (n *FlushStmt) Restore(ctx *RestoreCtx) error {
 			}
 			ctx.WritePlain(v)
 		}
+	case FlushHosts:
+		ctx.WriteKeyWord("HOSTS")
+	case FlushLogs:
+		var logType string
+		switch n.LogType {
+		case LogTypeDefault:
+			logType = "LOGS"
+		case LogTypeBinary:
+			logType = "BINARY LOGS"
+		case LogTypeEngine:
+			logType = "ENGINE LOGS"
+		case LogTypeError:
+			logType = "ERROR LOGS"
+		case LogTypeGeneral:
+			logType = "GENERAL LOGS"
+		case LogTypeSlow:
+			logType = "SLOW LOGS"
+		}
+		ctx.WriteKeyWord(logType)
 	default:
-		return errors.New("Unsupported type of FlushTables")
+		return errors.New("Unsupported type of FlushStmt")
 	}
 	return nil
 }
@@ -979,12 +1047,12 @@ const (
 	Subject
 )
 
-type TslOption struct {
+type TLSOption struct {
 	Type  int
 	Value string
 }
 
-func (t *TslOption) Restore(ctx *RestoreCtx) error {
+func (t *TLSOption) Restore(ctx *RestoreCtx) error {
 	switch t.Type {
 	case TslNone:
 		ctx.WriteKeyWord("NONE")
@@ -999,10 +1067,10 @@ func (t *TslOption) Restore(ctx *RestoreCtx) error {
 		ctx.WriteKeyWord("ISSUER ")
 		ctx.WriteString(t.Value)
 	case Subject:
-		ctx.WriteKeyWord("CIPHER")
+		ctx.WriteKeyWord("SUBJECT ")
 		ctx.WriteString(t.Value)
 	default:
-		return errors.Errorf("Unsupported TslOption.Type %d", t.Type)
+		return errors.Errorf("Unsupported TLSOption.Type %d", t.Type)
 	}
 	return nil
 }
@@ -1080,7 +1148,7 @@ type CreateUserStmt struct {
 	IsCreateRole          bool
 	IfNotExists           bool
 	Specs                 []*UserSpec
-	TslOptions            []*TslOption
+	TLSOptions            []*TLSOption
 	ResourceOptions       []*ResourceOption
 	PasswordOrLockOptions []*PasswordOrLockOption
 }
@@ -1104,19 +1172,16 @@ func (n *CreateUserStmt) Restore(ctx *RestoreCtx) error {
 		}
 	}
 
-	tslOptionLen := len(n.TslOptions)
-
-	if tslOptionLen != 0 {
+	if len(n.TLSOptions) != 0 {
 		ctx.WriteKeyWord(" REQUIRE ")
 	}
 
-	// Restore `tslOptions` reversely to keep order the same with original sql
-	for i := tslOptionLen; i > 0; i-- {
-		if i != tslOptionLen {
+	for i, option := range n.TLSOptions {
+		if i != 0 {
 			ctx.WriteKeyWord(" AND ")
 		}
-		if err := n.TslOptions[i-1].Restore(ctx); err != nil {
-			return errors.Annotatef(err, "An error occurred while restore CreateUserStmt.TslOptions[%d]", i)
+		if err := option.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore CreateUserStmt.TLSOptions[%d]", i)
 		}
 	}
 
@@ -1169,7 +1234,7 @@ type AlterUserStmt struct {
 	IfExists              bool
 	CurrentAuth           *AuthOption
 	Specs                 []*UserSpec
-	TslOptions            []*TslOption
+	TLSOptions            []*TLSOption
 	ResourceOptions       []*ResourceOption
 	PasswordOrLockOptions []*PasswordOrLockOption
 }
@@ -1196,19 +1261,16 @@ func (n *AlterUserStmt) Restore(ctx *RestoreCtx) error {
 		}
 	}
 
-	tslOptionLen := len(n.TslOptions)
-
-	if tslOptionLen != 0 {
+	if len(n.TLSOptions) != 0 {
 		ctx.WriteKeyWord(" REQUIRE ")
 	}
 
-	// Restore `tslOptions` reversely to keep order the same with original sql
-	for i := tslOptionLen; i > 0; i-- {
-		if i != tslOptionLen {
+	for i, option := range n.TLSOptions {
+		if i != 0 {
 			ctx.WriteKeyWord(" AND ")
 		}
-		if err := n.TslOptions[i-1].Restore(ctx); err != nil {
-			return errors.Annotatef(err, "An error occurred while restore AlterUserStmt.TslOptions[%d]", i)
+		if err := option.Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore AlterUserStmt.TLSOptions[%d]", i)
 		}
 	}
 
@@ -1346,10 +1408,27 @@ type DropBindingStmt struct {
 
 	GlobalScope bool
 	OriginSel   StmtNode
+	HintedSel   StmtNode
 }
 
 func (n *DropBindingStmt) Restore(ctx *RestoreCtx) error {
-	return errors.New("Not implemented")
+	ctx.WriteKeyWord("DROP ")
+	if n.GlobalScope {
+		ctx.WriteKeyWord("GLOBAL ")
+	} else {
+		ctx.WriteKeyWord("SESSION ")
+	}
+	ctx.WriteKeyWord("BINDING FOR ")
+	if err := n.OriginSel.Restore(ctx); err != nil {
+		return errors.Trace(err)
+	}
+	if n.HintedSel != nil {
+		ctx.WriteKeyWord(" USING ")
+		if err := n.HintedSel.Restore(ctx); err != nil {
+			return errors.Trace(err)
+		}
+	}
+	return nil
 }
 
 func (n *DropBindingStmt) Accept(v Visitor) (Node, bool) {
@@ -1363,6 +1442,13 @@ func (n *DropBindingStmt) Accept(v Visitor) (Node, bool) {
 		return n, false
 	}
 	n.OriginSel = selnode.(*SelectStmt)
+	if n.HintedSel != nil {
+		selnode, ok = n.HintedSel.Accept(v)
+		if !ok {
+			return n, false
+		}
+		n.HintedSel = selnode.(*SelectStmt)
+	}
 	return v.Leave(n)
 }
 
@@ -1425,6 +1511,9 @@ const (
 	AdminReloadOptRuleBlacklist
 	AdminPluginDisable
 	AdminPluginEnable
+	AdminFlushBindings
+	AdminCaptureBindings
+	AdminEvolveBindings
 )
 
 // HandleRange represents a range where handle value >= Begin and < End.
@@ -1625,6 +1714,12 @@ func (n *AdminStmt) Restore(ctx *RestoreCtx) error {
 			}
 			ctx.WritePlain(v)
 		}
+	case AdminFlushBindings:
+		ctx.WriteKeyWord("FLUSH BINDINGS")
+	case AdminCaptureBindings:
+		ctx.WriteKeyWord("CAPTURE BINDINGS")
+	case AdminEvolveBindings:
+		ctx.WriteKeyWord("EVOLVE BINDINGS")
 	default:
 		return errors.New("Unsupported AdminStmt type")
 	}
@@ -1879,6 +1974,7 @@ type GrantStmt struct {
 	ObjectType ObjectTypeType
 	Level      *GrantLevel
 	Users      []*UserSpec
+	TLSOptions []*TLSOption
 	WithGrant  bool
 }
 
@@ -1912,6 +2008,19 @@ func (n *GrantStmt) Restore(ctx *RestoreCtx) error {
 		}
 		if err := v.Restore(ctx); err != nil {
 			return errors.Annotatef(err, "An error occurred while restore GrantStmt.Users[%d]", i)
+		}
+	}
+	if n.TLSOptions != nil {
+		if len(n.TLSOptions) != 0 {
+			ctx.WriteKeyWord(" REQUIRE ")
+		}
+		for i, option := range n.TLSOptions {
+			if i != 0 {
+				ctx.WriteKeyWord(" AND ")
+			}
+			if err := option.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore GrantStmt.TLSOptions[%d]", i)
+			}
 		}
 	}
 	if n.WithGrant {
@@ -2073,11 +2182,16 @@ type TableOptimizerHint struct {
 
 // HintTable is table in the hint. It may have query block info.
 type HintTable struct {
+	DBName    model.CIStr
 	TableName model.CIStr
 	QBName    model.CIStr
 }
 
 func (ht *HintTable) Restore(ctx *RestoreCtx) {
+	if ht.DBName.L != "" {
+		ctx.WriteName(ht.DBName.String())
+		ctx.WriteKeyWord(".")
+	}
 	ctx.WriteName(ht.TableName.String())
 	if ht.QBName.L != "" {
 		ctx.WriteKeyWord("@")

@@ -62,7 +62,7 @@ func NewQuery4Audit(sql string, options ...string) (*Query4Audit, error) {
 	}
 
 	// TODO: charset, collation
-	// tdib parser 语法解析
+	// tidb parser 语法解析
 	q.TiStmt, err = ast.TiParse(sql, charset, collation)
 	return q, err
 }
