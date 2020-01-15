@@ -172,6 +172,7 @@ select col from tb;
 		[]byte(`select /*!50000 1,*/ 1;`),                                          // 20
 		[]byte(`UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;`),          // 21
 		[]byte("UPDATE `xxx` SET aaa='a;' WHERE `id` = 15;"),                       // 22
+		// []byte(`/* comment here */ SET MAX_JOIN_SIZE=#`),                           // 23
 	}
 	// \G 分隔符
 	buf2s := [][]byte{
@@ -185,9 +186,10 @@ select col from tb;
         \\G*/
         from test\\Ghello`), // 6
 	}
-	// single sql test
-	// SplitStatement(bufs[22], []byte(";"))
-	// return
+	//// single sql test
+	//b, t1, t2 := SplitStatement(bufs[23], []byte(";"))
+	//fmt.Println("buf: ", b, "sql: ", t1, "left: ", string(t2))
+	//return
 	err := common.GoldenDiff(func() {
 		for i, buf := range bufs {
 			sql, _, _ := SplitStatement(buf, []byte(";"))

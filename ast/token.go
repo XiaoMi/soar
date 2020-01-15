@@ -851,7 +851,7 @@ func Compress(sql string) string {
 }
 
 // SplitStatement SQL切分
-// return original sql, remove comment sql, left over buf
+// return 1. original sql, 2. remove comment sql, 3. left over buf
 func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 	var singleLineComment bool
 	var multiLineComment bool

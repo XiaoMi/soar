@@ -119,7 +119,14 @@ func main() {
 		// leftLineCounter
 		llc := ast.LeftNewLines([]byte(orgSQL))
 		lineCounter += llc
-		buf = string(bufBytes)
+		if len(buf) == len(bufBytes) {
+			// 防止切分死循环，当剩余的内容和原 SQL 相同时直接清空 buf
+			buf = ""
+			orgSQL = string(bufBytes)
+			sql = orgSQL
+		} else {
+			buf = string(bufBytes)
+		}
 
 		// 去除无用的备注和空格
 		sql = database.RemoveSQLComments(sql)
