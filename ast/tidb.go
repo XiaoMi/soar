@@ -154,7 +154,7 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 					tb := gjson.Get(table.String(), "Name.O")
 					if db.String() == "" {
 						if tb.String() != "" {
-							tables = append(tables, fmt.Sprintf("`%s`.%s`", defaultDatabase, tb.String()))
+							tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, tb.String()))
 						}
 					} else {
 						if tb.String() != "" {
@@ -177,7 +177,7 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 				tb := gjson.Get(table, "Name.O")
 				if db.String() == "" {
 					if tb.String() != "" {
-						tables = append(tables, fmt.Sprintf("`%s`.%s`", defaultDatabase, tb.String()))
+						tables = append(tables, fmt.Sprintf("`%s`.`%s`", defaultDatabase, tb.String()))
 					}
 				} else {
 					if tb.String() != "" {

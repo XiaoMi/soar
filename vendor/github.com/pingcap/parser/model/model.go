@@ -23,7 +23,6 @@ import (
 	"github.com/pingcap/parser/auth"
 	"github.com/pingcap/parser/mysql"
 	"github.com/pingcap/parser/types"
-	"github.com/pingcap/tipb/go-tipb"
 )
 
 // SchemaState is the state for schema elements.
@@ -81,12 +80,14 @@ const (
 
 // ColumnInfo provides meta data describing of a table column.
 type ColumnInfo struct {
-	ID                  int64               `json:"id"`
-	Name                CIStr               `json:"name"`
-	Offset              int                 `json:"offset"`
-	OriginDefaultValue  interface{}         `json:"origin_default"`
-	DefaultValue        interface{}         `json:"default"`
-	DefaultValueBit     []byte              `json:"default_bit"`
+	ID                 int64       `json:"id"`
+	Name               CIStr       `json:"name"`
+	Offset             int         `json:"offset"`
+	OriginDefaultValue interface{} `json:"origin_default"`
+	DefaultValue       interface{} `json:"default"`
+	DefaultValueBit    []byte      `json:"default_bit"`
+	// DefaultIsExpr is indicates the default value string is expr.
+	DefaultIsExpr       bool                `json:"default_is_expr"`
 	GeneratedExprString string              `json:"generated_expr_string"`
 	GeneratedStored     bool                `json:"generated_stored"`
 	Dependences         map[string]struct{} `json:"dependences"`
@@ -347,9 +348,20 @@ func (t TableLockType) String() string {
 
 // TiFlashReplicaInfo means the flash replica info.
 type TiFlashReplicaInfo struct {
-	Count          uint64
-	LocationLabels []string
-	Available      bool
+	Count                 uint64
+	LocationLabels        []string
+	Available             bool
+	AvailablePartitionIDs []int64
+}
+
+// IsPartitionAvailable checks whether the partition table replica was available.
+func (tr *TiFlashReplicaInfo) IsPartitionAvailable(pid int64) bool {
+	for _, id := range tr.AvailablePartitionIDs {
+		if id == pid {
+			return true
+		}
+	}
+	return false
 }
 
 // GetPartitionInfo returns the partition information.
@@ -720,15 +732,16 @@ const (
 // It corresponds to the statement `CREATE INDEX Name ON Table (Column);`
 // See https://dev.mysql.com/doc/refman/5.7/en/create-index.html
 type IndexInfo struct {
-	ID      int64          `json:"id"`
-	Name    CIStr          `json:"idx_name"`   // Index name.
-	Table   CIStr          `json:"tbl_name"`   // Table name.
-	Columns []*IndexColumn `json:"idx_cols"`   // Index columns.
-	Unique  bool           `json:"is_unique"`  // Whether the index is unique.
-	Primary bool           `json:"is_primary"` // Whether the index is primary key.
-	State   SchemaState    `json:"state"`
-	Comment string         `json:"comment"`    // Comment
-	Tp      IndexType      `json:"index_type"` // Index type: Btree, Hash or Rtree
+	ID        int64          `json:"id"`
+	Name      CIStr          `json:"idx_name"` // Index name.
+	Table     CIStr          `json:"tbl_name"` // Table name.
+	Columns   []*IndexColumn `json:"idx_cols"` // Index columns.
+	State     SchemaState    `json:"state"`
+	Comment   string         `json:"comment"`      // Comment
+	Tp        IndexType      `json:"index_type"`   // Index type: Btree, Hash or Rtree
+	Unique    bool           `json:"is_unique"`    // Whether the index is unique.
+	Primary   bool           `json:"is_primary"`   // Whether the index is primary key.
+	Invisible bool           `json:"is_invisible"` // Whether the index is invisible.
 }
 
 // Clone clones IndexInfo.
@@ -838,75 +851,6 @@ func (cis *CIStr) UnmarshalJSON(b []byte) error {
 	}
 	cis.L = strings.ToLower(cis.O)
 	return nil
-}
-
-// ColumnsToProto converts a slice of model.ColumnInfo to a slice of tipb.ColumnInfo.
-func ColumnsToProto(columns []*ColumnInfo, pkIsHandle bool) []*tipb.ColumnInfo {
-	cols := make([]*tipb.ColumnInfo, 0, len(columns))
-	for _, c := range columns {
-		col := ColumnToProto(c)
-		// TODO: Here `PkHandle`'s meaning is changed, we will change it to `IsHandle` when tikv's old select logic
-		// is abandoned.
-		if (pkIsHandle && mysql.HasPriKeyFlag(c.Flag)) || c.ID == ExtraHandleID {
-			col.PkHandle = true
-		} else {
-			col.PkHandle = false
-		}
-		cols = append(cols, col)
-	}
-	return cols
-}
-
-// IndexToProto converts a model.IndexInfo to a tipb.IndexInfo.
-func IndexToProto(t *TableInfo, idx *IndexInfo) *tipb.IndexInfo {
-	pi := &tipb.IndexInfo{
-		TableId: t.ID,
-		IndexId: idx.ID,
-		Unique:  idx.Unique,
-	}
-	cols := make([]*tipb.ColumnInfo, 0, len(idx.Columns)+1)
-	for _, c := range idx.Columns {
-		cols = append(cols, ColumnToProto(t.Columns[c.Offset]))
-	}
-	if t.PKIsHandle {
-		// Coprocessor needs to know PKHandle column info, so we need to append it.
-		for _, col := range t.Columns {
-			if mysql.HasPriKeyFlag(col.Flag) {
-				colPB := ColumnToProto(col)
-				colPB.PkHandle = true
-				cols = append(cols, colPB)
-				break
-			}
-		}
-	}
-	pi.Columns = cols
-	return pi
-}
-
-// ColumnToProto converts model.ColumnInfo to tipb.ColumnInfo.
-func ColumnToProto(c *ColumnInfo) *tipb.ColumnInfo {
-	pc := &tipb.ColumnInfo{
-		ColumnId:  c.ID,
-		Collation: collationToProto(c.FieldType.Collate),
-		ColumnLen: int32(c.FieldType.Flen),
-		Decimal:   int32(c.FieldType.Decimal),
-		Flag:      int32(c.Flag),
-		Elems:     c.Elems,
-	}
-	pc.Tp = int32(c.FieldType.Tp)
-	return pc
-}
-
-// TODO: update it when more collate is supported.
-func collationToProto(c string) int32 {
-	v := mysql.CollationNames[c]
-	if v == mysql.BinaryDefaultCollationID {
-		return int32(mysql.BinaryDefaultCollationID)
-	}
-	// We only support binary and utf8_bin collation.
-	// Setting other collations to utf8_bin for old data compatibility.
-	// For the data created when we didn't enforce utf8_bin collation in create table.
-	return int32(mysql.DefaultCollationID)
 }
 
 // TableColumnID is composed by table ID and column ID.

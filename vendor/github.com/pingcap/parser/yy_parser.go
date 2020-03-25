@@ -47,6 +47,8 @@ var (
 	ErrUnknownAlterLock = terror.ClassParser.New(mysql.ErrUnknownAlterLock, mysql.MySQLErrName[mysql.ErrUnknownAlterLock])
 	// ErrUnknownAlterAlgorithm returns for no alter algorithm found error.
 	ErrUnknownAlterAlgorithm = terror.ClassParser.New(mysql.ErrUnknownAlterAlgorithm, mysql.MySQLErrName[mysql.ErrUnknownAlterAlgorithm])
+	// ErrWrongValue returns for wrong value
+	ErrWrongValue = terror.ClassParser.New(mysql.ErrWrongValue, mysql.MySQLErrName[mysql.ErrWrongValue])
 	// SpecFieldPattern special result field pattern
 	SpecFieldPattern = regexp.MustCompile(`(\/\*!(M?[0-9]{5,6})?|\*\/)`)
 	specCodePattern  = regexp.MustCompile(`\/\*!(M?[0-9]{5,6})?([^*]|\*+[^*/])*\*+\/`)
@@ -57,22 +59,6 @@ var (
 	specVersionCodeStart   = regexp.MustCompile(`^\/\*T![0-9]{5,6}[ \t]*`)
 	specVersionCodeValue   = regexp.MustCompile(`[0-9]{5,6}`)
 )
-
-func init() {
-	parserMySQLErrCodes := map[terror.ErrCode]uint16{
-		mysql.ErrSyntax:                  mysql.ErrSyntax,
-		mysql.ErrParse:                   mysql.ErrParse,
-		mysql.ErrUnknownCharacterSet:     mysql.ErrUnknownCharacterSet,
-		mysql.ErrInvalidYearColumnLength: mysql.ErrInvalidYearColumnLength,
-		mysql.ErrWrongArguments:          mysql.ErrWrongArguments,
-		mysql.ErrWrongFieldTerminators:   mysql.ErrWrongFieldTerminators,
-		mysql.ErrTooBigDisplaywidth:      mysql.ErrTooBigDisplaywidth,
-		mysql.ErrUnknownAlterLock:        mysql.ErrUnknownAlterLock,
-		mysql.ErrUnknownAlterAlgorithm:   mysql.ErrUnknownAlterAlgorithm,
-		mysql.ErrTooBigPrecision:         mysql.ErrTooBigPrecision,
-	}
-	terror.ErrClassToMySQLCodes[terror.ClassParser] = parserMySQLErrCodes
-}
 
 // TrimComment trim comment for special comment code of MySQL.
 func TrimComment(txt string) string {

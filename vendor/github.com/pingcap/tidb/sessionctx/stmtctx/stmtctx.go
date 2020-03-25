@@ -142,6 +142,7 @@ type StatementContext struct {
 	lockWaitStartTime     *time.Time // LockWaitStartTime stores the pessimistic lock wait start time
 	PessimisticLockWaited int32
 	LockKeysDuration      time.Duration
+	LockKeysCount         int32
 }
 
 // StmtHints are SessionVars related sql hints.
@@ -152,12 +153,15 @@ type StmtHints struct {
 	ReplicaRead             byte
 	AllowInSubqToJoinAndAgg bool
 	NoIndexMergeHint        bool
+	// EnableCascadesPlanner is use cascades planner for a single query only.
+	EnableCascadesPlanner bool
 
 	// Hint flags
 	HasAllowInSubqToJoinAndAggHint bool
 	HasMemQuotaHint                bool
 	HasReplicaReadHint             bool
 	HasMaxExecutionTime            bool
+	HasEnableCascadesPlannerHint   bool
 }
 
 // GetNowTsCached getter for nowTs, if not set get now time and cache it
@@ -182,6 +186,13 @@ func (sc *StatementContext) SQLDigest() (normalized, sqlDigest string) {
 		sc.digestMemo.normalized, sc.digestMemo.digest = parser.NormalizeDigest(sc.OriginalSQL)
 	})
 	return sc.digestMemo.normalized, sc.digestMemo.digest
+}
+
+// InitSQLDigest sets the normalized and digest for sql.
+func (sc *StatementContext) InitSQLDigest(normalized, digest string) {
+	sc.digestMemo.Do(func() {
+		sc.digestMemo.normalized, sc.digestMemo.digest = normalized, digest
+	})
 }
 
 // GetPlanDigest gets the normalized plan and plan digest.
@@ -351,6 +362,15 @@ func (sc *StatementContext) AppendWarning(warn error) {
 	sc.mu.Lock()
 	if len(sc.mu.warnings) < math.MaxUint16 {
 		sc.mu.warnings = append(sc.mu.warnings, SQLWarn{WarnLevelWarning, warn})
+	}
+	sc.mu.Unlock()
+}
+
+// AppendWarnings appends some warnings.
+func (sc *StatementContext) AppendWarnings(warns []SQLWarn) {
+	sc.mu.Lock()
+	if len(sc.mu.warnings) < math.MaxUint16 {
+		sc.mu.warnings = append(sc.mu.warnings, warns...)
 	}
 	sc.mu.Unlock()
 }

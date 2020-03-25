@@ -21,7 +21,7 @@ import (
 
 	"github.com/pingcap/errors"
 	"github.com/pingcap/parser/auth"
-	. "github.com/pingcap/parser/format"
+	"github.com/pingcap/parser/format"
 	"github.com/pingcap/parser/model"
 	"github.com/pingcap/parser/mysql"
 )
@@ -108,7 +108,7 @@ type AuthOption struct {
 }
 
 // Restore implements Node interface.
-func (n *AuthOption) Restore(ctx *RestoreCtx) error {
+func (n *AuthOption) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("IDENTIFIED BY ")
 	if n.ByAuthString {
 		ctx.WriteString(n.AuthString)
@@ -128,7 +128,7 @@ type TraceStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *TraceStmt) Restore(ctx *RestoreCtx) error {
+func (n *TraceStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("TRACE ")
 	if n.Format != "json" {
 		ctx.WriteKeyWord("FORMAT")
@@ -168,7 +168,7 @@ type ExplainForStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *ExplainForStmt) Restore(ctx *RestoreCtx) error {
+func (n *ExplainForStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("EXPLAIN ")
 	ctx.WriteKeyWord("FORMAT ")
 	ctx.WritePlain("= ")
@@ -202,7 +202,7 @@ type ExplainStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *ExplainStmt) Restore(ctx *RestoreCtx) error {
+func (n *ExplainStmt) Restore(ctx *format.RestoreCtx) error {
 	if showStmt, ok := n.Stmt.(*ShowStmt); ok {
 		ctx.WriteKeyWord("DESC ")
 		if err := showStmt.Table.Restore(ctx); err != nil {
@@ -258,7 +258,7 @@ type PrepareStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *PrepareStmt) Restore(ctx *RestoreCtx) error {
+func (n *PrepareStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("PREPARE ")
 	ctx.WriteName(n.Name)
 	ctx.WriteKeyWord(" FROM ")
@@ -301,7 +301,7 @@ type DeallocateStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *DeallocateStmt) Restore(ctx *RestoreCtx) error {
+func (n *DeallocateStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("DEALLOCATE PREPARE ")
 	ctx.WriteName(n.Name)
 	return nil
@@ -341,7 +341,7 @@ type ExecuteStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *ExecuteStmt) Restore(ctx *RestoreCtx) error {
+func (n *ExecuteStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("EXECUTE ")
 	ctx.WriteName(n.Name)
 	if len(n.UsingVars) > 0 {
@@ -385,7 +385,7 @@ type BeginStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *BeginStmt) Restore(ctx *RestoreCtx) error {
+func (n *BeginStmt) Restore(ctx *format.RestoreCtx) error {
 	if n.Mode == "" {
 		if n.ReadOnly {
 			ctx.WriteKeyWord("START TRANSACTION READ ONLY")
@@ -443,7 +443,7 @@ type BinlogStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *BinlogStmt) Restore(ctx *RestoreCtx) error {
+func (n *BinlogStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("BINLOG ")
 	ctx.WriteString(n.Str)
 	return nil
@@ -459,15 +459,42 @@ func (n *BinlogStmt) Accept(v Visitor) (Node, bool) {
 	return v.Leave(n)
 }
 
+// CompletionType defines completion_type used in COMMIT and ROLLBACK statements
+type CompletionType int8
+
+const (
+	// CompletionTypeDefault refers to NO_CHAIN
+	CompletionTypeDefault CompletionType = iota
+	CompletionTypeChain
+	CompletionTypeRelease
+)
+
+func (n CompletionType) Restore(ctx *format.RestoreCtx) error {
+	switch n {
+	case CompletionTypeDefault:
+		break
+	case CompletionTypeChain:
+		ctx.WriteKeyWord(" AND CHAIN")
+	case CompletionTypeRelease:
+		ctx.WriteKeyWord(" RELEASE")
+	}
+	return nil
+}
+
 // CommitStmt is a statement to commit the current transaction.
 // See https://dev.mysql.com/doc/refman/5.7/en/commit.html
 type CommitStmt struct {
 	stmtNode
+	// CompletionType overwrites system variable `completion_type` within transaction
+	CompletionType CompletionType
 }
 
 // Restore implements Node interface.
-func (n *CommitStmt) Restore(ctx *RestoreCtx) error {
+func (n *CommitStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("COMMIT")
+	if err := n.CompletionType.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore CommitStmt.CompletionType")
+	}
 	return nil
 }
 
@@ -485,11 +512,16 @@ func (n *CommitStmt) Accept(v Visitor) (Node, bool) {
 // See https://dev.mysql.com/doc/refman/5.7/en/commit.html
 type RollbackStmt struct {
 	stmtNode
+	// CompletionType overwrites system variable `completion_type` within transaction
+	CompletionType CompletionType
 }
 
 // Restore implements Node interface.
-func (n *RollbackStmt) Restore(ctx *RestoreCtx) error {
+func (n *RollbackStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("ROLLBACK")
+	if err := n.CompletionType.Restore(ctx); err != nil {
+		return errors.Annotate(err, "An error occurred while restore RollbackStmt.CompletionType")
+	}
 	return nil
 }
 
@@ -512,7 +544,7 @@ type UseStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *UseStmt) Restore(ctx *RestoreCtx) error {
+func (n *UseStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("USE ")
 	ctx.WriteName(n.DBName)
 	return nil
@@ -550,7 +582,7 @@ type VariableAssignment struct {
 }
 
 // Restore implements Node interface.
-func (n *VariableAssignment) Restore(ctx *RestoreCtx) error {
+func (n *VariableAssignment) Restore(ctx *format.RestoreCtx) error {
 	if n.IsSystem {
 		ctx.WritePlain("@@")
 		if n.IsGlobal {
@@ -634,7 +666,7 @@ type FlushStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *FlushStmt) Restore(ctx *RestoreCtx) error {
+func (n *FlushStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("FLUSH ")
 	if n.NoWriteToBinLog {
 		ctx.WriteKeyWord("NO_WRITE_TO_BINLOG ")
@@ -725,7 +757,7 @@ type KillStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *KillStmt) Restore(ctx *RestoreCtx) error {
+func (n *KillStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("KILL")
 	if n.TiDBExtension {
 		ctx.WriteKeyWord(" TIDB")
@@ -755,7 +787,7 @@ type SetStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *SetStmt) Restore(ctx *RestoreCtx) error {
+func (n *SetStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("SET ")
 	for i, v := range n.Variables {
 		if i != 0 {
@@ -781,6 +813,43 @@ func (n *SetStmt) Accept(v Visitor) (Node, bool) {
 			return n, false
 		}
 		n.Variables[i] = node.(*VariableAssignment)
+	}
+	return v.Leave(n)
+}
+
+// SetConfigStmt is the statement to set cluster configs.
+type SetConfigStmt struct {
+	stmtNode
+
+	Type     string // TiDB, TiKV, PD
+	Instance string // '127.0.0.1:3306'
+	Name     string // the variable name
+	Value    ExprNode
+}
+
+func (n *SetConfigStmt) Restore(ctx *format.RestoreCtx) error {
+	ctx.WriteKeyWord("SET CONFIG ")
+	if n.Type != "" {
+		ctx.WriteKeyWord(n.Type)
+	} else {
+		ctx.WriteString(n.Instance)
+	}
+	ctx.WritePlain(" ")
+	ctx.WriteKeyWord(n.Name)
+	ctx.WritePlain(" = ")
+	return n.Value.Restore(ctx)
+}
+
+func (n *SetConfigStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*SetConfigStmt)
+	if node, ok := n.Value.Accept(v); !ok {
+		return n, false
+	} else {
+		n.Value = node.(ExprNode)
 	}
 	return v.Leave(n)
 }
@@ -816,7 +885,7 @@ type SetPwdStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *SetPwdStmt) Restore(ctx *RestoreCtx) error {
+func (n *SetPwdStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("SET PASSWORD")
 	if n.User != nil {
 		ctx.WriteKeyWord(" FOR ")
@@ -853,7 +922,7 @@ type ChangeStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *ChangeStmt) Restore(ctx *RestoreCtx) error {
+func (n *ChangeStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("CHANGE ")
 	ctx.WriteKeyWord(n.NodeType)
 	ctx.WriteKeyWord(" TO NODE_STATE ")
@@ -898,7 +967,7 @@ type SetRoleStmt struct {
 	RoleList   []*auth.RoleIdentity
 }
 
-func (n *SetRoleStmt) Restore(ctx *RestoreCtx) error {
+func (n *SetRoleStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("SET ROLE")
 	switch n.SetRoleOpt {
 	case SetRoleDefault:
@@ -941,7 +1010,7 @@ type SetDefaultRoleStmt struct {
 	UserList   []*auth.UserIdentity
 }
 
-func (n *SetDefaultRoleStmt) Restore(ctx *RestoreCtx) error {
+func (n *SetDefaultRoleStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("SET DEFAULT ROLE")
 	switch n.SetRoleOpt {
 	case SetRoleNone:
@@ -992,7 +1061,7 @@ type UserSpec struct {
 }
 
 // Restore implements Node interface.
-func (n *UserSpec) Restore(ctx *RestoreCtx) error {
+func (n *UserSpec) Restore(ctx *format.RestoreCtx) error {
 	if err := n.User.Restore(ctx); err != nil {
 		return errors.Annotate(err, "An error occurred while restore UserSpec.User")
 	}
@@ -1052,7 +1121,7 @@ type TLSOption struct {
 	Value string
 }
 
-func (t *TLSOption) Restore(ctx *RestoreCtx) error {
+func (t *TLSOption) Restore(ctx *format.RestoreCtx) error {
 	switch t.Type {
 	case TslNone:
 		ctx.WriteKeyWord("NONE")
@@ -1087,7 +1156,7 @@ type ResourceOption struct {
 	Count int64
 }
 
-func (r *ResourceOption) Restore(ctx *RestoreCtx) error {
+func (r *ResourceOption) Restore(ctx *format.RestoreCtx) error {
 	switch r.Type {
 	case MaxQueriesPerHour:
 		ctx.WriteKeyWord("MAX_QUERIES_PER_HOUR ")
@@ -1118,7 +1187,7 @@ type PasswordOrLockOption struct {
 	Count int64
 }
 
-func (p *PasswordOrLockOption) Restore(ctx *RestoreCtx) error {
+func (p *PasswordOrLockOption) Restore(ctx *format.RestoreCtx) error {
 	switch p.Type {
 	case PasswordExpire:
 		ctx.WriteKeyWord("PASSWORD EXPIRE")
@@ -1154,7 +1223,7 @@ type CreateUserStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *CreateUserStmt) Restore(ctx *RestoreCtx) error {
+func (n *CreateUserStmt) Restore(ctx *format.RestoreCtx) error {
 	if n.IsCreateRole {
 		ctx.WriteKeyWord("CREATE ROLE ")
 	} else {
@@ -1240,7 +1309,7 @@ type AlterUserStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *AlterUserStmt) Restore(ctx *RestoreCtx) error {
+func (n *AlterUserStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("ALTER USER ")
 	if n.IfExists {
 		ctx.WriteKeyWord("IF EXISTS ")
@@ -1315,6 +1384,37 @@ func (n *AlterUserStmt) Accept(v Visitor) (Node, bool) {
 	return v.Leave(n)
 }
 
+// AlterInstanceStmt modifies instance.
+// See https://dev.mysql.com/doc/refman/8.0/en/alter-instance.html
+type AlterInstanceStmt struct {
+	stmtNode
+
+	ReloadTLS         bool
+	NoRollbackOnError bool
+}
+
+// Restore implements Node interface.
+func (n *AlterInstanceStmt) Restore(ctx *format.RestoreCtx) error {
+	ctx.WriteKeyWord("ALTER INSTANCE")
+	if n.ReloadTLS {
+		ctx.WriteKeyWord(" RELOAD TLS")
+	}
+	if n.NoRollbackOnError {
+		ctx.WriteKeyWord(" NO ROLLBACK ON ERROR")
+	}
+	return nil
+}
+
+// Accept implements Node Accept interface.
+func (n *AlterInstanceStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*AlterInstanceStmt)
+	return v.Leave(n)
+}
+
 // DropUserStmt creates user account.
 // See http://dev.mysql.com/doc/refman/5.7/en/drop-user.html
 type DropUserStmt struct {
@@ -1326,7 +1426,7 @@ type DropUserStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *DropUserStmt) Restore(ctx *RestoreCtx) error {
+func (n *DropUserStmt) Restore(ctx *format.RestoreCtx) error {
 	if n.IsDropRole {
 		ctx.WriteKeyWord("DROP ROLE ")
 	} else {
@@ -1365,7 +1465,7 @@ type CreateBindingStmt struct {
 	HintedSel   StmtNode
 }
 
-func (n *CreateBindingStmt) Restore(ctx *RestoreCtx) error {
+func (n *CreateBindingStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("CREATE ")
 	if n.GlobalScope {
 		ctx.WriteKeyWord("GLOBAL ")
@@ -1411,7 +1511,7 @@ type DropBindingStmt struct {
 	HintedSel   StmtNode
 }
 
-func (n *DropBindingStmt) Restore(ctx *RestoreCtx) error {
+func (n *DropBindingStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("DROP ")
 	if n.GlobalScope {
 		ctx.WriteKeyWord("GLOBAL ")
@@ -1460,7 +1560,7 @@ type DoStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *DoStmt) Restore(ctx *RestoreCtx) error {
+func (n *DoStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("DO ")
 	for i, v := range n.Exprs {
 		if i != 0 {
@@ -1554,7 +1654,7 @@ type ShowSlow struct {
 }
 
 // Restore implements Node interface.
-func (n *ShowSlow) Restore(ctx *RestoreCtx) error {
+func (n *ShowSlow) Restore(ctx *format.RestoreCtx) error {
 	switch n.Tp {
 	case ShowSlowRecent:
 		ctx.WriteKeyWord("RECENT ")
@@ -1594,7 +1694,7 @@ type AdminStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *AdminStmt) Restore(ctx *RestoreCtx) error {
+func (n *AdminStmt) Restore(ctx *format.RestoreCtx) error {
 	restoreTables := func() error {
 		for i, v := range n.Tables {
 			if i != 0 {
@@ -1754,7 +1854,7 @@ type PrivElem struct {
 }
 
 // Restore implements Node interface.
-func (n *PrivElem) Restore(ctx *RestoreCtx) error {
+func (n *PrivElem) Restore(ctx *format.RestoreCtx) error {
 	if n.Priv == 0 {
 		ctx.WritePlain("/* UNSUPPORTED TYPE */")
 	} else if n.Priv == mysql.AllPriv {
@@ -1810,7 +1910,7 @@ const (
 )
 
 // Restore implements Node interface.
-func (n ObjectTypeType) Restore(ctx *RestoreCtx) error {
+func (n ObjectTypeType) Restore(ctx *format.RestoreCtx) error {
 	switch n {
 	case ObjectTypeNone:
 		// do nothing
@@ -1844,7 +1944,7 @@ type GrantLevel struct {
 }
 
 // Restore implements Node interface.
-func (n *GrantLevel) Restore(ctx *RestoreCtx) error {
+func (n *GrantLevel) Restore(ctx *format.RestoreCtx) error {
 	switch n.Level {
 	case GrantLevelDB:
 		if n.DBName == "" {
@@ -1876,7 +1976,7 @@ type RevokeStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *RevokeStmt) Restore(ctx *RestoreCtx) error {
+func (n *RevokeStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("REVOKE ")
 	for i, v := range n.Privs {
 		if i != 0 {
@@ -1934,7 +2034,7 @@ type RevokeRoleStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *RevokeRoleStmt) Restore(ctx *RestoreCtx) error {
+func (n *RevokeRoleStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("REVOKE ")
 	for i, role := range n.Roles {
 		if i != 0 {
@@ -1979,7 +2079,7 @@ type GrantStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *GrantStmt) Restore(ctx *RestoreCtx) error {
+func (n *GrantStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("GRANT ")
 	for i, v := range n.Privs {
 		if i != 0 && v.Priv != 0 {
@@ -2076,7 +2176,7 @@ func (n *GrantRoleStmt) Accept(v Visitor) (Node, bool) {
 }
 
 // Restore implements Node interface.
-func (n *GrantRoleStmt) Restore(ctx *RestoreCtx) error {
+func (n *GrantRoleStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("GRANT ")
 	if len(n.Roles) > 0 {
 		for i, role := range n.Roles {
@@ -2118,7 +2218,7 @@ type ShutdownStmt struct {
 }
 
 // Restore implements Node interface.
-func (n *ShutdownStmt) Restore(ctx *RestoreCtx) error {
+func (n *ShutdownStmt) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord("SHUTDOWN")
 	return nil
 }
@@ -2131,6 +2231,209 @@ func (n *ShutdownStmt) Accept(v Visitor) (Node, bool) {
 	}
 	n = newNode.(*ShutdownStmt)
 	return v.Leave(n)
+}
+
+type BRIEKind uint8
+type BRIEOptionType uint16
+
+const (
+	BRIEKindBackup BRIEKind = iota
+	BRIEKindRestore
+
+	// common BRIE options
+	BRIEOptionRateLimit BRIEOptionType = iota + 1
+	BRIEOptionConcurrency
+	BRIEOptionChecksum
+	BRIEOptionSendCreds
+	// backup options
+	BRIEOptionBackupTimeAgo
+	BRIEOptionBackupTS
+	BRIEOptionBackupTSO
+	BRIEOptionLastBackupTS
+	BRIEOptionLastBackupTSO
+	// restore options
+	BRIEOptionOnline
+	// S3 storage options
+	BRIEOptionS3Endpoint
+	BRIEOptionS3Region
+	BRIEOptionS3StorageClass
+	BRIEOptionS3SSE
+	BRIEOptionS3ACL
+	BRIEOptionS3AccessKey
+	BRIEOptionS3SecretAccessKey
+	BRIEOptionS3Provider
+	BRIEOptionS3ForcePathStyle
+	BRIEOptionS3UseAccelerateEndpoint
+	// GCS storage options
+	BRIEOptionGCSEndpoint
+	BRIEOptionGCSStorageClass
+	BRIEOptionGCSPredefinedACL
+	BRIEOptionGCSCredentialsFile
+)
+
+func (kind BRIEKind) String() string {
+	switch kind {
+	case BRIEKindBackup:
+		return "BACKUP"
+	case BRIEKindRestore:
+		return "RESTORE"
+	default:
+		return ""
+	}
+}
+
+func (kind BRIEOptionType) String() string {
+	switch kind {
+	case BRIEOptionRateLimit:
+		return "RATE_LIMIT"
+	case BRIEOptionConcurrency:
+		return "CONCURRENCY"
+	case BRIEOptionChecksum:
+		return "CHECKSUM"
+	case BRIEOptionSendCreds:
+		return "SEND_CREDENTIALS_TO_TIKV"
+	case BRIEOptionBackupTimeAgo, BRIEOptionBackupTS, BRIEOptionBackupTSO:
+		return "SNAPSHOT"
+	case BRIEOptionLastBackupTS:
+		return "INCREMENTAL UNTIL TIMESTAMP"
+	case BRIEOptionLastBackupTSO:
+		return "INCREMENTAL UNTIL TIMESTAMP_ORACLE"
+	case BRIEOptionOnline:
+		return "ONLINE"
+	case BRIEOptionS3Endpoint:
+		return "S3_ENDPOINT"
+	case BRIEOptionS3Region:
+		return "S3_REGION"
+	case BRIEOptionS3StorageClass:
+		return "S3_STORAGE_CLASS"
+	case BRIEOptionS3SSE:
+		return "S3_SSE"
+	case BRIEOptionS3ACL:
+		return "S3_ACL"
+	case BRIEOptionS3AccessKey:
+		return "S3_ACCESS_KEY"
+	case BRIEOptionS3SecretAccessKey:
+		return "S3_SECRET_ACCESS_KEY"
+	case BRIEOptionS3Provider:
+		return "S3_PROVIDER"
+	case BRIEOptionS3ForcePathStyle:
+		return "S3_FORCE_PATH_STYLE"
+	case BRIEOptionS3UseAccelerateEndpoint:
+		return "S3_USE_ACCELERATE_ENDPOINT"
+	case BRIEOptionGCSEndpoint:
+		return "GCS_ENDPOINT"
+	case BRIEOptionGCSStorageClass:
+		return "GCS_STORAGE_CLASS"
+	case BRIEOptionGCSPredefinedACL:
+		return "GCS_PREDEFINED_ACL"
+	case BRIEOptionGCSCredentialsFile:
+		return "GCS_CREDENTIALS_FILE"
+	default:
+		return ""
+	}
+}
+
+type BRIEOption struct {
+	Tp        BRIEOptionType
+	StrValue  string
+	UintValue uint64
+}
+
+// BRIEStmt is a statement for backup, restore, import and export.
+type BRIEStmt struct {
+	stmtNode
+
+	Kind        BRIEKind
+	Schemas     []string
+	Tables      []*TableName
+	Storage     string
+	Options     []*BRIEOption
+	Incremental *BRIEOption
+}
+
+func (n *BRIEStmt) Accept(v Visitor) (Node, bool) {
+	newNode, skipChildren := v.Enter(n)
+	if skipChildren {
+		return v.Leave(newNode)
+	}
+	n = newNode.(*BRIEStmt)
+	for i, val := range n.Tables {
+		node, ok := val.Accept(v)
+		if !ok {
+			return n, false
+		}
+		n.Tables[i] = node.(*TableName)
+	}
+	return v.Leave(n)
+}
+
+func (n *BRIEStmt) Restore(ctx *format.RestoreCtx) error {
+	ctx.WriteKeyWord(n.Kind.String())
+
+	switch {
+	case len(n.Tables) != 0:
+		ctx.WriteKeyWord(" TABLE ")
+		for index, table := range n.Tables {
+			if index != 0 {
+				ctx.WritePlain(", ")
+			}
+			if err := table.Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore BRIEStmt.Tables[%d]", index)
+			}
+		}
+	case len(n.Schemas) != 0:
+		ctx.WriteKeyWord(" DATABASE ")
+		for index, schema := range n.Schemas {
+			if index != 0 {
+				ctx.WritePlain(", ")
+			}
+			ctx.WriteName(schema)
+		}
+	default:
+		ctx.WriteKeyWord(" DATABASE")
+		ctx.WritePlain(" *")
+	}
+
+	if n.Incremental != nil {
+		switch n.Incremental.Tp {
+		case BRIEOptionLastBackupTS:
+			ctx.WriteKeyWord(" INCREMENTAL UNTIL TIMESTAMP ")
+			ctx.WriteString(n.Incremental.StrValue)
+		case BRIEOptionLastBackupTSO:
+			ctx.WriteKeyWord(" INCREMENTAL UNTIL TIMESTAMP_ORACLE")
+			ctx.WritePlainf(" %d", n.Incremental.UintValue)
+		}
+	}
+
+	switch n.Kind {
+	case BRIEKindBackup:
+		ctx.WriteKeyWord(" TO ")
+	case BRIEKindRestore:
+		ctx.WriteKeyWord(" FROM ")
+	}
+	ctx.WriteString(n.Storage)
+
+	for _, opt := range n.Options {
+		ctx.WritePlain(" ")
+		ctx.WriteKeyWord(opt.Tp.String())
+		ctx.WritePlain(" = ")
+		switch opt.Tp {
+		case BRIEOptionConcurrency, BRIEOptionChecksum, BRIEOptionSendCreds, BRIEOptionOnline, BRIEOptionS3ForcePathStyle, BRIEOptionS3UseAccelerateEndpoint, BRIEOptionBackupTSO:
+			ctx.WritePlainf("%d", opt.UintValue)
+		case BRIEOptionBackupTimeAgo:
+			ctx.WritePlainf("%d ", opt.UintValue/1000)
+			ctx.WriteKeyWord("MICROSECOND AGO")
+		case BRIEOptionRateLimit:
+			ctx.WritePlainf("%d ", opt.UintValue/1048576)
+			ctx.WriteKeyWord("MB")
+			ctx.WritePlain("/")
+			ctx.WriteKeyWord("SECOND")
+		default:
+			ctx.WriteString(opt.StrValue)
+		}
+	}
+
+	return nil
 }
 
 // Ident is the table identifier composed of schema name and table name.
@@ -2167,17 +2470,31 @@ type TableOptimizerHint struct {
 	// Table hints has no schema info
 	// It allows only table name or alias (if table has an alias)
 	HintName model.CIStr
-	// QBName is the default effective query block of this hint.
-	QBName    model.CIStr
-	Tables    []HintTable
-	Indexes   []model.CIStr
-	StoreType model.CIStr
+	// HintData is the payload of the hint. The actual type of this field
+	// is defined differently as according `HintName`. Define as following:
+	//
 	// Statement Execution Time Optimizer Hints
 	// See https://dev.mysql.com/doc/refman/5.7/en/optimizer-hints.html#optimizer-hints-execution-time
-	MaxExecutionTime uint64
-	MemoryQuota      int64
-	QueryType        model.CIStr
-	HintFlag         bool
+	// - MAX_EXECUTION_TIME  => uint64
+	// - MEMORY_QUOTA        => int64
+	// - QUERY_TYPE          => model.CIStr
+	//
+	// Time Range is used to hint the time range of inspection tables
+	// e.g: select /*+ time_range('','') */ * from information_schema.inspection_result.
+	// - TIME_RANGE          => ast.HintTimeRange
+	// - READ_FROM_STORAGE   => model.CIStr
+	// - USE_TOJA            => bool
+	HintData interface{}
+	// QBName is the default effective query block of this hint.
+	QBName  model.CIStr
+	Tables  []HintTable
+	Indexes []model.CIStr
+}
+
+// HintTimeRange is the payload of `TIME_RANGE` hint
+type HintTimeRange struct {
+	From string
+	To   string
 }
 
 // HintTable is table in the hint. It may have query block info.
@@ -2187,7 +2504,7 @@ type HintTable struct {
 	QBName    model.CIStr
 }
 
-func (ht *HintTable) Restore(ctx *RestoreCtx) {
+func (ht *HintTable) Restore(ctx *format.RestoreCtx) {
 	if ht.DBName.L != "" {
 		ctx.WriteName(ht.DBName.String())
 		ctx.WriteKeyWord(".")
@@ -2200,7 +2517,7 @@ func (ht *HintTable) Restore(ctx *RestoreCtx) {
 }
 
 // Restore implements Node interface.
-func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
+func (n *TableOptimizerHint) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord(n.HintName.String())
 	ctx.WritePlain("(")
 	if n.QBName.L != "" {
@@ -2211,7 +2528,7 @@ func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
 	}
 	// Hints without args except query block.
 	switch n.HintName.L {
-	case "hash_agg", "stream_agg", "agg_to_cop", "read_consistent_replica", "no_index_merge", "qb_name":
+	case "hash_agg", "stream_agg", "agg_to_cop", "read_consistent_replica", "no_index_merge", "qb_name", "ignore_plan_cache":
 		ctx.WritePlain(")")
 		return nil
 	}
@@ -2221,8 +2538,8 @@ func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
 	// Hints with args except query block.
 	switch n.HintName.L {
 	case "max_execution_time":
-		ctx.WritePlainf("%d", n.MaxExecutionTime)
-	case "tidb_hj", "tidb_smj", "tidb_inlj", "hash_join", "sm_join", "inl_join":
+		ctx.WritePlainf("%d", n.HintData.(uint64))
+	case "tidb_hj", "tidb_smj", "tidb_inlj", "hash_join", "merge_join", "inl_join":
 		for i, table := range n.Tables {
 			if i != 0 {
 				ctx.WritePlain(", ")
@@ -2238,18 +2555,18 @@ func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
 			}
 			ctx.WriteName(index.String())
 		}
-	case "use_toja", "enable_plan_cache":
-		if n.HintFlag {
+	case "use_toja", "use_cascades":
+		if n.HintData.(bool) {
 			ctx.WritePlain("TRUE")
 		} else {
 			ctx.WritePlain("FALSE")
 		}
 	case "query_type":
-		ctx.WriteKeyWord(n.QueryType.String())
+		ctx.WriteKeyWord(n.HintData.(model.CIStr).String())
 	case "memory_quota":
-		ctx.WritePlainf("%d MB", n.MemoryQuota/1024/1024)
+		ctx.WritePlainf("%d MB", n.HintData.(int64)/1024/1024)
 	case "read_from_storage":
-		ctx.WriteKeyWord(n.StoreType.String())
+		ctx.WriteKeyWord(n.HintData.(model.CIStr).String())
 		for i, table := range n.Tables {
 			if i == 0 {
 				ctx.WritePlain("[")
@@ -2261,6 +2578,11 @@ func (n *TableOptimizerHint) Restore(ctx *RestoreCtx) error {
 				ctx.WritePlain(", ")
 			}
 		}
+	case "time_range":
+		hintData := n.HintData.(HintTimeRange)
+		ctx.WriteString(hintData.From)
+		ctx.WritePlain(", ")
+		ctx.WriteString(hintData.To)
 	}
 	ctx.WritePlain(")")
 	return nil

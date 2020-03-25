@@ -78,7 +78,7 @@ import (
 
 	/* TiDB hint names */
 	hintAggToCop              "AGG_TO_COP"
-	hintEnablePlanCache       "ENABLE_PLAN_CACHE"
+	hintIgnorePlanCache       "IGNORE_PLAN_CACHE"
 	hintHashAgg               "HASH_AGG"
 	hintIgnoreIndex           "IGNORE_INDEX"
 	hintInlHashJoin           "INL_HASH_JOIN"
@@ -89,13 +89,15 @@ import (
 	hintQueryType             "QUERY_TYPE"
 	hintReadConsistentReplica "READ_CONSISTENT_REPLICA"
 	hintReadFromStorage       "READ_FROM_STORAGE"
-	hintSMJoin                "SM_JOIN"
+	hintSMJoin                "MERGE_JOIN"
 	hintStreamAgg             "STREAM_AGG"
 	hintSwapJoinInputs        "SWAP_JOIN_INPUTS"
 	hintUseIndexMerge         "USE_INDEX_MERGE"
 	hintUseIndex              "USE_INDEX"
 	hintUsePlanCache          "USE_PLAN_CACHE"
 	hintUseToja               "USE_TOJA"
+	hintTimeRange             "TIME_RANGE"
+	hintUseCascades           "USE_CASCADES"
 
 	/* Other keywords */
 	hintOLAP            "OLAP"
@@ -227,9 +229,9 @@ TableOptimizerHintOpt:
 |	"MAX_EXECUTION_TIME" '(' QueryBlockOpt hintIntLit ')'
 	{
 		$$ = &ast.TableOptimizerHint{
-			HintName:         model.NewCIStr($1),
-			QBName:           model.NewCIStr($3),
-			MaxExecutionTime: $4,
+			HintName: model.NewCIStr($1),
+			QBName:   model.NewCIStr($3),
+			HintData: $4,
 		}
 	}
 |	"SET_VAR" '(' Identifier '=' Value ')'
@@ -254,14 +256,24 @@ TableOptimizerHintOpt:
 		maxValue := uint64(math.MaxInt64) / $5
 		if $4 <= maxValue {
 			$$ = &ast.TableOptimizerHint{
-				HintName:    model.NewCIStr($1),
-				MemoryQuota: int64($4 * $5),
-				QBName:      model.NewCIStr($3),
+				HintName: model.NewCIStr($1),
+				HintData: int64($4 * $5),
+				QBName:   model.NewCIStr($3),
 			}
 		} else {
 			yylex.AppendError(ErrWarnMemoryQuotaOverflow.GenWithStackByArgs(math.MaxInt64))
 			parser.lastErrorAsWarn()
 			$$ = nil
+		}
+	}
+|	"TIME_RANGE" '(' hintStringLit CommaOpt hintStringLit ')'
+	{
+		$$ = &ast.TableOptimizerHint{
+			HintName: model.NewCIStr($1),
+			HintData: ast.HintTimeRange{
+				From: $3,
+				To:   $5,
+			},
 		}
 	}
 |	BooleanHintName '(' QueryBlockOpt HintTrueOrFalse ')'
@@ -281,9 +293,9 @@ TableOptimizerHintOpt:
 |	"QUERY_TYPE" '(' QueryBlockOpt HintQueryType ')'
 	{
 		$$ = &ast.TableOptimizerHint{
-			HintName:  model.NewCIStr($1),
-			QBName:    model.NewCIStr($3),
-			QueryType: model.NewCIStr($4),
+			HintName: model.NewCIStr($1),
+			QBName:   model.NewCIStr($3),
+			HintData: model.NewCIStr($4),
 		}
 	}
 
@@ -314,7 +326,7 @@ HintStorageTypeAndTable:
 	HintStorageType '[' HintTableList ']'
 	{
 		h := $3
-		h.StoreType = model.NewCIStr($1)
+		h.HintData = model.NewCIStr($1)
 		$$ = h
 	}
 
@@ -449,11 +461,11 @@ UnitOfBytes:
 HintTrueOrFalse:
 	"TRUE"
 	{
-		$$ = &ast.TableOptimizerHint{HintFlag: true}
+		$$ = &ast.TableOptimizerHint{HintData: true}
 	}
 |	"FALSE"
 	{
-		$$ = &ast.TableOptimizerHint{HintFlag: false}
+		$$ = &ast.TableOptimizerHint{HintData: false}
 	}
 
 JoinOrderOptimizerHintName:
@@ -472,7 +484,7 @@ UnsupportedTableLevelOptimizerHintName:
 |	"NO_MERGE"
 
 SupportedTableLevelOptimizerHintName:
-	"SM_JOIN"
+	"MERGE_JOIN"
 |	"INL_JOIN"
 |	"INL_HASH_JOIN"
 |	"SWAP_JOIN_INPUTS"
@@ -507,7 +519,7 @@ SubqueryStrategy:
 
 BooleanHintName:
 	"USE_TOJA"
-|	"ENABLE_PLAN_CACHE"
+|	"USE_CASCADES"
 
 NullaryHintName:
 	"USE_PLAN_CACHE"
@@ -516,6 +528,7 @@ NullaryHintName:
 |	"AGG_TO_COP"
 |	"NO_INDEX_MERGE"
 |	"READ_CONSISTENT_REPLICA"
+|	"IGNORE_PLAN_CACHE"
 
 HintQueryType:
 	"OLAP"
@@ -556,7 +569,7 @@ Identifier:
 |	"QB_NAME"
 /* TiDB hint names */
 |	"AGG_TO_COP"
-|	"ENABLE_PLAN_CACHE"
+|	"IGNORE_PLAN_CACHE"
 |	"HASH_AGG"
 |	"IGNORE_INDEX"
 |	"INL_HASH_JOIN"
@@ -567,13 +580,15 @@ Identifier:
 |	"QUERY_TYPE"
 |	"READ_CONSISTENT_REPLICA"
 |	"READ_FROM_STORAGE"
-|	"SM_JOIN"
+|	"MERGE_JOIN"
 |	"STREAM_AGG"
 |	"SWAP_JOIN_INPUTS"
 |	"USE_INDEX_MERGE"
 |	"USE_INDEX"
 |	"USE_PLAN_CACHE"
 |	"USE_TOJA"
+|	"TIME_RANGE"
+|	"USE_CASCADES"
 /* other keywords */
 |	"OLAP"
 |	"OLTP"

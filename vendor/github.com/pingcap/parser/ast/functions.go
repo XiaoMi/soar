@@ -17,9 +17,10 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/pingcap/errors"
-	. "github.com/pingcap/parser/format"
+	"github.com/pingcap/parser/format"
 	"github.com/pingcap/parser/model"
 	"github.com/pingcap/parser/types"
 )
@@ -226,6 +227,7 @@ const (
 	CharLength      = "char_length"
 	CharacterLength = "character_length"
 	FindInSet       = "find_in_set"
+	WeightString    = "weight_string"
 
 	// information functions
 	Benchmark      = "benchmark"
@@ -247,6 +249,8 @@ const (
 	TiDBVersion    = "tidb_version"
 	TiDBIsDDLOwner = "tidb_is_ddl_owner"
 	TiDBDecodePlan = "tidb_decode_plan"
+	FormatBytes    = "format_bytes"
+	FormatNanoTime = "format_nano_time"
 
 	// control functions
 	If     = "if"
@@ -325,6 +329,11 @@ const (
 
 	// TiDB internal function.
 	TiDBDecodeKey = "tidb_decode_key"
+
+	// Sequence function.
+	NextVal = "nextval"
+	LastVal = "lastval"
+	SetVal  = "setval"
 )
 
 // FuncCallExpr is for function expression.
@@ -337,7 +346,7 @@ type FuncCallExpr struct {
 }
 
 // Restore implements Node interface.
-func (n *FuncCallExpr) Restore(ctx *RestoreCtx) error {
+func (n *FuncCallExpr) Restore(ctx *format.RestoreCtx) error {
 	var specialLiteral string
 	switch n.FnName.L {
 	case DateLiteral:
@@ -414,6 +423,19 @@ func (n *FuncCallExpr) Restore(ctx *RestoreCtx) error {
 			if err := n.Args[0].Restore(ctx); err != nil {
 				return errors.Annotatef(err, "An error occurred while restore FuncCallExpr.Args[0]")
 			}
+		}
+	case WeightString:
+		if err := n.Args[0].Restore(ctx); err != nil {
+			return errors.Annotatef(err, "An error occurred while restore FuncCallExpr.(WEIGHT_STRING).Args[0]")
+		}
+		if len(n.Args) == 3 {
+			ctx.WriteKeyWord(" AS ")
+			ctx.WriteKeyWord(n.Args[1].(ValueExpr).GetValue().(string))
+			ctx.WritePlain("(")
+			if err := n.Args[2].Restore(ctx); err != nil {
+				return errors.Annotatef(err, "An error occurred while restore FuncCallExpr.(WEIGHT_STRING).Args[2]")
+			}
+			ctx.WritePlain(")")
 		}
 	default:
 		for i, argv := range n.Args {
@@ -497,7 +519,7 @@ type FuncCastExpr struct {
 }
 
 // Restore implements Node interface.
-func (n *FuncCastExpr) Restore(ctx *RestoreCtx) error {
+func (n *FuncCastExpr) Restore(ctx *format.RestoreCtx) error {
 	switch n.FunctionType {
 	case CastFunction:
 		ctx.WriteKeyWord("CAST")
@@ -598,7 +620,7 @@ type TrimDirectionExpr struct {
 }
 
 // Restore implements Node interface.
-func (n *TrimDirectionExpr) Restore(ctx *RestoreCtx) error {
+func (n *TrimDirectionExpr) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord(n.Direction.String())
 	return nil
 }
@@ -660,6 +682,8 @@ const (
 	AggFuncStddevPop = "stddev_pop"
 	// AggFuncStddevSamp is the name of stddev_samp function
 	AggFuncStddevSamp = "stddev_samp"
+	// AggFuncJsonObjectAgg is the name of json_objectagg function
+	AggFuncJsonObjectAgg = "json_objectagg"
 )
 
 // AggregateFuncExpr represents aggregate function expression.
@@ -676,7 +700,7 @@ type AggregateFuncExpr struct {
 }
 
 // Restore implements Node interface.
-func (n *AggregateFuncExpr) Restore(ctx *RestoreCtx) error {
+func (n *AggregateFuncExpr) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord(n.F)
 	ctx.WritePlain("(")
 	if n.Distinct {
@@ -779,7 +803,7 @@ type WindowFuncExpr struct {
 }
 
 // Restore implements Node interface.
-func (n *WindowFuncExpr) Restore(ctx *RestoreCtx) error {
+func (n *WindowFuncExpr) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord(n.F)
 	ctx.WritePlain("(")
 	for i, v := range n.Args {
@@ -930,6 +954,30 @@ func (unit TimeUnitType) String() string {
 	}
 }
 
+// Duration represented by this unit.
+// Returns error if the time unit is not a fixed time interval (such as MONTH)
+// or a composite unit (such as MINUTE_SECOND).
+func (unit TimeUnitType) Duration() (time.Duration, error) {
+	switch unit {
+	case TimeUnitMicrosecond:
+		return time.Microsecond, nil
+	case TimeUnitSecond:
+		return time.Second, nil
+	case TimeUnitMinute:
+		return time.Minute, nil
+	case TimeUnitHour:
+		return time.Hour, nil
+	case TimeUnitDay:
+		return time.Hour * 24, nil
+	case TimeUnitWeek:
+		return time.Hour * 24 * 7, nil
+	case TimeUnitMonth, TimeUnitQuarter, TimeUnitYear:
+		return 0, errors.Errorf("%s is not a constant time interval and cannot be used here", unit)
+	default:
+		return 0, errors.Errorf("%s is a composite time unit and is not supported yet", unit)
+	}
+}
+
 // TimeUnitExpr is an expression representing a time or timestamp unit.
 type TimeUnitExpr struct {
 	exprNode
@@ -938,7 +986,7 @@ type TimeUnitExpr struct {
 }
 
 // Restore implements Node interface.
-func (n *TimeUnitExpr) Restore(ctx *RestoreCtx) error {
+func (n *TimeUnitExpr) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord(n.Unit.String())
 	return nil
 }
@@ -991,7 +1039,7 @@ func (selector GetFormatSelectorType) String() string {
 }
 
 // Restore implements Node interface.
-func (n *GetFormatSelectorExpr) Restore(ctx *RestoreCtx) error {
+func (n *GetFormatSelectorExpr) Restore(ctx *format.RestoreCtx) error {
 	ctx.WriteKeyWord(n.Selector.String())
 	return nil
 }
