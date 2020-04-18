@@ -2455,19 +2455,29 @@ func TestCompareWithFunction(t *testing.T) {
 			`select id from t where substring(name,1,3)='abc';`,
 			`SELECT * FROM tbl WHERE UNIX_TIMESTAMP(loginTime) BETWEEN UNIX_TIMESTAMP('2018-11-16 09:46:00 +0800 CST') AND UNIX_TIMESTAMP('2018-11-22 00:00:00 +0800 CST')`,
 			`select id from t where num/2 = 100`,
-		},
-		// TODO: 右侧使用函数比较
-		{
+			`select id from t where num/2 < 100`,
+			// 时间 builtin 函数
+			`SELECT * FROM tb WHERE DATE '2020-01-01'`,
+			`DELETE FROM tb WHERE DATE '2020-01-01'`,
+			`UPDATE tb SET col = 1 WHERE DATE '2020-01-01'`,
+			`SELECT * FROM tb WHERE TIME '10:01:01'`,
+			`SELECT * FROM tb WHERE TIMESTAMP '1587181360'`,
+			`select * from mysql.user where user  = "root" and date '2020-02-01'`,
+			// 右侧使用函数比较
 			`select id from t where 'abc'=substring(name,1,3);`,
+		},
+		// 正常 SQL
+		{
 			`select id from t where col = (select 1)`,
+			`select id from t where col = 1`,
 		},
 	}
-	for _, sql := range sqls[0] {
+	for i, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleCompareWithFunction()
 			if rule.Item != "FUN.001" {
-				t.Error("Rule not match:", rule.Item, "Expect : FUN.001")
+				t.Errorf("SQL: %d,  Rule not match: %s Expect : FUN.001", i, rule.Item)
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)

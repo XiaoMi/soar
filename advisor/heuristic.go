@@ -2460,6 +2460,8 @@ func (q *Query4Audit) RuleInjection() Rule {
 // RuleCompareWithFunction FUN.001
 func (q *Query4Audit) RuleCompareWithFunction() Rule {
 	var rule = q.RuleOK()
+
+	// `select id from t where num/2 = 100`,
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		// Vitess 中有些函数进行了单独定义不在 FuncExpr 中，如: substring。所以不能直接用 FuncExpr 判断。
 		switch n := node.(type) {
@@ -2470,38 +2472,26 @@ func (q *Query4Audit) RuleCompareWithFunction() Rule {
 				rule = HeuristicRules["FUN.001"]
 				return false, nil
 			}
-			/*
-				// func always has bracket
-				if strings.HasSuffix(sqlparser.String(n.Left), ")") {
-					rule = HeuristicRules["FUN.001"]
-					return false, nil
-				}
-			*/
-
-		case *sqlparser.RangeCond:
-			// func(a) between func(c) and func(d)
-			switch n.Left.(type) {
-			case *sqlparser.SQLVal, *sqlparser.ColName:
-			default:
-				rule = HeuristicRules["FUN.001"]
-				return false, nil
-			}
-			switch n.From.(type) {
-			case *sqlparser.SQLVal, *sqlparser.ColName:
-			default:
-				rule = HeuristicRules["FUN.001"]
-				return false, nil
-			}
-			switch n.To.(type) {
-			case *sqlparser.SQLVal, *sqlparser.ColName:
-			default:
-				rule = HeuristicRules["FUN.001"]
-				return false, nil
-			}
 		}
 		return true, nil
 	}, q.Stmt)
 	common.LogIfError(err, "")
+
+	// select id from t where substring(name,1,3)='abc';
+	for _, tiStmt := range q.TiStmt {
+		switch tiStmt.(type) {
+		case *tidb.SelectStmt, *tidb.UpdateStmt, *tidb.DeleteStmt:
+			json := ast.StmtNode2JSON(q.Query, "", "")
+			whereJSON := common.JSONFind(json, "Where")
+			for _, where := range whereJSON {
+				if len(common.JSONFind(where, "FnName")) > 0 {
+					rule = HeuristicRules["FUN.001"]
+				}
+				break
+			}
+		}
+	}
+
 	return rule
 }
 
