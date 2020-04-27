@@ -252,9 +252,14 @@ func (db *Connector) IsView(tbName string) bool {
 // RemoveSQLComments 去除SQL中的注释
 func RemoveSQLComments(sql string) string {
 	buf := []byte(sql)
-	cmtReg := regexp.MustCompile(`("(""|[^"])*")|('(''|[^'])*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
+	// ("(""|[^"])*") 双引号中的内容
+	// ('(''|[^'])*') 单引号中的内容
+	// (--[^\n\r]*) 双减号注释
+	// (#.*) 井号注释
+	// (/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/) 多行注释
+	commentRegex := regexp.MustCompile(`("(""|[^"])*")|('(''|[^'])*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
 
-	res := cmtReg.ReplaceAllFunc(buf, func(s []byte) []byte {
+	res := commentRegex.ReplaceAllFunc(buf, func(s []byte) []byte {
 		if (s[0] == '"' && s[len(s)-1] == '"') ||
 			(s[0] == '\'' && s[len(s)-1] == '\'') ||
 			(string(s[:3]) == "/*!") {

@@ -146,17 +146,18 @@ func TestVersion(t *testing.T) {
 }
 
 func TestRemoveSQLComments(t *testing.T) {
+	// Notice: double dash without space not comment, eg. `--not comment`
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	SQLs := []string{
 		`-- comment`,
 		`--`,
 		`# comment`,
+		`#comment`,
 		`/* multi-line
 comment*/`,
 		`--
 -- comment`,
 	}
-
 	err := common.GoldenDiff(func() {
 		for _, sql := range SQLs {
 			fmt.Println(RemoveSQLComments(sql))
