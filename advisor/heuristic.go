@@ -915,6 +915,15 @@ func (q *Query4Audit) RuleColCommentCheck() Rule {
 // RuleIPString LIT.001
 func (q *Query4Audit) RuleIPString() Rule {
 	var rule = q.RuleOK()
+
+	for _, stmt := range q.TiStmt {
+		switch stmt.(type) {
+		case *tidb.AlterUserStmt, *tidb.CreateUserStmt, *tidb.GrantStmt, *tidb.GrantRoleStmt,
+			*tidb.RevokeRoleStmt, *tidb.RevokeStmt, *tidb.DropUserStmt:
+			return rule
+		}
+	}
+
 	re := regexp.MustCompile(`['"]\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`)
 	if re.FindString(q.Query) != "" {
 		rule = HeuristicRules["LIT.001"]
