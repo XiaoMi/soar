@@ -1575,6 +1575,7 @@ func TestRuleSysdate(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`select sysdate();`,
+		`select Sysdate();`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -2435,6 +2436,7 @@ func TestRuleInjection(t *testing.T) {
 		{
 			`select benchmark(10, rand())`,
 			`select sleep(1)`,
+			`select Sleep(1)`,
 			`select get_lock('lock_name', 1)`,
 			`select release_lock('lock_name')`,
 		},
@@ -2542,6 +2544,7 @@ func TestRuleTruncateTable(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`TRUNCATE TABLE tbl_name;`,
+		`truncate TABLE tbl_name;`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
@@ -2861,6 +2864,7 @@ func TestRulePKNotInt(t *testing.T) {
 		},
 		{
 			"CREATE TABLE tbl (a int unsigned auto_increment, b int, primary key(`a`)) engine=InnoDB;",
+			"CREATE TABLE `tb` ( `id` Bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto id', Primary  key (`id`) ) ENGINE = InnoDB COMMENT 'comment'",
 		},
 	}
 	for _, sql := range sqls[0] {
