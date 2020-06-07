@@ -32,7 +32,7 @@
             },
             "flag": 0,
             "k": 1,
-            "collation": 0,
+            "collation": "",
             "decimal": 0,
             "length": 0,
             "i": 1,
@@ -57,7 +57,8 @@
     "TableHints": null,
     "IsAfterUnionDistinct": false,
     "IsInBraces": false,
-    "QueryBlockOffset": 0
+    "QueryBlockOffset": 0,
+    "SelectIntoOpt": null
   }
 ]
 

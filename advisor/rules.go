@@ -869,6 +869,14 @@ func init() {
 			Case:     "select col as 列 from tb",
 			Func:     (*Query4Audit).RuleMultiBytesWord,
 		},
+		"KWR.005": {
+			Item:     "KWR.005",
+			Severity: "L1",
+			Summary:  "SQL 中包含 unicode 特殊字符",
+			Content:  "部分 IDE 会自动在 SQL 插入肉眼不可见的 unicode 字符。如：non-break space, zero-width space 等。Linux 下可使用 `cat -A file.sql` 命令查看不可见字符。",
+			Case:     "update tb set status = 1 where id = 1;",
+			Func:     (*Query4Audit).RuleInvisibleUnicode,
+		},
 		"LCK.001": {
 			Item:     "LCK.001",
 			Severity: "L3",

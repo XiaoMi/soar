@@ -580,7 +580,7 @@ type Token struct {
 	i    int
 }
 
-// Tokenizer 用于初始化token
+// Tokenizer 用于初始化 token，区别于 Tokenize 函数，这个函数使用 vitess 的切词方式
 func Tokenizer(sql string) []Token {
 	var tokens []Token
 	tkn := sqlparser.NewStringTokenizer(sql)
@@ -785,7 +785,7 @@ func getQuotedString(buf string) string {
 	return buf
 }
 
-// Tokenize 序列化token
+// Tokenize 序列化 token，区别于 Tokenizer 函数，这个函数是 soar built-in 实现的切词
 func Tokenize(sql string) []Token {
 	var token Token
 	var tokenLength int

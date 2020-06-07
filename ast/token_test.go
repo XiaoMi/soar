@@ -52,6 +52,7 @@ func TestTokenizer(t *testing.T) {
 		"SELECT * FROM tb WHERE id between 1 and 3;",
 		"alter table inventory add index idx_store_film` (`store_id`,`film_id`);",
 		`UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;`,
+		`update tb set status = 1 where id = 1;`, // SQL 中包含 non-broken-space
 	}
 	err := common.GoldenDiff(func() {
 		for _, sql := range sqls {

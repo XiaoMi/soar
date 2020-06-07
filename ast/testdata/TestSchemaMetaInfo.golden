@@ -9,7 +9,7 @@ select * from ta join tb using (id)
 select * from ta, tb limit 1
 [`sakila`.`ta` `sakila`.`tb`]
 drop table tb
-[`sakila`.tb`]
+[`sakila`.`tb`]
 drop table db.tb
 [`db`.`tb`]
 drop database db
@@ -17,9 +17,9 @@ drop database db
 create database db
 [`db`.`dual`]
 create index idx_col on tbl (col)
-[`sakila`.tbl`]
+[`sakila`.`tbl`]
 DROP INDEX idx_col on tbl
-[`sakila`.tbl`]
+[`sakila`.`tbl`]
 SELECT * FROM film WHERE length = 86;
 [`sakila`.`film`]
 SELECT * FROM film WHERE length IS NULL;
@@ -177,11 +177,11 @@ SELECT last_update FROM film order by date(last_update);
 SELECT description FROM film WHERE description IN('NEWS','asd') GROUP BY description;
 [`sakila`.`film`]
 alter table address add index idx_city_id(city_id);
-[`sakila`.address`]
+[`sakila`.`address`]
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`);
-[`sakila`.inventory`]
+[`sakila`.`inventory`]
 alter table inventory add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`),add index `idx_store_film` (`store_id`,`film_id`);
-[`sakila`.inventory`]
+[`sakila`.`inventory`]
 SELECT	DATE_FORMAT(t.last_update, '%Y-%m-%d'),	COUNT(DISTINCT (t.city))	FROM city t WHERE t.last_update > '2018-10-22 00:00:00'	AND t.city LIKE '%Chrome%'	AND t.city = 'eip' GROUP BY DATE_FORMAT(t.last_update, '%Y-%m-%d') ORDER BY DATE_FORMAT(t.last_update, '%Y-%m-%d');
 [`sakila`.`city`]
 create table hello.t (id int unsigned);
@@ -189,7 +189,7 @@ create table hello.t (id int unsigned);
 select * from tb where data >= '';
 [`sakila`.`tb`]
 alter table tb alter column id drop default;
-[`sakila`.tb`]
+[`sakila`.`tb`]
 select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film where last_update > '2016-03-27 02:01:01') as d;
 [`sakila`.`film`]
 select maxId, minId from (select max(film_id) maxId, min(film_id) minId from film) as d;

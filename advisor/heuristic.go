@@ -1545,6 +1545,30 @@ func (q *Query4Audit) RuleMultiBytesWord() Rule {
 	return rule
 }
 
+// RuleInvisibleUnicode KWR.005
+func (q *Query4Audit) RuleInvisibleUnicode() Rule {
+	var rule = q.RuleOK()
+	for _, tk := range ast.Tokenizer(q.Query) {
+		fmt.Println(tk.Val, []byte(tk.Val))
+		// 多字节的肉眼不可见字符经过 Tokenizer 后被切成了单字节字符。
+		// strings.Contains 中的内容也肉眼不可见，需要使用 cat -A 查看代码
+		switch tk.Val {
+		case string([]byte{194}), string([]byte{160}): // non-broken-space C2 A0
+			if strings.Contains(q.Query, ` `) {
+				rule = HeuristicRules["KWR.005"]
+				return rule
+			}
+		case string([]byte{226}), string([]byte{128}), string([]byte{139}): // zero-width space E2 80 8B
+			if strings.Contains(q.Query, `​`) {
+				rule = HeuristicRules["KWR.005"]
+				return rule
+			}
+		default:
+		}
+	}
+	return rule
+}
+
 // RuleInsertSelect LCK.001
 func (q *Query4Audit) RuleInsertSelect() Rule {
 	var rule = q.RuleOK()

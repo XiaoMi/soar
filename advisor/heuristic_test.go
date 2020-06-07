@@ -1284,6 +1284,43 @@ func TestRuleMultiBytesWord(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// KWR.005
+func TestRuleInvisibleUnicode(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	// 不可见的 unicode 可以通过 https://unicode-table.com 复制得到
+	sqls := [][]string{
+		{
+			`select 1`,   // SQL 中包含 non-broken-space
+			`select​ 1;`, // SQL 中包含 zero-width space
+		},
+		{
+			"select 1",    // 正常 SQL
+			`select "1 "`, // 值中包含 non-broken-space
+			`select "1​"`, // 值中包含 zero-width space
+		},
+	}
+	for _, sql := range sqls[0] {
+		q, _ := NewQuery4Audit(sql)
+		// 含有特殊 unicode 字符的 SQL 语法肯定是不通过的
+		rule := q.RuleInvisibleUnicode()
+		if rule.Item != "KWR.005" {
+			t.Error("Rule not match:", rule.Item, "Expect : KWR.005")
+		}
+	}
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleInvisibleUnicode()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 // LCK.001
 func TestRuleInsertSelect(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
