@@ -1549,7 +1549,6 @@ func (q *Query4Audit) RuleMultiBytesWord() Rule {
 func (q *Query4Audit) RuleInvisibleUnicode() Rule {
 	var rule = q.RuleOK()
 	for _, tk := range ast.Tokenizer(q.Query) {
-		fmt.Println(tk.Val, []byte(tk.Val))
 		// 多字节的肉眼不可见字符经过 Tokenizer 后被切成了单字节字符。
 		// strings.Contains 中的内容也肉眼不可见，需要使用 cat -A 查看代码
 		switch tk.Val {
@@ -1692,7 +1691,7 @@ func (q *Query4Audit) RuleUNIONLimit() Rule {
 // RuleMultiValueAttribute LIT.003
 func (q *Query4Audit) RuleMultiValueAttribute() Rule {
 	var rule = q.RuleOK()
-	re := regexp.MustCompile(`(?i)(id\s+varchar)|(id\s+text)|(id\s+regexp)`)
+	re := regexp.MustCompile(`(?i)(id\s+regexp)`)
 	if re.FindString(q.Query) != "" {
 		rule = HeuristicRules["LIT.003"]
 		if position := re.FindIndex([]byte(q.Query)); len(position) > 0 {
