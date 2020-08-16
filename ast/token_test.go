@@ -173,7 +173,8 @@ select col from tb;
 		[]byte(`select /*!50000 1,*/ 1;`),                                          // 20
 		[]byte(`UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;`),          // 21
 		[]byte("UPDATE `xxx` SET aaa='a;' WHERE `id` = 15;"),                       // 22
-		// []byte(`/* comment here */ SET MAX_JOIN_SIZE=#`),                           // 23
+		[]byte("UPDATE `xxx` SET aaa='a -- b' WHERE `id` = 15; UPDATE `xxx` SET aaa='c -- d' WHERE `id` = 16;"), // 23
+		// []byte(`/* comment here */ SET MAX_JOIN_SIZE=#`),                        // 24
 	}
 	// \G 分隔符
 	buf2s := [][]byte{
