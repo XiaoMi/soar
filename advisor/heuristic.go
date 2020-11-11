@@ -1253,20 +1253,66 @@ func (q *Query4Audit) RuleImpossibleWhere() Rule {
 // RuleMeaninglessWhere RES.007
 func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 	var rule = q.RuleOK()
-	// SELECT * FROM tb WHERE 1
+
+	var where *sqlparser.Where
 	switch n := q.Stmt.(type) {
 	case *sqlparser.Select:
-		if n.Where != nil {
-			switch n.Where.Expr.(type) {
-			case *sqlparser.SQLVal:
+		where = n.Where
+	case *sqlparser.Update:
+		where = n.Where
+	case *sqlparser.Delete:
+		where = n.Where
+	}
+	if where != nil {
+		switch v := where.Expr.(type) {
+		// WHERE 1
+		case *sqlparser.SQLVal:
+			switch string(v.Val) {
+			case "0", "false":
+			default:
+				rule = HeuristicRules["RES.007"]
+				return rule
+			}
+		// WHERE true
+		case sqlparser.BoolVal:
+			if v {
 				rule = HeuristicRules["RES.007"]
 				return rule
 			}
 		}
 	}
-	// 1=1, 0=0
+
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
+		// WHERE id = 1 or 2
+		case *sqlparser.OrExpr:
+			// right always true
+			switch v := n.Right.(type) {
+			case *sqlparser.SQLVal:
+				switch string(v.Val) {
+				case "0", "false":
+				default:
+					rule = HeuristicRules["RES.007"]
+				}
+			case sqlparser.BoolVal:
+				if v {
+					rule = HeuristicRules["RES.007"]
+				}
+			}
+			// left always true
+			switch v := n.Left.(type) {
+			case *sqlparser.SQLVal:
+				switch string(v.Val) {
+				case "0", "false":
+				default:
+					rule = HeuristicRules["RES.007"]
+				}
+			case sqlparser.BoolVal:
+				if v {
+					rule = HeuristicRules["RES.007"]
+				}
+			}
+		// 1=1, 0=0
 		case *sqlparser.ComparisonExpr:
 			factor := false
 			switch n.Operator {
@@ -1300,6 +1346,12 @@ func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 			if (bytes.Equal(left, right) && !factor) || (!bytes.Equal(left, right) && factor) {
 				rule = HeuristicRules["RES.007"]
 			}
+
+			// TODO:
+			// 2 > 1
+			// true = 1
+			// false != 1
+
 			return false, nil
 		}
 		return true, nil
