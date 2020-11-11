@@ -3265,17 +3265,24 @@ func TestRuleBlobDefaultValue(t *testing.T) {
 	sqls := [][]string{
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
+			"CREATE TABLE `tb` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` json NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
 			"alter table `tb` add column `c` blob NOT NULL DEFAULT '';",
+			"alter table `tb` add column `c` json NOT NULL DEFAULT '';",
 		},
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL, PRIMARY KEY (`id`));",
+			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` json NOT NULL, PRIMARY KEY (`id`));",
 			"CREATE TABLE `tb` (`col` text NOT NULL);",
 			"alter table `tb` add column `c` blob NOT NULL;",
+			"alter table `tb` add column `c` json NOT NULL;",
 			"ALTER TABLE tb ADD COLUMN a BLOB DEFAULT NULL",
+			"ALTER TABLE tb ADD COLUMN a JSON DEFAULT NULL",
 			"CREATE TABLE tb ( a BLOB DEFAULT NULL)",
+			"CREATE TABLE tb ( a JSON DEFAULT NULL)",
 			"alter TABLE `tbl` add column `c` longblob;",
 			"alter TABLE `tbl` add column `c` text;",
 			"alter TABLE `tbl` add column `c` blob;",
+			"alter TABLE `tbl` add column `c` json;",
 		},
 	}
 
