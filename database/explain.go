@@ -181,11 +181,12 @@ type ExplainJSONDuplicatesRemoval struct {
 
 // ExplainJSONOrderingOperation JSON
 type ExplainJSONOrderingOperation struct {
-	UsingFilesort     bool                         `json:"using_filesort"`
-	Table             ExplainJSONTable             `json:"table"`
-	DuplicatesRemoval ExplainJSONDuplicatesRemoval `json:"duplicates_removal"`
-	GroupingOperation ExplainJSONGroupingOperation `json:"grouping_operation"`
-	OrderbySubqueries []ExplainJSONSubqueries      `json:"order_by_subqueries"`
+	UsingFilesort           bool                         `json:"using_filesort"`
+	Table                   ExplainJSONTable             `json:"table"`
+	DuplicatesRemoval       ExplainJSONDuplicatesRemoval `json:"duplicates_removal"`
+	GroupingOperation       ExplainJSONGroupingOperation `json:"grouping_operation"`
+	OrderbySubqueries       []ExplainJSONSubqueries      `json:"order_by_subqueries"`
+	OptimizedAwaySubqueries []ExplainJSONSubqueries      `json:"optimized_away_subqueries"`
 }
 
 // ExplainJSONQueryBlock JSON
