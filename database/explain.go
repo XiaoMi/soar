@@ -177,6 +177,7 @@ type ExplainJSONDuplicatesRemoval struct {
 	UsingFilesort       bool                         `json:"using_filesort"`
 	BufferResult        ExplainJSONBufferResult      `json:"buffer_result"`
 	GroupingOperation   ExplainJSONGroupingOperation `json:"grouping_operation"`
+	Table               ExplainJSONTable             `json:"table"`             
 }
 
 // ExplainJSONOrderingOperation JSON
