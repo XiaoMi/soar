@@ -152,6 +152,7 @@ type ExplainJSONNestedLoop struct {
 type ExplainJSONBufferResult struct {
 	UsingTemporaryTable bool                    `json:"using_temporary_table"`
 	NestedLoop          []ExplainJSONNestedLoop `json:"nested_loop"`
+	Table               ExplainJSONTable        `json:"table"`
 }
 
 // ExplainJSONSubqueries JSON
