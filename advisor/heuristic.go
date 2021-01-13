@@ -279,7 +279,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					continue
 				}
 
-				// 检查排序排序不一致导致的隐式数据转换
+				// 检查 collation 排序不一致导致的隐式数据转换
 				common.Log.Debug("Collation: `%s`.`%s` (%s) VS `%s`.`%s` (%s)",
 					colList[0].Table, colList[0].Name, colList[0].Collation,
 					colList[1].Table, colList[1].Name, colList[1].Collation)
@@ -322,6 +322,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 				isCovered := true
 				if tps, ok := typMap[val.Type]; ok {
 					for _, tp := range tps {
+						// colList[0].DataType, eg. year(4)
 						if strings.HasPrefix(colList[0].DataType, tp) {
 							isCovered = false
 						}
@@ -339,6 +340,18 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
 					content = append(content, c)
+				} else {
+					// 检查时间格式，如："", "2020-0a-01"
+					switch strings.Split(colList[0].DataType, "(")[0] {
+					case "date", "time", "datetime", "timestamp", "year":
+						if !timeFormatCheck(string(val.Val)) {
+							c := fmt.Sprintf("%s 表中列 %s 的时间格式错误，%s。", colList[0].Table, colList[0].Name, string(val.Val))
+							common.Log.Debug("Implicit data type conversion: %s", c)
+							content = append(content, c)
+						}
+						// TODO: 各种数据类型格式检查
+					default:
+					}
 				}
 			}
 
@@ -353,6 +366,15 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 		rule.Content = strings.Join(common.RemoveDuplicatesItem(content), " ")
 	}
 	return rule
+}
+
+// timeFormatCheck 时间格式检查，格式正确返回 true，格式错误返回 false
+func timeFormatCheck(t string) bool {
+	// 不允许为空，但允许时间前后有空格
+	t = strings.TrimSpace(t)
+	// 仅允许 数字、减号、冒号、空格
+	allowChars := regexp.MustCompile(`^[\-0-9: ]+$`)
+	return allowChars.MatchString(t)
 }
 
 // RuleNoWhere CLA.001 & CLA.014 & CLA.015

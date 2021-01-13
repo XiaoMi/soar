@@ -150,6 +150,31 @@ func TestRuleEqualLike(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// ARG.003
+// TODO:
+
+func TestTimeFormatError(t *testing.T) {
+	rightTimes := []string{
+		`2020-01-01`,
+	}
+	for _, rt := range rightTimes {
+		if !timeFormatCheck(rt) {
+			t.Error("wrong time format")
+		}
+	}
+
+	wrongTimes := []string{
+		``,                    // 空时间
+		`2020-01-01 abc`,      // 含英文字符
+		`2020–02-15 23:59:59`, // 2020 后面的不是减号，是个 连接符
+	}
+	for _, wt := range wrongTimes {
+		if timeFormatCheck(wt) {
+			t.Error("wrong time format")
+		}
+	}
+}
+
 // CLA.001
 func TestRuleNoWhere(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
