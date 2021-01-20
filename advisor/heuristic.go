@@ -135,10 +135,15 @@ func (q *Query4Audit) RuleEqualLike() Rule {
 				case *sqlparser.SQLVal:
 					// not start with '%', '_' && not end with '%', '_'
 					if sqlval.Type == 0 {
-						if sqlval.Val[0] != 0x25 &&
-							sqlval.Val[0] != 0x5f &&
-							sqlval.Val[len(sqlval.Val)-1] != 0x5f &&
-							sqlval.Val[len(sqlval.Val)-1] != 0x25 {
+						//不包含通配符的意思是整个目标串中都没有,而不是首位、结尾没有;如下就是正确的语法
+						//select * from city where Name like 'K%l' limit 10;
+						hasWildCard := false
+						for _, sqlElem := range sqlval.Val {
+							if sqlElem == 0x25 || sqlElem == 0x5f {
+								hasWildCard = true
+							}
+						}
+						if hasWildCard == false {
 							rule = HeuristicRules["ARG.002"]
 							return false, nil
 						}
