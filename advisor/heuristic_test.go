@@ -2727,13 +2727,14 @@ func TestRuleAlterCharset(t *testing.T) {
 			`ALTER TABLE tbl_name CHARACTER SET charset_name;`,
 			`ALTER TABLE t1 CHANGE a b BIGINT NOT NULL, character set utf8`,
 			`ALTER TABLE t1 CHANGE a b BIGINT NOT NULL,character set utf8`,
-			`alter table t1 convert to character set utf8 collate utf8_unicode_ci;`,
 			`alter table t1 default collate = utf8_unicode_ci;`,
 		},
 		{
 			// 反面的例子
 			`ALTER TABLE t MODIFY latin1_text_col TEXT CHARACTER SET utf8`,
 			`ALTER TABLE t1 CHANGE c1 c1 TEXT CHARACTER SET utf8;`,
+			//正规写法,不应该写在上面
+			`alter table t1 convert to character set utf8 collate utf8_unicode_ci;`,
 		},
 	}
 	for _, sql := range sqls[0] {
