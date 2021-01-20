@@ -67,7 +67,7 @@ func (q *Query4Audit) RuleStarAlias() Rule {
 	tkns := ast.Tokenizer(q.Query)
 	for i, tkn := range tkns {
 		//TODO 省略不写AS的语法没有检查,原则上也需要检查
-		if tkn.Val == "*" && i+1 < len(tkns) && (tkns[i+1].Val == "as" || tkns[i+1].Type == sqlparser.ID {
+		if tkn.Val == "*" && i+1 < len(tkns) && (tkns[i+1].Val == "as" || tkns[i+1].Type == sqlparser.ID) {
 			rule = HeuristicRules["ALI.002"]
 		}
 	}
