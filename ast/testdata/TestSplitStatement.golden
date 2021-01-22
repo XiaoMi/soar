@@ -40,6 +40,7 @@ tb;
 20 select /*!50000 1,*/ 1;
 21 UPDATE xxx SET c1=' LOGGER.error(""); }' WHERE id = 2 ;
 22 UPDATE `xxx` SET aaa='a;' WHERE `id` = 15;
+23 UPDATE `xxx` SET aaa='a -- b' WHERE `id` = 15;
 0 select * from test\G
 1 select 'hello\Gworld', col from test\G
 2 -- select * from test\Ghello

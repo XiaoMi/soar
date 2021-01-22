@@ -202,6 +202,16 @@ INSERT INTO tb (a) VALUES (1), (2)
 ```sql
 CREATE TABLE tb (a varchar(10) default '“”'
 ```
+## IN 条件中存在列名，可能导致数据匹配范围扩大
+
+* **Item**:ARG.014
+* **Severity**:L4
+* **Content**:如：delete from t where id in(1, 2, id) 可能会导致全表数据误删除。请仔细检查 IN 条件的正确性。
+* **Case**:
+
+```sql
+select id from t where id in(1, 2, id)
+```
 ## 最外层 SELECT 未指定 WHERE 条件
 
 * **Item**:CLA.001
@@ -472,11 +482,11 @@ create table tab1(status ENUM('new','in progress','fixed'))
 ```sql
 select c1,c2,c3 from tbl where c4 is null or c4 <> 1
 ```
-## BLOB 和 TEXT 类型的字段不建议设置为 NOT NULL
+## TEXT、BLOB 和 JSON 类型的字段不建议设置为 NOT NULL
 
 * **Item**:COL.012
 * **Severity**:L5
-* **Content**:BLOB 和 TEXT 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。
+* **Content**:TEXT、BLOB 和 JSON 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。
 * **Case**:
 
 ```sql
@@ -502,11 +512,11 @@ CREATE TABLE tbl( `id` bigint not null, `create_time` timestamp);
 ```sql
 CREATE TABLE `tb2` ( `id` int(11) DEFAULT NULL, `col` char(10) CHARACTER SET utf8 DEFAULT NULL)
 ```
-## TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值
+## TEXT、BLOB 和 JSON 类型的字段不可指定非 NULL 的默认值
 
 * **Item**:COL.015
 * **Severity**:L4
-* **Content**:MySQL 数据库中 TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。
+* **Content**:MySQL 数据库中 TEXT、BLOB 和 JSON 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。
 * **Case**:
 
 ```sql

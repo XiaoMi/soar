@@ -279,7 +279,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 					continue
 				}
 
-				// 检查排序排序不一致导致的隐式数据转换
+				// 检查 collation 排序不一致导致的隐式数据转换
 				common.Log.Debug("Collation: `%s`.`%s` (%s) VS `%s`.`%s` (%s)",
 					colList[0].Table, colList[0].Name, colList[0].Collation,
 					colList[1].Table, colList[1].Name, colList[1].Collation)
@@ -322,6 +322,7 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 				isCovered := true
 				if tps, ok := typMap[val.Type]; ok {
 					for _, tp := range tps {
+						// colList[0].DataType, eg. year(4)
 						if strings.HasPrefix(colList[0].DataType, tp) {
 							isCovered = false
 						}
@@ -339,6 +340,18 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 
 					common.Log.Debug("Implicit data type conversion: %s", c)
 					content = append(content, c)
+				} else {
+					// 检查时间格式，如："", "2020-0a-01"
+					switch strings.Split(colList[0].DataType, "(")[0] {
+					case "date", "time", "datetime", "timestamp", "year":
+						if !timeFormatCheck(string(val.Val)) {
+							c := fmt.Sprintf("%s 表中列 %s 的时间格式错误，%s。", colList[0].Table, colList[0].Name, string(val.Val))
+							common.Log.Debug("Implicit data type conversion: %s", c)
+							content = append(content, c)
+						}
+						// TODO: 各种数据类型格式检查
+					default:
+					}
 				}
 			}
 
@@ -353,6 +366,15 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 		rule.Content = strings.Join(common.RemoveDuplicatesItem(content), " ")
 	}
 	return rule
+}
+
+// timeFormatCheck 时间格式检查，格式正确返回 true，格式错误返回 false
+func timeFormatCheck(t string) bool {
+	// 不允许为空，但允许时间前后有空格
+	t = strings.TrimSpace(t)
+	// 仅允许 数字、减号、冒号、空格
+	allowChars := regexp.MustCompile(`^[\-0-9: ]+$`)
+	return allowChars.MatchString(t)
 }
 
 // RuleNoWhere CLA.001 & CLA.014 & CLA.015
@@ -832,7 +854,7 @@ func (q *Query4Audit) RuleAddDefaultValue() Rule {
 				}
 
 				switch c.Tp.Tp {
-				case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+				case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob, mysql.TypeJSON:
 					colDefault = true
 				}
 
@@ -855,7 +877,7 @@ func (q *Query4Audit) RuleAddDefaultValue() Rule {
 						}
 
 						switch c.Tp.Tp {
-						case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+						case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob, mysql.TypeJSON:
 							colDefault = true
 						}
 
@@ -1253,20 +1275,66 @@ func (q *Query4Audit) RuleImpossibleWhere() Rule {
 // RuleMeaninglessWhere RES.007
 func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 	var rule = q.RuleOK()
-	// SELECT * FROM tb WHERE 1
+
+	var where *sqlparser.Where
 	switch n := q.Stmt.(type) {
 	case *sqlparser.Select:
-		if n.Where != nil {
-			switch n.Where.Expr.(type) {
-			case *sqlparser.SQLVal:
+		where = n.Where
+	case *sqlparser.Update:
+		where = n.Where
+	case *sqlparser.Delete:
+		where = n.Where
+	}
+	if where != nil {
+		switch v := where.Expr.(type) {
+		// WHERE 1
+		case *sqlparser.SQLVal:
+			switch string(v.Val) {
+			case "0", "false":
+			default:
+				rule = HeuristicRules["RES.007"]
+				return rule
+			}
+		// WHERE true
+		case sqlparser.BoolVal:
+			if v {
 				rule = HeuristicRules["RES.007"]
 				return rule
 			}
 		}
 	}
-	// 1=1, 0=0
+
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
+		// WHERE id = 1 or 2
+		case *sqlparser.OrExpr:
+			// right always true
+			switch v := n.Right.(type) {
+			case *sqlparser.SQLVal:
+				switch string(v.Val) {
+				case "0", "false":
+				default:
+					rule = HeuristicRules["RES.007"]
+				}
+			case sqlparser.BoolVal:
+				if v {
+					rule = HeuristicRules["RES.007"]
+				}
+			}
+			// left always true
+			switch v := n.Left.(type) {
+			case *sqlparser.SQLVal:
+				switch string(v.Val) {
+				case "0", "false":
+				default:
+					rule = HeuristicRules["RES.007"]
+				}
+			case sqlparser.BoolVal:
+				if v {
+					rule = HeuristicRules["RES.007"]
+				}
+			}
+		// 1=1, 0=0
 		case *sqlparser.ComparisonExpr:
 			factor := false
 			switch n.Operator {
@@ -1300,6 +1368,12 @@ func (q *Query4Audit) RuleMeaninglessWhere() Rule {
 			if (bytes.Equal(left, right) && !factor) || (!bytes.Equal(left, right) && factor) {
 				rule = HeuristicRules["RES.007"]
 			}
+
+			// TODO:
+			// 2 > 1
+			// true = 1
+			// false != 1
+
 			return false, nil
 		}
 		return true, nil
@@ -2681,8 +2755,14 @@ func (q *Query4Audit) RuleAlterCharset() Rule {
 						for _, option := range spec.Options {
 							if option.Tp == tidb.TableOptionCharset ||
 								option.Tp == tidb.TableOptionCollate {
-								rule = HeuristicRules["ALT.001"]
-								break
+								//增加CONVERT TO的判断
+								convertReg, _ := regexp.Compile("convert to")
+								if convertReg.Match([]byte(strings.ToLower(q.Query))) {
+									break
+								} else {
+									rule = HeuristicRules["ALT.001"]
+									break
+								}
 							}
 						}
 					}
@@ -2759,7 +2839,7 @@ func (q *Query4Audit) RuleBLOBNotNull() Rule {
 						continue
 					}
 					switch col.Tp.Tp {
-					case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+					case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob, mysql.TypeJSON:
 						for _, opt := range col.Options {
 							if opt.Tp == tidb.ColumnOptionNotNull {
 								rule = HeuristicRules["COL.012"]
@@ -2782,7 +2862,7 @@ func (q *Query4Audit) RuleBLOBNotNull() Rule {
 								continue
 							}
 							switch col.Tp.Tp {
-							case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob:
+							case mysql.TypeBlob, mysql.TypeTinyBlob, mysql.TypeMediumBlob, mysql.TypeLongBlob, mysql.TypeJSON:
 								for _, opt := range col.Options {
 									if opt.Tp == tidb.ColumnOptionNotNull {
 										rule = HeuristicRules["COL.012"]
@@ -3109,7 +3189,8 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 	for _, tk := range tks {
 		if tk.Type == ast.TokenTypeWord {
 			switch strings.TrimSpace(strings.ToLower(tk.Val)) {
-			case "national", "nvarchar", "nchar", "nvarchar(", "nchar(", "character":
+			//character移到后面检查
+			case "national", "nvarchar", "nchar", "nvarchar(", "nchar(":
 				rule = HeuristicRules["COL.014"]
 				return rule
 			}
@@ -3125,6 +3206,16 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 						continue
 					}
 					if col.Tp.Charset != "" || col.Tp.Collate != "" {
+						if col.Tp.Charset == "binary" || col.Tp.Collate == "binary" {
+							continue
+						} else {
+							rule = HeuristicRules["COL.014"]
+							break
+						}
+					}
+					//在这里检查character
+					characterReg, _ := regexp.Compile("character set")
+					if characterReg.Match([]byte(strings.ToLower(q.Query))) {
 						rule = HeuristicRules["COL.014"]
 						break
 					}
@@ -3139,6 +3230,15 @@ func (q *Query4Audit) RuleColumnWithCharset() Rule {
 								continue
 							}
 							if col.Tp.Charset != "" || col.Tp.Collate != "" {
+								if col.Tp.Charset == "binary" || col.Tp.Collate == "binary" {
+									continue
+								} else {
+									rule = HeuristicRules["COL.014"]
+									break
+								}
+							}
+							characterReg, _ := regexp.Compile("character set")
+							if characterReg.Match([]byte(strings.ToLower(q.Query))) {
 								rule = HeuristicRules["COL.014"]
 								break
 							}
@@ -3343,7 +3443,7 @@ func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 						continue
 					}
 					switch col.Tp.Tp {
-					case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob:
+					case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob, mysql.TypeJSON:
 						for _, opt := range col.Options {
 							if opt.Tp == tidb.ColumnOptionDefaultValue && opt.Expr.GetType().Tp != mysql.TypeNull {
 								rule = HeuristicRules["COL.015"]
@@ -3362,7 +3462,7 @@ func (q *Query4Audit) RuleBlobDefaultValue() Rule {
 								continue
 							}
 							switch col.Tp.Tp {
-							case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob:
+							case mysql.TypeBlob, mysql.TypeMediumBlob, mysql.TypeTinyBlob, mysql.TypeLongBlob, mysql.TypeJSON:
 								for _, opt := range col.Options {
 									if opt.Tp == tidb.ColumnOptionDefaultValue && opt.Expr.GetType().Tp != mysql.TypeNull {
 										rule = HeuristicRules["COL.015"]

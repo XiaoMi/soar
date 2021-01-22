@@ -70,6 +70,15 @@ type tableStatusRow struct {
 	Comment       []byte // 注释
 }
 
+// 记录去除逗号类型是外健还是分区表
+type deleteComaType int8
+
+const (
+	_ deleteComaType = iota
+	CS
+	PART
+)
+
 // newTableStat 构造 table Stat 对象
 func newTableStat(tableName string) *TableStatInfo {
 	return &TableStatInfo{
@@ -478,21 +487,37 @@ func (db *Connector) ShowCreateTable(tableName string) (string, error) {
 	if len(lines) > 2 {
 		var noConstraint []string
 		relationReg, _ := regexp.Compile("CONSTRAINT")
+		partitionReg, _ := regexp.Compile("PARTITIONS")
+		var DeleteComaT deleteComaType
 		for _, line := range lines[1 : len(lines)-1] {
 			if relationReg.Match([]byte(line)) {
+				DeleteComaT = CS
 				continue
+			} else if partitionReg.Match([]byte(line)) {
+				DeleteComaT = PART
 			}
 			line = strings.TrimSuffix(line, ",")
 			noConstraint = append(noConstraint, line)
 		}
 
 		// 去除外键语句会使DDL中多一个','导致语法错误，要把多余的逗号去除
-		ddl = fmt.Sprint(
-			lines[0], "\n",
-			strings.Join(noConstraint, ",\n"), "\n",
-			lines[len(lines)-1],
-		)
+		// len(lines) > 2的判断方式有问题，如果是分区表也会判断成为外键语句，导致建表语句的逗号错乱
+		if DeleteComaT == CS {
+			ddl = fmt.Sprint(
+				lines[0], "\n",
+				strings.Join(noConstraint, ",\n"), "\n",
+				lines[len(lines)-1],
+			)
+		} else if DeleteComaT == PART {
+			ddl = fmt.Sprint(
+				lines[0], "\n",
+				strings.Join(noConstraint, ",\n"), "\n",
+				lines[len(lines)-3],
+			)
+		}
+
 	}
+
 	return ddl, err
 }
 

@@ -150,6 +150,31 @@ func TestRuleEqualLike(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+// ARG.003
+// TODO:
+
+func TestTimeFormatError(t *testing.T) {
+	rightTimes := []string{
+		`2020-01-01`,
+	}
+	for _, rt := range rightTimes {
+		if !timeFormatCheck(rt) {
+			t.Error("wrong time format")
+		}
+	}
+
+	wrongTimes := []string{
+		``,                    // 空时间
+		`2020-01-01 abc`,      // 含英文字符
+		`2020–02-15 23:59:59`, // 2020 后面的不是减号，是个 连接符
+	}
+	for _, wt := range wrongTimes {
+		if timeFormatCheck(wt) {
+			t.Error("wrong time format")
+		}
+	}
+}
+
 // CLA.001
 func TestRuleNoWhere(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
@@ -931,8 +956,15 @@ func TestRuleMeaninglessWhere(t *testing.T) {
 			"select * from tbl where 'a' limit 1;",
 			"select * from tbl where 1;",
 			"select * from tbl where 1 limit 1;",
+			"select * from tbl where id = 1 or 2;",
+			"select * from tbl where true;",
+			"select * from tbl where 'true';",
 		},
 		{
+			"select * from tbl where false;",
+			"select * from tbl where 'false';",
+			"select * from tbl where 0;",
+			"select * from tbl where '0';",
 			"select * from tbl where 2 = 1;",
 			"select * from tbl where 'b' = 'a';",
 		},
@@ -3258,17 +3290,24 @@ func TestRuleBlobDefaultValue(t *testing.T) {
 	sqls := [][]string{
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
+			"CREATE TABLE `tb` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` json NOT NULL DEFAULT '', PRIMARY KEY (`id`));",
 			"alter table `tb` add column `c` blob NOT NULL DEFAULT '';",
+			"alter table `tb` add column `c` json NOT NULL DEFAULT '';",
 		},
 		{
 			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` blob NOT NULL, PRIMARY KEY (`id`));",
+			"CREATE TABLE `tb` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT, `c` json NOT NULL, PRIMARY KEY (`id`));",
 			"CREATE TABLE `tb` (`col` text NOT NULL);",
 			"alter table `tb` add column `c` blob NOT NULL;",
+			"alter table `tb` add column `c` json NOT NULL;",
 			"ALTER TABLE tb ADD COLUMN a BLOB DEFAULT NULL",
+			"ALTER TABLE tb ADD COLUMN a JSON DEFAULT NULL",
 			"CREATE TABLE tb ( a BLOB DEFAULT NULL)",
+			"CREATE TABLE tb ( a JSON DEFAULT NULL)",
 			"alter TABLE `tbl` add column `c` longblob;",
 			"alter TABLE `tbl` add column `c` text;",
 			"alter TABLE `tbl` add column `c` blob;",
+			"alter TABLE `tbl` add column `c` json;",
 		},
 	}
 

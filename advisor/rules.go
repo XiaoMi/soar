@@ -531,8 +531,8 @@ func init() {
 		"COL.012": {
 			Item:     "COL.012",
 			Severity: "L5",
-			Summary:  "BLOB 和 TEXT 类型的字段不建议设置为 NOT NULL",
-			Content:  `BLOB 和 TEXT 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。`,
+			Summary:  "TEXT、BLOB 和 JSON 类型的字段不建议设置为 NOT NULL",
+			Content:  `TEXT、BLOB 和 JSON 类型的字段无法指定非 NULL 的默认值，如果添加了 NOT NULL 限制，写入数据时又未对该字段指定值可能导致写入失败。`,
 			Case:     "CREATE TABLE `tb`(`c` longblob NOT NULL);",
 			Func:     (*Query4Audit).RuleBLOBNotNull,
 		},
@@ -556,8 +556,8 @@ func init() {
 		"COL.015": {
 			Item:     "COL.015",
 			Severity: "L4",
-			Summary:  "TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值",
-			Content:  `MySQL 数据库中 TEXT 和 BLOB 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。`,
+			Summary:  "TEXT、BLOB 和 JSON 类型的字段不可指定非 NULL 的默认值",
+			Content:  `MySQL 数据库中 TEXT、BLOB 和 JSON 类型的字段不可指定非 NULL 的默认值。TEXT最大长度为2^16-1个字符，MEDIUMTEXT最大长度为2^32-1个字符，LONGTEXT最大长度为2^64-1个字符。`,
 			Case:     "CREATE TABLE `tbl` (`c` blob DEFAULT NULL);",
 			Func:     (*Query4Audit).RuleBlobDefaultValue,
 		},

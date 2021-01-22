@@ -45,7 +45,6 @@ const (
 var maxCachekeySize = 15
 var cacheHits int
 var cacheMisses int
-var tokenCache map[string]Token
 
 var tokenBoundaries = []string{
 	// multi character
@@ -790,7 +789,7 @@ func Tokenize(sql string) []Token {
 	var token Token
 	var tokenLength int
 	var tokens []Token
-	tokenCache = make(map[string]Token)
+	tokenCache := make(map[string]Token)
 
 	// Used to make sure the string keeps shrinking on each iteration
 	oldStringLen := len(sql) + 1
@@ -863,12 +862,12 @@ func SplitStatement(buf []byte, delimiter []byte) (string, string, []byte) {
 		b := buf[i]
 		// single line comment
 		if b == '-' {
-			if i+2 < len(buf) && buf[i+1] == '-' && buf[i+2] == ' ' {
+			if !quoted && i+2 < len(buf) && buf[i+1] == '-' && buf[i+2] == ' ' {
 				singleLineComment = true
 				i = i + 2
 				continue
 			}
-			if i+2 < len(buf) && i == 0 && buf[i+1] == '-' && (buf[i+2] == '\n' || buf[i+2] == '\r') {
+			if !quoted && i+2 < len(buf) && i == 0 && buf[i+1] == '-' && (buf[i+2] == '\n' || buf[i+2] == '\r') {
 				sql = "--\n"
 				break
 			}

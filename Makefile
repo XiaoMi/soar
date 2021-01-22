@@ -17,9 +17,9 @@ VERSION_TAG := $(shell git describe --tags --always)
 VERSION_VERSION := $(shell git log --date=iso --pretty=format:"%cd" -1) $(VERSION_TAG)
 VERSION_COMPILE := $(shell date +"%F %T %z") by $(shell go version)
 VERSION_BRANCH  := $(shell git rev-parse --abbrev-ref HEAD)
-VERSION_GIT_DIRTY := $(shell git diff --no-ext-diff 2>/dev/null | wc -l | awk '{print 1}')
+VERSION_GIT_DIRTY := $(shell git diff --no-ext-diff 2>/dev/null | wc -l | awk '{print $1}')
 VERSION_DEV_PATH:= $(shell pwd)
-LDFLAGS=-ldflags="-s -w -X 'github.com/XiaoMi/soar/common.Version=$(VERSION_VERSION)' -X 'github.com/XiaoMi/soar/common.Compile=$(VERSION_COMPILE)' -X 'github.com/XiaoMi/soar/common.Branch=$(VERSION_BRANCH)' -X github.com/XiaoMi/soar/common.GitDirty=$(VERSION_GIT_DIRTY) -X github.com/XiaoMi/soar/common.DevPath=$(VERSION_DEV_PATH)"
+LDFLAGS=-ldflags="-s -w -X 'github.com/XiaoMi/soar/common.Version=$(VERSION_VERSION)' -X 'github.com/XiaoMi/soar/common.Compile=$(VERSION_COMPILE)' -X 'github.com/XiaoMi/soar/common.Branch=$(VERSION_BRANCH)' -X 'github.com/XiaoMi/soar/common.GitDirty=$(VERSION_GIT_DIRTY)' -X 'github.com/XiaoMi/soar/common.DevPath=$(VERSION_DEV_PATH)'"
 
 # These are the values we want to pass for VERSION  and BUILD
 BUILD_TIME=`date +%Y%m%d%H%M`

@@ -152,6 +152,7 @@ type ExplainJSONNestedLoop struct {
 type ExplainJSONBufferResult struct {
 	UsingTemporaryTable bool                    `json:"using_temporary_table"`
 	NestedLoop          []ExplainJSONNestedLoop `json:"nested_loop"`
+	Table               ExplainJSONTable        `json:"table"`
 }
 
 // ExplainJSONSubqueries JSON
@@ -177,15 +178,17 @@ type ExplainJSONDuplicatesRemoval struct {
 	UsingFilesort       bool                         `json:"using_filesort"`
 	BufferResult        ExplainJSONBufferResult      `json:"buffer_result"`
 	GroupingOperation   ExplainJSONGroupingOperation `json:"grouping_operation"`
+	Table               ExplainJSONTable             `json:"table"`
 }
 
 // ExplainJSONOrderingOperation JSON
 type ExplainJSONOrderingOperation struct {
-	UsingFilesort     bool                         `json:"using_filesort"`
-	Table             ExplainJSONTable             `json:"table"`
-	DuplicatesRemoval ExplainJSONDuplicatesRemoval `json:"duplicates_removal"`
-	GroupingOperation ExplainJSONGroupingOperation `json:"grouping_operation"`
-	OrderbySubqueries []ExplainJSONSubqueries      `json:"order_by_subqueries"`
+	UsingFilesort           bool                         `json:"using_filesort"`
+	Table                   ExplainJSONTable             `json:"table"`
+	DuplicatesRemoval       ExplainJSONDuplicatesRemoval `json:"duplicates_removal"`
+	GroupingOperation       ExplainJSONGroupingOperation `json:"grouping_operation"`
+	OrderbySubqueries       []ExplainJSONSubqueries      `json:"order_by_subqueries"`
+	OptimizedAwaySubqueries []ExplainJSONSubqueries      `json:"optimized_away_subqueries"`
 }
 
 // ExplainJSONQueryBlock JSON
