@@ -452,7 +452,7 @@ create table t1(id int,name char(20),last_time date)
 ```sql
 CREATE TABLE tab2 (p_id  BIGINT UNSIGNED NOT NULL,a_id  BIGINT UNSIGNED NOT NULL,hours float not null,PRIMARY KEY (p_id, a_id))
 ```
-## 不建议使用 ENUM 数据类型
+## 不建议使用 ENUM/BIT/SET 数据类型
 
 * **Item**:COL.010
 * **Severity**:L2

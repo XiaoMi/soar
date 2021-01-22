@@ -2553,7 +2553,7 @@ func (q *Query4Audit) RuleTruncateTable() Rule {
 	return rule
 }
 
-// RuleIn ARG.005 && ARG.004
+// RuleIn ARG.005 && ARG.004 && ARG.014
 func (q *Query4Audit) RuleIn() Rule {
 	var rule = q.RuleOK()
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
@@ -2562,6 +2562,10 @@ func (q *Query4Audit) RuleIn() Rule {
 			switch strings.ToLower(n.Operator) {
 			case "in":
 				switch r := n.Right.(type) {
+				case sqlparser.ColTuple:
+					// id in (1, 2, id), always true.
+					rule = HeuristicRules["ARG.014"]
+					return false, nil
 				case sqlparser.ValTuple:
 					// IN (NULL)
 					for _, v := range r {

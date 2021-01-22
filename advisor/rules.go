@@ -280,6 +280,14 @@ func init() {
 			Case:     "CREATE TABLE tb (a varchar(10) default '“”'",
 			Func:     (*Query4Audit).RuleFullWidthQuote,
 		},
+		"ARG.014": {
+			Item:     "ARG.014",
+			Severity: "L4",
+			Summary:  "IN 条件中存在列名，可能导致数据匹配范围扩大",
+			Content:  `如：delete from t where id in(1, 2, id) 可能会导致全表数据误删除。请仔细检查 IN 条件的正确性。`,
+			Case:     "select id from t where id in(1, 2, id)",
+			Func:     (*Query4Audit).RuleIn,
+		},
 		"CLA.001": {
 			Item:     "CLA.001",
 			Severity: "L4",
@@ -506,7 +514,7 @@ func init() {
 		"COL.010": {
 			Item:     "COL.010",
 			Severity: "L2",
-			Summary:  "不建议使用 ENUM 数据类型",
+			Summary:  "不建议使用 ENUM/BIT/SET 数据类型",
 			Content:  `ENUM 定义了列中值的类型，使用字符串表示 ENUM 里的值时，实际存储在列中的数据是这些值在定义时的序数。因此，这列的数据是字节对齐的，当您进行一次排序查询时，结果是按照实际存储的序数值排序的，而不是按字符串值的字母顺序排序的。这可能不是您所希望的。没有什么语法支持从 ENUM 或者 check 约束中添加或删除一个值；您只能使用一个新的集合重新定义这一列。如果您打算废弃一个选项，您可能会为历史数据而烦恼。作为一种策略，改变元数据——也就是说，改变表和列的定义——应该是不常见的，并且要注意测试和质量保证。有一个更好的解决方案来约束一列中的可选值:创建一张检查表，每一行包含一个允许在列中出现的候选值；然后在引用新表的旧表上声明一个外键约束。`,
 			Case:     "create table tab1(status ENUM('new','in progress','fixed'))",
 			Func:     (*Query4Audit).RuleValuesInDefinition,
