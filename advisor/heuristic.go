@@ -2636,6 +2636,10 @@ func (q *Query4Audit) RuleIn() Rule {
 			switch strings.ToLower(n.Operator) {
 			case "in":
 				switch r := n.Right.(type) {
+				case *sqlparser.Subquery:
+					// by pass sub query
+					// id in (select id from tb where xxx)
+					break
 				case sqlparser.ColTuple:
 					// id in (1, 2, id), always true.
 					rule = HeuristicRules["ARG.014"]
@@ -2653,6 +2657,8 @@ func (q *Query4Audit) RuleIn() Rule {
 						rule = HeuristicRules["ARG.005"]
 						return false, nil
 					}
+					//default: // debug
+					//	fmt.Println("Type: ", reflect.TypeOf(n.Right).String())
 				}
 			case "not in":
 				switch r := n.Right.(type) {
