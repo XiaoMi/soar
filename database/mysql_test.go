@@ -149,6 +149,8 @@ func TestRemoveSQLComments(t *testing.T) {
 	// Notice: double dash without space not comment, eg. `--not comment`
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	SQLs := []string{
+		`select 'c#\'#not comment'`,
+		`select "c#\"#not comment"`,
 		`-- comment`,
 		`--`,
 		`# comment`,
