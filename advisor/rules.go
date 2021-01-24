@@ -1073,7 +1073,7 @@ func init() {
 			Item:     "STA.003",
 			Severity: "L1",
 			Summary:  "索引起名不规范",
-			Content:  `建议普通二级索引以idx_为前缀，唯一索引以uk_为前缀。`,
+			Content:  `建议普通二级索引以` + common.Config.IdxPrefix + `为前缀，唯一索引以` + common.Config.UkPrefix + `为前缀。`,
 			Case:     "select col from now where type!=0",
 			Func:     (*Query4Audit).RuleIdxPrefix,
 		},
