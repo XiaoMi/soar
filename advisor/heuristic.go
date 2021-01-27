@@ -2640,16 +2640,17 @@ func (q *Query4Audit) RuleIn() Rule {
 					// by pass sub query
 					// id in (select id from tb where xxx)
 					break
-				case sqlparser.ColTuple:
-					// id in (1, 2, id), always true.
-					rule = HeuristicRules["ARG.014"]
-					return false, nil
 				case sqlparser.ValTuple:
 					// IN (NULL)
 					for _, v := range r {
 						switch v.(type) {
 						case *sqlparser.NullVal:
 							rule = HeuristicRules["ARG.004"]
+							return false, nil
+
+						case *sqlparser.ColName:
+							// id in (1, 2, id), always true.
+							rule = HeuristicRules["ARG.014"]
 							return false, nil
 						}
 					}
