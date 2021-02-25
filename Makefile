@@ -117,7 +117,7 @@ build: fmt
 	@mkdir -p bin
 	@ret=0 && for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 		b=$$(basename $${d}) ; \
-		go build ${LDFLAGS} ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
+		GO111MODULE=auto go build ${LDFLAGS} ${GCFLAGS} -o bin/$${b} $$d || ret=$$? ; \
 	done ; exit $$ret
 	@echo "build Success!"
 
@@ -182,7 +182,7 @@ release: build
 			for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 				b=$$(basename $${d}) ; \
 				echo "Building $${b}.$${GOOS}-$${GOARCH} ..."; \
-				CGO_ENABLED=0 GOOS=$${GOOS} GOARCH=$${GOARCH} go build ${GCFLAGS} ${LDFLAGS} -v -o release/$${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
+				GO111MODULE=auto CGO_ENABLED=0 GOOS=$${GOOS} GOARCH=$${GOARCH} go build ${GCFLAGS} ${LDFLAGS} -v -o release/$${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
 			done ; \
 		done ;\
 	done
