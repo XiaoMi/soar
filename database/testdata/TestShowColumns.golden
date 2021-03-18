@@ -3,7 +3,7 @@
     DescValues: {
         {
             Field:      "actor_id",
-            Type:       "smallint(5) unsigned",
+            Type:       "smallint unsigned",
             Collation:  nil,
             Null:       "NO",
             Key:        "",

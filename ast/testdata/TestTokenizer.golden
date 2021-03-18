@@ -1,5 +1,9 @@
 []ast.Token{
     {Type:57348, Val:"select", i:0},
+    {Type:57407, Val:"-- comment 1", i:0},
+}
+[]ast.Token{
+    {Type:57348, Val:"select", i:0},
     {Type:57397, Val:"c1", i:0},
     {Type:44, Val:",", i:0},
     {Type:57397, Val:"c2", i:0},

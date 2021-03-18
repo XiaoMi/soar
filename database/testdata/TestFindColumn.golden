@@ -4,7 +4,7 @@
         Alias:       nil,
         Table:       "film",
         DB:          "sakila",
-        DataType:    "smallint(5) unsigned",
+        DataType:    "smallint unsigned",
         Character:   "utf8",
         Collation:   "utf8_general_ci",
         Cardinality: 0,

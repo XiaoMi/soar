@@ -149,6 +149,14 @@ func TestRemoveSQLComments(t *testing.T) {
 	// Notice: double dash without space not comment, eg. `--not comment`
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	SQLs := []string{
+		// FIXME: comments in two quotes string won't be remove
+		// 		`"abc" /* comment */ "abc"`,
+		// 		`"abc"
+		// # comment
+		// "abc"`,
+		// 		`"abc"
+		// -- comment
+		// "abc"`,
 		`select 'c#\'#not comment'`,
 		`select "c#\"#not comment"`,
 		`-- comment`,
@@ -160,6 +168,10 @@ comment*/`,
 		`--
 -- comment`,
 	}
+
+	// fmt.Println(RemoveSQLComments(SQLs[0]))
+	// return
+
 	err := common.GoldenDiff(func() {
 		for _, sql := range SQLs {
 			fmt.Println(RemoveSQLComments(sql))

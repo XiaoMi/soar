@@ -1094,9 +1094,9 @@ func removeDup(vt ...sqlparser.Expr) sqlparser.ValTuple {
 		switch v := value.(type) {
 		case *sqlparser.SQLVal:
 			// Type:Val, 冒号用于分隔 Type 和 Val，防止两种不同类型拼接后出现同一个值
-			if _, ok := m[string(v.Type)+":"+sqlparser.String(v)]; !ok {
+			if _, ok := m[fmt.Sprint(v.Type)+":"+sqlparser.String(v)]; !ok {
 				uni = append(uni, v)
-				m[string(v.Type)+":"+sqlparser.String(v)] = v
+				m[fmt.Sprint(v.Type)+":"+sqlparser.String(v)] = v
 			}
 		case *sqlparser.BoolVal:
 			if _, ok := m[sqlparser.String(v)]; !ok {
@@ -1112,9 +1112,9 @@ func removeDup(vt ...sqlparser.Expr) sqlparser.ValTuple {
 			for _, val := range removeDup(v...) {
 				switch v := val.(type) {
 				case *sqlparser.SQLVal:
-					if _, ok := m[string(v.Type)+":"+sqlparser.String(v)]; !ok {
+					if _, ok := m[fmt.Sprint(v.Type)+":"+sqlparser.String(v)]; !ok {
 						uni = append(uni, v)
-						m[string(v.Type)+":"+sqlparser.String(v)] = v
+						m[fmt.Sprint(v.Type)+":"+sqlparser.String(v)] = v
 					}
 				case *sqlparser.BoolVal:
 					if _, ok := m[sqlparser.String(v)]; !ok {

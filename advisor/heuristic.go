@@ -66,7 +66,7 @@ func (q *Query4Audit) RuleStarAlias() Rule {
 	var rule = q.RuleOK()
 	tkns := ast.Tokenizer(q.Query)
 	for i, tkn := range tkns {
-		if tkn.Val == "*" && i+1 < len(tkns) && tkns[i+1].Val == "as" {
+		if strings.HasSuffix(tkn.Val, "*") && i+1 < len(tkns) && strings.ToLower(tkns[i+1].Val) == "as" {
 			rule = HeuristicRules["ALI.002"]
 		}
 	}
