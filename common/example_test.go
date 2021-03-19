@@ -31,7 +31,7 @@ func ExampleFormatDSN() {
 	// 根据 &dsn 生成 dsnStr
 	fmt.Println(FormatDSN(dsxExp))
 
-	// Output: root:1t'sB1g3rt@tcp(127.0.0.1:3306)/mysql?charset=utf8mb4
+	// Output: root:1t'sB1g3rt@tcp(127.0.0.1:3306)/mysql?timeout=3s&charset=utf8mb4
 	Log.Debug("Exiting function: %s", GetFunctionName())
 }
 

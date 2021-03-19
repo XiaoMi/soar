@@ -78,14 +78,6 @@ func Test_Main_More(_ *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
-func Test_Main_checkConfig(t *testing.T) {
-	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	if checkConfig() != 0 {
-		t.Error("checkConfig error")
-	}
-	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
-}
-
 func Test_Main_initQuery(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	// direct query

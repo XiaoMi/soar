@@ -241,7 +241,7 @@ func (db *Connector) IsView(tbName string) bool {
 	}
 
 	if len(tbStatus.Rows) > 0 {
-		if string(tbStatus.Rows[0].Comment) == "VIEW" {
+		if string(tbStatus.Rows[0].Comment) != "TABLE" {
 			return true
 		}
 	}

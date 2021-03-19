@@ -122,12 +122,13 @@ func TestWarningsAndQueryCost(t *testing.T) {
 		t.Error("Query Error: ", err)
 	} else {
 		for res.Warning.Next() {
-			var str string
-			err = res.Warning.Scan(str)
+			var level, msg string
+			var code int
+			err = res.Warning.Scan(&level, &code, &msg)
 			if err != nil {
 				t.Error(err.Error())
 			}
-			pretty.Println(str)
+			pretty.Println(msg)
 		}
 		res.Warning.Close()
 		fmt.Println(res.QueryCost, err)

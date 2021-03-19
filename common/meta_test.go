@@ -159,8 +159,9 @@ func TestStringStorageReq(t *testing.T) {
 		"not_exist",
 		"char(-1)",
 	}
+
 	err := GoldenDiff(func() {
-		for name := range CharSets {
+		for _, name := range SortedKey(CharSets) {
 			for _, tp := range dataTypes {
 				fmt.Println(tp, name, StringStorageReq(tp, name))
 			}

@@ -31,11 +31,11 @@ func TestRewrite(t *testing.T) {
 	testSQL := []map[string]string{
 		{
 			"input":  `SELECT * FROM film`,
-			"output": `select film.film_id, film.title, film.description, film.release_year, film.language_id, film.original_language_id, film.rental_duration from film;`,
+			"output": `select film_id, title, description, release_year, language_id, original_language_id, rental_duration from film;`,
 		},
 		{
 			"input":  `SELECT film.*, actor.actor_id FROM film,actor`,
-			"output": `select film.film_id, film.title, film.description, film.release_year, film.language_id, film.original_language_id, film.rental_duration, actor.actor_id from film, actor;`,
+			"output": `select film_id, title, description, release_year, language_id, original_language_id, rental_duration, actor.actor_id from film, actor;`,
 		},
 		{
 			"input":  `insert into film values(1,2,3,4,5)`,
@@ -390,11 +390,11 @@ func TestRewriteIntWidth(t *testing.T) {
 	testSQL := []map[string]string{
 		{
 			"input":  "CREATE TABLE t1(id bigint(10) NOT NULL AUTO_INCREMENT) ENGINE=InnoDB AUTO_INCREMENT=123802;",
-			"output": "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB auto_increment=123802",
+			"output": "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB AUTO_INCREMENT=123802",
 		},
 		{
 			"input":  "CREATE TABLE t1(id bigint NOT NULL AUTO_INCREMENT) ENGINE=InnoDB AUTO_INCREMENT=123802;",
-			"output": "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB auto_increment=123802",
+			"output": "create table t1 (\n\tid bigint(20) not null auto_increment\n) ENGINE=InnoDB AUTO_INCREMENT=123802",
 		},
 		{
 			"input":  "create table t1(id int(20) not null auto_increment) ENGINE=InnoDB;",
