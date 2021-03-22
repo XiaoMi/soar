@@ -189,10 +189,13 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 		common.Log.Debug("(db *Connector) ColumnCardinality() No table status: %s", tb)
 		return 1
 	}
-	rowTotal := tbStatus.Rows[0].Rows
-	if rowTotal == 0 {
+	rowTotal, err := strconv.ParseUint(string(tbStatus.Rows[0].Rows), 10, 64)
+	if rowTotal == 0 || err != nil {
 		if common.Config.Sampling {
 			common.Log.Debug("ColumnCardinality, %s rowTotal == 0", tb)
+		}
+		if err != nil {
+			common.Log.Error("ColumnCardinality, Error:", err.Error())
 		}
 		return 1
 	}

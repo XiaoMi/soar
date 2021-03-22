@@ -19,6 +19,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -74,9 +75,12 @@ func (db *Connector) SamplingData(onlineConn *Connector, tables ...string) error
 				return nil
 			}
 
-			tableRows := tableStatus.Rows[0].Rows
-			if tableRows == 0 {
+			tableRows, err := strconv.ParseUint(string(tableStatus.Rows[0].Rows), 10, 64)
+			if tableRows == 0 || err != nil {
 				common.Log.Info("SamplingData, Table %s with no data, stop sampling", table)
+				if err != nil {
+					common.Log.Error("SamplingData, Error: ", err.Error())
+				}
 				return nil
 			}
 
