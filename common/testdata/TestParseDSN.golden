@@ -438,7 +438,7 @@ root:pw@unix(/tmp/mysql.sock)/myDatabase?loc=Local
     Disable:              false,
     Version:              99999,
 }
-user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
+user:password@tcp(localhost:5555)/dbname?tls=skip-verify
 &common.Dsn{
     User:                 "user",
     Password:             "password",
@@ -449,6 +449,28 @@ user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
     Collation:            "utf8_general_ci",
     Loc:                  "UTC",
     TLS:                  "skip-verify",
+    ServerPubKey:         "",
+    MaxAllowedPacket:     4194304,
+    Params:               {},
+    Timeout:              "0s",
+    ReadTimeout:          "0s",
+    WriteTimeout:         "0s",
+    AllowNativePasswords: true,
+    AllowOldPasswords:    false,
+    Disable:              false,
+    Version:              99999,
+}
+user:password@tcp(localhost:5555)/dbname?autocommit=true
+&common.Dsn{
+    User:                 "user",
+    Password:             "password",
+    Net:                  "tcp",
+    Addr:                 "localhost:5555",
+    Schema:               "dbname",
+    Charset:              "utf8",
+    Collation:            "utf8_general_ci",
+    Loc:                  "UTC",
+    TLS:                  "",
     ServerPubKey:         "",
     MaxAllowedPacket:     4194304,
     Params:               {"autocommit":"true"},
@@ -482,7 +504,29 @@ user:password@/dbname?sql_mode=TRADITIONAL
     Disable:              false,
     Version:              99999,
 }
-user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s&collation=utf8mb4_unicode_ci
+user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s
+&common.Dsn{
+    User:                 "user",
+    Password:             "password",
+    Net:                  "tcp",
+    Addr:                 "[de:ad:be:ef::ca:fe]:80",
+    Schema:               "dbname",
+    Charset:              "utf8",
+    Collation:            "utf8_general_ci",
+    Loc:                  "UTC",
+    TLS:                  "",
+    ServerPubKey:         "",
+    MaxAllowedPacket:     4194304,
+    Params:               {},
+    Timeout:              "1m30s",
+    ReadTimeout:          "0s",
+    WriteTimeout:         "0s",
+    AllowNativePasswords: true,
+    AllowOldPasswords:    false,
+    Disable:              false,
+    Version:              99999,
+}
+user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?collation=utf8mb4_unicode_ci
 &common.Dsn{
     User:                 "user",
     Password:             "password",
@@ -496,7 +540,7 @@ user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s&collation=utf8mb4_
     ServerPubKey:         "",
     MaxAllowedPacket:     4194304,
     Params:               {},
-    Timeout:              "1m30s",
+    Timeout:              "0s",
     ReadTimeout:          "0s",
     WriteTimeout:         "0s",
     AllowNativePasswords: true,
@@ -570,20 +614,20 @@ user@cloudsql(project-id:regionname:instance-name)/dbname
     Disable:              false,
     Version:              99999,
 }
-user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped
+user:password@tcp/dbname?sys_var=esc%40ped
 &common.Dsn{
     User:                 "user",
     Password:             "password",
     Net:                  "tcp",
     Addr:                 "127.0.0.1:3306",
     Schema:               "dbname",
-    Charset:              "utf8mb4,utf8",
+    Charset:              "utf8",
     Collation:            "utf8_general_ci",
     Loc:                  "UTC",
     TLS:                  "",
     ServerPubKey:         "",
     MaxAllowedPacket:     4194304,
-    Params:               {"charset":"utf8mb4,utf8", "sys_var":"esc@ped"},
+    Params:               {"sys_var":"esc@ped"},
     Timeout:              "0s",
     ReadTimeout:          "0s",
     WriteTimeout:         "0s",
@@ -636,7 +680,7 @@ user:password@/
     Disable:              false,
     Version:              99999,
 }
-user:password@tcp(localhost:3307)/database?charset=utf8&timeout=5s
+user:password@tcp(localhost:3307)/database?timeout=5s
 &common.Dsn{
     User:                 "user",
     Password:             "password",
@@ -649,7 +693,7 @@ user:password@tcp(localhost:3307)/database?charset=utf8&timeout=5s
     TLS:                  "",
     ServerPubKey:         "",
     MaxAllowedPacket:     4194304,
-    Params:               {"charset":"utf8"},
+    Params:               {},
     Timeout:              "5s",
     ReadTimeout:          "0s",
     WriteTimeout:         "0s",

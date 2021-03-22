@@ -38,16 +38,15 @@ func TestShowTableStatus(t *testing.T) {
 	}
 	pretty.Println(ts)
 
-	// FIXME: too much column NULL ABLE
-	//connTest.Database = "sakila"
-	//ts, err = connTest.ShowTableStatus("actor_info")
-	//if err != nil {
-	//	t.Error("ShowTableStatus Error: ", err)
-	//}
-	//if string(ts.Rows[0].Comment) != "VIEW" {
-	//	t.Error("actor_info should be VIEW", ts.Rows[0].Comment)
-	//}
-	//pretty.Println(ts)
+	connTest.Database = "sakila"
+	ts, err = connTest.ShowTableStatus("actor_info")
+	if err != nil {
+		t.Error("ShowTableStatus Error: ", err)
+	}
+	if string(ts.Rows[0].Comment) != "VIEW" {
+		t.Error("actor_info should be VIEW", ts.Rows[0].Comment)
+	}
+	pretty.Println(ts)
 	connTest.Database = orgDatabase
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

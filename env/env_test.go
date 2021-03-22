@@ -259,14 +259,13 @@ func TestCreateTable(t *testing.T) {
 		"rental",
 		"staff",
 		"store",
-		// FIXME: SUPPORT VIEW
-		//"staff_list",
-		//"customer_list",
-		//"actor_info",
-		//"sales_by_film_category",
-		//"sales_by_store",
-		//"nicer_but_slower_film_list",
-		//"film_list",
+		"staff_list",
+		"customer_list",
+		"actor_info",
+		"sales_by_film_category",
+		"sales_by_store",
+		"nicer_but_slower_film_list",
+		"film_list",
 	}
 	for _, table := range tables {
 		err := vEnv.createTable(rEnv, table)
