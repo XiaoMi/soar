@@ -90,18 +90,20 @@ func TestParseDSN(t *testing.T) {
 		// go-sql-driver dsn
 		"user@unix(/path/to/socket)/dbname",
 		"root:pw@unix(/tmp/mysql.sock)/myDatabase?loc=Local",
-		"user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true",
+		"user:password@tcp(localhost:5555)/dbname?tls=skip-verify",
+		"user:password@tcp(localhost:5555)/dbname?autocommit=true",
 		"user:password@/dbname?sql_mode=TRADITIONAL",
-		"user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s&collation=utf8mb4_unicode_ci",
+		"user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?timeout=90s",
+		"user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname?collation=utf8mb4_unicode_ci",
 		"id:password@tcp(your-amazonaws-uri.com:3306)/dbname",
 		"user@cloudsql(project-id:instance-name)/dbname",
 		"user@cloudsql(project-id:regionname:instance-name)/dbname",
-		"user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped",
+		//"user:password@tcp/dbname?charset=utf8mb4,utf8&sys_var=esc%40ped", multi key in map, pretty print in random order, by pass
+		"user:password@tcp/dbname?sys_var=esc%40ped",
 		"user:password@/dbname",
 		"user:password@/",
-		"user:password@tcp(localhost:3307)/database?charset=utf8&timeout=5s",
+		"user:password@tcp(localhost:3307)/database?timeout=5s",
 	}
-
 	err := GoldenDiff(func() {
 		for _, dsn := range dsns {
 			pretty.Println(dsn)
