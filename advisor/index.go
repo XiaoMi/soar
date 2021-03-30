@@ -1132,6 +1132,10 @@ func DuplicateKeyChecker(conn *database.Connector, databases ...string) map[stri
 			for k1, cl1 := range idxMap {
 				for k2, cl2 := range idxMap {
 					if k1 != k2 && common.IsColsPart(cl1, cl2) {
+						//如果存在覆盖,但是被覆盖的是主键索引不进行删除操作,主键索引是不能被删除的
+						if k1 == "PRIMARY" || k2 == "PRIMARY" {
+							continue
+						}
 						hasDup = true
 						col1Str := common.JoinColumnsName(cl1, ", ")
 						col2Str := common.JoinColumnsName(cl2, ", ")
