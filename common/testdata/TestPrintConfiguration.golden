@@ -5,7 +5,7 @@ online-dsn:
   addr: 127.0.0.1:3306
   schema: sakila
   charset: utf8
-  collation: utf8_general_ci
+  collation: utf8mb4_general_ci
   loc: UTC
   tls: ""
   server-public-key: ""
@@ -25,7 +25,7 @@ test-dsn:
   addr: 127.0.0.1:3306
   schema: sakila
   charset: utf8
-  collation: utf8_general_ci
+  collation: utf8mb4_general_ci
   loc: UTC
   tls: ""
   server-public-key: ""
