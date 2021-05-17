@@ -261,7 +261,8 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 				common.Log.Debug("DataType: `%s`.`%s` (%s) VS `%s`.`%s` (%s)",
 					colList[0].Table, colList[0].Name, type1,
 					colList[1].Table, colList[1].Name, type2)
-				if strings.ToLower(type1) != strings.ToLower(type2) {
+				// case-insensitive check type1, type2
+				if !strings.EqualFold(type1, type2) {
 					content = append(content, fmt.Sprintf("`%s`.`%s` (%s) VS `%s`.`%s` (%s) datatype not match",
 						colList[0].Table, colList[0].Name, type1,
 						colList[1].Table, colList[1].Name, type2))
@@ -296,6 +297,8 @@ func (idxAdv *IndexAdvisor) RuleImplicitConversion() Rule {
 				sqlparser.StrVal: {
 					"char", "varchar", "tinytext", "text", "mediumtext", "longtext",
 					"date", "time", "datetime", "timestamp", "year",
+					"tinyint", "smallint", "mediumint", "int", "integer", "bigint",
+					"float", "double", "real", "decimal",
 				},
 				sqlparser.IntVal: {
 					"tinyint", "smallint", "mediumint", "int", "integer", "bigint",

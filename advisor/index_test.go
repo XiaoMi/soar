@@ -83,6 +83,7 @@ func TestRuleImplicitConversion(t *testing.T) {
 	}
 
 	sqls := [][]string{
+		// ARG.003
 		{
 			"SELECT * FROM t1 WHERE title >= 60;",
 			"SELECT * FROM t1, t2 WHERE t1.title = t2.title;",
@@ -90,11 +91,13 @@ func TestRuleImplicitConversion(t *testing.T) {
 			"SELECT * FROM t1 WHERE title in (60, '60');",
 			"SELECT * FROM t1 WHERE title in (60);",
 			"SELECT * FROM t1 WHERE title in (60, 60);",
-			"SELECT * FROM t4 WHERE col = '1'",
+			"SELECT * FROM t1 WHERE title = 1",
 		},
+		// OK
 		{
-			// https://github.com/XiaoMi/soar/issues/151
-			"SELECT * FROM t4 WHERE col = 1",
+			"SELECT * FROM t1 WHERE id = '1'", // string -> int can use index
+			"SELECT * FROM t1 WHERE id = 1",
+			"SELECT * FROM t4 WHERE col = 1", // https://github.com/XiaoMi/soar/issues/151
 			"SELECT * FROM sakila.film WHERE rental_rate > 1",
 		},
 	}
@@ -114,7 +117,7 @@ func TestRuleImplicitConversion(t *testing.T) {
 		if idxAdvisor != nil {
 			rule := idxAdvisor.RuleImplicitConversion()
 			if rule.Item != "ARG.003" {
-				t.Error("Rule not match:", rule, "Expect : ARG.003, SQL:", sql)
+				t.Error("Rule not match:", rule.Item, "Expect : ARG.003, SQL:", sql)
 			}
 		}
 	}
@@ -134,7 +137,7 @@ func TestRuleImplicitConversion(t *testing.T) {
 		if idxAdvisor != nil {
 			rule := idxAdvisor.RuleImplicitConversion()
 			if rule.Item != "OK" {
-				t.Error("Rule not match:", rule, "Expect : OK, SQL:", sql)
+				t.Error("Rule not match:", rule.Item, "Expect : OK, SQL:", sql)
 			}
 		}
 	}
