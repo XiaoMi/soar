@@ -156,6 +156,9 @@ func TestRuleEqualLike(t *testing.T) {
 func TestTimeFormatError(t *testing.T) {
 	rightTimes := []string{
 		`2020-01-01`,
+		`2020-01-01 23:59:59`,
+		`2020-01-01 23:59:59.0`,   // 0ms
+		`2020-01-01 23:59:59.123`, // 123ms
 	}
 	for _, rt := range rightTimes {
 		if !timeFormatCheck(rt) {

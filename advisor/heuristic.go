@@ -376,7 +376,7 @@ func timeFormatCheck(t string) bool {
 	// 不允许为空，但允许时间前后有空格
 	t = strings.TrimSpace(t)
 	// 仅允许 数字、减号、冒号、空格
-	allowChars := regexp.MustCompile(`^[\-0-9: ]+$`)
+	allowChars := regexp.MustCompile(`^[\-0-9:. ]+$`)
 	return allowChars.MatchString(t)
 }
 
