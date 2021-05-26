@@ -1516,6 +1516,10 @@ func formatJSON(sql string, db string, suggest map[string]Rule) string {
 			common.Log.Error("formatJSON strconv.Atoi error: %s, item: %s, serverity: %s", err.Error(), item, suggest[item].Severity)
 		}
 		score = score - l*5
+		// ## MySQL execute failed
+		if strings.HasPrefix(item, "ERR") {
+			score = 0
+		}
 	}
 	if score < 0 {
 		score = 0
