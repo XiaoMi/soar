@@ -1517,7 +1517,7 @@ func formatJSON(sql string, db string, suggest map[string]Rule) string {
 		}
 		score = score - l*5
 		// ## MySQL execute failed
-		if strings.HasPrefix(item, "ERR") {
+		if strings.HasPrefix(item, "ERR") && suggest[item].Content != "" {
 			score = 0
 		}
 	}
