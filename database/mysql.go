@@ -183,9 +183,13 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 		return 0
 	}
 
-	// 如果是视图或表中无数据，rowTotal 都为0
-	// 视图不需要加索引，无数据相当于散粒度为1
+	// 如果是视图或表中无数据，rowTotal 都为 0
+	// 视图不需要加索引，无数据相当于散粒度为 1
 	if len(tbStatus.Rows) == 0 {
+		common.Log.Debug("(db *Connector) ColumnCardinality() No table status: %s", tb)
+		return 1
+	}
+	if tbStatus.Rows[0].Rows == nil {
 		common.Log.Debug("(db *Connector) ColumnCardinality() No table status: %s", tb)
 		return 1
 	}
@@ -195,7 +199,7 @@ func (db *Connector) ColumnCardinality(tb, col string) float64 {
 			common.Log.Debug("ColumnCardinality, %s rowTotal == 0", tb)
 		}
 		if err != nil {
-			common.Log.Error("ColumnCardinality, Error:", err.Error())
+			common.Log.Error("ColumnCardinality, ParseUint: " + string(tbStatus.Rows[0].Rows) + " Error: " + err.Error())
 		}
 		return 1
 	}
@@ -244,8 +248,55 @@ func (db *Connector) IsView(tbName string) bool {
 	}
 
 	if len(tbStatus.Rows) > 0 {
-		if string(tbStatus.Rows[0].Comment) != "TABLE" {
+		/*
+				// mysql 8.0.23
+			mysql> show table status like "actor_info"\G
+			*************************** 1. row ***************************
+			           Name: actor_info
+			         Engine: NULL
+			        Version: NULL
+			     Row_format: NULL
+			           Rows: NULL
+			 Avg_row_length: NULL
+			    Data_length: NULL
+			Max_data_length: NULL
+			   Index_length: NULL
+			      Data_free: NULL
+			 Auto_increment: NULL
+			    Create_time: 2021-06-01 10:56:47
+			    Update_time: NULL
+			     Check_time: NULL
+			      Collation: NULL
+			       Checksum: NULL
+			 Create_options: NULL
+			        Comment: VIEW
+
+					mysql> show table status like "film"\G
+					*************************** 1. row ***************************
+					Name: film
+					Engine: InnoDB
+					Version: 10
+					Row_format: Dynamic
+					Rows: 1000
+					Avg_row_length: 196
+					Data_length: 196608
+					Max_data_length: 0
+					Index_length: 81920
+					Data_free: 0
+					Auto_increment: 1001
+					Create_time: 2021-06-01 10:56:47
+					Update_time: NULL
+					Check_time: NULL
+					Collation: utf8_general_ci
+					Checksum: NULL
+					Create_options:
+					Comment:
+		*/
+		if string(tbStatus.Rows[0].Comment) == "VIEW" {
 			return true
+		}
+		if string(tbStatus.Rows[0].Comment) == "TABLE" {
+			return false
 		}
 	}
 

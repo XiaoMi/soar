@@ -2,10 +2,9 @@
     &ast.SelectStmt{
         dmlNode: ast.dmlNode{
             stmtNode: ast.stmtNode{
-                node: ast.node{text:"select 1"},
+                node: ast.node{text:"select 1", offset:0},
             },
         },
-        resultSetNode:  ast.resultSetNode{},
         SelectStmtOpts: &ast.SelectStmtOpts{
             Distinct:        false,
             SQLBigResult:    false,
@@ -16,6 +15,7 @@
             StraightJoin:    false,
             Priority:        0,
             TableHints:      nil,
+            ExplicitAll:     false,
         },
         Distinct: false,
         From:     (*ast.TableRefsClause)(nil),
@@ -24,12 +24,12 @@
             node:   ast.node{},
             Fields: {
                 &ast.SelectField{
-                    node:     ast.node{text:"1"},
+                    node:     ast.node{text:"1", offset:0},
                     Offset:   7,
                     WildCard: (*ast.WildCardField)(nil),
                     Expr:     &driver.ValueExpr{
                         TexprNode: ast.exprNode{
-                            node: ast.node{},
+                            node: ast.node{text:"", offset:7},
                             Type: types.FieldType{
                                 Tp:      0x8,
                                 Flag:    0x80,
@@ -43,10 +43,10 @@
                         },
                         Datum: types.Datum{
                             k:         0x1,
-                            collation: "",
                             decimal:   0x0,
                             length:    0x0,
                             i:         1,
+                            collation: "",
                             b:         nil,
                             x:         nil,
                         },
@@ -57,16 +57,20 @@
                 },
             },
         },
-        GroupBy:              (*ast.GroupByClause)(nil),
-        Having:               (*ast.HavingClause)(nil),
-        WindowSpecs:          nil,
-        OrderBy:              (*ast.OrderByClause)(nil),
-        Limit:                (*ast.Limit)(nil),
-        LockTp:               0,
-        TableHints:           nil,
-        IsAfterUnionDistinct: false,
-        IsInBraces:           false,
-        QueryBlockOffset:     0,
-        SelectIntoOpt:        (*ast.SelectIntoOption)(nil),
+        GroupBy:          (*ast.GroupByClause)(nil),
+        Having:           (*ast.HavingClause)(nil),
+        WindowSpecs:      nil,
+        OrderBy:          (*ast.OrderByClause)(nil),
+        Limit:            (*ast.Limit)(nil),
+        LockInfo:         (*ast.SelectLockInfo)(nil),
+        TableHints:       nil,
+        IsInBraces:       false,
+        WithBeforeBraces: false,
+        QueryBlockOffset: 0,
+        SelectIntoOpt:    (*ast.SelectIntoOption)(nil),
+        AfterSetOperator: (*ast.SetOprType)(nil),
+        Kind:             0x0,
+        Lists:            nil,
+        With:             (*ast.WithClause)(nil),
     },
 }

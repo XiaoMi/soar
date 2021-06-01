@@ -126,7 +126,8 @@ func SchemaMetaInfo(sql string, defaultDatabase string) []string {
 		switch n := node.(type) {
 		case *ast.UseStmt:
 			tables = append(tables, fmt.Sprintf("`%s`.`dual`", n.DBName))
-		case *ast.InsertStmt, *ast.SelectStmt, *ast.UnionStmt, *ast.UpdateStmt, *ast.DeleteStmt:
+		// SetOprStmt represents "union/except/intersect statement"
+		case *ast.InsertStmt, *ast.SelectStmt, *ast.SetOprStmt, *ast.UpdateStmt, *ast.DeleteStmt:
 			// DML/DQL: INSERT, SELECT, UPDATE, DELETE
 			for _, tableRef := range common.JSONFind(jsonString, "TableRefs") {
 				for _, source := range common.JSONFind(tableRef, "Source") {

@@ -1752,11 +1752,24 @@ func (q *Query4Audit) RuleUNIONLimit() Rule {
 	var rule = q.RuleOK()
 	for _, tiStmtNode := range q.TiStmt {
 		switch stmt := tiStmtNode.(type) {
-		case *tidb.UnionStmt:
+		// SetOprStmt represents "union/except/intersect statement"
+		case *tidb.SetOprStmt:
 			if stmt.Limit != nil {
 				for _, sel := range stmt.SelectList.Selects {
-					if sel.Limit == nil {
-						rule = HeuristicRules["SUB.007"]
+					switch n := sel.(type) {
+					case *tidb.SelectStmt:
+						if n.Limit == nil {
+							rule = HeuristicRules["SUB.007"]
+						}
+					case *tidb.SetOprSelectList:
+						for _, s := range n.Selects {
+							switch s1 := s.(type) {
+							case *tidb.SelectStmt:
+								if s1.Limit == nil {
+									rule = HeuristicRules["SUB.007"]
+								}
+							}
+						}
 					}
 				}
 			}
@@ -1840,7 +1853,7 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 						continue
 					}
 					switch col.Tp.Tp {
-					case mysql.TypeFloat, mysql.TypeDouble, mysql.TypeDecimal, mysql.TypeNewDecimal:
+					case mysql.TypeFloat, mysql.TypeDouble, mysql.TypeNewDecimal:
 						rule = HeuristicRules["COL.009"]
 					}
 				}
@@ -1855,8 +1868,7 @@ func (q *Query4Audit) RuleImpreciseDataType() Rule {
 								continue
 							}
 							switch col.Tp.Tp {
-							case mysql.TypeFloat, mysql.TypeDouble,
-								mysql.TypeDecimal, mysql.TypeNewDecimal:
+							case mysql.TypeFloat, mysql.TypeDouble, mysql.TypeNewDecimal:
 								rule = HeuristicRules["COL.009"]
 							}
 						}
@@ -3152,7 +3164,9 @@ func (q *Query4Audit) RuleTimestampDefault() Rule {
 										hasDefault = true
 										if err := option.Restore(ctx); err == nil {
 											if strings.HasPrefix(strings.ToLower(sb.String()), `default '0`) ||
-												strings.HasPrefix(strings.ToLower(sb.String()), `default 0`) {
+												strings.HasPrefix(strings.ToLower(sb.String()), `default 0`) ||
+												strings.HasPrefix(strings.ToLower(sb.String()), `default _utf8mb4'0`) ||
+												strings.HasPrefix(strings.ToLower(sb.String()), `default _utf8'0`) {
 												hasDefault = false
 											}
 										}

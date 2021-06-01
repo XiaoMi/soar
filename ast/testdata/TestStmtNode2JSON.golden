@@ -1,7 +1,7 @@
 [
   {
     "text": "select 1",
-    "resultFields": null,
+    "offset": 0,
     "SQLBigResult": false,
     "SQLBufferResult": false,
     "SQLCache": true,
@@ -9,18 +9,22 @@
     "CalcFoundRows": false,
     "StraightJoin": false,
     "Priority": 0,
+    "ExplicitAll": false,
     "Distinct": false,
     "From": null,
     "Where": null,
     "Fields": {
       "text": "",
+      "offset": 0,
       "Fields": [
         {
           "text": "1",
+          "offset": 0,
           "Offset": 7,
           "WildCard": null,
           "Expr": {
             "text": "",
+            "offset": 7,
             "Type": {
               "Tp": 8,
               "Flag": 128,
@@ -32,10 +36,10 @@
             },
             "flag": 0,
             "k": 1,
-            "collation": "",
             "decimal": 0,
             "length": 0,
             "i": 1,
+            "collation": "",
             "b": null,
             "x": null,
             "projectionOffset": -1
@@ -53,12 +57,16 @@
     "WindowSpecs": null,
     "OrderBy": null,
     "Limit": null,
-    "LockTp": 0,
+    "LockInfo": null,
     "TableHints": null,
-    "IsAfterUnionDistinct": false,
     "IsInBraces": false,
+    "WithBeforeBraces": false,
     "QueryBlockOffset": 0,
-    "SelectIntoOpt": null
+    "SelectIntoOpt": null,
+    "AfterSetOperator": null,
+    "Kind": 0,
+    "Lists": null,
+    "With": null
   }
 ]
 

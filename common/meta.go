@@ -205,6 +205,13 @@ func ColumnSort(colList []*Column) []*Column {
 
 // GetDataTypeBase 获取dataType中的数据类型，忽略长度
 func GetDataTypeBase(dataType string) string {
+	dataType = strings.TrimSpace(dataType)
+	if dataType == "" {
+		return dataType
+	}
+	// smallint unsigned, remove unsigned
+	dataType = strings.Fields(dataType)[0]
+	// int(10), remote (10)
 	if i := strings.Index(dataType, "("); i > 0 {
 		return dataType[0:i]
 	}
@@ -256,7 +263,7 @@ func (col *Column) GetDataBytes(dbVersion int) int {
 	case "tinyint", "smallint", "mediumint",
 		"int", "integer", "bigint",
 		"double", "real", "float", "decimal",
-		"numeric", "bit":
+		"numeric", "bit", "smallint unsigned":
 		// numeric
 		return numericStorageReq(col.DataType)
 

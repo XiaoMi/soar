@@ -103,7 +103,7 @@ load test_helper
 # 14. soar -help 检查
 @test "Check soar help" {
   run ${SOAR_BIN} -help
-  [ $status -eq 2 ]
+  [ $status -eq 0 ]
   [ "${#lines[@]}" -gt 30 ]
 }
 

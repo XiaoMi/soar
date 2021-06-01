@@ -4082,7 +4082,7 @@ FROM
 
 # Query: E48A20D0413512DA
 
-★ ☆ ☆ ☆ ☆ 30分
+★ ★ ☆ ☆ ☆ 40分
 
 ```sql
 
@@ -4112,7 +4112,7 @@ ORDER BY
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1  | PRIMARY | *country* | NULL | index | PRIMARY | PRIMARY | 2 | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | Using index; Using temporary; Using filesort |
 | 1  | PRIMARY | *city* | NULL | ref | PRIMARY,<br>idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.country.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
-| 1  | PRIMARY | *c* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | n% | ☠️ **O(n)** | Using where; Using join buffer (Block Nested Loop) |
+| 1  | PRIMARY | *c* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | n% | ☠️ **O(n)** | Using where; Using join buffer (hash join) |
 | 1  | PRIMARY | *a* | NULL | ref | PRIMARY,<br>idx\_fk\_city\_id | idx\_fk\_city\_id | 2 | sakila.city.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 | 1  | PRIMARY | *cu* | NULL | ref | idx\_fk\_address\_id | idx\_fk\_address\_id | 2 | sakila.a.address\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 | 1  | PRIMARY | *<derived2>* | NULL | ref | <auto\_key0> | <auto\_key0> | 152 | sakila.a.address | 6 | ☠️ **100.00%** | O(log n) | Using index |
@@ -4163,18 +4163,6 @@ ORDER BY
 * **Content:**  为列city添加索引，散粒度为: n%; 
 
 * **Case:** ALTER TABLE \`sakila\`.\`city\` add index \`idx\_city\` (\`city\`) ;
-
-
-
-##  为sakila库的customer\_list表添加索引
-
-* **Item:**  IDX.002
-
-* **Severity:**  L2
-
-* **Content:**  为列city添加索引，散粒度为: n%; 为列address添加索引，散粒度为: n%; 为列SID添加索引，散粒度为: n%; 为列phone添加索引，散粒度为: n%; 
-
-* **Case:** ALTER TABLE \`sakila\`.\`customer\_list\` add index \`idx\_city\` (\`city\`), add index \`idx\_address\` (\`address\`), add index \`idx\_SID\_phone\` (\`SID\`,\`phone\`) ;
 
 
 

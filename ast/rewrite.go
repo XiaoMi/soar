@@ -1723,8 +1723,8 @@ func MergeAlterTables(sqls ...string) map[string]string {
 				alterSQL = fmt.Sprint("ADD INDEX", " "+idxName+" ", buf)
 			case *ast.RenameTableStmt:
 				// 注意: 表名和库名不区分大小写
-				tableName = n.OldTable.Name.L
-				dbName = n.OldTable.Schema.L
+				tableName = n.TableToTables[0].OldTable.Name.L
+				dbName = n.TableToTables[0].OldTable.Schema.L
 				if alterExp.MatchString(sql) {
 					common.Log.Debug("rename alterExp: ALTER %v %v", tableName, alterExp.ReplaceAllString(sql, ""))
 					alterSQL = fmt.Sprint(alterExp.ReplaceAllString(sql, ""))

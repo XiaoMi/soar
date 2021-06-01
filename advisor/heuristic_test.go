@@ -2430,6 +2430,7 @@ func TestRuleUNIONLimit(t *testing.T) {
 		},
 		{
 			`(SELECT * FROM tb1 ORDER BY name LIMIT 20) UNION ALL (SELECT * FROM tb2 ORDER BY name LIMIT 20) LIMIT 20;`,
+			`SELECT * FROM tb1 ORDER BY name LIMIT 20`,
 		},
 	}
 	for _, sql := range sqls[0] {
@@ -2437,7 +2438,7 @@ func TestRuleUNIONLimit(t *testing.T) {
 		if err == nil {
 			rule := q.RuleUNIONLimit()
 			if rule.Item != "SUB.007" {
-				t.Error("Rule not match:", rule.Item, "Expect : SUB.007")
+				t.Error("Rule not match:", rule.Item, "Expect : SUB.007", sql)
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)
@@ -3094,6 +3095,7 @@ func TestRuleTimestampDefault(t *testing.T) {
 			"CREATE TABLE tbl( `id` bigint not null, `create_time` timestamp) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 			"ALTER TABLE t1 MODIFY b timestamp NOT NULL;",
 			`ALTER TABLE t1 ADD c_time timestamp NOT NULL default "0000-00-00"`,
+			`ALTER TABLE t1 ADD c_time timestamp NOT NULL default '0'`,
 			`ALTER TABLE t1 ADD c_time timestamp NOT NULL default 0`,
 			`ALTER TABLE t1 ADD c_time datetime NOT NULL default 0`,
 		},
@@ -3107,7 +3109,7 @@ func TestRuleTimestampDefault(t *testing.T) {
 		if err == nil {
 			rule := q.RuleTimestampDefault()
 			if rule.Item != "COL.013" {
-				t.Error("Rule not match:", rule.Item, "Expect : COL.013")
+				t.Error("Rule not match:", rule.Item, "Expect : COL.013", sql)
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)

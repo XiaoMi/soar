@@ -203,6 +203,10 @@ func TestIsView(t *testing.T) {
 	if !connTest.IsView("actor_info") {
 		t.Error("actor_info should be a VIEW")
 	}
+
+	if connTest.IsView("film") {
+		t.Error("film should be a TABLE")
+	}
 	connTest.Database = originalDatabase
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }

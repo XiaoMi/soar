@@ -15,7 +15,7 @@ require (
 	github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813
 	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab // indirect
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/golang/snappy v0.0.1 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
@@ -25,7 +25,9 @@ require (
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/hashicorp/serf v0.9.2 // indirect
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c // indirect
+	github.com/jeremywohl/flatten v0.0.0-20190921043622-d936035e55cf // indirect
 	github.com/klauspost/pgzip v1.2.4 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/kr/pretty v0.2.1
 	github.com/looplab/fsm v0.2.0 // indirect
 	github.com/martini-contrib/auth v0.0.0-20150219114609-fa62c19b7ae8 // indirect
@@ -39,19 +41,26 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/percona/go-mysql v0.0.0-20210427141028-73d29c6da78c
-	github.com/pingcap/parser v0.0.0-20200325032611-b7d1e7e1b93d
-	github.com/pingcap/tidb v1.1.0-beta.0.20200325081839-4a7d477399f4
-	github.com/pingcap/tipb v0.0.0-20210425040103-dc47a87b52aa // indirect
+	github.com/pingcap/log v0.0.0-20210317133921-96f4fcab92a4 // indirect
+	github.com/pingcap/parser v0.0.0-20210525032559-c37778aff307
+	github.com/pingcap/pd/v4 v4.0.0-beta.1.0.20200305072537-61d9f9cc35d3 // indirect
+	github.com/pingcap/tidb v1.1.0-beta.0.20210601085537-5d7c852770eb
+	github.com/pingcap/tipb v0.0.0-20210601083426-79a378b6d1c4 // indirect
 	github.com/planetscale/pargzip v0.0.0-20201116224723-90c7fc03ea8a // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/russross/blackfriday v1.6.0
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/samuel/go-zookeeper v0.0.0-20200724154423-2164a8ac840e // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/sjmudd/stopwatch v0.0.0-20170613150411-f380bf8a9be1 // indirect
 	github.com/spf13/cobra v1.1.1 // indirect
 	github.com/spyzhov/ajson v0.4.2 // indirect
 	github.com/tidwall/gjson v1.7.5
-	golang.org/x/tools v0.0.0-20201202200335-bef1c476418a // indirect
+	go.uber.org/multierr v1.7.0 // indirect
+	go.uber.org/zap v1.17.0 // indirect
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/sys v0.0.0-20210601080250-7ecdf8ef093b // indirect
+	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/gcfg.v1 v1.2.3 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0
