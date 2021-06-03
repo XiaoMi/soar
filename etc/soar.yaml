@@ -15,6 +15,10 @@ test-dsn:
 
 # 高危，仅测试时使用，线上环境禁止配置为 true
 allow-online-as-test: true
+column-not-allow-type:
+- json
+- text
+- boolean
 
 log-level:  7
 log-output: soar.log

@@ -60,6 +60,10 @@ func initConfig() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+
+	// 更新 HeuristicRules 中与配置相关的文字
+	advisor.InitHeuristicRules()
+
 	common.LogIfWarn(err, "")
 }
 

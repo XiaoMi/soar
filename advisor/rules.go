@@ -111,6 +111,11 @@ type Rule struct {
 var HeuristicRules map[string]Rule
 
 func init() {
+	InitHeuristicRules()
+}
+
+// InitHeuristicRules ...
+func InitHeuristicRules() {
 	HeuristicRules = map[string]Rule{
 		"OK": {
 			Item:     "OK",
@@ -579,9 +584,9 @@ func init() {
 		},
 		"COL.018": {
 			Item:     "COL.018",
-			Severity: "L1",
+			Severity: "L9",
 			Summary:  "建表语句中使用了不推荐的字段类型",
-			Content:  "以下字段类型不被推荐使用：" + strings.Join(common.Config.ColumnNotAllowType, ","),
+			Content:  "以下字段类型不被推荐使用：" + strings.Join(common.Config.ColumnNotAllowType, ", "),
 			Case:     "CREATE TABLE tab (a BOOLEAN);",
 			Func:     (*Query4Audit).RuleColumnNotAllowType,
 		},

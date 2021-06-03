@@ -545,7 +545,7 @@ CREATE TABLE tab (a varchar(3500));
 ## 建表语句中使用了不推荐的字段类型
 
 * **Item**:COL.018
-* **Severity**:L1
+* **Severity**:L9
 * **Content**:以下字段类型不被推荐使用：boolean
 * **Case**:
 

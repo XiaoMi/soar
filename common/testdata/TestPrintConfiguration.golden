@@ -95,6 +95,8 @@ unique-key-prefix: uk_
 max-subquery-depth: 5
 max-varchar-length: 1024
 column-not-allow-type:
+- json
+- text
 - boolean
 min-cardinality: 0
 explain-sql-report-type: pretty
