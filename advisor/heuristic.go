@@ -962,6 +962,20 @@ func (q *Query4Audit) RuleIPString() Rule {
 // RuleDataNotQuote LIT.002
 func (q *Query4Audit) RuleDataNotQuote() Rule {
 	var rule = q.RuleOK()
+
+	// by pass insert except, insert select
+	switch n := q.Stmt.(type) {
+	case *sqlparser.Insert:
+		var insertSelect bool
+		switch n.Rows.(type) {
+		case *sqlparser.Select:
+			insertSelect = true
+		}
+		if !insertSelect {
+			return rule
+		}
+	}
+
 	// 2010-01-01
 	re := regexp.MustCompile(`.\d{4}\s*-\s*\d{1,2}\s*-\s*\d{1,2}\b`)
 	sqls := re.FindAllString(q.Query, -1)

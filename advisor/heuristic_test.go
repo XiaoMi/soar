@@ -484,16 +484,33 @@ func TestRuleSelectStar(t *testing.T) {
 // COL.002
 func TestRuleInsertColDef(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"insert into tbl values(1,'name')",
-		"replace into tbl values(1,'name')",
+	sqls := [][]string{
+		{
+			"insert into tbl values(1,'name')",
+			"replace into tbl values(1,'name')",
+		},
+		{
+			"insert into tb (col) values ('hello world')",
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleInsertColDef()
 			if rule.Item != "COL.002" {
 				t.Error("Rule not match:", rule.Item, "Expect : COL.002")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleInsertColDef()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)
@@ -634,10 +651,14 @@ func TestRuleDataNotQuote(t *testing.T) {
 		{
 			"select col1,col2 from tbl where time < 2018-01-10",
 			"select col1,col2 from tbl where time < 18-01-10",
+			"INSERT INTO tb1 SELECT * FROM tb2 WHERE time < 2020-01-10",
 		},
 		{
-			// TODO:
-			// "INSERT INTO `pay_order` (`app_pay_obj`) VALUES('timestamp=2019-12-16');",
+			"select col1,col2 from tbl where time < '2018-01-10'",
+			"INSERT INTO `tb` (`col`) VALUES ('timestamp=2019-12-16')",
+			"insert into tb (col) values (' 2020-09-15 ')",
+			"replace into tb (col) values (' 2020-09-15 ')",
+			"INSERT INTO tb1 SELECT * FROM tb2 WHERE time < '2020-01-10'",
 		},
 	}
 	for _, sql := range sqls[0] {
