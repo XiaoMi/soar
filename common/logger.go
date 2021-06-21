@@ -39,18 +39,26 @@ func init() {
 
 // LoggerInit Log配置初始化
 func LoggerInit() {
+	var err error
+
 	Log.SetLevel(Config.LogLevel)
 	func() { _ = Log.DelLogger(logs.AdapterFile) }()
-	logConfig := map[string]interface{}{
-		"filename": Config.LogOutput,
-		"level":    7,
-		"maxlines": 0,
-		"maxsize":  0,
-		"daily":    false,
-		"maxdays":  0,
+
+	if Config.LogOutput == "" {
+		err = Log.SetLogger(logs.AdapterConsole)
+	} else {
+		logConfig := map[string]interface{}{
+			"filename": Config.LogOutput,
+			"level":    7,
+			"maxlines": 0,
+			"maxsize":  0,
+			"daily":    false,
+			"maxdays":  0,
+		}
+		logConfigJSON, _ := json.Marshal(logConfig)
+		err = Log.SetLogger(logs.AdapterFile, string(logConfigJSON))
 	}
-	logConfigJSON, _ := json.Marshal(logConfig)
-	err := Log.SetLogger(logs.AdapterFile, string(logConfigJSON))
+
 	if err != nil {
 		fmt.Println(err.Error())
 	}
