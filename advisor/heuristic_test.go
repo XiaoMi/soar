@@ -132,11 +132,18 @@ func TestRulePrefixLike(t *testing.T) {
 // ARG.002
 func TestRuleEqualLike(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"select col from tbl where id like 'abc'",
-		"select col from tbl where id like 1",
+	sqls := [][]string{
+		{
+			"select col from tbl where id like 'abc'",
+			"select col from tbl where id like 1",
+		},
+		{
+			"select col from tbl where id like 'abc%'",
+			"select col from tbl where id like '%abc'",
+			"select col from tbl where id like 'a%c'", // issue #273
+		},
 	}
-	for _, sql := range sqls {
+	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleEqualLike()
@@ -147,6 +154,19 @@ func TestRuleEqualLike(t *testing.T) {
 			t.Error("sqlparser.Parse Error:", err)
 		}
 	}
+
+	for _, sql := range sqls[1] {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleEqualLike()
+			if rule.Item == "ARG.002" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK")
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 

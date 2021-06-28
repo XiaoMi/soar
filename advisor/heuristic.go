@@ -133,16 +133,17 @@ func (q *Query4Audit) RuleEqualLike() Rule {
 			if strings.ToLower(expr.Operator) == "like" {
 				switch sqlval := expr.Right.(type) {
 				case *sqlparser.SQLVal:
-					// not start with '%', '_' && not end with '%', '_'
+					// 1. string that not contain '%', '_'
+					// 2. int, bit, float without wildcard
+					var hasWildCard bool
 					if sqlval.Type == 0 {
-						if sqlval.Val[0] != 0x25 &&
-							sqlval.Val[0] != 0x5f &&
-							sqlval.Val[len(sqlval.Val)-1] != 0x5f &&
-							sqlval.Val[len(sqlval.Val)-1] != 0x25 {
-							rule = HeuristicRules["ARG.002"]
-							return false, nil
+						for _, sqlElem := range sqlval.Val {
+							if sqlElem == 0x25 || sqlElem == 0x5f {
+								hasWildCard = true
+							}
 						}
-					} else {
+					}
+					if !hasWildCard {
 						rule = HeuristicRules["ARG.002"]
 						return false, nil
 					}
