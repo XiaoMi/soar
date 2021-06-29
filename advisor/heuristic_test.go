@@ -2780,6 +2780,8 @@ func TestRuleAlterCharset(t *testing.T) {
 			// 反面的例子
 			`ALTER TABLE t MODIFY latin1_text_col TEXT CHARACTER SET utf8`,
 			`ALTER TABLE t1 CHANGE c1 c1 TEXT CHARACTER SET utf8;`,
+			//正规写法,不应该写在上面
+			`alter table t1 convert to character set utf8 collate utf8_unicode_ci;`,
 		},
 	}
 	for _, sql := range sqls[0] {
