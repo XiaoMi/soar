@@ -226,6 +226,18 @@ func TestRewriteHaving(t *testing.T) {
 			"input":  `SELECT state, COUNT(*) FROM Drivers WHERE col =1 or col1 =2 GROUP BY state HAVING state IN ('GA', 'TX') ORDER BY state`,
 			"output": "select state, COUNT(*) from Drivers where (col = 1 or col1 = 2) and state in ('GA', 'TX') group by state order by state asc",
 		},
+		{
+			"input":  `SELECT state, COUNT(*) as cnt FROM Drivers WHERE col = 1 or col1 = 2 GROUP BY state HAVING cnt > 1 and state IN ('GA', 'TX') order by state asc`,
+			"output": `select state, COUNT(*) as cnt from Drivers where (col = 1 or col1 = 2) and state in ('GA', 'TX') group by state having cnt > 1 order by state asc`,
+		},
+		{
+			"input":  `SELECT state, COUNT(*) FROM Drivers WHERE col = 1 or col1 = 2 GROUP BY state HAVING COUNT(*) > 1 and state IN ('GA', 'TX') order by state asc`,
+			"output": `select state, COUNT(*) from Drivers where (col = 1 or col1 = 2) and state in ('GA', 'TX') group by state having COUNT(*) > 1 order by state asc`,
+		},
+		{
+			"input":  `SELECT state, (col - 40) as col, COUNT(*) as cnt from Drivers GROUP BY state HAVING col > 1 AND cnt > 1 AND state IN ('GA', 'TX') `,
+			"output": `select state, (col - 40) as col, COUNT(*) as cnt from Drivers where state in ('GA', 'TX') group by state having col > 1 and cnt > 1`,
+		},
 	}
 	for _, sql := range testSQL {
 		rw := NewRewrite(sql["input"]).RewriteHaving()

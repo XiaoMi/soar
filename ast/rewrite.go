@@ -20,10 +20,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/pingcap/parser/ast"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/pingcap/parser/ast"
 
 	"github.com/XiaoMi/soar/common"
 
@@ -811,27 +812,43 @@ func (rw *Rewrite) RewriteInsertColumns() *Rewrite {
 
 // RewriteHaving having: 对应CLA.013，使用 WHERE 过滤条件替代 HAVING
 func (rw *Rewrite) RewriteHaving() *Rewrite {
+	calcExprs := getCalcExprFromSelect(rw.Stmt) // 获取语句中所有计算列
 	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
 		switch n := node.(type) {
 		case *sqlparser.Select:
 			if n.Having != nil {
-				if n.Where == nil {
-					// WHERE 条件为空直接用 HAVING 替代 WHERE 即可
-					n.Where = n.Having
-				} else {
-					// WHERE 条件不为空，需要对已有的条件进行括号保护，然后再 AND+HAVING
-					n.Where = &sqlparser.Where{
-						Expr: &sqlparser.AndExpr{
-							Left: &sqlparser.ParenExpr{
-								Expr: n.Where.Expr,
-							},
-							Right: n.Having.Expr,
-						},
+				// 对 having 子句拆分，判断每一个 having 条件是否是计算列
+				// 当该列为计算列时不替换到 where 子句
+				exprs := sqlparser.SplitAndExpression(nil, n.Having.Expr)
+				n.Having = nil
+				for _, havingExpr := range exprs {
+					if colName, isCalc := getColNameFromExpr(havingExpr); isCalc {
+						// 如果该列为计算列，则直接添加到 having 子句
+						n.AddHaving(havingExpr)
+					} else {
+						if _, ok := calcExprs[colName]; ok {
+							n.AddHaving(havingExpr)
+						} else {
+							// WHERE 条件不为空，需要对已有的条件进行括号保护，然后再 AND+HAVING
+							if n.Where != nil {
+								n.Where = &sqlparser.Where{
+									Type: sqlparser.WhereStr,
+									Expr: &sqlparser.AndExpr{
+										Left: &sqlparser.ParenExpr{
+											Expr: n.Where.Expr,
+										},
+										Right: havingExpr,
+									},
+								}
+							} else {
+								n.Where = &sqlparser.Where{
+									Type: sqlparser.WhereStr,
+									Expr: havingExpr,
+								}
+							}
+						}
 					}
 				}
-				// 别忘了重置 HAVING 和 Where.Type
-				n.Where.Type = "where"
-				n.Having = nil
 			}
 		}
 		return true, nil
@@ -839,6 +856,76 @@ func (rw *Rewrite) RewriteHaving() *Rewrite {
 	common.LogIfError(err, "")
 	rw.NewSQL = sqlparser.String(rw.Stmt)
 	return rw
+}
+
+// getCalcExprFromSelect 获取 select 语句中的计算列
+func getCalcExprFromSelect(stmt sqlparser.Statement) map[string]string {
+	calcExpr := make(map[string]string)
+	switch v := stmt.(type) {
+	case *sqlparser.Select:
+		for _, selectExpr := range v.SelectExprs {
+			switch ex := selectExpr.(type) {
+			case *sqlparser.AliasedExpr:
+				switch x := ex.Expr.(type) {
+				case *sqlparser.ColName:
+					continue
+				default:
+					if !ex.As.IsEmpty() {
+						calcExpr[ex.As.String()] = sqlparser.String(x)
+					}
+					calcExpr[sqlparser.String(x)] = sqlparser.String(x)
+				}
+			}
+		}
+
+		if v.Having != nil {
+			exprs := sqlparser.SplitAndExpression(nil, v.Having.Expr)
+			for _, expr := range exprs {
+				colName, isAgg := getColNameFromExpr(expr)
+				if isAgg {
+					calcExpr[colName] = colName
+				}
+			}
+		}
+
+		if v.OrderBy != nil {
+			for _, order := range v.OrderBy {
+				exprs := sqlparser.SplitAndExpression(nil, order.Expr)
+				for _, expr := range exprs {
+					colName, isAgg := getColNameFromExpr(expr)
+					if isAgg {
+						calcExpr[colName] = colName
+					}
+				}
+			}
+		}
+	default:
+		return nil
+	}
+
+	return calcExpr
+}
+
+// getColNameFromExpr 从 expr 中获取列名与该列是否为计算列
+func getColNameFromExpr(expr sqlparser.SQLNode) (colName string, isCalc bool) {
+	switch v := expr.(type) {
+	case *sqlparser.ComparisonExpr:
+		return getColNameFromExpr(v.Left)
+	case *sqlparser.RangeCond:
+		return getColNameFromExpr(v.Left)
+	case *sqlparser.FuncExpr:
+		return sqlparser.String(v), true
+	case sqlparser.SelectExprs:
+		return getColNameFromExpr(v[0])
+	case *sqlparser.AliasedExpr:
+		if !v.As.IsEmpty() {
+			return getColNameFromExpr(v.Expr)
+		}
+		return sqlparser.String(v), false
+	case *sqlparser.ColName:
+		return v.Name.String(), false
+	}
+	return "", false
 }
 
 // RewriteAddOrderByNull orderbynull: 对应 CLA.008，GROUP BY 无排序要求时添加 ORDER BY NULL
