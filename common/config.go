@@ -236,7 +236,7 @@ type Dsn struct {
 	Loc              string            `yaml:"loc"`                // Location for time.Time values
 	TLS              string            `yaml:"tls"`                // TLS configuration name
 	ServerPubKey     string            `yaml:"server-public-key"`  // Server public key name
-	MaxAllowedPacket int               `ymal:"max-allowed-packet"` // Max packet size allowed
+	MaxAllowedPacket int               `yaml:"max-allowed-packet"` // Max packet size allowed
 	Params           map[string]string `yaml:"params"`             // Other Connection parameters, `SET param=val`, `SET NAMES charset`
 	Timeout          string            `yaml:"timeout"`            // Dial timeout
 	ReadTimeout      string            `yaml:"read-timeout"`       // I/O read timeout
