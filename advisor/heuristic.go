@@ -2793,7 +2793,7 @@ func (q *Query4Audit) RuleAlterCharset() Rule {
 							if option.Tp == tidb.TableOptionCharset ||
 								option.Tp == tidb.TableOptionCollate {
 								//增加CONVERT TO的判断
-								convertReg, _ := regexp.Compile("convert to")
+								convertReg, _ := regexp.Compile("convert\\b\\s+to")
 								if convertReg.Match([]byte(strings.ToLower(q.Query))) {
 									break
 								} else {
