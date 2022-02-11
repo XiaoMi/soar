@@ -23,6 +23,8 @@ test-dsn:
   disable: false
 # 是否允许测试环境与线上环境配置相同
 allow-online-as-test: true
+# 是否允许测试环境数据库版本小于线上环境
+allow-test-ver-older-than-online: false
 # 是否清理测试时产生的临时文件
 drop-test-temporary: true
 # 语法检查小工具
