@@ -53,6 +53,13 @@ func init() {
 			Func:        (*Rewrite).RewriteDML2Select,
 		},
 		{
+			Name:        "reg2select",
+			Description: "使用正则的方式将数据库更新请求转换为只读查询请求，便于执行EXPLAIN",
+			Original:    "DELETE FROM film WHERE length > 100",
+			Suggest:     "select * from film where length > 100",
+			Func:        (*Rewrite).RewriteReg2Select,
+		},
+		{
 			Name:        "star2columns",
 			Description: "为SELECT *补全表的列信息",
 			Original:    "SELECT * FROM film",
@@ -1619,6 +1626,24 @@ func (rw *Rewrite) RewriteDML2Select() *Rewrite {
 	return rw
 }
 
+func (rw *Rewrite) RewriteReg2Select() *Rewrite {
+	var pre = 9
+	if len(rw.SQL) < pre {
+		// SQL to short no need convert
+		return rw
+	}
+	if strings.HasPrefix(strings.ToLower(rw.SQL[:pre]), "select") {
+		rw.NewSQL = rw.SQL
+	}
+	if strings.HasPrefix(strings.ToLower(rw.SQL[:pre]), "update") {
+		rw.NewSQL = regUpdate2Select(rw.SQL)
+	}
+	if strings.HasPrefix(strings.ToLower(rw.SQL[:pre]), "delete") {
+		rw.NewSQL = regDelete2Select(rw.SQL)
+	}
+	return rw
+}
+
 // delete2Select 将 Delete 语句改写成 Select
 func delete2Select(stmt *sqlparser.Delete) string {
 	newSQL := &sqlparser.Select{
@@ -1630,6 +1655,17 @@ func delete2Select(stmt *sqlparser.Delete) string {
 		OrderBy: stmt.OrderBy,
 	}
 	return sqlparser.String(newSQL)
+}
+
+// regDelete2Select convert delete to select by regexp
+func regDelete2Select(sql string) string {
+	sql = strings.TrimSpace(sql)
+	sqlRegexp := regexp.MustCompile(`^(?i)delete\s+from\s+(.*)$`)
+	params := sqlRegexp.FindStringSubmatch(sql)
+	if len(params) > 1 {
+		return fmt.Sprintf(`select * from %s`, params[1])
+	}
+	return sql
 }
 
 // update2Select 将 Update 语句改写成 Select
@@ -1644,6 +1680,17 @@ func update2Select(stmt *sqlparser.Update) string {
 		Limit:   stmt.Limit,
 	}
 	return sqlparser.String(newSQL)
+}
+
+// regUpdate2Select convert update to select by regexp
+func regUpdate2Select(sql string) string {
+	sql = strings.TrimSpace(sql)
+	sqlRegexp := regexp.MustCompile(`^(?i)update\s+(.*)\s+set\s+(.*)\s+(where\s+.*)$`)
+	params := sqlRegexp.FindStringSubmatch(sql)
+	if len(params) > 2 {
+		return fmt.Sprintf(`select * from %s %s`, params[1], params[3])
+	}
+	return sql
 }
 
 // insert2Select 将 Insert 语句改写成 Select

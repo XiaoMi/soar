@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NEEDED_COMMANDS="docker git go govendor retool bats"
+NEEDED_COMMANDS="docker git go retool bats"
 
 for cmd in ${NEEDED_COMMANDS} ; do
     if ! command -v "${cmd}" &> /dev/null ; then
