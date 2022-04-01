@@ -143,24 +143,6 @@ heuristic: doc
 	go test github.com/XiaoMi/soar/advisor -v -update -run TestMergeConflictHeuristicRules
 	docker stop soar-mysql 2>/dev/null || true
 
-# Update vitess vendor
-.PHONY: vitess
-vitess:
-	@echo "$(CGREEN)Update vitess deps ...$(CEND)"
-	govendor fetch -v vitess.io/vitess/...
-
-# Update tidb vendor
-.PHONY: tidb
-tidb:
-	@echo "$(CGREEN)Update tidb deps ...$(CEND)"
-	govendor fetch -v github.com/pingcap/tidb/...
-
-# make pingcap parser
-.PHONY: pingcap-parser
-pingcap-parser: tidb
-	@echo "$(CGREEN)Update pingcap parser deps ...$(CEND)"
-	govendor fetch -v github.com/pingcap/parser/...
-
 # Update all vendor
 .PHONY: vendor
 vendor: vitess pingcap-parser

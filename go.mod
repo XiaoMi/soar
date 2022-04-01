@@ -8,7 +8,7 @@ require (
 	github.com/CorgiMan/json2 v0.0.0-20150213135156-e72957aba209
 	github.com/aquarapid/vaultlib v0.5.1 // indirect
 	github.com/astaxie/beego v1.12.3
-	github.com/buger/jsonparser v0.0.0-20200322175846-f7e751efca13 // indirect
+	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
 	github.com/cyberdelia/go-metrics-graphite v0.0.0-20161219230853-39f87cc3b432 // indirect
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
@@ -55,7 +55,7 @@ require (
 	github.com/sjmudd/stopwatch v0.0.0-20170613150411-f380bf8a9be1 // indirect
 	github.com/spf13/cobra v1.1.1 // indirect
 	github.com/spyzhov/ajson v0.4.2 // indirect
-	github.com/tidwall/gjson v1.7.5
+	github.com/tidwall/gjson v1.12.1
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect

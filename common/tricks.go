@@ -126,7 +126,9 @@ func jsonFind(json string, name string, find *[]string) (next []string) {
 }
 
 // JSONFind iterate find name in json
+// TODO: for complicate SQL JSONFind will run a long time for json interactions.
 func JSONFind(json string, name string) []string {
+	Log.Debug("Entering function: %s", GetFunctionName())
 	var find []string
 	next := []string{json}
 	for len(next) > 0 {
@@ -136,6 +138,7 @@ func JSONFind(json string, name string) []string {
 		}
 		next = tmpNext
 	}
+	Log.Debug("Exiting function: %s", GetFunctionName())
 	return find
 }
 

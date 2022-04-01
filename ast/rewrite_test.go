@@ -587,6 +587,31 @@ func TestRewriteDML2Select(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
+func TestRewriteReg2Select(t *testing.T) {
+	common.Log.Debug("Entering function: %s", common.GetFunctionName())
+	testSQL := []map[string]string{
+		{
+			"input":  "select 1 from dual",
+			"output": "select 1 from dual",
+		},
+		{
+			"input":  "delete from dual",
+			"output": "select * from dual",
+		},
+		{
+			"input":  "update tb set col = 1 where col = 2",
+			"output": "select * from tb where col = 2",
+		},
+	}
+	for _, sql := range testSQL {
+		rw := NewRewrite(sql["input"]).RewriteReg2Select()
+		if rw.NewSQL != sql["output"] {
+			t.Errorf("want: %s\ngot: %s", sql["output"], rw.NewSQL)
+		}
+	}
+	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
+}
+
 func TestRewriteDistinctStar(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	testSQL := []map[string]string{
