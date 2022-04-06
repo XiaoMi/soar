@@ -172,7 +172,7 @@ func (vEnv *VirtualEnv) CleanupTestDatabase() {
 			continue
 		}
 		s := strings.Split(testDatabase, "_")
-		pastTime, err := time.Parse("060102150405", s[1])
+		pastTime, err := time.ParseInLocation("060102150405", s[1], time.Local)
 		if err != nil {
 			common.Log.Error("CleanupTestDatabase compute  pastTime Error: %s", err.Error())
 			continue
