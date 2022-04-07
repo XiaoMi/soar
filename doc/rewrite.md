@@ -16,6 +16,20 @@ DELETE FROM film WHERE length > 100
 ```sql
 select * from film where length > 100
 ```
+## reg2select
+* **Description**:使用正则的方式将数据库更新请求转换为只读查询请求，便于执行EXPLAIN
+
+* **Original**:
+
+```sql
+DELETE FROM film WHERE length > 100
+```
+
+* **Suggest**:
+
+```sql
+select * from film where length > 100
+```
 ## star2columns
 * **Description**:为SELECT *补全表的列信息
 

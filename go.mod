@@ -51,6 +51,7 @@ require (
 	github.com/russross/blackfriday v1.6.0
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/samuel/go-zookeeper v0.0.0-20200724154423-2164a8ac840e // indirect
+	github.com/shirou/gopsutil v3.21.2+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/sjmudd/stopwatch v0.0.0-20170613150411-f380bf8a9be1 // indirect
 	github.com/spf13/cobra v1.1.1 // indirect

@@ -159,8 +159,17 @@ lint: build
 release: build
 	@echo "$(CGREEN)Cross platform building for release ...$(CEND)"
 	@mkdir -p release
-	@for GOOS in darwin linux windows; do \
+	@for GOOS in linux windows; do \
 		for GOARCH in amd64; do \
+			for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
+				b=$$(basename $${d}) ; \
+				echo "Building $${b}.$${GOOS}-$${GOARCH} ..."; \
+				CGO_ENABLED=0 GOOS=$${GOOS} GOARCH=$${GOARCH} go build ${GCFLAGS} ${LDFLAGS} -v -o release/$${b}.$${GOOS}-$${GOARCH} $$d 2>/dev/null ; \
+			done ; \
+		done ;\
+	done
+	@for GOOS in darwin; do \
+		for GOARCH in arm64 amd64; do \
 			for d in $$(go list -f '{{if (eq .Name "main")}}{{.ImportPath}}{{end}}' ./...); do \
 				b=$$(basename $${d}) ; \
 				echo "Building $${b}.$${GOOS}-$${GOARCH} ..."; \

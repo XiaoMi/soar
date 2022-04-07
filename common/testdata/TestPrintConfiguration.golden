@@ -9,7 +9,7 @@ online-dsn:
   loc: UTC
   tls: ""
   server-public-key: ""
-  maxallowedpacket: 4194304
+  max-allowed-packet: 4194304
   params:
     charset: utf8
   timeout: 3s
@@ -29,7 +29,7 @@ test-dsn:
   loc: UTC
   tls: ""
   server-public-key: ""
-  maxallowedpacket: 4194304
+  max-allowed-packet: 4194304
   params:
     charset: utf8
   timeout: 3s
