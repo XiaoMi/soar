@@ -665,13 +665,14 @@ func TestRuleIPString(t *testing.T) {
 }
 
 // LIT.002
-func TestRuleDataNotQuote(t *testing.T) {
+func TestRuleDateNotQuote(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := [][]string{
 		{
 			"select col1,col2 from tbl where time < 2018-01-10",
 			"select col1,col2 from tbl where time < 18-01-10",
 			"INSERT INTO tb1 SELECT * FROM tb2 WHERE time < 2020-01-10",
+			`select * from tb where col < ' 2022-01-10'`,
 		},
 		{
 			"select col1,col2 from tbl where time < '2018-01-10'",
@@ -684,7 +685,7 @@ func TestRuleDataNotQuote(t *testing.T) {
 	for _, sql := range sqls[0] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
-			rule := q.RuleDataNotQuote()
+			rule := q.RuleDateNotQuote()
 			if rule.Item != "LIT.002" {
 				t.Error("Rule not match:", rule.Item, "Expect : LIT.002")
 			}
@@ -696,7 +697,7 @@ func TestRuleDataNotQuote(t *testing.T) {
 	for _, sql := range sqls[1] {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
-			rule := q.RuleDataNotQuote()
+			rule := q.RuleDateNotQuote()
 			if rule.Item != "OK" {
 				t.Error("Rule not match:", rule.Item, "Expect : OK")
 			}

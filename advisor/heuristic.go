@@ -960,8 +960,8 @@ func (q *Query4Audit) RuleIPString() Rule {
 	return rule
 }
 
-// RuleDataNotQuote LIT.002
-func (q *Query4Audit) RuleDataNotQuote() Rule {
+// RuleDateNotQuote LIT.002
+func (q *Query4Audit) RuleDateNotQuote() Rule {
 	var rule = q.RuleOK()
 
 	// by pass insert except, insert select
@@ -984,6 +984,10 @@ func (q *Query4Audit) RuleDataNotQuote() Rule {
 		re = regexp.MustCompile(`^['"\w-].*`)
 		if re.FindString(sql) == "" {
 			rule = HeuristicRules["LIT.002"]
+			if position := re.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
+			return rule
 		}
 	}
 
@@ -993,13 +997,13 @@ func (q *Query4Audit) RuleDataNotQuote() Rule {
 	for _, sql := range sqls {
 		re = regexp.MustCompile(`^['"\w-].*`)
 		if re.FindString(sql) == "" {
+			if position := re.FindIndex([]byte(q.Query)); len(position) > 0 {
+				rule.Position = position[0]
+			}
 			rule = HeuristicRules["LIT.002"]
 		}
 	}
 
-	if position := re.FindIndex([]byte(q.Query)); len(position) > 0 {
-		rule.Position = position[0]
-	}
 	return rule
 }
 

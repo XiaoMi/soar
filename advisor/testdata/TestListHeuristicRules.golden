@@ -956,7 +956,7 @@ insert into tbl (IP,name) values('10.20.306.122','test')
 
 * **Item**:LIT.002
 * **Severity**:L4
-* **Content**:诸如“WHERE col <2010-02-12”之类的查询是有效的SQL，但可能是一个错误，因为它将被解释为“WHERE col <1996”; 日期/时间文字应该加引号。
+* **Content**:诸如“WHERE col <2010-02-12”之类的查询是有效的SQL，但可能是一个错误，因为它将被解释为“WHERE col <1996”; 日期/时间文字应该加引号，且引号前后不应有空格。
 * **Case**:
 
 ```sql

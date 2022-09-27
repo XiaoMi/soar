@@ -4416,7 +4416,7 @@ GROUP BY
 
 * **Content:**  为列description添加索引，散粒度为: n%; 
 
-* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_description\` (\`description\`(255)) ;
+* **Case:** ALTER TABLE \`sakila\`.\`film\` add index \`idx\_description\` (\`description\`(191)) ;
 
 
 
@@ -4530,7 +4530,7 @@ ORDER BY
 
 | id | select\_type | table | partitions | type | possible_keys | key | key\_len | ref | rows | filtered | scalability | Extra |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1  | SIMPLE | *NULL* | NULL | NULL | NULL | NULL | NULL | NULL | 0 | n% | NULL | Impossible WHERE |
+| 1  | SIMPLE | *t* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | n% | ☠️ **O(n)** | Using where; Using filesort |
 
 
 
@@ -4540,9 +4540,15 @@ ORDER BY
 
 * **SIMPLE**: 简单SELECT(不使用UNION或子查询等).
 
+#### Type信息解读
+
+* ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
+
 #### Extra信息解读
 
-* **Impossible WHERE**: WHERE条件过滤没有效果, 最终是全表扫描.
+* **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
+
+* ☠️ **Using filesort**: MySQL会对结果使用一个外部索引排序,而不是从表里按照索引次序读到相关内容. 可能在内存或者磁盘上进行排序. MySQL中无法利用索引完成的排序操作称为'文件排序'.
 
 
 ##  为sakila库的city表添加索引
