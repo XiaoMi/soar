@@ -616,28 +616,6 @@ func (q *Query4Audit) RuleDiffGroupByOrderBy() Rule {
 	return rule
 }
 
-// RuleMixOrderBy CLA.007
-func (q *Query4Audit) RuleMixOrderBy() Rule {
-	var rule = q.RuleOK()
-	var direction string
-	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
-		switch n := node.(type) {
-		case sqlparser.OrderBy:
-			for _, order := range n {
-				// 比较相邻两个order by列的方向
-				if direction != "" && order.Direction != direction {
-					rule = HeuristicRules["CLA.007"]
-					return false, nil
-				}
-				direction = order.Direction
-			}
-		}
-		return true, nil
-	}, q.Stmt)
-	common.LogIfError(err, "")
-	return rule
-}
-
 // RuleExplicitOrderBy CLA.008
 func (q *Query4Audit) RuleExplicitOrderBy() Rule {
 	var rule = q.RuleOK()

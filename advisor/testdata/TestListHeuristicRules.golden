@@ -272,16 +272,6 @@ select id from test where id=1 order by id
 ```sql
 select tb1.col, tb2.col from tb1, tb2 where id=1 group by tb1.col, tb2.col
 ```
-## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
-
-* **Item**:CLA.007
-* **Severity**:L2
-* **Content**:ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
-* **Case**:
-
-```sql
-select c1,c2,c3 from t1 where c1='foo' order by c2 desc, c3 asc
-```
 ## 请为 GROUP BY 显示添加 ORDER BY 条件
 
 * **Item**:CLA.008
@@ -846,7 +836,7 @@ CREATE TABLE tbl (a int);
 
 * **Item**:KEY.008
 * **Severity**:L4
-* **Content**:在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
+* **Content**:在 MySQL 8.0 之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
 * **Case**:
 
 ```sql

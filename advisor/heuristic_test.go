@@ -340,26 +340,6 @@ func TestRuleDiffGroupByOrderBy(t *testing.T) {
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
 
-// CLA.007
-func TestRuleMixOrderBy(t *testing.T) {
-	common.Log.Debug("Entering function: %s", common.GetFunctionName())
-	sqls := []string{
-		"select c1,c2,c3 from t1 where c1='foo' order by c2 desc, c3 asc",
-	}
-	for _, sql := range sqls {
-		q, err := NewQuery4Audit(sql)
-		if err == nil {
-			rule := q.RuleMixOrderBy()
-			if rule.Item != "CLA.007" {
-				t.Error("Rule not match:", rule.Item, "Expect : CLA.007")
-			}
-		} else {
-			t.Error("sqlparser.Parse Error:", err)
-		}
-	}
-	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
-}
-
 // CLA.008
 func TestRuleExplicitOrderBy(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
@@ -3016,9 +2996,13 @@ func TestRuleOrderByMultiDirection(t *testing.T) {
 	sqls := [][]string{
 		{
 			`SELECT col FROM tbl order by col desc, col2 asc`,
+			`SELECT col FROM tbl order by col desc, col2`,
+			`SELECT col FROM tbl order by col, col2 desc`,
 		},
 		{
 			`SELECT col FROM tbl order by col, col2`,
+			`SELECT col FROM tbl order by col desc, col2 desc`,
+			`SELECT col FROM tbl order by col asc, col2 asc`,
 		},
 	}
 	for _, sql := range sqls[0] {

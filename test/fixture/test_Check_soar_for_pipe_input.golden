@@ -577,7 +577,7 @@ ORDER BY
 
 # Query: 6E9B96CA3F0E6BDA
 
-★ ★ ★ ☆ ☆ 65分
+★ ★ ★ ☆ ☆ 75分
 
 ```sql
 
@@ -590,14 +590,6 @@ WHERE
 ORDER BY  
   release_year  ASC, language_id  DESC
 ```
-
-## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
-
-* **Item:**  CLA.007
-
-* **Severity:**  L2
-
-* **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
 
 ## 不建议使用 SELECT * 类型查询
 
@@ -613,7 +605,7 @@ ORDER BY
 
 * **Severity:**  L4
 
-* **Content:**  在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
+* **Content:**  在 MySQL 8.0 之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
 
 # Query: 2EAACFD7030EA528
 
@@ -2024,7 +2016,7 @@ FROM
 
 # Query: E48A20D0413512DA
 
-★ ★ ☆ ☆ ☆ 50分
+★ ★ ★ ☆ ☆ 60分
 
 ```sql
 
@@ -2055,14 +2047,6 @@ ORDER BY
 * **Severity:**  L0
 
 * **Content:**  在列或表别名(如"tbl AS alias")中, 明确使用 AS 关键字比隐含别名(如"tbl alias")更易懂。
-
-## ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引
-
-* **Item:**  CLA.007
-
-* **Severity:**  L2
-
-* **Content:**  ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。
 
 ## 同一张表被连接两次
 
@@ -2329,7 +2313,7 @@ ORDER BY
 
 * **Severity:**  L4
 
-* **Content:**  在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
+* **Content:**  在 MySQL 8.0 之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。
 
 # Query: C11ECE7AE5F80CE5
 

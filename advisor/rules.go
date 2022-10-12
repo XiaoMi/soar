@@ -341,14 +341,6 @@ func InitHeuristicRules() {
 			Case:     "select tb1.col, tb2.col from tb1, tb2 where id=1 group by tb1.col, tb2.col",
 			Func:     (*Query4Audit).RuleDiffGroupByOrderBy,
 		},
-		"CLA.007": {
-			Item:     "CLA.007",
-			Severity: "L2",
-			Summary:  "ORDER BY 语句对多个不同条件使用不同方向的排序无法使用索引",
-			Content:  `ORDER BY 子句中的所有表达式必须按统一的 ASC 或 DESC 方向排序，以便利用索引。`,
-			Case:     "select c1,c2,c3 from t1 where c1='foo' order by c2 desc, c3 asc",
-			Func:     (*Query4Audit).RuleMixOrderBy,
-		},
 		"CLA.008": {
 			Item:     "CLA.008",
 			Severity: "L2",
@@ -830,7 +822,7 @@ func InitHeuristicRules() {
 			Item:     "KEY.008",
 			Severity: "L4",
 			Summary:  "ORDER BY 多个列但排序方向不同时可能无法使用索引",
-			Content:  `在 MySQL 8.0之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。`,
+			Content:  `在 MySQL 8.0 之前当 ORDER BY 多个列指定的排序方向不同时将无法使用已经建立的索引。`,
 			Case:     "SELECT * FROM tbl ORDER BY a DESC, b ASC;",
 			Func:     (*Query4Audit).RuleOrderByMultiDirection,
 		},
