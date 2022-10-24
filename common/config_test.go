@@ -133,8 +133,11 @@ func TestArgConfig(t *testing.T) {
 	}
 	testArgs2 := [][]string{
 		{"soar", "-config", "soar.yaml"},
+		{"soar", "--config", "soar.yaml"},
 		{"soar", "-config", "=soar.yaml"},
+		{"soar", "--config", "=soar.yaml"},
 		{"soar", "-config=soar.yaml"},
+		{"soar", "--config=soar.yaml"},
 	}
 	for _, args := range testArgs1 {
 		os.Args = args

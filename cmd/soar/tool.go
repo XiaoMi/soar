@@ -41,8 +41,9 @@ func initConfig() {
 
 	for i, c := range os.Args {
 		// 如果指定了 -config, 它必须是第一个参数
-		if strings.HasPrefix(c, "-config") && i != 1 {
-			fmt.Println("-config must be the first arg")
+		if (strings.HasPrefix(c, "-config") || strings.HasPrefix(c, "--config")) &&
+			i != 1 {
+			fmt.Println("--config must be the first arg")
 			os.Exit(1)
 		}
 		// 等号两边请不要加空格

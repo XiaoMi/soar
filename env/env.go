@@ -44,23 +44,43 @@ type VirtualEnv struct {
 }
 
 // NewVirtualEnv 初始化一个新的测试环境
-func NewVirtualEnv(vEnv *database.Connector) *VirtualEnv {
-	return &VirtualEnv{
-		Connector: vEnv,
+func NewVirtualEnv() *VirtualEnv {
+	conn, err := database.NewConnector(common.Config.TestDSN)
+	common.LogIfError(err, "")
+
+	// validate test-dsn
+	_, err = conn.Version()
+	if err != nil && common.Config.TestDSN.Disable != true {
+		common.Log.Warn("test-dsn: %s, try to start built-in dolt database", err.Error())
+		go NewDoltDB()
+		for i := 0; i < 3; i++ {
+			time.Sleep(5 * time.Millisecond)
+			conn, err = database.NewConnector(common.Config.TestDSN)
+			common.LogIfError(err, "")
+			err = conn.Conn.Ping()
+			if err == nil {
+				common.Log.Info("built-in dolt database started, address: %s", common.Config.TestDSN.Addr)
+				break
+			}
+		}
+	}
+
+	vEnv := &VirtualEnv{
+		Connector: conn,
 		DBRef:     make(map[string]string),
 		Hash2DB:   make(map[string]string),
 		TableMap:  make(map[string]map[string]string),
 	}
+
+	return vEnv
 }
 
 // BuildEnv 测试环境初始化&连接线上环境检查
 // @output *VirtualEnv	测试环境
 // @output *database.Connector 线上环境连接句柄
 func BuildEnv() (*VirtualEnv, *database.Connector) {
-	connTest, err := database.NewConnector(common.Config.TestDSN)
-	common.LogIfError(err, "")
 	// 生成测试环境
-	vEnv := NewVirtualEnv(connTest)
+	vEnv := NewVirtualEnv()
 
 	// 检查测试环境可用性，并记录数据库版本
 	vEnvVersion, err := vEnv.Version()
@@ -420,24 +440,29 @@ func (vEnv *VirtualEnv) createDatabase(rEnv *database.Connector) error {
 }
 
 /*
-	@input:
-		database.Connector 为一个线上环境数据库连接句柄的复制，因为在处理SQL时需要对上下文进行关联处理，
-		所以存在修改DB连接参数（主要是数据库名称变更）的可能性，为了不影响整体上下文的环境，所以需要一个镜像句柄来做当前环境的操作。
+@input:
 
-		dbName, tbName: 需要在环境中操作的库表名称，
+	database.Connector 为一个线上环境数据库连接句柄的复制，因为在处理SQL时需要对上下文进行关联处理，
+	所以存在修改DB连接参数（主要是数据库名称变更）的可能性，为了不影响整体上下文的环境，所以需要一个镜像句柄来做当前环境的操作。
 
-	@output:
-		return 执行过程中的错误
+	dbName, tbName: 需要在环境中操作的库表名称，
 
-	NOTE:
-		该函数会将线上环境中使用到的库表结构复制到测试环境中，为后续操作提供基础环境。
-		传入的库表名称均来自于对AST的解析，库表名称的获取遵循以下原则：
-			如果未在SQL中指定数据库名称，则数据库一定是配置文件（或命令行参数传入DSN）中指定的数据库
-			如果一个SQL中存在多个数据库，则只能有一个数据库是没有在SQL中被显示指定的（即DSN中指定的数据库）
-	TODO:
-		在一些可能的情况下，由于数据库配置的不一致（如SQL_MODE不同）导致remote环境的库表无法正确的在测试环境进行同步，
-		soar 能够做出判断并进行 session 级别的修改，但是这一阶段可用性保证应该是由用户提供两个完全相同（或测试环境兼容线上环境）
-		的数据库环境来实现的。
+@output:
+
+	return 执行过程中的错误
+
+NOTE:
+
+	该函数会将线上环境中使用到的库表结构复制到测试环境中，为后续操作提供基础环境。
+	传入的库表名称均来自于对AST的解析，库表名称的获取遵循以下原则：
+		如果未在SQL中指定数据库名称，则数据库一定是配置文件（或命令行参数传入DSN）中指定的数据库
+		如果一个SQL中存在多个数据库，则只能有一个数据库是没有在SQL中被显示指定的（即DSN中指定的数据库）
+
+TODO:
+
+	在一些可能的情况下，由于数据库配置的不一致（如SQL_MODE不同）导致remote环境的库表无法正确的在测试环境进行同步，
+	soar 能够做出判断并进行 session 级别的修改，但是这一阶段可用性保证应该是由用户提供两个完全相同（或测试环境兼容线上环境）
+	的数据库环境来实现的。
 */
 func (vEnv *VirtualEnv) createTable(rEnv *database.Connector, tbName string) error {
 	// 判断数据库是否已经创建

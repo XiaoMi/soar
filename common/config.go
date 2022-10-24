@@ -976,8 +976,8 @@ func ListReportTypes() {
 // ArgConfig get -config arg value from cli
 func ArgConfig() string {
 	var configFile string
-	if len(os.Args) > 1 && strings.HasPrefix(os.Args[1], "-config") {
-		if os.Args[1] == "-config" && len(os.Args) > 2 {
+	if len(os.Args) > 1 && (strings.HasPrefix(os.Args[1], "-config") || strings.HasPrefix(os.Args[1], "--config")) {
+		if (os.Args[1] == "-config" || os.Args[1] == "--config") && len(os.Args) > 2 {
 			if os.Args[2] == "=" && len(os.Args) > 3 {
 				// -config = soar.yaml not support
 				fmt.Println("wrong format, no space between '=', eg: -config=soar.yaml")
@@ -996,7 +996,7 @@ func ArgConfig() string {
 		}
 	} else {
 		for i, c := range os.Args {
-			if strings.HasPrefix(c, "-config") && i != 1 {
+			if (strings.HasPrefix(c, "-config") || strings.HasPrefix(c, "--config")) && i != 1 {
 				fmt.Println("-config must be the first arg")
 			}
 		}
