@@ -124,6 +124,16 @@ func (db *Connector) ShowTableStatus(tableName string) (*TableStatInfo, error) {
 	// 执行 show table status
 	res, err := db.Query(fmt.Sprintf("show table status where name = '%s'", Escape(tbStatus.Name, false)))
 	if err != nil {
+		// 部分 MySQL 协议的数据库不支持 show table status 语法，从 information_schema.TABLES 表查
+		res, err = db.Query(fmt.Sprintf("SELECT `TABLE_NAME` AS `Name`, `ENGINE` AS `Engine`, `VERSION` AS `Version`, "+
+			"`ROW_FORMAT` AS `Row_format`, `TABLE_ROWS` AS `Rows`, `AVG_ROW_LENGTH` AS `Avg_row_length`, `DATA_LENGTH` AS `Data_length`, "+
+			"`MAX_DATA_LENGTH` AS `Max_data_length`, `INDEX_LENGTH` AS `Index_length`, `DATA_FREE` AS `Data_free`, "+
+			"`AUTO_INCREMENT` AS `Auto_increment`, `CREATE_TIME` AS `Create_time`, `UPDATE_TIME` AS `Update_time`, `CHECK_TIME` AS `Check_time`, "+
+			"`TABLE_COLLATION` AS `Collation`, `CHECKSUM` AS `Checksum`, `CREATE_OPTIONS` AS `Create_options`, `TABLE_COMMENT` AS `Comment` "+
+			"FROM information_schema.TABLES WHERE TABLE_NAME = '%s' AND TABLE_SCHEMA = '%s'",
+			Escape(tbStatus.Name, false), Escape(db.Database, false)))
+	}
+	if err != nil {
 		return tbStatus, err
 	}
 
@@ -220,6 +230,15 @@ func (db *Connector) ShowIndex(tableName string) (*TableIndexInfo, error) {
 
 	// 执行 show create table
 	res, err := db.Query(fmt.Sprintf("show index from `%s`.`%s`", Escape(db.Database, false), Escape(tableName, false)))
+	if err != nil {
+		// 部分 MySQL 协议的数据库不支持 show index 语法，从 information_schema.STATISTICS 查询
+		res, err = db.Query(fmt.Sprintf(
+			"SELECT `TABLE_NAME` AS `Table`, `NON_UNIQUE` AS `Non_unique`, `INDEX_NAME` AS `Key_name`, `SEQ_IN_INDEX` AS `Seq_in_index`, "+
+				"`COLUMN_NAME` AS `Column_name`, `COLLATION` AS `Collation`, `CARDINALITY` AS `Cardinality`, `SUB_PART` AS `Sub_part`, "+
+				"`PACKED` AS `Packed`, `NULLABLE` AS `Null`, `INDEX_TYPE` AS `Index_type`, `COMMENT` AS `Comment`, `INDEX_COMMENT` AS `Index_comment` "+
+				"FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'",
+			Escape(db.Database, false), Escape(tableName, false)))
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -357,9 +376,14 @@ func NewTableDesc(tableName string) *TableDesc {
 // ShowColumns 获取 DB 中所有的 columns
 func (db *Connector) ShowColumns(tableName string) (*TableDesc, error) {
 	tbDesc := NewTableDesc(tableName)
-
 	// 执行 show create table
 	res, err := db.Query(fmt.Sprintf("show full columns from `%s`.`%s`", Escape(db.Database, false), Escape(tableName, false)))
+	if err != nil {
+		res, err = db.Query(fmt.Sprintf("SELECT `COLUMN_NAME` AS `Field`, `DATA_TYPE` AS `Type`, `COLLATION_NAME` AS `Collation`, `IS_NULLABLE` AS `Null`, `COLUMN_KEY` AS `Key`, "+
+			"`COLUMN_DEFAULT` AS `Default`, `EXTRA` AS `Extra`, `Privileges` AS `Privileges`, `COLUMN_COMMENT` AS `Comment` "+
+			"FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'",
+			Escape(db.Database, false), Escape(tableName, false)))
+	}
 	if err != nil {
 		return nil, err
 	}

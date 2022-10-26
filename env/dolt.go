@@ -76,6 +76,7 @@ func NewDoltDB() {
 	common.Config.TestDSN.Password = pass
 	common.Config.TestDSN.Net = "tcp"
 	common.Config.TestDSN.Addr = fmt.Sprintf("localhost:%d", port)
+	common.Config.Sampling = false // disable sampling, limit memory usage
 
 	common.Log.Info("starting built-in dolt database, address: localhost:%d", port)
 	err = s.Start()
