@@ -54,6 +54,7 @@ type Configuration struct {
 	OnlineDSN               *Dsn   `yaml:"online-dsn"`                // 线上环境数据库配置
 	TestDSN                 *Dsn   `yaml:"test-dsn"`                  // 测试环境数据库配置
 	AllowOnlineAsTest       bool   `yaml:"allow-online-as-test"`      // 允许 Online 环境也可以当作 Test 环境
+	DisableVersionCheck     bool   `yaml:"disable-version-check"`     // 是否禁用环境检测，开启后表示允许测试环境版本低于线上环境 不建议开启，可能会导致语句执行异常
 	DropTestTemporary       bool   `yaml:"drop-test-temporary"`       // 是否清理Test环境产生的临时库表
 	CleanupTestDatabase     bool   `yaml:"cleanup-test-database"`     // 清理残余的测试数据库（程序异常退出或未开启drop-test-temporary）  issue #48
 	OnlySyntaxCheck         bool   `yaml:"only-syntax-check"`         // 只做语法检查不输出优化建议

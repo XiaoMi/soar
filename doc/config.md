@@ -23,6 +23,8 @@ test-dsn:
   disable: false
 # 是否允许测试环境与线上环境配置相同
 allow-online-as-test: true
+# 是否禁用环境检测，开启后表示允许测试环境版本低于线上环境 不建议开启，可能会导致语句执行异常
+disable-version-check: false
 # 是否清理测试时产生的临时文件
 drop-test-temporary: true
 # 语法检查小工具
