@@ -39,6 +39,7 @@ test-dsn:
   allow-old-passwords: false
   disable: false
 allow-online-as-test: false
+disable-version-check: false
 drop-test-temporary: true
 cleanup-test-database: false
 only-syntax-check: false
