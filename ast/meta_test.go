@@ -87,6 +87,7 @@ func TestFindCondition(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`SELECT * FROM film WHERE length % 20 = 4;`,
+		`select * from actor where actor_id = 1 order by if(first_name="PENELOPE", last_name, "") desc`,
 	}
 	for _, sql := range append(sqls, common.TestSQLs...) {
 		fmt.Println(sql)

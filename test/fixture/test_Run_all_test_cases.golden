@@ -2455,7 +2455,7 @@ FROM
 | 1  | PRIMARY | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 | 2  | UNION | *b* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
-| 3  | UNION RESULT | *<union1,2>* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | n% | ☠️ **O(n)** | Using temporary |
+| 2  | UNION | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -2464,8 +2464,6 @@ FROM
 #### SelectType信息解读
 
 * **PRIMARY**: 最外层的select.
-
-* **UNION RESULT**: UNION查询的结果集.
 
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
@@ -2476,10 +2474,6 @@ FROM
 * **ref**: 连接不能基于关键字选择单个行, 可能查找到多个符合条件的行. 叫做ref是因为索引要跟某个参考值相比较. 这个参考值或者是一个数, 或者是来自一个表里的多表查询的结果值. 例:'SELECT * FROM tbl WHERE idx_col=expr;'.
 
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
 
 
 ## 建议使用 AS 关键字显示声明一个别名
@@ -2537,7 +2531,7 @@ WHERE
 | 1  | PRIMARY | *a* | NULL | ref | idx\_fk\_country\_id | idx\_fk\_country\_id | 2 | sakila.b.country\_id | 5 | n% | O(log n) | Using where; Not exists |
 | 2  | UNION | *a* | NULL | ALL | NULL | NULL | NULL | NULL | 600 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | n% | O(log n) | Using where; Not exists |
-| 3  | UNION RESULT | *<union1,2>* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | n% | ☠️ **O(n)** | Using temporary |
+| 2  | UNION | *b* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.a.country\_id | 1 | n% | O(log n) | Using where; Not exists |
 
 
 
@@ -2546,8 +2540,6 @@ WHERE
 #### SelectType信息解读
 
 * **PRIMARY**: 最外层的select.
-
-* **UNION RESULT**: UNION查询的结果集.
 
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
@@ -2564,8 +2556,6 @@ WHERE
 * **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
 
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
 
 
 ##  为sakila库的city表添加索引
@@ -3827,7 +3817,7 @@ FROM
 | 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 | 2  | UNION | *o* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
-| 3  | UNION RESULT | *<union1,2>* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | n% | ☠️ **O(n)** | Using temporary |
+| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | NULL |
 
 
 
@@ -3837,8 +3827,6 @@ FROM
 
 * **PRIMARY**: 最外层的select.
 
-* **UNION RESULT**: UNION查询的结果集.
-
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
 #### Type信息解读
@@ -3846,10 +3834,6 @@ FROM
 * **eq_ref**: 除const类型外最好的可能实现的连接类型. 它用在一个索引的所有部分被连接使用并且索引是UNIQUE或PRIMARY KEY, 对于每个索引键, 表中只有一条记录与之匹配. 例: 'SELECT * FROM RefTbl, tbl WHERE RefTbl.col=tbl.col;'.
 
 * ☠️ **ALL**: 最坏的情况, 从头到尾全表扫描.
-
-#### Extra信息解读
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
 
 
 ## 建议使用 AS 关键字显示声明一个别名
@@ -4001,7 +3985,7 @@ WHERE
 | 1  | PRIMARY | *o* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.i.city\_id | 1 | ☠️ **100.00%** | O(log n) | Using where; Not exists |
 | 2  | UNION | *o* | NULL | ALL | NULL | NULL | NULL | NULL | 109 | ☠️ **100.00%** | ☠️ **O(n)** | NULL |
 | 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using where; Not exists |
-| 3  | UNION RESULT | *<union1,2>* | NULL | ALL | NULL | NULL | NULL | NULL | 0 | n% | ☠️ **O(n)** | Using temporary |
+| 2  | UNION | *i* | NULL | eq\_ref | PRIMARY | PRIMARY | 2 | sakila.o.country\_id | 1 | ☠️ **100.00%** | O(log n) | Using where; Not exists |
 
 
 
@@ -4010,8 +3994,6 @@ WHERE
 #### SelectType信息解读
 
 * **PRIMARY**: 最外层的select.
-
-* **UNION RESULT**: UNION查询的结果集.
 
 * **UNION**: UNION中的第二个或后面的SELECT查询, 不依赖于外部查询的结果集.
 
@@ -4026,8 +4008,6 @@ WHERE
 * **Not exists**: MySQL能够对LEFT JOIN查询进行优化, 并且在查找到符合LEFT JOIN条件的行后, 则不再查找更多的行.
 
 * **Using where**: WHERE条件用于筛选出与下一个表匹配的数据然后返回给客户端. 除非故意做的全表扫描, 否则连接类型是ALL或者是index, 且在Extra列的值中没有Using Where, 则该查询可能是有问题的.
-
-* ☠️ **Using temporary**: 表示MySQL在对查询结果排序时使用临时表. 常见于排序order by和分组查询group by.
 
 
 ## 建议使用 AS 关键字显示声明一个别名
