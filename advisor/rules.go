@@ -1007,8 +1007,8 @@ func InitHeuristicRules() {
 			Severity: "L2",
 			Summary:  "建表语句中定义为 ON UPDATE CURRENT_TIMESTAMP 的字段不建议包含业务逻辑",
 			Content:  "定义为 ON UPDATE CURRENT_TIMESTAMP 的字段在该表其他字段更新时会联动修改，如果包含业务逻辑用户可见会埋下隐患。后续如有批量修改数据却又不想修改该字段时会导致数据错误。",
-			Case: `CREATE TABLE category (category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,	name VARCHAR(25) NOT NULL, last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY  (category_id)`,
-			Func: (*Query4Audit).RuleCreateOnUpdate,
+			Case:     `CREATE TABLE category (category_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,	name VARCHAR(25) NOT NULL, last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY  (category_id)`,
+			Func:     (*Query4Audit).RuleCreateOnUpdate,
 		},
 		"RES.011": {
 			Item:     "RES.011",
