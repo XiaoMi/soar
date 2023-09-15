@@ -995,12 +995,6 @@ func ArgConfig() string {
 			// -config=soar.yaml
 			configFile = strings.Split(os.Args[1], "=")[1]
 		}
-	} else {
-		for i, c := range os.Args {
-			if strings.HasPrefix(c, "-config") && i != 1 {
-				fmt.Println("-config must be the first arg")
-			}
-		}
 	}
 	return configFile
 }
