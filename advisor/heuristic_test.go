@@ -1649,13 +1649,40 @@ func TestRuleStringConcatenation(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())
 	sqls := []string{
 		`select c1 || coalesce(' ' || c2 || ' ', ' ') || c3 as c from tab;`,
+		`update t1 set c1 = v1 where id in (select id || 1 from t2)`,
+		`update t1 set c1 = v1 where id in (select id 
+			|| 1 from t2)`,
+		`update t1 set c1 = v1 where id in (select id 
+				|| 
+		1 from t2)`,
 	}
 	for _, sql := range sqls {
 		q, err := NewQuery4Audit(sql)
 		if err == nil {
 			rule := q.RuleStringConcatenation()
 			if rule.Item != "FUN.003" {
-				t.Error("Rule not match:", rule.Item, "Expect : FUN.003")
+				t.Error("Rule not match:", rule.Item, "Expect : FUN.003", "SQL: ", sql)
+			}
+		} else {
+			t.Error("sqlparser.Parse Error:", err)
+		}
+	}
+
+	okSqls := []string{
+		`select "a || b" from tab;`,
+		`update t1 set c1 = "{\"key\":\"text or text\"}" where id = 1`,
+		`update t1 set c1 = "{\"key\":\"text||text\"}" where id = 1`,
+		`select " ' or ' " from tab;`,
+		`select " or ' " from tab;`,
+		`select "a or b" from tab;`,
+		"INSERT INTO `order` VALUES (8, \"test\", \"order.salesType==200||order.salesType==201||order.salesType==202\")",
+	}
+	for _, sql := range okSqls {
+		q, err := NewQuery4Audit(sql)
+		if err == nil {
+			rule := q.RuleStringConcatenation()
+			if rule.Item != "OK" {
+				t.Error("Rule not match:", rule.Item, "Expect : OK", "SQL: ", sql)
 			}
 		} else {
 			t.Error("sqlparser.Parse Error:", err)
@@ -1663,7 +1690,6 @@ func TestRuleStringConcatenation(t *testing.T) {
 	}
 	common.Log.Debug("Exiting function: %s", common.GetFunctionName())
 }
-
 // FUN.004
 func TestRuleSysdate(t *testing.T) {
 	common.Log.Debug("Entering function: %s", common.GetFunctionName())

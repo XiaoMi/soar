@@ -1986,13 +1986,57 @@ func (q *Query4Audit) RuleNullUsage() Rule {
 // RuleStringConcatenation FUN.003
 func (q *Query4Audit) RuleStringConcatenation() Rule {
 	var rule = q.RuleOK()
-	re := regexp.MustCompile(`(?i)(\|\|)`)
-	if re.FindString(q.Query) != "" {
-		rule = HeuristicRules["FUN.003"]
-		if position := re.FindIndex([]byte(q.Query)); len(position) > 0 {
-			rule.Position = position[0]
+	// 匹配 or 关键字
+	matchF := func(s string) bool {
+		// 状态：进入下一状态要匹配的字符
+		path := map[int]rune{
+			-1: '\'', // 特殊状态，左侧有单引号，等待匹配单引号
+			0:  ' ',  // 初始态
+			1:  'o',
+			2:  'r',
+			3:  ' ',
 		}
+		status := 0
+		skip := false
+		for _, c := range s {
+			if skip {
+				skip = false
+				continue
+			}
+			switch c {
+			case '\\':
+				skip = true
+			case path[status]:
+				status += 1 // next status
+			case '\'':
+				status = -1
+			default:
+				// 碰到其他字符，如果status = -1，说明在引号中间，保持不变
+				if status != -1 {
+					status = 0
+				}
+			}
+			if status == 4 {
+				return true
+			}
+		}
+		return false
 	}
+	err := sqlparser.Walk(func(node sqlparser.SQLNode) (kontinue bool, err error) {
+		switch n := node.(type) {
+		case *sqlparser.Select:
+			for _, expr := range n.SelectExprs {
+				if matchF(sqlparser.String(expr)) {
+					rule = HeuristicRules["FUN.003"]
+					return false, nil
+				}
+			}
+
+		}
+		return true, nil
+	}, q.Stmt)
+	common.LogIfError(err, "")
+
 	return rule
 }
 
